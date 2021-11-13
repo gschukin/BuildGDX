@@ -111,6 +111,7 @@ public class GDXRenderer implements GLRenderer {
 //	TODO:
 //  Skies panning
 //  Tekwar skies bug
+//  Tekwar mirror + orto bug
 //	Hires detail, glow
 //  Overheadmap sector visible check
 //  Hires sprite alpha

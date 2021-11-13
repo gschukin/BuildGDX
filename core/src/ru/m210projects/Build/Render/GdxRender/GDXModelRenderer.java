@@ -28,6 +28,7 @@ import ru.m210projects.Build.Render.ModelHandle.Voxel.GLVoxel;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Spriteext;
+import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.SPRITE;
 import ru.m210projects.Build.Types.Tile;
@@ -104,7 +105,8 @@ public class GDXModelRenderer {
 			parent.calcFog(pal, shade, vis);
 
 		BuildGdx.gl.glEnable(GL_BLEND);
-		m.render(pal, shade, defs.mdInfo.getParams(tspr.picnum).skinnum, vis, alpha);
+		Tile2model t2m = defs.mdInfo.getParams(tspr.picnum);
+		m.render(pal, shade, t2m != null ? t2m.skinnum : 0, vis, alpha);
 
 		BuildGdx.gl.glFrontFace(GL_CW);
 
