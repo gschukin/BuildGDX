@@ -2076,6 +2076,9 @@ public class Software implements Renderer {
 		daxscale = scale(daxscale, xdimenscale, xdimen << 8);
 		dayscale = scale(dayscale, mulscale(xdimenscale, viewingrangerecip, 16), xdimen << 8);
 
+		if(daxscale == 0 || dayscale == 0)
+			return;
+
 		daxscalerecip = (1 << 30) / daxscale;
 		dayscalerecip = (1 << 30) / dayscale;
 

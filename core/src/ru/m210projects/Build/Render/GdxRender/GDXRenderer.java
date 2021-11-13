@@ -116,6 +116,8 @@ public class GDXRenderer implements GLRenderer {
 //  Overheadmap sector visible check
 //  Hires sprite alpha
 //  Duke E2L2 model invisible
+//  Pelette disabled voxels shade flickering
+//  Software renderer can't render custom voxels
 
 //	Sprite ZFighting
 //	Blood drunk effect
@@ -262,11 +264,11 @@ public class GDXRenderer implements GLRenderer {
 			orphoRen.end();
 
 		// Temporaly code (Tekwar issue)
-		else if (!clearStatus) { // once at frame
-			gl.glClearColor(0.0f, 0.5f, 0.5f, 1);
-			gl.glClear(GL_COLOR_BUFFER_BIT);
-			clearStatus = true;
-		}
+//		else if (!clearStatus) { // once at frame
+//			gl.glClearColor(0.0f, 0.5f, 0.5f, 1);
+//			gl.glClear(GL_COLOR_BUFFER_BIT);
+//			clearStatus = true;
+//		}
 		gl.glClear(GL_DEPTH_BUFFER_BIT);
 
 //		if (shape == null) {
