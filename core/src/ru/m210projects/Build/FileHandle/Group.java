@@ -147,8 +147,7 @@ public abstract class Group {
 	protected abstract boolean open(GroupResource res);
 	
 	public List<GroupResource> getList() {
-		List<GroupResource> list = new ArrayList<GroupResource>();
-		list.addAll(filelist);
+		List<GroupResource> list = new ArrayList<GroupResource>(filelist);
 		return list;
 	}
 	
@@ -182,14 +181,14 @@ public abstract class Group {
 	
 	public String toString()
 	{
-		String txt = "Group name: " + name + "\r\n";
-		txt += "Num files: " + numfiles + "\r\n";
-		txt += "File list: \r\n";
+		StringBuilder txt = new StringBuilder("Group name: " + name + "\r\n");
+		txt.append("Num files: ").append(numfiles).append("\r\n");
+		txt.append("File list: \r\n");
 
 		for(GroupResource res : filelist)
-			txt += res.toString();
+			txt.append(res.toString());
 		
-		return txt;
+		return txt.toString();
 	}
 	
 }

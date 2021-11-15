@@ -281,11 +281,11 @@ public class MD4 {
 		MD4.update(bytes);
 		byte[] b = MD4.digest();
 
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (byte value : b)
-			result += Integer.toString((value & 0xff) + 0x100, 16).substring(1).toUpperCase();
+			result.append(Integer.toString((value & 0xff) + 0x100, 16).substring(1).toUpperCase());
 
-		return result;
+		return result.toString();
 	}
 
 }

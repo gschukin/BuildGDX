@@ -43,8 +43,7 @@ public class Cache1D {
 	}
 
 	public List<Group> getGroupList() {
-		List<Group> out = new ArrayList<Group>();
-		out.addAll(groupfil);
+		List<Group> out = new ArrayList<Group>(groupfil);
 		return out;
 	}
 

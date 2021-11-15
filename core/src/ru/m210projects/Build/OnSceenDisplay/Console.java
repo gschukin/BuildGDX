@@ -453,22 +453,22 @@ public class Console {
 				if(foundText.size() > 1) {
 					Collections.sort(foundText);
 					Println("Symbol listing:", OSDTEXT_RED);
-					String msg = "  ";
+					StringBuilder msg = new StringBuilder("  ");
 					for(int i = 0; i < foundText.size(); i ++)
 		            {
-						msg += foundText.get(i);
+						msg.append(foundText.get(i));
 						for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
-							msg += " ";
+							msg.append(" ");
 		                if (msg.length() > (osdcols - maxwidth))
 		                {
-		                    msg += "\n";
-		                    Print(msg);
+		                    msg.append("\n");
+		                    Print(msg.toString());
 		                    if (i < foundText.size())
-		                    	msg = "  ";
+		                    	msg = new StringBuilder("  ");
 		                }
 		            }
 					if(msg.length() > 2)
-		        	  Println(msg);
+		        	  Println(msg.toString());
 					Println("Found " + foundText.size() + " symbols", OSDTEXT_RED);
 				}
 			}
@@ -930,22 +930,22 @@ public class Console {
 			} else if(foundText.size() > 1) {
 				Collections.sort(foundText);
 				Println("Found " + foundText.size() + " possible completions for " + "\"" + inputText + "\"", OSDTEXT_RED);
-				String msg = "  ";
+				StringBuilder msg = new StringBuilder("  ");
 				for(int i = 0; i < foundText.size(); i ++)
 	            {
-					msg += foundText.get(i);
+					msg.append(foundText.get(i));
 					for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
-						msg += " ";
+						msg.append(" ");
 	                if (msg.length() > (osdcols - maxwidth))
 	                {
-	                    msg += "\n";
-	                    Print(msg);
+	                    msg.append("\n");
+	                    Print(msg.toString());
 	                    if (i < foundText.size() - 1)
-	                    	msg = "  ";
+	                    	msg = new StringBuilder("  ");
 	                }
 	            }
 				if(msg.length() > 2)
-	        	  Println(msg);
+	        	  Println(msg.toString());
 				Println("Press TAB again to cycle through matches", OSDTEXT_RED);
 				tabc = 0;
 				lastmatch = true;

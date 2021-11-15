@@ -189,19 +189,19 @@ public class IniFile {
 		pointer = new ArrayList<Integer>();
 		length = new ArrayList<Integer>();
 
-	    String line;
+	    StringBuilder line;
 	    char c;
 	    int ptr = 0;
 	    while(ptr < data.length) {
-	    	line = "";
+	    	line = new StringBuilder();
 	    	while(ptr < data.length && (c = (char)data[ptr++]) != '\n') {
-	    		line += c;
+	    		line.append(c);
 	    	}
 	    	
-	    	if(isContext(line)) {
+	    	if(isContext(line.toString())) {
 	    		pointer.add(ptr-line.length()-1);
-	    		line = toLowerCase(line.replaceAll("[^a-zA-Z0-9_-]", ""));
-	    		context.put(line, pointer.size()-1);
+	    		line = new StringBuilder(toLowerCase(line.toString().replaceAll("[^a-zA-Z0-9_-]", "")));
+	    		context.put(line.toString(), pointer.size()-1);
 			}
 	    }
 

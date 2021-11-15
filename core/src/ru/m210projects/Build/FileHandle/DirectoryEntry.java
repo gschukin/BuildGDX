@@ -204,19 +204,19 @@ public class DirectoryEntry {
 
 	@Override
 	public String toString() {
-		String out = "Directory name: " + getName() + "\r\n";
-		out += "\r\nSubDirectories: \r\n";
+		StringBuilder out = new StringBuilder("Directory name: " + getName() + "\r\n");
+		out.append("\r\nSubDirectories: \r\n");
 		for (Iterator<String> it = getDirectories().keySet().iterator(); it.hasNext();) {
 			String dir = it.next();
-			out += "\t" + dir + "\r\n";
+			out.append("\t").append(dir).append("\r\n");
 		}
-		out += "\r\nFiles: \r\n";
+		out.append("\r\nFiles: \r\n");
 		for (Iterator<FileEntry> it = getFiles().values().iterator(); it.hasNext();) {
 			FileEntry file = it.next();
-			out += "\t" + file.getFile().getName() + "\r\n";
+			out.append("\t").append(file.getFile().getName()).append("\r\n");
 		}
 
-		return out;
+		return out.toString();
 	}
 
 	public boolean isInited() {

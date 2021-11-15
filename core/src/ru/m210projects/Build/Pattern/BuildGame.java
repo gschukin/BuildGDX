@@ -230,7 +230,7 @@ public abstract class BuildGame extends Game {
 	protected String stackTraceToString(Throwable e) {
 		StringBuilder sb = new StringBuilder();
 		for (StackTraceElement element : e.getStackTrace()) {
-			sb.append("\t" + element.toString());
+			sb.append("\t").append(element.toString());
 			sb.append("\r\n");
 		}
 		return sb.toString();
@@ -240,7 +240,7 @@ public abstract class BuildGame extends Game {
 	{
 		StringBuilder sb = new StringBuilder();
 		for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-			sb.append("\t" + element.toString());
+			sb.append("\t").append(element.toString());
 			sb.append("\r\n");
 		}
 

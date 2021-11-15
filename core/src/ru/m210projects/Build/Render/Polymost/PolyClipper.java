@@ -20,10 +20,8 @@ public class PolyClipper {
 
 		public void set(vsptyp src) {
 			this.x = src.x;
-			for (int i = 0; i < 2; i++)
-				this.cy[i] = src.cy[i];
-			for (int i = 0; i < 2; i++)
-				this.fy[i] = src.fy[i];
+			System.arraycopy(src.cy, 0, this.cy, 0, 2);
+			System.arraycopy(src.fy, 0, this.fy, 0, 2);
 			this.n = src.n;
 			this.p = src.p;
 			this.tag = src.tag;
