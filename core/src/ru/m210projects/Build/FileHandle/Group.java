@@ -41,7 +41,7 @@ public abstract class Group {
 	protected HashMap<String, Integer> lookup = new HashMap<String, Integer>();
 	protected List<GroupResource> filelist = new ArrayList<GroupResource>();
 	
-//	Hashmap не возволяет добавлять два одинаковых файла с разными fileid
+//	Hashmap РЅРµ РІРѕР·РІРѕР»СЏРµС‚ РґРѕР±Р°РІР»СЏС‚СЊ РґРІР° РѕРґРёРЅР°РєРѕРІС‹С… С„Р°Р№Р»Р° СЃ СЂР°Р·РЅС‹РјРё fileid
 //	protected HashMap<String, GroupResource> filelist =  new HashMap<String, GroupResource>();
 	protected HashSet<String> fmtlist =  new HashSet<String>();
 	
