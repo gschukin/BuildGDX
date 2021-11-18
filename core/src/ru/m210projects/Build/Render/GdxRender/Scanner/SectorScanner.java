@@ -1,20 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
 import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.showinvisibility;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.wall;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -259,6 +245,9 @@ public abstract class SectorScanner {
 			pFrustum = portqueue[(pqhead++) & queuemask];
 			sectnum = pFrustum.sectnum;
 			VisibleSector sec = handled[sectnum];
+
+			if (automapping == 1)
+				show2dsector[sectnum >> 3] |= pow2char[sectnum & 7];
 
 			boolean isParallaxCeiling = sector[sectnum].isParallaxCeiling();
 			boolean isParallaxFloor = sector[sectnum].isParallaxFloor();

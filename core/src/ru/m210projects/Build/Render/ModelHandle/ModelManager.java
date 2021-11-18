@@ -84,6 +84,13 @@ public abstract class ModelManager {
 		return mdInfo.getModelInfo(tile) != null;
 	}
 
+	public boolean hasVoxelInfo(int tile) {
+		if (mdInfo == null)
+			return false;
+
+		return mdInfo.getVoxelInfo(tile) != null;
+	}
+
 	public GLModel getModel(int tile, int pal) {
 		if (mdInfo == null)
 			return null;
@@ -215,10 +222,7 @@ public abstract class ModelManager {
 	}
 
 	public void preload(int picnum, int pal, boolean skinPreload) {
-		if (!hasModelInfo(picnum))
-			return;
-
-		if (GLSettings.useModels.get()) {
+		if (GLSettings.useModels.get() && hasModelInfo(picnum)) {
 			GLModel model = getModel(picnum, pal);
 			if (model != null && skinPreload) {
 				if(model instanceof MDModel) {
@@ -229,7 +233,7 @@ public abstract class ModelManager {
 			}
 		}
 
-		if (BuildSettings.useVoxels.get()) {
+		if (BuildSettings.useVoxels.get() && hasVoxelInfo(picnum)) {
 			GLVoxel voxel = (GLVoxel) getVoxel(picnum);
 			if (voxel != null && skinPreload) {
 				voxel.getSkin(pal);

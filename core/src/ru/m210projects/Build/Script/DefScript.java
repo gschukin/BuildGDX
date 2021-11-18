@@ -1656,7 +1656,7 @@ public class DefScript {
 			}
 			script.skipbrace(vmodelend); // close bracke
 
-			vox.setMisc((float) vscale, 0, 0, vrotate ? ModelInfo.MD_ROTATE : 0);
+			vox.setMisc((float) vscale * 65536, 0, 0, vrotate ? ModelInfo.MD_ROTATE : 0);
 			return BaseToken.Ok;
 		}
 	}
