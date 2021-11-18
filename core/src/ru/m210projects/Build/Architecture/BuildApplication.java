@@ -91,6 +91,8 @@ public class BuildApplication implements Application {
 
 						mainLoop();
 					} catch (Throwable t) {
+						t.printStackTrace();
+
 						destroyLoop();
 
 						if (t instanceof RuntimeException)

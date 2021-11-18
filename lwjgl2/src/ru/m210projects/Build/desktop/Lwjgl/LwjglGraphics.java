@@ -274,8 +274,10 @@ public class LwjglGraphics extends BuildGraphics {
 	@Override
 	protected void dispose() {
 		// Workaround for bug in LWJGL whereby resizable state is lost on DisplayMode change
-		Display.setResizable(false);
-		Display.destroy();
+		if(Display.isCreated()) {
+			Display.setResizable(false);
+			Display.destroy();
+		}
 	}
 
 	@Override

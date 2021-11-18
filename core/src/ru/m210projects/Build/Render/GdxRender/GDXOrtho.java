@@ -1037,6 +1037,7 @@ public class GDXOrtho extends OrphoRenderer {
 
 		final float aspectFix = ((dastat & 2) != 0) || ((dastat & 8) == 0) ? ourxyaspect / 65536.0f : 1.0f;
 		final float scale = z / 65536.0f;
+
 		final float xoffs = xoffset * scale;
 		final float yoffs = yoffset * scale;
 		final float width = scale * sizx;
@@ -1070,6 +1071,14 @@ public class GDXOrtho extends OrphoRenderer {
 
 			x3 = x4 = x1 + width * aspectFix;
 			y2 = y3 = y1 + height;
+		}
+
+		if ((dastat & 8) == 0) {
+			float yaspect = windowy2 / (float) ydim;
+			y1 *= yaspect;
+			y2 *= yaspect;
+			y3 *= yaspect;
+			y4 *= yaspect;
 		}
 
 		if(tex.isHighTile()) {

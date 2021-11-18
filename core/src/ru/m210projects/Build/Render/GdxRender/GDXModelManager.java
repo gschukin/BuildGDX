@@ -79,6 +79,7 @@ public class GDXModelManager extends ModelManager {
 					((IndexedShader) parent.manager.getProgram()).setVisibility((int) (-visibility / 64.0f));
 				} else {
 					parent.manager.color(1.0f, 1.0f, 1.0f, alpha);
+					parent.calcFog(pal, shade, visibility);
 				}
 			}
 
