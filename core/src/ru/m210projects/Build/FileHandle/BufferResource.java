@@ -7,7 +7,7 @@ import ru.m210projects.Build.Gameutils;
 
 public class BufferResource extends ByteArrayOutputStream {
 
-	private static byte[] tmpbuf = new byte[1024];
+	private static final byte[] tmpbuf = new byte[1024];
 
 	public BufferResource() {
 		super();

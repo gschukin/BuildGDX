@@ -29,7 +29,7 @@ import ru.m210projects.Build.OnSceenDisplay.Console;
 public class Compat {
 
 	public class CacheList {
-		private DirectoryEntry entry;
+		private final DirectoryEntry entry;
 
 		public CacheList(String path, String userpath) {
 			entry = DirectoryEntry.init(path, userpath);
@@ -53,10 +53,10 @@ public class Compat {
 		}
 	}
 
-	private boolean debug = false;
+	private final boolean debug = false;
 	private final int MAXOPENFILES = 64;
 
-	private FileResource[] list = new FileResource[MAXOPENFILES];
+	private final FileResource[] list = new FileResource[MAXOPENFILES];
 	private int pos = 0;
 
 	private CacheList cache;

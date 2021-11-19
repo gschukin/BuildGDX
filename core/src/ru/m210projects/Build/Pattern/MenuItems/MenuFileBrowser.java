@@ -57,7 +57,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 		}
 	}
 
-	private Comparator<String> fileComparator = new Comparator<String>() {
+	private final Comparator<String> fileComparator = new Comparator<String>() {
 		@Override
 		public int compare(String s1, String s2) {
 			Object o1 = fileUnit.get(s1);
@@ -89,8 +89,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 	protected char[] ffs = "Files".toCharArray();
 
 	private int touchY;
-	private int[] scrollX = new int[2];
-	public boolean scrollTouch[] = new boolean[2];
+	private final int[] scrollX = new int[2];
+	public boolean[] scrollTouch = new boolean[2];
 
 	protected int[] l_nMin;
 	protected int[] l_nFocus;
@@ -101,8 +101,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 	protected int currColumn;
 	protected DirectoryEntry currDir;
 
-	private BuildEngine draw;
-	private SliderDrawable slider;
+	private final BuildEngine draw;
+	private final SliderDrawable slider;
 	private int nBackground = 0;
 	private int scrollerHeight;
 	protected BuildFont topFont, pathFont;
@@ -480,10 +480,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 		touchY = my;
 		if (mx > scrollX[currColumn] && mx < scrollX[currColumn] + slider.getScrollerWidth()) {
-			if (BuildGdx.input.isTouched())
-				scrollTouch[currColumn] = true;
-			else
-				scrollTouch[currColumn] = false;
+			scrollTouch[currColumn] = BuildGdx.input.isTouched();
 			return true;
 		}
 

@@ -27,7 +27,7 @@ import ru.m210projects.Build.Types.BuildVariable.RespondType;
 
 public abstract class MenuRendererSettings extends BuildMenuList {
 
-	private MenuItem title;
+	private final MenuItem title;
 	private Renderer currentRenderer;
 	private PixelFormat currentFormat;
 	public BuildGame app;

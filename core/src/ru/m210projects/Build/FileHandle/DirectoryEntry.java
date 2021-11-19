@@ -28,11 +28,11 @@ import ru.m210projects.Build.FileHandle.Compat.Path;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 public class DirectoryEntry {
-	private HashMap<String, DirectoryEntry> subDirectory;
-	private HashMap<String, FileEntry> files;
-	private String name;
+	private final HashMap<String, DirectoryEntry> subDirectory;
+	private final HashMap<String, FileEntry> files;
+	private final String name;
 	private String relativePath;
-	private String absolutePath;
+	private final String absolutePath;
 	private DirectoryEntry parentDir;
 	private boolean inited;
 

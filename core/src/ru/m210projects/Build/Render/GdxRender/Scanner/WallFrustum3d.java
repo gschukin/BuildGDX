@@ -24,7 +24,7 @@ public class WallFrustum3d implements Poolable {
 	// Viewport
 
 	public Vector3[] bounds = new Vector3[2]; // XXX private
-	private static Vector3[] tmpVec = { new Vector3(), new Vector3(), new Vector3(), new Vector3() };
+	private static final Vector3[] tmpVec = { new Vector3(), new Vector3(), new Vector3(), new Vector3() };
 
 	public WallFrustum3d() {
 		for (int i = 0; i < planes.length; i++) {
@@ -232,10 +232,7 @@ public class WallFrustum3d implements Poolable {
 		bounds[0].y = (viewport.bounds[0].y >= bounds[0].y) ? viewport.bounds[0].y : bounds[0].y;
 		bounds[1].y = (viewport.bounds[1].y <= bounds[1].y) ? viewport.bounds[1].y : bounds[1].y;
 
-		if (bounds[1].x - bounds[0].x <= 0 || bounds[1].y - bounds[0].y <= 0)
-			return false;
-
-		return true;
+		return !(bounds[1].x - bounds[0].x <= 0) && !(bounds[1].y - bounds[0].y <= 0);
 	}
 
 	public static final Plane[] clipPlanes = { new Plane(), new Plane() };

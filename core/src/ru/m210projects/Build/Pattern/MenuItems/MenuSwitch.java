@@ -91,8 +91,7 @@ public class MenuSwitch extends MenuItem
 		int fontx = font.getWidth(sw);
 		int px = x + width - 1 - fontx;
 		if(mx > px && mx < px + fontx)
-			if(my > y && my < y + font.getHeight())
-				return true;
+            return my > y && my < y + font.getHeight();
 		
 		return false;
 	}

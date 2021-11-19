@@ -22,8 +22,8 @@ import java.util.Locale;
 
 public class Date {
 
-	private DateFormat dateFormat;
-	private long launchDate;
+	private final DateFormat dateFormat;
+	private final long launchDate;
 	
 	public Date(String format)
 	{

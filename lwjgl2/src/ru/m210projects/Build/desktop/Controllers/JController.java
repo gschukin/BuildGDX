@@ -172,10 +172,7 @@ public class JController implements BuildController {
 	@Override
 	public boolean buttonStatus(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode]) 
-			return true;
-
-		return false;
+		return buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode];
 	}
 	
 	private void dPadHandler()

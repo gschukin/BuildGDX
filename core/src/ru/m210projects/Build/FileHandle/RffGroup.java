@@ -28,10 +28,10 @@ import ru.m210projects.Build.Types.LittleEndian;
 
 public class RffGroup extends Group {
 
-	private static byte[] readbuf = new byte[1024];
+	private static final byte[] readbuf = new byte[1024];
 	
 	private Resource file = null;
-	private boolean crypted;
+	private final boolean crypted;
 	
 	private class RffResource extends GroupResource {
 		

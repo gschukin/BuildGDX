@@ -178,10 +178,7 @@ public class LwjglInput implements BuildInput {
 					}
 
 					private void updated () {
-						if (textField.getText().length() == 0)
-							placeholderLabel.setVisible(true);
-						else
-							placeholderLabel.setVisible(false);
+						placeholderLabel.setVisible(textField.getText().length() == 0);
 					}
 				});
 

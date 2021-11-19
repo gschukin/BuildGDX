@@ -39,7 +39,7 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 
 public class GDXModelManager extends ModelManager {
 
-	private GDXRenderer parent;
+	private final GDXRenderer parent;
 
 	public GDXModelManager(GDXRenderer parent) {
 		this.parent = parent;

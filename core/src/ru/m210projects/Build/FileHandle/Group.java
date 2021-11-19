@@ -76,8 +76,7 @@ public abstract class Group {
 	public boolean contains(String filename) {
 		if (filename != null) {
 			Integer out = lookup.get(toLowerCase(filename));
-			if(out != null) 
-				return true;
+            return out != null;
 			
 //			GroupResource res = filelist.get(toLowerCase(filename));
 //			if(res != null) 

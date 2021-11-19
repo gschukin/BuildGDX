@@ -45,7 +45,7 @@ public class GrpGroup extends Group {
 
 			this.handleName(fullname);
 
-			this.size = (Integer) file.readInt();
+			this.size = file.readInt();
 			this.offset = offset;
 			
 			if(debug) System.out.println("\t" + filenamext + ", offset: " + offset + ", size: " +  size);

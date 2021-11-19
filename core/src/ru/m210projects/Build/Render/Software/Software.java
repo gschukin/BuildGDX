@@ -129,7 +129,7 @@ public class Software implements Renderer {
 	protected int guniqhudid;
 
 	protected final int MAXPERMS = 512;
-	protected PermFifo permfifo[] = new PermFifo[MAXPERMS];
+	protected PermFifo[] permfifo = new PermFifo[MAXPERMS];
 	protected int permhead = 0, permtail = 0;
 
 	public short[] umost = new short[MAXXDIM], dmost = new short[MAXXDIM];
@@ -188,16 +188,19 @@ public class Software implements Renderer {
 	public int[] reciptable = new int[2048];
 	public int xdimenrecip;
 
-	public int smostwall[] = new int[MAXWALLSB], smostwallcnt = -1, smostcnt;
-	public short smost[] = new short[MAXYSAVES];
-	public int smoststart[] = new int[MAXWALLSB];
+	public int[] smostwall = new int[MAXWALLSB];
+	public int smostwallcnt = -1;
+	public int smostcnt;
+	public short[] smost = new short[MAXYSAVES];
+	public int[] smoststart = new int[MAXWALLSB];
 	public byte[] smostwalltype = new byte[MAXWALLSB];
 
-	public int maskwall[] = new int[MAXWALLSB], maskwallcnt;
-	private int spritesx[] = new int[MAXSPRITESONSCREEN];
-	private int spritesy[] = new int[MAXSPRITESONSCREEN + 1];
-	private int spritesz[] = new int[MAXSPRITESONSCREEN];
-	private SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
+	public int[] maskwall = new int[MAXWALLSB];
+	public int maskwallcnt;
+	private final int[] spritesx = new int[MAXSPRITESONSCREEN];
+	private final int[] spritesy = new int[MAXSPRITESONSCREEN + 1];
+	private final int[] spritesz = new int[MAXSPRITESONSCREEN];
+	private final SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
 
 	public short[] sectorborder = new short[256];
 	public short sectorbordercnt;
@@ -207,11 +210,14 @@ public class Software implements Renderer {
 
 	protected int oxyaspect, oxdimen, oviewingrange;
 
-	private int[] zofslope = new int[2];
+	private final int[] zofslope = new int[2];
 
 	private final int MAXXSIZ = 256;
-	private int[] ggxinc = new int[MAXXSIZ + 1], ggyinc = new int[MAXXSIZ + 1];
-	protected int lowrecip[] = new int[1024], nytooclose, nytoofar;
+	private final int[] ggxinc = new int[MAXXSIZ + 1];
+	private final int[] ggyinc = new int[MAXXSIZ + 1];
+	protected int[] lowrecip = new int[1024];
+	protected int nytooclose;
+	protected int nytoofar;
 	protected int[] distrecip = new int[65536];
 	public boolean novoxmips = false;
 	public boolean isInited = false;
@@ -639,8 +645,8 @@ public class Software implements Renderer {
 		}
 	}
 
-	private int[] cz = new int[5];
-	private int[] fz = new int[5];
+	private final int[] cz = new int[5];
+	private final int[] fz = new int[5];
 
 	@Override
 	public void completemirror() {

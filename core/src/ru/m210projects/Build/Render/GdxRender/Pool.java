@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public abstract class Pool<T> {
 	private int free;
-	private ArrayList<T> instances = new ArrayList<T>();
+	private final ArrayList<T> instances = new ArrayList<T>();
 
 	protected abstract T newObject();
 
@@ -40,7 +40,7 @@ public abstract class Pool<T> {
 		return text;
 	}
 
-	public static interface Poolable {
-		public void reset();
+	public interface Poolable {
+		void reset();
 	}
 }

@@ -13,7 +13,7 @@ import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 
 public abstract class MD3ModelGL20 extends MDModel {
 
-	private Mesh mesh;
+	private final Mesh mesh;
 	private final MD3Surface[] surfaces;
 	private final int numSurfaces;
 

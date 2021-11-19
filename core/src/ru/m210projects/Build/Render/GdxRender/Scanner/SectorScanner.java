@@ -27,33 +27,33 @@ import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
 
 public abstract class SectorScanner {
 
-	private Pool<WallFrustum3d> pFrustumPool = new Pool<WallFrustum3d>() {
+	private final Pool<WallFrustum3d> pFrustumPool = new Pool<WallFrustum3d>() {
 		@Override
 		protected WallFrustum3d newObject() {
 			return new WallFrustum3d();
 		}
 	};
 
-	private Pool<VisibleSector> pSectorPool = new Pool<VisibleSector>() {
+	private final Pool<VisibleSector> pSectorPool = new Pool<VisibleSector>() {
 		@Override
 		protected VisibleSector newObject() {
 			return new VisibleSector();
 		}
 	};
 
-	private Vector2 projPoint = new Vector2();
+	private final Vector2 projPoint = new Vector2();
 
-	private PotentiallyVisibleSet pvs;
+	private final PotentiallyVisibleSet pvs;
 
-	private WallFrustum3d[] portqueue; // to linkedlist
+	private final WallFrustum3d[] portqueue; // to linkedlist
 	private final int queuemask; // pay attention!
 	private int pqhead, pqtail;
 
-	private VisibleSector[] handled;
-	private WallFrustum3d[] gotviewport;
-	private WallFrustum3d[] skyviewport;
-	private byte[] gotwall;
-	private byte[] wallflags;
+	private final VisibleSector[] handled;
+	private final WallFrustum3d[] gotviewport;
+	private final WallFrustum3d[] skyviewport;
+	private final byte[] gotwall;
+	private final byte[] wallflags;
 	protected Engine engine;
 
 	public int[] maskwall = new int[MAXWALLS];
@@ -61,7 +61,7 @@ public abstract class SectorScanner {
 
 	private SECTOR skyFloor, skyCeiling;
 
-	private PolygonClipper cl = new PolygonClipper();
+	private final PolygonClipper cl = new PolygonClipper();
 
 	public SectorScanner(Engine engine) {
 		this.engine = engine;
@@ -406,7 +406,7 @@ public abstract class SectorScanner {
 		}
 	}
 
-	private static Vector3[] tmpVec = { new Vector3(), new Vector3(), new Vector3(), new Vector3() };
+	private static final Vector3[] tmpVec = { new Vector3(), new Vector3(), new Vector3(), new Vector3() };
 
 	public boolean spriteInFrustum(WallFrustum3d frustum, SPRITE tspr) {
 		Vector3[] points = tmpVec;

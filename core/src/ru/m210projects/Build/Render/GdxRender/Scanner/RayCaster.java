@@ -26,14 +26,14 @@ public class RayCaster {
 	protected byte[] handled = new byte[MAXWALLS >> 3];
 	protected boolean globalcheck;
 
-	private Pool<Segment> pSegmentPool = new Pool<Segment>() {
+	private final Pool<Segment> pSegmentPool = new Pool<Segment>() {
 		@Override
 		protected Segment newObject() {
 			return new Segment();
 		}
 	};
 
-	private Pool<EndPoint> pEndpointPool = new Pool<EndPoint>() {
+	private final Pool<EndPoint> pEndpointPool = new Pool<EndPoint>() {
 		@Override
 		protected EndPoint newObject() {
 			return new EndPoint();

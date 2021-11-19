@@ -41,10 +41,10 @@ public class ModelsInfo {
 
 	}
 
-	private Tile2model[] cache = new Tile2model[MAXTILES];
-	private Hudtyp[][] hudInfo = new Hudtyp[2][MAXTILES];
-	private Spritesmooth[] spritesmooth = new Spritesmooth[MAXSPRITES + MAXUNIQHUDID];
-	private SpriteAnim[] spriteanim = new SpriteAnim[MAXSPRITES + MAXUNIQHUDID];
+	private final Tile2model[] cache = new Tile2model[MAXTILES];
+	private final Hudtyp[][] hudInfo = new Hudtyp[2][MAXTILES];
+	private final Spritesmooth[] spritesmooth = new Spritesmooth[MAXSPRITES + MAXUNIQHUDID];
+	private final SpriteAnim[] spriteanim = new SpriteAnim[MAXSPRITES + MAXUNIQHUDID];
 
 	public ModelsInfo() {
 		for (int i = 0; i < spritesmooth.length; i++)

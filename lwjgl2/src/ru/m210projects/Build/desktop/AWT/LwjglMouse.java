@@ -29,11 +29,11 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 
 public class LwjglMouse extends AWTMouse {
 
-	private Method moveMouse;
-	private Method grabMouse;
-	private Method ungrabMouse;
+	private final Method moveMouse;
+	private final Method grabMouse;
+	private final Method ungrabMouse;
 	
-	private Object displayImpl;
+	private final Object displayImpl;
 	private long handle;
 	public static final boolean IS_WINDOWS = BuildGdx.app.getPlatform() == Platform.Windows;
 
@@ -80,7 +80,7 @@ public class LwjglMouse extends AWTMouse {
 		try {
 			handle = getWindowHandle(display.getCanvas());
 			setImplementVariable(IS_WINDOWS ? "hwnd" : "parent_window", handle);
-		} catch (Exception e) { e.printStackTrace(); };
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	private long getWindowHandle(Canvas canvas) throws Exception {

@@ -30,7 +30,7 @@ public class BuildFont {
 
 	public enum TextAlign {
 		Left, Center, Right
-	};
+	}
 
 	public static final int nSpace = -2;
 

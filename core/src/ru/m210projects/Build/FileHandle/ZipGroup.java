@@ -36,7 +36,7 @@ import ru.m210projects.Build.OnSceenDisplay.Console;
 
 public class ZipGroup extends Group {
 
-	private static byte[] readbuf = new byte[1024];
+	private static final byte[] readbuf = new byte[1024];
 
 	private ZipFile zfile;
 
@@ -120,14 +120,14 @@ public class ZipGroup extends Group {
 			}
 
 			@Override
-			public int read(byte b[]) {
+			public int read(byte[] b) {
 				synchronized(parent) {
 					return read(b, 0, b.length);
 				}
 		    }
 
 			@Override
-			public int read(byte b[], int off, int len)
+			public int read(byte[] b, int off, int len)
 			{
 				synchronized(parent) {
 					int var = -1;
@@ -259,8 +259,6 @@ public class ZipGroup extends Group {
 					return -1;
 
 				len = bis.read(buf, offset, len);
-				if(len == -1)
-					return -1;
 
 				return len;
 			}
@@ -516,10 +514,7 @@ public class ZipGroup extends Group {
 	@Override
 	protected boolean open(GroupResource res) {
 		ZipResource zres = (ZipResource) res;
-		if(zres != null && zres.open() != null)
-			return true;
-
-		return false;
+		return zres != null && zres.open() != null;
 	}
 
 

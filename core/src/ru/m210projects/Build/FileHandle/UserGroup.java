@@ -256,7 +256,7 @@ public class UserGroup extends Group {
 		}	
 	}
 
-	private Compat compat;
+	private final Compat compat;
 	protected UserGroup(Compat compat)
 	{
 		this.compat = compat;

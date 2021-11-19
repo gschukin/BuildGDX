@@ -10,7 +10,7 @@ import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 
 public class PolygonClipper {
 
-	private Pool<Vertex> vecs = new Pool<Vertex>() {
+	private final Pool<Vertex> vecs = new Pool<Vertex>() {
 		@Override
 		protected Vertex newObject() {
 			return new Vertex(0, 0);

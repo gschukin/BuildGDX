@@ -717,9 +717,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static int readInt( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static int readInt( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         int ch3 = stream.read();
@@ -742,9 +740,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static long readUInt( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static long readUInt( InputStream stream ) throws IOException {
 		long retNum = readInt(stream);
 		return retNum & 0x00FFFFFFFFl;
     }
@@ -760,9 +756,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static long readLong( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static long readLong( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         int ch3 = stream.read();
@@ -794,15 +788,11 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static short readShort( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static short readShort( InputStream stream ) throws IOException {
         return (short) readUShort( stream );
     }
 
-    public static int readUShort( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static int readUShort( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         if ( ( ch1 | ch2 ) < 0 )

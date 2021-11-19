@@ -2,46 +2,46 @@ package ru.m210projects.Build.Render;
 
 public interface IOverheadMapSettings {
 
-	public enum MapView {
+	enum MapView {
 		Polygons, Lines
-	};
+	}
 
-	public boolean isFullMap();
+    boolean isFullMap();
 
-	public boolean isScrollMode();
+	boolean isScrollMode();
 
-	public int getViewPlayer();
+	int getViewPlayer();
 
-	public boolean isShowSprites(MapView view);
+	boolean isShowSprites(MapView view);
 
-	public boolean isShowFloorSprites();
+	boolean isShowFloorSprites();
 
-	public boolean isShowRedWalls();
+	boolean isShowRedWalls();
 
-	public boolean isShowAllPlayers();
+	boolean isShowAllPlayers();
 
-	public boolean isSpriteVisible(MapView view, int index);
+	boolean isSpriteVisible(MapView view, int index);
 
-	public boolean isWallVisible(int w, int ses);
+	boolean isWallVisible(int w, int ses);
 
-	public int getWallColor(int w, int sec);
+	int getWallColor(int w, int sec);
 
-	public int getWallX(int w);
+	int getWallX(int w);
 
-	public int getWallY(int w);
+	int getWallY(int w);
 
-	public int getSpriteColor(int s);
+	int getSpriteColor(int s);
 
-	public int getSpriteX(int spr);
+	int getSpriteX(int spr);
 
-	public int getSpriteY(int spr);
+	int getSpriteY(int spr);
 
-	public int getSpritePicnum(int spr);
+	int getSpritePicnum(int spr);
 
-	public int getPlayerSprite(int player);
+	int getPlayerSprite(int player);
 
-	public int getPlayerPicnum(int player);
+	int getPlayerPicnum(int player);
 
-	public int getPlayerZoom(int player, int czoom);
+	int getPlayerZoom(int player, int czoom);
 
 }

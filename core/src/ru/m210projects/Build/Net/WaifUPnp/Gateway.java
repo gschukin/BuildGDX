@@ -38,7 +38,7 @@ import org.w3c.dom.traversal.NodeIterator;
  */
 class Gateway {
 
-    private Inet4Address iface;
+    private final Inet4Address iface;
 
     private String serviceType = null, controlURL = null;
 

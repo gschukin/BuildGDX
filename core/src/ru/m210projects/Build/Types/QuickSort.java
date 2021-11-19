@@ -10,8 +10,8 @@ public class QuickSort {
 		elementData[j] = temp;
 	}
 
-	private static int[] base_stack = new int[4 * 8];
-	private static int[] n_stack = new int[4 * 8];
+	private static final int[] base_stack = new int[4 * 8];
+	private static final int[] n_stack = new int[4 * 8];
 
 	private static <E> int med3(E[] elementData, Comparator<? super E> comp, int a, int b, int c) {
 //		return CompareChannels(rxBucket[a], rxBucket[b]) < 0 ?
@@ -139,7 +139,7 @@ public class QuickSort {
 		}
 	}
 
-	public static interface IntComparator {
+	public interface IntComparator {
 		int compare(int o1, int o2);
 	}
 

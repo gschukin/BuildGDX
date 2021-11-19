@@ -46,11 +46,11 @@ public abstract class BuildConfig extends IniFile {
 
 	public interface KeyType {
 
-		public int getNum();
+		int getNum();
 
-		public KeyType setNum(int num);
+		KeyType setNum(int num);
 
-		public String getName();
+		String getName();
 
 	}
 

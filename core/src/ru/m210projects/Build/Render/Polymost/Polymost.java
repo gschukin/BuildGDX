@@ -218,17 +218,20 @@ public class Polymost implements GLRenderer {
 
 	protected SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
 
-	private int spritesx[] = new int[MAXSPRITESONSCREEN + 1];
-	private int spritesy[] = new int[MAXSPRITESONSCREEN + 1];
-	private int spritesz[] = new int[MAXSPRITESONSCREEN + 1];
+	private final int[] spritesx = new int[MAXSPRITESONSCREEN + 1];
+	private final int[] spritesy = new int[MAXSPRITESONSCREEN + 1];
+	private final int[] spritesz = new int[MAXSPRITESONSCREEN + 1];
 
 	protected final static int MAXWALLSB = ((MAXWALLS >> 2) + (MAXWALLS >> 3));
 
-	private short[] p2 = new short[MAXWALLSB], thesector = new short[MAXWALLSB], thewall = new short[MAXWALLSB];
-	private short maskwall[] = new short[MAXWALLSB];
+	private final short[] p2 = new short[MAXWALLSB];
+	private final short[] thesector = new short[MAXWALLSB];
+	private final short[] thewall = new short[MAXWALLSB];
+	private final short[] maskwall = new short[MAXWALLSB];
 	private int maskwallcnt;
 
-	private short[] bunchfirst = new short[MAXWALLSB], bunchlast = new short[MAXWALLSB];
+	private final short[] bunchfirst = new short[MAXWALLSB];
+	private final short[] bunchlast = new short[MAXWALLSB];
 
 	private int global_cf_z;
 	private float global_cf_xpanning, global_cf_ypanning, global_cf_heinum;
@@ -262,24 +265,27 @@ public class Polymost implements GLRenderer {
 	protected double gvy;
 	protected double gdo, gdx, gdy;
 
-	private int[] sectorborder = new int[256];
-	private double[] dxb1 = new double[MAXWALLSB], dxb2 = new double[MAXWALLSB];
-	private byte[] ptempbuf = new byte[MAXWALLSB << 1];
+	private final int[] sectorborder = new int[256];
+	private final double[] dxb1 = new double[MAXWALLSB];
+	private final double[] dxb2 = new double[MAXWALLSB];
+	private final byte[] ptempbuf = new byte[MAXWALLSB << 1];
 
 	protected final float[][] matrix = new float[4][4];
 
 	private int srepeat = 0, trepeat = 0;
 
-	private float SCISDIST = 1.0f; // 1.0: Close plane clipping distance
+	private final float SCISDIST = 1.0f; // 1.0: Close plane clipping distance
 
-	private PolyClipper clipper;
+	private final PolyClipper clipper;
 
 	private int glmultisample, glnvmultisamplehint;
 
 	protected DefScript defs;
 
-	private int[] h_xsize = new int[MAXTILES], h_ysize = new int[MAXTILES];
-	private byte[] h_xoffs = new byte[MAXTILES], h_yoffs = new byte[MAXTILES];
+	private final int[] h_xsize = new int[MAXTILES];
+	private final int[] h_ysize = new int[MAXTILES];
+	private final byte[] h_xoffs = new byte[MAXTILES];
+	private final byte[] h_yoffs = new byte[MAXTILES];
 
 	protected GL10 gl;
 	protected OrphoRenderer ortho;
@@ -791,7 +797,7 @@ public class Polymost implements GLRenderer {
 	int pow2xsplit = 0;
 	int skyclamphack = 0;
 
-	private final Polygon drawpoly[] = new Polygon[16];
+	private final Polygon[] drawpoly = new Polygon[16];
 
 	protected void drawpoly(Surface[] dm, int n, int method) {
 		double ngdx = 0.0, ngdy = 0.0, ngdo = 0.0, ngux = 0.0, nguy = 0.0, nguo = 0.0;
@@ -1123,9 +1129,9 @@ public class Polymost implements GLRenderer {
 	// variables that are set to ceiling- or floor-members, depending
 	// on which one is processed right now
 
-	private final double nonparallaxed_ft[] = new double[4], nonparallaxed_px[] = new double[3],
-			nonparallaxed_py[] = new double[3], nonparallaxed_dd[] = new double[3], nonparallaxed_uu[] = new double[3],
-			nonparallaxed_vv[] = new double[3];
+	private final double[] nonparallaxed_ft = new double[4], nonparallaxed_px = new double[3],
+			nonparallaxed_py = new double[3], nonparallaxed_dd = new double[3], nonparallaxed_uu = new double[3],
+			nonparallaxed_vv = new double[3];
 
 	private void nonparallaxed(double nx0, double ny0, double nx1, double ny1, double ryp0, double ryp1, float x0,
 			float x1, float cf_y0, float cf_y1, int have_floor, int sectnum, boolean floor) {
@@ -1343,8 +1349,8 @@ public class Polymost implements GLRenderer {
 		gvy += fy * gdy;
 	}
 
-	private final double drawalls_dd[] = new double[3], drawalls_vv[] = new double[3], drawalls_ft[] = new double[4];
-	private WALL drawalls_nwal = new WALL();
+	private final double[] drawalls_dd = new double[3], drawalls_vv = new double[3], drawalls_ft = new double[4];
+	private final WALL drawalls_nwal = new WALL();
 
 	private void drawalls(int bunch) {
 		SECTOR sec, nextsec;
@@ -1857,10 +1863,7 @@ public class Polymost implements GLRenderer {
 		} else
 			dxb2[numscans] = 1e32;
 
-		if (dxb1[numscans] < dxb2[numscans])
-			return true;
-
-		return false;
+		return dxb1[numscans] < dxb2[numscans];
 	}
 
 	private void drawpapersky(int sectnum, double x0, double x1, double y0, double y1, boolean floor) {
@@ -2690,7 +2693,7 @@ public class Polymost implements GLRenderer {
 		gl.glDepthRange(defznear, defzfar);
 	}
 
-	private static Vector2 projPoint = new Vector2();
+	private static final Vector2 projPoint = new Vector2();
 
 	private int getclosestpointonwall(int posx, int posy, int dawall, Vector2 n) {
 		WALL w = wall[dawall];
@@ -2723,8 +2726,8 @@ public class Polymost implements GLRenderer {
 		return -offset;
 	}
 
-	private final Surface dsprite[] = new Surface[6];
-	private final float drawsprite_ft[] = new float[4];
+	private final Surface[] dsprite = new Surface[6];
+	private final float[] drawsprite_ft = new float[4];
 	private final Vector2[] dsin = new Vector2[MAXSPRITES];
 	private final Vector2[] dcoord = new Vector2[MAXSPRITES];
 	private final int[] spritewall = new int[MAXSPRITES];
@@ -3412,12 +3415,9 @@ public class Polymost implements GLRenderer {
 		sign2 = eq.x * p2.x + eq.y * p2.y + eq.z;
 
 		sign1 = sign1 * sign2;
-		if (sign1 > 0) {
-			// OSD_Printf("SAME SIDE !\n");
-			return true;
-		}
+		// OSD_Printf("SAME SIDE !\n");
+		return sign1 > 0;
 		// OSD_Printf("OPPOSITE SIDE !\n");
-		return false;
 	}
 
 	public void swapsprite(int k, int l, boolean z) {
@@ -3440,8 +3440,9 @@ public class Polymost implements GLRenderer {
 	}
 
 	// PLAG: sorting stuff
-	private static Vector3 drawmasks_maskeq = new Vector3(), drawmasks_p1eq = new Vector3(),
-			drawmasks_p2eq = new Vector3();
+	private static final Vector3 drawmasks_maskeq = new Vector3();
+	private static final Vector3 drawmasks_p1eq = new Vector3();
+	private static final Vector3 drawmasks_p2eq = new Vector3();
 	private static final Vector2 drawmasks_dot = new Vector2(), drawmasks_dot2 = new Vector2(),
 			drawmasks_middle = new Vector2(), drawmasks_pos = new Vector2(), drawmasks_spr = new Vector2();
 

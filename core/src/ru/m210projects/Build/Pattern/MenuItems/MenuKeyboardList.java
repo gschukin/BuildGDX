@@ -217,9 +217,7 @@ public abstract class MenuKeyboardList extends MenuList
 		touchY = my;
 		if(mx > scrollerX && mx < scrollerX + slider.getScrollerWidth()) 
 		{
-			if(BuildGdx.input.isTouched())
-				isTouched = true;
-			else isTouched = false;
+			isTouched = BuildGdx.input.isTouched();
 			return true;
 		}
 

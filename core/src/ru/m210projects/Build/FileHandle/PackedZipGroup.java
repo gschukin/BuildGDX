@@ -75,7 +75,7 @@ public class PackedZipGroup extends Group {
 		}
 	}
 
-	private Resource file;
+	private final Resource file;
 
 	public PackedZipGroup(Resource file) throws IOException
 	{
@@ -158,10 +158,7 @@ public class PackedZipGroup extends Group {
 	protected boolean open(GroupResource res) {
 		ZipResource available = (ZipResource) res;
 
-		if(findEntry(available)) 
-			return true;
-
-		return false;
+		return findEntry(available);
 	}
 	
 	@Override

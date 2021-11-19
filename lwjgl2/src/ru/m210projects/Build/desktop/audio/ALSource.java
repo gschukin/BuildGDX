@@ -36,8 +36,8 @@ import ru.m210projects.Build.OnSceenDisplay.Console;
 
 public class ALSource extends Source {
 
-	private ALSoundDrv drv;
-	private ALAudio al;
+	private final ALSoundDrv drv;
+	private final ALAudio al;
 	public ALSource(ALSoundDrv drv, int bufferId, int sourceId) {
 		super(bufferId, sourceId, 0);
 		this.drv = drv;

@@ -18,7 +18,7 @@ public class BuildEngine extends Engine {
 	protected long timerskipticks;
 	protected float frametime;
 
-	private BuildGame game;
+	private final BuildGame game;
 
 	public BuildEngine(BuildGame game, int ticks) throws Exception {
 		super();

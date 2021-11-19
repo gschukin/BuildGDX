@@ -107,7 +107,7 @@ import ru.m210projects.Build.Types.WALL;
 
 public class Polymost2D extends OrphoRenderer {
 
-	private Polymost parent;
+	private final Polymost parent;
 	private GL10 gl;
 	private final TextureManager textureCache;
 
@@ -126,7 +126,9 @@ public class Polymost2D extends OrphoRenderer {
 	protected float[] rx1 = new float[MAXWALLSB];
 	protected float[] ry1 = new float[MAXWALLSB];
 
-	private int allocpoints = 0, slist[], npoint2[];
+	private int allocpoints = 0;
+	private int[] slist;
+	private int[] npoint2;
 	private raster[] rst;
 	private final float[] trapextx = new float[2];
 
@@ -146,7 +148,7 @@ public class Polymost2D extends OrphoRenderer {
 	private short globalpicnum;
 	private int globalorientation;
 
-	private final Polygon drawpoly[] = new Polygon[4];
+	private final Polygon[] drawpoly = new Polygon[4];
 
 	// Overhead map settings
 
@@ -1426,5 +1428,5 @@ public class Polymost2D extends OrphoRenderer {
 
 	@Override
 	public void nextpage() {
-	};
+	}
 }

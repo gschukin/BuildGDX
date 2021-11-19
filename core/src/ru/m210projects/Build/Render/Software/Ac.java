@@ -20,7 +20,7 @@ public class Ac implements A {
 	private int gshade;
 	private int bpl, gpinc;
 	private byte[] gtrans, gbuf, frameplace, gpal, ghlinepal, hlinepal;
-	private int[] reciptable;
+	private final int[] reciptable;
 
 	private int bzinc;
 	private int asm1, asm2;

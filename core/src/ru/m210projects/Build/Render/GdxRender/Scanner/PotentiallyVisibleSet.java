@@ -19,20 +19,20 @@ import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
 
 public class PotentiallyVisibleSet {
 
-	private WallFrustum2d[] portqueue;
+	private final WallFrustum2d[] portqueue;
 	private final int queuemask; // pay attention!
 	private int pqhead, pqtail;
 	private int[] sectorqueue;
 	private int secindex = 0;
 
-	private byte[] handled;
-	private WallFrustum2d[] gotviewport;
-	private byte[] gotwall;
+	private final byte[] handled;
+	private final WallFrustum2d[] gotviewport;
+	private final byte[] gotwall;
 
-	private RayCaster ray = new RayCaster();
+	private final RayCaster ray = new RayCaster();
 	protected SectorInfo info = new SectorInfo();
 
-	private Pool<WallFrustum2d> pWallFrustumPool = new Pool<WallFrustum2d>() {
+	private final Pool<WallFrustum2d> pWallFrustumPool = new Pool<WallFrustum2d>() {
 		@Override
 		protected WallFrustum2d newObject() {
 			return new WallFrustum2d();

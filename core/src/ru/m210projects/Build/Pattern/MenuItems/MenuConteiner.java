@@ -146,8 +146,7 @@ public class MenuConteiner extends MenuItem
 			int fontx =  listFont.getWidth(key);
 			int px = x + width - 1 - fontx;
 			if(mx > px && mx < px + fontx)
-				if(my > y && my < y + font.getHeight()) 
-					return true;
+                return my > y && my < y + font.getHeight();
 		}
 		
 		return false;

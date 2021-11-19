@@ -13,7 +13,7 @@ import ru.m210projects.Build.Types.Tile;
 
 public abstract class MovieScreen extends SkippableAdapter {
 
-	public static interface MovieFile {
+	public interface MovieFile {
 
 		int getFrames();
 

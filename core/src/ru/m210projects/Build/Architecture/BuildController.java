@@ -20,26 +20,26 @@ import com.badlogic.gdx.math.Vector2;
 
 public interface BuildController {
 
-	public void resetButtonStatus();
+	void resetButtonStatus();
 
-	public boolean buttonPressed();
+	boolean buttonPressed();
 	
-	public boolean buttonPressed(int buttonCode);
+	boolean buttonPressed(int buttonCode);
 	
-	public boolean buttonStatusOnce(int buttonCode);
+	boolean buttonStatusOnce(int buttonCode);
 	
-	public boolean buttonStatus(int buttonCode);
+	boolean buttonStatus(int buttonCode);
 	
-	public int getButtonCount();
+	int getButtonCount();
 	
-	public int getAxisCount();
+	int getAxisCount();
 	
-	public int getPovCount();
+	int getPovCount();
 	
-	public Vector2 getStickValue(int aCode1, int aCode2, float deadZone);
+	Vector2 getStickValue(int aCode1, int aCode2, float deadZone);
 
-	public String getName();
+	String getName();
 
-	public void update();
+	void update();
 	
 }

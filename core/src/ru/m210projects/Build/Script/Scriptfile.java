@@ -136,9 +136,7 @@ public class Scriptfile {
 
 	public boolean eof() {
 		skipoverws();
-		if (textptr >= eof)
-			return true;
-		return false;
+		return textptr >= eof;
 	}
 
 	public int getlinum(int ptr) {

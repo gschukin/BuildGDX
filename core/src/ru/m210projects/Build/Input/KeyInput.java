@@ -28,14 +28,16 @@ import com.badlogic.gdx.Input.Keys;
 
 public class KeyInput {
 	public static final int KEYFIFOSIZ = 64;
-	public byte keystatus[] = new byte[256 + 1], 
-		keyfifo[] = new byte[KEYFIFOSIZ], keyfifoplc, keyfifoend;
+	public byte[] keystatus = new byte[256 + 1];
+	public byte[] keyfifo = new byte[KEYFIFOSIZ];
+	public byte keyfifoplc;
+	public byte keyfifoend;
 	public int locmessagelen;
 	public static final char[] lockeybuf = new char[40]; 
 
 	public boolean[] hitkey = new boolean[256];
 	
-	public static char gdxscantoasc[] = { 0, 0, 0, 0, 0, 0, 0, '0', '1', '2',
+	public static char[] gdxscantoasc = { 0, 0, 0, 0, 0, 0, 0, '0', '1', '2',
 			'3', '4', '5', '6', '7', '8', '9', '*', 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
 			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
@@ -44,7 +46,7 @@ public class KeyInput {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
 	
-	public static char gdxscantoascwithshift[] = { 0, 0, 0, 0, 0, 0, 0, ')', '!', '@',
+	public static char[] gdxscantoascwithshift = { 0, 0, 0, 0, 0, 0, 0, ')', '!', '@',
 		'#', '$', '%', '^', '&', '*', '(', '*', 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
 		'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
@@ -161,10 +163,7 @@ public class KeyInput {
 	
 	public boolean keyStatus(int keyId)
 	{
-		if(keyId > 0 && getKey(keyId) == 1) 
-			return true;
-
-		return false;
+		return keyId > 0 && getKey(keyId) == 1;
 	}
 
 	public boolean keyPressed(int kb)

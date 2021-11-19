@@ -38,23 +38,23 @@ import ru.m210projects.Build.Settings.BuildConfig;
 public abstract class MenuAudio extends BuildMenu {
 
 	public interface AudioListener {
-		public void PreDrvChange(Driver drv);
+		void PreDrvChange(Driver drv);
 
-		public void PostDrvChange();
+		void PostDrvChange();
 
-		public void SoundVolumeChange();
+		void SoundVolumeChange();
 
-		public void VoicesChange();
+		void VoicesChange();
 
-		public void SoundOn();
+		void SoundOn();
 
-		public void SoundOff();
+		void SoundOff();
 
-		public void MusicVolumeChange();
+		void MusicVolumeChange();
 
-		public void MusicOn();
+		void MusicOn();
 
-		public void MusicOff();
+		void MusicOff();
 	}
 
 	public class AudioAdapter implements AudioListener {

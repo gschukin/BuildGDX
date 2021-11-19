@@ -178,7 +178,7 @@ public class Gameutils {
 
 	public enum ConvertType {
 		Normal, AlignLeft, AlignRight, Stretch
-	};
+	}
 
 	public static int coordsConvertXScaled(int coord, ConvertType type) {
 		int oxdim = xdim;

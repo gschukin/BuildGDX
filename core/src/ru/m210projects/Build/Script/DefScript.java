@@ -399,7 +399,7 @@ public class DefScript {
 	// Tokens logic
 
 	public interface Token {
-		public BaseToken parse(Scriptfile script);
+		BaseToken parse(Scriptfile script);
 	}
 
 	public enum BaseToken implements Token {
@@ -409,7 +409,7 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			return this;
 		}
-	};
+	}
 
 	private final Map<String, Token> basetokens = new HashMap<String, Token>() {
 		private static final long serialVersionUID = 1L;
@@ -446,8 +446,8 @@ public class DefScript {
 	};
 
 	public enum MapHackTokens {
-		FILE, MHK, MD4, TITLE;
-	};
+		FILE, MHK, MD4, TITLE
+	}
 
 	protected class MaphackToken implements Token {
 		private final Map<String, MapHackTokens> maptokens = new HashMap<String, MapHackTokens>() {
@@ -579,7 +579,7 @@ public class DefScript {
 	}
 
 	public enum TileTextureTokens {
-		FILE, ALPHACUT, XOFFSET, YOFFSET, TEXTURE, CRC;
+		FILE, ALPHACUT, XOFFSET, YOFFSET, TEXTURE, CRC
 	}
 
 	protected class TileFromTextureToken implements Token {
@@ -642,7 +642,7 @@ public class DefScript {
 					break;
 				case XOFFSET:
 					String xoffs = script.getstring();
-					if (xoffs.toUpperCase().equals("ART"))
+					if (xoffs.equalsIgnoreCase("ART"))
 						xoffset = engine.getTile(tile).getOffsetX();
 					else {
 						try {
@@ -656,7 +656,7 @@ public class DefScript {
 					break;
 				case YOFFSET:
 					String yoffs = script.getstring();
-					if (yoffs.toUpperCase().equals("ART"))
+					if (yoffs.equalsIgnoreCase("ART"))
 						yoffset = engine.getTile(tile).getOffsetY();
 					else {
 						try {
@@ -787,7 +787,7 @@ public class DefScript {
 
 			return deftile;
 		}
-	};
+	}
 
 	protected enum ModelTokens {
 		SCALE, SHADE, XADD, YADD, ZADD, FRAME, FRAME0, FRAME1, ANIM, SKIN, HUD, TILE, TILE0, TILE1, FPS, FLAGS, PAL,
@@ -1667,7 +1667,7 @@ public class DefScript {
 
 	protected class SkyboxToken implements Token {
 
-		private final String skyfaces[] = { "front face", "right face", "back face", "left face", "top face",
+		private final String[] skyfaces = { "front face", "right face", "back face", "left face", "top face",
 				"bottom face" };
 
 		private final Map<String, SkyboxTokens> skyboxtokens = new HashMap<String, SkyboxTokens>() {

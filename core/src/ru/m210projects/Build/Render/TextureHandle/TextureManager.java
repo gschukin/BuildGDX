@@ -49,14 +49,14 @@ public class TextureManager {
 	protected TextureHDInfo info;
 	private GLTile bindedTile;
 	protected GLTile palette; // to shader
-	protected GLTile palookups[]; // to shader
+	protected GLTile[] palookups; // to shader
 	protected int texunits = 0;
 	protected final ExpandTexture expand;
 
 	public enum ExpandTexture {
 		Horizontal(1), Vertical(2), Both(1 | 2);
 
-		private byte bit;
+		private final byte bit;
 
 		ExpandTexture(int bit) {
 			this.bit = (byte) bit;
@@ -65,7 +65,7 @@ public class TextureManager {
 		public byte get() {
 			return bit;
 		}
-	};
+	}
 
 	public TextureManager(Engine engine, ExpandTexture opt) {
 		this.engine = engine;
@@ -79,10 +79,8 @@ public class TextureManager {
 	}
 
 	/**
-	 *
-	 * @param tilenum
-	 * @param pal
-	 * @param shade
+	 * @param dapicnum
+	 * @param dapalnum
 	 * @param skybox
 	 * @param method  0: solid, 1: masked(255 is transparent), 2: transluscent #1,
 	 *                3: transluscent #2, 4: it's a sprite, so wraparound isn't

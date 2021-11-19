@@ -97,9 +97,7 @@ public class TestController implements BuildController {
 	{
 		if(i == 0 && BuildGdx.input.isKeyPressed(Keys.K))
 			return true;
-		if(i == 1 && BuildGdx.input.isKeyPressed(Keys.L))
-			return true;
-		return false;
+		return i == 1 && BuildGdx.input.isKeyPressed(Keys.L);
 	}
 	
 	private float getAxis(int value) {
@@ -134,10 +132,7 @@ public class TestController implements BuildController {
 	@Override
 	public boolean buttonStatus(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode]) 
-			return true;
-
-		return false;
+		return buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode];
 	}
 	
 	@Override

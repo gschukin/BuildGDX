@@ -212,7 +212,7 @@ public abstract class BuildMenuList extends BuildMenu {
 	}
 
 	protected MenuItemList list;
-	private BuildGame app;
+	private final BuildGame app;
 
 	public BuildMenuList(BuildGame app, String title, int x, int y, int width, int step, int nShowElements) {
 		this.app = app;

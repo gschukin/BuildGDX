@@ -31,8 +31,8 @@ public class Cache1D {
 		Grp, Rff, Zip, User, PackedGrp, PackedRff, PackedZip
 	}
 
-	private Compat compat;
-	private List<Group> groupfil = new ArrayList<Group>();
+	private final Compat compat;
+	private final List<Group> groupfil = new ArrayList<Group>();
 
 	private final int grpsign = 0x536E654B;
 	private final int zipsign = 0x04034b50;

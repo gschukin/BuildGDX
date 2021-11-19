@@ -30,8 +30,8 @@ import ru.m210projects.Build.Types.WALL;
 
 public class WorldMesh {
 
-	private Tesselator tess;
-	private Mesh mesh;
+	private final Tesselator tess;
+	private final Mesh mesh;
 	protected Engine engine;
 	private int maxVertices;
 	private int meshOffset;
@@ -41,23 +41,23 @@ public class WorldMesh {
 
 	public enum Heinum {
 		MaxWall, Max, Lower, Upper, Portal, SkyLower, SkyUpper
-	};
+	}
 
 	private final FloatArray vertices = new FloatArray();
 
-	private int[] floorhash = new int[MAXSECTORS];
-	private int[] ceilinghash = new int[MAXSECTORS];
-	private int[] wallhash = new int[MAXWALLS];
+	private final int[] floorhash = new int[MAXSECTORS];
+	private final int[] ceilinghash = new int[MAXSECTORS];
+	private final int[] wallhash = new int[MAXWALLS];
 
-	private GLSurface[] walls = new GLSurface[MAXWALLS];
-	private GLSurface[] upper_walls = new GLSurface[MAXWALLS];
-	private GLSurface[] lower_walls = new GLSurface[MAXWALLS];
-	private GLSurface[] maskwalls = new GLSurface[MAXWALLS];
-	private GLSurface[] upper_skies = new GLSurface[MAXWALLS];
-	private GLSurface[] lower_skies = new GLSurface[MAXWALLS];
-	private GLSurface[] floors = new GLSurface[MAXSECTORS];
-	private GLSurface[] ceilings = new GLSurface[MAXSECTORS];
-	private GLSurface quad;
+	private final GLSurface[] walls = new GLSurface[MAXWALLS];
+	private final GLSurface[] upper_walls = new GLSurface[MAXWALLS];
+	private final GLSurface[] lower_walls = new GLSurface[MAXWALLS];
+	private final GLSurface[] maskwalls = new GLSurface[MAXWALLS];
+	private final GLSurface[] upper_skies = new GLSurface[MAXWALLS];
+	private final GLSurface[] lower_skies = new GLSurface[MAXWALLS];
+	private final GLSurface[] floors = new GLSurface[MAXSECTORS];
+	private final GLSurface[] ceilings = new GLSurface[MAXSECTORS];
+	private final GLSurface quad;
 
 	private final int[] zofslope = new int[2];
 	private static final int CEILING1 = 0;
@@ -66,7 +66,7 @@ public class WorldMesh {
 	private static final int FLOOR1 = 3;
 	private final Vertex[] pol = new Vertex[] { new Vertex(0, 0), new Vertex(1, 0), new Vertex(1, 1),
 			new Vertex(0, 1) };
-	private ArrayList<Vertex> pointList = new ArrayList<Vertex>();
+	private final ArrayList<Vertex> pointList = new ArrayList<Vertex>();
 
 	protected final float scalexy = 512.0f;
 	protected final float scalez = 8192.0f;

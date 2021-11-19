@@ -36,7 +36,7 @@ public class Mmulti {
 	public static final int MAXPAKSIZ = 256;
 	public static final int PAKRATE = 40;
 	
-	private static byte[] pakbuf = new byte[MAXPAKSIZ];
+	private static final byte[] pakbuf = new byte[MAXPAKSIZ];
 //	public static final int SIMMIS = 0;
 //	public static final int SIMLAG = 0;
 //	public static int[] simlagcnt = new int[MAXPLAYERS];
@@ -44,26 +44,31 @@ public class Mmulti {
 	
 	//ENGINE CONTROLLED MULTIPLAYER VARIABLES:
 	public static short numplayers, myconnectindex;
-	public static short connecthead, connectpoint2[] = new short[MAXPLAYERS];   //Player linked list variables (indeces, not connection numbers)
+	public static short connecthead;
+	public static short[] connectpoint2 = new short[MAXPLAYERS];   //Player linked list variables (indeces, not connection numbers)
 
 	public static ISocket mysock;
 	public static int danetmode = 255;
 
-	public static Object othersocket[] = new Object[MAXPLAYERS];
+	public static Object[] othersocket = new Object[MAXPLAYERS];
 	public static Object snatsocket;
 	
 	public static final int FIFSIZ = 512; //16384/40 = 6min:49sec
-	static int[] ipak[] = new int[MAXPLAYERS][FIFSIZ], icnt0 = new int[MAXPLAYERS];
-	static int[] opak[] = new int[MAXPLAYERS][FIFSIZ], ocnt0 = new int[MAXPLAYERS], ocnt1 = new int[MAXPLAYERS];
+	static int[][] ipak = new int[MAXPLAYERS][FIFSIZ];
+	static int[] icnt0 = new int[MAXPLAYERS];
+	static int[][] opak = new int[MAXPLAYERS][FIFSIZ];
+	static int[] ocnt0 = new int[MAXPLAYERS];
+	static int[] ocnt1 = new int[MAXPLAYERS];
 	
-	public static byte pakmem[] = new byte[4194304];
+	public static byte[] pakmem = new byte[4194304];
 	public static int pakmemi = 1;
 	
 	public static long netping = 0;
 
 	//MULTI.OBJ sync state variables
 	public static char syncstate;
-	public static long tims, lastsendtims[] = new long[MAXPLAYERS];
+	public static long tims;
+	public static long[] lastsendtims = new long[MAXPLAYERS];
 	
 	public static NetInfo inet = new NetInfo();
 	
@@ -72,7 +77,7 @@ public class Mmulti {
 		return System.currentTimeMillis();
 	}
 	
-	private static int[] crctab16 = new int[256];
+	private static final int[] crctab16 = new int[256];
 	static void initcrc16 ()
 	{
 		int a;

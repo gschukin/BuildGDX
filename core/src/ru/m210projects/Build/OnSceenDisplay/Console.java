@@ -904,7 +904,7 @@ public class Console {
         if (osdlines < MAXLINES) osdlines++;
 	}
 
-	private static List<String> foundText = new ArrayList<String>();
+	private static final List<String> foundText = new ArrayList<String>();
 	private static void ListCommands()
 	{
 		if(!lastmatch) {
