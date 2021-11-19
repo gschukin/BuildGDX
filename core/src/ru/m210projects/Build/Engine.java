@@ -83,36 +83,66 @@ import ru.m210projects.Build.Types.WALL;
 public abstract class Engine {
 
 	/*
-	 * TODO: Software renderer: and the draw distance for voxel detail is really low
-	 * Software renderer: You might want to look at wall sprites. I noticed a lot of
-	 * them clipping through geometry in classic render � ������� ����� ������������
-	 * ��� ���������� ������ �������� (console default font)
+	 * TODO:
+	 * Software renderer: and the draw distance for voxel detail is really low
+	 * Software renderer: You might want to look at wall sprites. I noticed a lot of them clipping through geometry in classic render
+	 * Software renderer: Voxel is not clipped by ceiling geometry
 	 *
-	 * osdrows � ���������� ������� ����� ������� �� ���������� ������ (Polymost)
-	 * History list for last used IP's (client could be better for multiplayer) or
-	 * copy paste IP if possible. brz ������ broadcast Some sort of anti-aliasing
-	 * option. The NVidia control panel's anti-aliasing works, but it introduces
-	 * artifacting on voxels. ���� � ������� ������ ������� ����� � ������� ����
-	 * ����� ������ 2� �������������� Bsprintf ���������� � ����� (������ �� ��
-	 * ������� ����) render: ��������� �������������� ������ �� ��� ��� ���� ���
-	 * ������������ ����� ��������� ������ 2� ����� ������������ �������� ��������
-	 * �� �������� ������� floor-alignment voxels for maphack
+	 * osdrows в сохранения конфига
+	 * Туман зависит от разрешения экрана (Polymost)
+	 * History list for last used IP's (client could be better for multiplayer) or copy paste IP if possible.
+	 * brz фильтр
+	 * broadcast
+	 * Some sort of anti-aliasing option. The NVidia control panel's anti-aliasing works, but it introduces artifacting on voxels.
+	 * бинд в консоль
+	 * плохой перенос строк в консоли если строк больше 2х
+	 * оптимизировать Bsprintf
+	 * сохранения в папку (почему то не находит файл)
+	 * render: некоторые горизонтальные модели не там где надо под определенным
+	 * углом пропадает спрайт 2д карта подглюкивает вылазиют полигоны за скайбокс
+	 * потолок
+	 * floor-alignment voxels for maphack
 	 *
-	 * ��� ��������: ������ �������� - ������� FadeScreen ��������� HRP ������ ���
-	 * ��������
-	 *
-	 * GameAdapter TODO: SaveManager findSaves() Launcher start parameters
-	 *
-	 *
-	 * Architecture: Engine messages filecache filegroup -> filecache (net) mmulti
-	 * audiomanger (BAudio) midimodule openal renderer polymost -> texturecache
-	 * software input keyboard -> input() gamepad -> gpmanager
-	 *
-	 * OnScreenDisplay Console loader md2 md3 vox wav
+	 * для шейдеров:
+	 * затенения уровня в далеке(туман)
+	 * прекэш вокселей - палитра
+	 * FadeScreen
+	 * Проверить HRP модели для шейдеров
+	 * Отключить GL туман для шейдеров
+	 * Отключить фильтрацию текстур для шейдеров
+	 * Не работают текстуры в userepisode
 	 *
 	 *
-	 * Utils string handler def loader + common + scriptfile -> texturecache /
-	 * mdloader pragmas bithandler
+	 * Architecture:
+	 * 	Engine
+	 * 		messages
+	 * 		filecache
+	 * 		filegroup		-> 		filecache
+	 * 		(net) mmulti
+	 * 		audiomanger (BAudio)
+	 * 			midimodule
+	 * 			openal
+	 * 		renderer
+	 * 			polymost	->    texturecache
+	 * 			software
+	 * 		input
+	 * 			keyboard -> input()
+	 * 			gamepad	-> gpmanager
+	 *
+	 * 		OnScreenDisplay
+	 * 			Console
+	 * 		loader
+	 * 			md2
+	 * 			md3
+	 * 			vox
+	 * 			wav
+	 *
+	 *
+	 *  Utils
+	 *  	string handler
+	 *  	def loader + common + scriptfile	-> texturecache / mdloader
+	 *  	pragmas
+	 *  	bithandler
 	 */
 
 	public static final String version = "21.110"; // XX. - year, XX - month, X - build
