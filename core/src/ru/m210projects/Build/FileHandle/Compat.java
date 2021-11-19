@@ -128,7 +128,7 @@ public class Compat {
 	}
 
 	private FileResource obtain() {
-		FileResource res = null;
+		FileResource res;
 		for (int i = 0; i < MAXOPENFILES; i++) {
 			res = list[(pos = (pos + 1) & (MAXOPENFILES - 1))];
 			if (res.isClosed())

@@ -38,8 +38,7 @@ public class UserGroup extends Group {
 		public UserResource(String absolutePath, int fileid) {
 			super(UserGroup.this);
 
-			String fullname = absolutePath;
-			this.filenamext = toLowerCase(fullname);
+			this.filenamext = toLowerCase(absolutePath);
 			
 			int point = filenamext.lastIndexOf('.');
 			if(point != -1) {

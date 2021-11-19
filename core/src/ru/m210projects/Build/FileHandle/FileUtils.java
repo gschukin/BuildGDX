@@ -37,7 +37,7 @@ public class FileUtils {
 
 	public static String getFullName(String path) {
 		if (path != null) {
-			int index = -1;
+			int index;
 			if ((index = path.lastIndexOf(File.separator)) != -1 || (index = path.lastIndexOf("\\")) != -1
 					|| (index = path.lastIndexOf("/")) != -1)
 				path = path.substring(index + 1);

@@ -116,7 +116,6 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 			this.addItem(separator, false);
 			this.addItem(GLPalette, false);
 			this.addItem(GLHires, false);
-			return;
 		} else {
 			this.addItem(palettedGamma, true);
 

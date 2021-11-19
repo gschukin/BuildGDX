@@ -778,11 +778,9 @@ public class Console {
 
 	                if (osdhistorysize < OSD_HISTORYDEPTH) osdhistorysize++;
 	                osdhistorytotal++;
-	                osdexeccount++;
-	            }
-	            else
-	            	osdexeccount++;
-	            osdhistorypos=-1;
+				}
+				osdexeccount++;
+				osdhistorypos=-1;
 	            String input = new String(osdeditbuf, 0, osdeditlen);
 
 	            if(Dispatch(input) == -1) {
@@ -882,7 +880,7 @@ public class Console {
 		Arrays.fill(osd_argv, null);
 		String osdvar = toLowerCase(text).trim();
 		osd_argv[osd_argc-1] = osdvar;
-    	String var = null;
+    	String var;
     	int index = osdvar.indexOf(" ");
     	while(index != -1) {
     		var = osdvar.substring(0, index);

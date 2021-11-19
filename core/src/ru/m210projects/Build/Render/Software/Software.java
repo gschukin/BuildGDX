@@ -698,7 +698,7 @@ public class Software implements Renderer {
 			else if ((sec.ceilingstat & 1) == 0)
 				ceilscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else
-				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 0, bunch);
+				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 0, bunch);
 		}
 		if ((andwstat2 & 12) != 12) // draw floors
 		{
@@ -707,7 +707,7 @@ public class Software implements Renderer {
 			else if ((sec.floorstat & 1) == 0) // solid
 				florscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else // background
-				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 1, bunch);
+				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 1, bunch);
 		}
 
 		// DRAW WALLS SECTION!
@@ -1759,8 +1759,8 @@ public class Software implements Renderer {
 					xsi[z] = 0;
 				if (xsi[z] > (xdimen << 16))
 					xsi[z] = (xdimen << 16);
-				if (ysi[z] < (0 << 16))
-					ysi[z] = (0 << 16);
+				if (ysi[z] < (0))
+					ysi[z] = (0);
 				if (ysi[z] > (ydimen << 16))
 					ysi[z] = (ydimen << 16);
 				if (xsi[z] < lmax) {
@@ -2960,12 +2960,12 @@ public class Software implements Renderer {
 //		engine.faketimerhandler();
 	}
 
-	private void parascan(int dax1, int dax2, short sectnum, int dastat, int bunch) {
+	private void parascan(int dax1, int dax2, int dastat, int bunch) {
 		SECTOR sec;
 		int j, k, l, m, n, x, z, wallnum, nextsectnum, globalhorizbak;
 		short[] topptr, botptr;
 
-		sectnum = thesector[bunchfirst[bunch]];
+		short sectnum = thesector[bunchfirst[bunch]];
 		sec = sector[sectnum];
 		globalhorizbak = (int) globalhoriz;
 		if (parallaxyscale != 65536)

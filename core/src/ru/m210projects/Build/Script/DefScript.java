@@ -604,7 +604,7 @@ public class DefScript {
 
 			int ttexturetokptr = script.ltextptr, ttextureend;
 			String fn = null;
-			Integer tile = -1, value;
+			Integer tile, value;
 			int talphacut = 255;
 			Byte xoffset = null, yoffset = null;
 			long tilecrc = 0;
@@ -745,7 +745,7 @@ public class DefScript {
 				return null;
 			}
 
-			Pixmap pix = null;
+			Pixmap pix;
 			try {
 				pix = new Pixmap(data, 0, data.length);
 			} catch (Throwable e) { // if native code didn't load
@@ -972,7 +972,7 @@ public class DefScript {
 					int frametokptr = script.ltextptr;
 					int frameend, happy = 1;
 					String framename = null;
-					int ftilenume = -1, ltilenume = -1, tilex = 0;
+					int ftilenume = -1, ltilenume = -1, tilex;
 					double smoothduration = 0.1;
 
 					if ((frameend = script.getbraces()) == -1)
@@ -1242,7 +1242,7 @@ public class DefScript {
 				case HUD:
 					int hudtokptr = script.ltextptr;
 					int happy = 1, frameend;
-					int ftilenume = -1, ltilenume = -1, tilex = 0, flags = 0, fov = -1;
+					int ftilenume = -1, ltilenume = -1, tilex, flags = 0, fov = -1;
 					double xadd = 0.0, yadd = 0.0, zadd = 0.0, angadd = 0.0;
 
 					if ((frameend = script.getbraces()) == -1)
@@ -1389,7 +1389,7 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			int textureend;
 			Double dvalue;
-			Integer ttile = -1;
+			Integer ttile;
 			Object tk;
 
 			if ((ttile = script.getsymbol()) == null)
@@ -1575,7 +1575,7 @@ public class DefScript {
 
 			int vmodelend;
 			double vscale = 1.0;
-			int tile0 = MAXTILES, tile1 = -1, tilex = -1;
+			int tile0 = MAXTILES, tile1 = -1, tilex;
 			boolean vrotate = false;
 
 			if ((fn = getFile(script)) == null) // voxel filename
@@ -1862,7 +1862,7 @@ public class DefScript {
 
 		@Override
 		public BaseToken parse(Scriptfile script) {
-			Integer pal = -1, r = 255, g = 255, b = 255, f = 0;
+			int pal = -1, r = 255, g = 255, b = 255, f = 0;
 			Integer ivalue;
 			int send;
 
@@ -1917,7 +1917,7 @@ public class DefScript {
 			}
 
 			Console.Println("Loading tint " + pal);
-			texInfo.setPaletteTint(pal.intValue(), r.intValue(), g.intValue(), b.intValue(), f.intValue());
+			texInfo.setPaletteTint((int) pal, r, g, b, f);
 
 			return BaseToken.Ok;
 		}

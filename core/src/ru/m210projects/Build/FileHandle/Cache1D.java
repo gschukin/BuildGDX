@@ -43,8 +43,7 @@ public class Cache1D {
 	}
 
 	public List<Group> getGroupList() {
-		List<Group> out = new ArrayList<Group>(groupfil);
-		return out;
+		return new ArrayList<Group>(groupfil);
 	}
 
 	public Group getGroup(String groupname) {
@@ -134,7 +133,7 @@ public class Cache1D {
 	}
 
 	public Group add(GroupResource res, boolean removable) {
-		Group out = null;
+		Group out;
 		if (res.isClosed())
 			res.getParent().open(res);
 

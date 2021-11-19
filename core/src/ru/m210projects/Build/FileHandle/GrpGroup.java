@@ -28,7 +28,7 @@ public class GrpGroup extends Group {
 
 	private static final byte[] tmp = new byte[1024];
 	
-	private Resource file = null;
+	private Resource file;
 	
 	private class GrpResource extends GroupResource {
 
@@ -108,7 +108,7 @@ public class GrpGroup extends Group {
 		@Override
 		public int read(ByteBuffer bb, int offset, int len) {
 			synchronized(parent) {
-				int var = -1;
+				int var;
 				bb.position(offset);
 				int p = 0;
 				while(len > 0)

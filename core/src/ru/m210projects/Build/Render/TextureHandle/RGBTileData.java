@@ -208,19 +208,19 @@ public class RGBTileData extends TileData {
 				switch (j) {
 				case 0:
 				case 1:
-					rgb = ((dapic.get(wp + 3) & 0xFF) << 24) + (b << 16) + (g << 8) + (r << 0);
+					rgb = ((dapic.get(wp + 3) & 0xFF) << 24) + (b << 16) + (g << 8) + (r);
 					break;
 				case 2:
 					rgb = ((dapic.get(wp + 3) & 0xFF) << 24) + (((b + 1) >> 1) << 16) + (((g + 1) >> 1) << 8)
-							+ (((r + 1) >> 1) << 0);
+							+ (((r + 1) >> 1));
 					break;
 				case 3:
 					rgb = ((dapic.get(wp + 3) & 0xFF) << 24) + (((b * 85 + 128) >> 8) << 16)
-							+ (((g * 85 + 128) >> 8) << 8) + (((r * 85 + 128) >> 8) << 0);
+							+ (((g * 85 + 128) >> 8) << 8) + (((r * 85 + 128) >> 8));
 					break;
 				case 4:
 					rgb = ((dapic.get(wp + 3) & 0xFF) << 24) + (((b + 2) >> 2) << 16) + (((g + 2) >> 2) << 8)
-							+ (((r + 2) >> 2) << 0);
+							+ (((r + 2) >> 2));
 					break;
 				default:
 					continue;

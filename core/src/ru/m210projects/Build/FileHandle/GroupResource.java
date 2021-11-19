@@ -105,7 +105,6 @@ public abstract class GroupResource implements Resource {
 	
 	public String toString()
 	{
-		String txt = getFullName() + " fileid: " + getIdentification() + " parent: " + (parent != null ? parent.name : "") + "\r\n";	
-		return txt;
+		return getFullName() + " fileid: " + getIdentification() + " parent: " + (parent != null ? parent.name : "") + "\r\n";
 	}
 }

@@ -213,8 +213,8 @@ public class LwjglInput implements BuildInput {
 
 				Object selectedValue = pane.getValue();
 
-				if (selectedValue != null && (selectedValue instanceof Integer)
-					&& ((Integer)selectedValue).intValue() == JOptionPane.OK_OPTION) {
+				if ((selectedValue instanceof Integer)
+						&& ((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
 					listener.input(textField.getText());
 				} else {
 					listener.canceled();
@@ -271,8 +271,7 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public boolean isTouched () {
-		boolean button = Mouse.isButtonDown(0) || Mouse.isButtonDown(1) || Mouse.isButtonDown(2);
-		return button;
+		return Mouse.isButtonDown(0) || Mouse.isButtonDown(1) || Mouse.isButtonDown(2);
 	}
 
 	@Override

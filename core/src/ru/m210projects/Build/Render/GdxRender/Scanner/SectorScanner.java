@@ -306,7 +306,6 @@ public abstract class SectorScanner {
 		} while (pqhead != pqtail);
 
 		QuickSort.sort(maskwall, maskwallcnt, wallcomp);
-		return;
 	}
 
 	protected IntComparator wallcomp = new IntComparator() {

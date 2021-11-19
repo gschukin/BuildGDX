@@ -85,8 +85,7 @@ public abstract class MD3ModelGL20 extends MDModel {
 
 	@Override
 	public void loadSkins(int pal, int skinnum) {
-		int numsurfs = numSurfaces;
-		for (int surfi = 0; surfi < numsurfs; surfi++)
+		for (int surfi = 0; surfi < numSurfaces; surfi++)
 			getSkin(pal, skinnum, surfi);
 	}
 

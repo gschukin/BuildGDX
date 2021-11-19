@@ -366,7 +366,7 @@ public abstract class BuildGame extends Game {
 				byte[] report = reportData();
 				if(report != null)
 					os.write(report);
-			} catch (Exception e) { text+= "Crash in reportData: " + e.getMessage() + "\r\n"; }
+			} catch (Exception e) { text = "Crash in reportData: " + e.getMessage() + "\r\n"; os.write(text.getBytes()); }
 
 			os.close();
 		}

@@ -95,7 +95,7 @@ public class Mmulti {
 	}
 
 	private static int updatecrc16(int crc, byte dat) {
-		return crc = (((crc<<8)&65535)^crctab16[(((crc & 0xFFFF)>>8)&65535)^(dat&0xFF)]);
+		return (((crc<<8)&65535)^crctab16[(((crc & 0xFFFF)>>8)&65535)^(dat&0xFF)]);
 	}
 			
 	private static int getcrc16 (byte[] buffer, int bufleng)
@@ -527,7 +527,7 @@ public class Mmulti {
 	public static int otherpacket;
 	public static int getpacket(byte[] bufptr)
 	{
-		int j, k, ic0, crc16ofs, messleng, other = 0;
+		int j, k, ic0, crc16ofs, messleng, other;
 
 		if (numplayers < 2) return(0);
 
@@ -668,8 +668,7 @@ public class Mmulti {
         	URL whatismyip = new URL("http://myip.dnsomatic.com"); //	http://checkip.amazonaws.com	 http://icanhazip.com
             in = new BufferedReader(new InputStreamReader(
                     whatismyip.openStream()));
-            String ip = in.readLine();
-            return ip;
+			return in.readLine();
         } catch (IOException e) {} 
 		finally {
             if (in != null) {

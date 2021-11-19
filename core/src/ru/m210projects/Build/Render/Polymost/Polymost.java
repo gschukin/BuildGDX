@@ -619,7 +619,7 @@ public class Polymost implements GLRenderer {
 		int hp;
 
 		PixelFormat fmt = textureCache.getFmt(tilenume);
-		if (fmt != null && fmt == PixelFormat.Pal8) {
+		if (fmt == PixelFormat.Pal8) {
 			numpal = 1;
 			firstpal = 0;
 		} else {
@@ -800,8 +800,8 @@ public class Polymost implements GLRenderer {
 	private final Polygon[] drawpoly = new Polygon[16];
 
 	protected void drawpoly(Surface[] dm, int n, int method) {
-		double ngdx = 0.0, ngdy = 0.0, ngdo = 0.0, ngux = 0.0, nguy = 0.0, nguo = 0.0;
-		double ngvx = 0.0, ngvy = 0.0, ngvo = 0.0, dp, up, vp, du0 = 0.0, du1 = 0.0, dui, duj;
+		double ngdx, ngdy, ngdo, ngux, nguy, nguo;
+		double ngvx, ngvy, ngvo, dp, up, vp, du0 = 0.0, du1 = 0.0, dui, duj;
 		double f, r, ox, oy, oz, ox2, oy2, oz2, uoffs, ix0, ix1;
 		int i, j, k, nn, tsizx, tsizy, xx, yy;
 
@@ -3449,7 +3449,7 @@ public class Polymost implements GLRenderer {
 	@Override
 	public void drawmasks() {
 		int i, j, k, l, gap, xs, ys, xp, yp, yoff, yspan;
-		boolean modelp = false;
+		boolean modelp;
 
 		for (i = spritesortcnt - 1; i >= 0; i--) {
 			tspriteptr[i] = tsprite[i];
@@ -3600,7 +3600,7 @@ public class Polymost implements GLRenderer {
 				texshader.end();
 
 			if (frameTexture == null || framew != xdim || frameh != ydim) {
-				int size = 1;
+				int size;
 				for (size = 1; size < Math.max(xdim, ydim); size <<= 1)
 					;
 
@@ -3942,7 +3942,7 @@ public class Polymost implements GLRenderer {
 
 	@Override
 	public void addSpriteCorr(int snum) {
-		int spr_wall = -1;
+		int spr_wall;
 		SPRITE spr = sprite[snum];
 		if ((spr_wall = nearwall(snum, -64)) == -1)
 			if ((spr.cstat & 64) != 0 || (spr_wall = nearwall(snum, 64)) == -1)

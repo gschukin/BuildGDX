@@ -128,10 +128,9 @@ public class GDXOrtho extends OrphoRenderer {
 		this.parent = parent;
 		this.manager = parent.manager;
 
-		int size = maxSpriteCount;
 		int VERTEX_SIZE = 2 + 1 + 2;
 		int SPRITE_SIZE = 4 * VERTEX_SIZE;
-		this.vertices = new float[size * SPRITE_SIZE];
+		this.vertices = new float[maxSpriteCount * SPRITE_SIZE];
 	}
 
 	@Override
@@ -398,7 +397,7 @@ public class GDXOrtho extends OrphoRenderer {
 	public boolean dorotatesprite3d(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
 			int cy1, int cx2, int cy2) {
 
-		Hudtyp hudInfo = null;
+		Hudtyp hudInfo;
 		if (parent.defs == null
 				|| ((hudInfo = parent.defs.mdInfo.getHudInfo(picnum, dastat)) != null && (hudInfo.flags & 1) != 0))
 			return true; // "HIDE" is specified in DEF
@@ -715,8 +714,8 @@ public class GDXOrtho extends OrphoRenderer {
 			if (i == viewindex || mapSettings.isShowAllPlayers()) {
 				int picnum = mapSettings.getPlayerPicnum(i);
 				if (picnum == -1) { // draw it with lines
-					ox = (sintable[(pPlayer.ang + 512) & 2047] >> 7);
-					oy = (sintable[(pPlayer.ang) & 2047] >> 7);
+//					ox = (sintable[(pPlayer.ang + 512) & 2047] >> 7);
+//					oy = (sintable[(pPlayer.ang) & 2047] >> 7);
 					int x2 = 0;
 					int y2 = -(mapSettings.getPlayerZoom(i, czoom) << 1);
 

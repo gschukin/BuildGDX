@@ -1064,15 +1064,13 @@ public class GDXRenderer implements GLRenderer {
 				break;
 			case TexturesOnly:
 			case IndexedTexturesOnly:
-				textureCache.invalidateall();
+			case All:
+					textureCache.invalidateall();
 				break;
 			case Palookup:
 				for (int j = 0; j < MAXPALOOKUPS; j++) {
 					textureCache.invalidatepalookup(j);
 				}
-				break;
-			case All:
-				textureCache.invalidateall();
 				break;
 			}
 		}

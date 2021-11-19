@@ -146,7 +146,7 @@ public class LZWDecoder implements Closeable {
 		int bitcnt = (4 << 3);
 		int numbits = 8;
 		int oneupnumbits = (1 << 8);
-		short addr = 0;
+		short addr;
 		do {
 			addr = (short) (lzwinbuf[bytecnt1] & 0xFF);
 			do {

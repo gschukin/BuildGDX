@@ -54,13 +54,13 @@ public class CRC32 {
 		}
 
 		// flip bits
-		crc = crc ^ 0xffffffff;
+		crc = ~crc;
 
 		return crc & 0xFFFFFFFFL;
 	}
 
 	public static long getChecksum(ByteBuffer bb) {
-		int rem = 0;
+		int rem;
 		int crc = 0xffffffff;
 		byte[] bytes = new byte[2048];
 
@@ -72,7 +72,7 @@ public class CRC32 {
 		}
 
 		// flip bits
-		crc = crc ^ 0xffffffff;
+		crc = ~crc;
 		return crc & 0xFFFFFFFFL;
 	}
 
@@ -91,7 +91,7 @@ public class CRC32 {
 
 	public static long getChecksum(Resource res) {
 		int crc = 0xffffffff;
-		int len = 0;
+		int len;
 		byte[] bytes = new byte[2048];
 
 		res.seek(0, Whence.Set);
@@ -102,7 +102,7 @@ public class CRC32 {
 		}
 
 		// flip bits
-		crc = crc ^ 0xffffffff;
+		crc = ~crc;
 		return crc & 0xFFFFFFFFL;
 	}
 }

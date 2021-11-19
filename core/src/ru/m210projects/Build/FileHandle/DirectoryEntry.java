@@ -150,7 +150,7 @@ public class DirectoryEntry {
 			return false;
 		int currentSize = files.size() + subDirectory.size();
 		boolean isMain = this == BuildGdx.compat.getDirectory(Path.Game);
-		File directory = null;
+		File directory;
 
 		if (isMain) {
 			directory = new File(Path.Game.getPath());
@@ -225,7 +225,7 @@ public class DirectoryEntry {
 
 	private String getRelativePath(String path) {
 		String mainpath = Path.Game.getPath();
-		if (name == "<userdir>")
+		if (name.equals("<userdir>"))
 			mainpath = Path.User.getPath();
 
 		if (path.length() > mainpath.length()) {

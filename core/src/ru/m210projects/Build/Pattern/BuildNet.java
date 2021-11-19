@@ -258,13 +258,13 @@ public abstract class BuildNet {
 		if(pptr + size >= p.length)
 			game.ThrowError("ptr + size < packbuf.length");
 		System.arraycopy(p, pptr, v, vptr, size); //memcpy(v, p, size);
-		return pptr += size;
+		return pptr + size;
 	}
 	
 	public int PutPacketByte(byte[] p, int ptr, int value)
 	{
 		p[ptr] = (byte) value;
-		return ptr += 1;
+		return ptr + 1;
 	}
 
 	public int PutPacket(byte[] p, int ptr, Object v, int vptr, int size)
@@ -275,7 +275,7 @@ public abstract class BuildNet {
 		{
 			byte[] array = (byte[]) v;
 			System.arraycopy(array, vptr, p, ptr, size); //memcpy(p, v, size);
-			return ptr += size;
+			return ptr + size;
 		} 
 		else if(v instanceof int[])
 		{

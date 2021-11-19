@@ -84,7 +84,7 @@ public class LwjglGraphics extends BuildGraphics {
 			System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
 		}
 
-		boolean displayCreated = false;
+		boolean displayCreated;
 		if(!config.fullscreen) {
 			displayCreated = setWindowedMode(config.width, config.height);
 		} else {

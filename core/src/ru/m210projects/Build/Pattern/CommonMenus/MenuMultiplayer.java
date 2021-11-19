@@ -33,7 +33,7 @@ public abstract class MenuMultiplayer extends BuildMenu {
 
 		int pos = posy;
 		mCreate = new MenuButton("New game", style, 0, pos += menuHeight, 320, 1, 0, getMenuCreate(app), -1, null, 0);
-		mJoin = new MenuButton("Join a game", style, 0, pos += menuHeight, 320, 1, 0, getMenuJoin(app), -1, null, 0);
+		mJoin = new MenuButton("Join a game", style, 0, pos + menuHeight, 320, 1, 0, getMenuJoin(app), -1, null, 0);
 		// splitscreen game
 		// end game
 

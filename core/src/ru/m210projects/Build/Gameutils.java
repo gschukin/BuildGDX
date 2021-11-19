@@ -55,7 +55,7 @@ public class Gameutils {
 			array[0] = (byte) value;
 
 		for (int i = 1; i < len; i += i)
-			System.arraycopy(array, 0, array, i, ((len - i) < i) ? (len - i) : i);
+			System.arraycopy(array, 0, array, i, Math.min((len - i), i));
 	}
 
 	public static void fill(byte[] array, int start, int end, int value) {
@@ -65,7 +65,7 @@ public class Gameutils {
 		int len = end - start;
 
 		for (int i = 1; i < len; i += i)
-			System.arraycopy(array, start, array, start + i, ((len - i) < i) ? (len - i) : i);
+			System.arraycopy(array, start, array, start + i, Math.min((len - i), i));
 	}
 
 	public static float invSqrt(float x) {
@@ -95,19 +95,15 @@ public class Gameutils {
 	public static float BClipRange(float value, float min, float max) {
 		if (value < min)
 			return min;
-		if (value > max)
-			return max;
+		return Math.min(value, max);
 
-		return value;
 	}
 
 	public static int BClipRange(int value, int min, int max) {
 		if (value < min)
 			return min;
-		if (value > max)
-			return max;
+		return Math.min(value, max);
 
-		return value;
 	}
 
 	public static short BClipLow(short value, short min) {
@@ -119,11 +115,11 @@ public class Gameutils {
 	}
 
 	public static int BClipLow(int value, int min) {
-		return value < min ? min : value;
+		return Math.max(value, min);
 	}
 
 	public static int BClipHigh(int value, int max) {
-		return value > max ? max : value;
+		return Math.min(value, max);
 	}
 
 	public static float BClipLow(float value, int min) {
@@ -213,9 +209,8 @@ public class Gameutils {
 		int ydim = (3 * xdim) / 4;
 		int buildim = 200 * ydim / oydim;
 		int normxofs = coord - (buildim << 15);
-		int wy = (ydim << 15) + scale(normxofs, ydim, buildim);
 
-		return wy;
+		return (ydim << 15) + scale(normxofs, ydim, buildim);
 	}
 
 	public static byte[] getInternalResource(String name) {

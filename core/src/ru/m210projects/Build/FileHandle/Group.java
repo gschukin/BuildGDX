@@ -146,8 +146,7 @@ public abstract class Group {
 	protected abstract boolean open(GroupResource res);
 	
 	public List<GroupResource> getList() {
-		List<GroupResource> list = new ArrayList<GroupResource>(filelist);
-		return list;
+		return new ArrayList<GroupResource>(filelist);
 	}
 	
 	public boolean containsType(String type)

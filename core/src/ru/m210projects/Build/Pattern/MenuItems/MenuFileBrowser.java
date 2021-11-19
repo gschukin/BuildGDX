@@ -103,7 +103,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 	private final BuildEngine draw;
 	private final SliderDrawable slider;
-	private int nBackground = 0;
+	private int nBackground;
 	private int scrollerHeight;
 	protected BuildFont topFont, pathFont;
 	public int topPal, pathPal, listPal, backgroundPal;

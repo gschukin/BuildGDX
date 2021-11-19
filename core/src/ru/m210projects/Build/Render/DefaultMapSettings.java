@@ -67,22 +67,22 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 	@Override
 	public int getWallColor(int w, int sec) {
 		WALL wal = wall[w];
-		if (Gameutils.isValidSector(wal.nextsector)) // red wall
-			return 31;
+//		if (Gameutils.isValidSector(wal.nextsector)) // red wall
+//			return 31;
 		return 31; // white wall
 	}
 
 	@Override
 	public int getSpriteColor(int s) {
 		SPRITE spr = sprite[s];
-		switch (spr.cstat & 48) {
-		case 0:
-			return 31;
-		case 16:
-			return 31;
-		case 32:
-			return 31;
-		}
+//		switch (spr.cstat & 48) {
+//		case 0:
+//			return 31;
+//		case 16:
+//			return 31;
+//		case 32:
+//			return 31;
+//		}
 
 		return 31;
 	}
@@ -103,7 +103,7 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 		SPRITE pPlayer = sprite[getPlayerSprite(player)];
 		int nZoom = mulscale(yxaspect,
 				czoom * (klabs((sector[pPlayer.sectnum].floorz - pPlayer.z) >> 8) + pPlayer.yrepeat), 16);
-		return nZoom = BClipRange(nZoom, 22000, 0x20000);
+		return BClipRange(nZoom, 22000, 0x20000);
 	}
 
 	@Override

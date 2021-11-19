@@ -397,7 +397,7 @@ public abstract class Engine {
 	private short[] colnext;
 	private final byte[] coldist = { 0, 1, 2, 3, 4, 3, 2, 1 };
 	private int[] colscan;
-	protected int randomseed = 1;
+	protected int randomseed;
 
 	public static short[] radarang;
 	public static byte[] transluc;
@@ -416,7 +416,7 @@ public abstract class Engine {
 		if ((nInfo & 0xC000) == 0x8000) { // sprite
 			// hash sprite frame by info variable
 
-			shortbuf[0] = (byte) ((nInfo >>> 0) & 0xFF);
+			shortbuf[0] = (byte) ((nInfo) & 0xFF);
 			shortbuf[1] = (byte) ((nInfo >>> 8) & 0xFF);
 
 			clock = (int) ((totalclocklock + CRC32.getChecksum(shortbuf)) >> speed);
@@ -442,7 +442,7 @@ public abstract class Engine {
 				break;
 			}
 		}
-		return (int) index;
+		return index;
 	}
 
 	public void initksqrt() { // jfBuild
@@ -1455,7 +1455,7 @@ public abstract class Engine {
 
 	public synchronized void loadpic(String filename) // gdxBuild
 	{
-		Resource fil = null;
+		Resource fil;
 		if ((fil = BuildGdx.cache.open(filename, 0)) != null) {
 			artversion = fil.readInt();
 			if (artversion != 1)
@@ -1507,7 +1507,7 @@ public abstract class Engine {
 		buildString(artfilename, 0, tilesPath);
 
 		numtilefiles = 0;
-		Resource fil = null;
+		Resource fil;
 		do {
 			k = numtilefiles;
 
@@ -1795,29 +1795,18 @@ public abstract class Engine {
 			if (wal.nextsector >= 0) {
 				if (topbottom == 1) {
 					testz = sector[wal.nextsector].floorz;
-					if (direction == 1) {
-						if ((testz > thez) && (testz < nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					} else {
-						if ((testz < thez) && (testz > nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					}
 				} else {
 					testz = sector[wal.nextsector].ceilingz;
-					if (direction == 1) {
-						if ((testz > thez) && (testz < nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					} else {
-						if ((testz < thez) && (testz > nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
+				}
+				if (direction == 1) {
+					if ((testz > thez) && (testz < nextz)) {
+						nextz = testz;
+						sectortouse = wal.nextsector;
+					}
+				} else {
+					if ((testz < thez) && (testz > nextz)) {
+						nextz = testz;
+						sectortouse = wal.nextsector;
 					}
 				}
 			}
@@ -2318,7 +2307,7 @@ public abstract class Engine {
 		short tempshortcnt = 0;
 		short tempshortnum = 1;
 
-		Point out = null;
+		Point out;
 		do {
 			dasector = clipsectorlist[tempshortcnt];
 			if (dasector < 0) {
@@ -2617,7 +2606,6 @@ public abstract class Engine {
 					} else {
 						dax = out.getX();
 						day = out.getY();
-						daz = out.getZ();
 					}
 
 					daz = getflorzofslope((short) dasect, dax, day);
@@ -2821,7 +2809,6 @@ public abstract class Engine {
 			}
 		} while (clipsectcnt < clipsectnum);
 
-		hitwall = 0;
 		cnt = clipmoveboxtracenum;
 		do {
 			Clip out = raytrace(clipmove_x, clipmove_y, goalx, goaly);
@@ -2885,12 +2872,7 @@ public abstract class Engine {
 				else
 					templong2 = (sector[j].ceilingz - (clipmove_z));
 
-				if (templong2 > 0) {
-					if (templong2 < templong1) {
-						clipmove_sectnum = j;
-						templong1 = templong2;
-					}
-				} else {
+				if (templong2 <= 0) {
 					if ((sector[j].floorstat & 2) != 0)
 						templong2 = (clipmove_z) - getflorzofslope(j, clipmove_x, clipmove_y);
 					else
@@ -2900,10 +2882,10 @@ public abstract class Engine {
 						clipmove_sectnum = j;
 						return (retval);
 					}
-					if (templong2 < templong1) {
-						clipmove_sectnum = j;
-						templong1 = templong2;
-					}
+				}
+				if (templong2 < templong1) {
+					clipmove_sectnum = j;
+					templong1 = templong2;
 				}
 			}
 

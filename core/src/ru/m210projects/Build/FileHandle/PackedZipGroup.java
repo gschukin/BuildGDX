@@ -110,7 +110,7 @@ public class PackedZipGroup extends Group {
 						byte[] data = new byte[512];
 						res.buffer = ByteBuffer.allocateDirect(res.size);
 						res.buffer.order(ByteOrder.LITTLE_ENDIAN);
-						int len = 0;
+						int len;
 						while((len = zis.read(data)) != -1) 
 							res.buffer.put(data, 0, len);
 						res.buffer.rewind();

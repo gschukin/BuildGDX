@@ -93,7 +93,7 @@ public class JController implements BuildController {
 		float mag = (float) Math.sqrt(lx*lx + ly*ly);
 		float nlx = lx / mag;
 		float nly = ly / mag;
-		float nlm = 0.0f;
+		float nlm;
 		if (mag > deadZone)
 		{
 			if (mag > 1.0f)

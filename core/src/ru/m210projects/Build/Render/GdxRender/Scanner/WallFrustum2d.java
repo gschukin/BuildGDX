@@ -435,7 +435,7 @@ public class WallFrustum2d implements Poolable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
-		sb.append("fov : " + getHFov());
+		sb.append("fov : ").append(getHFov());
 		sb.append(", dir: ").append(this.getDirection(true).angle());
 		sb.append(", plane0 ").append(getPlane(0));
 		sb.append(", plane1 ").append(getPlane(1));

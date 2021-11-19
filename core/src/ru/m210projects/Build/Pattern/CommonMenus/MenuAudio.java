@@ -243,7 +243,7 @@ public abstract class MenuAudio extends BuildMenu {
 			}
 		};
 
-		sSoundSwitch = new MenuSwitch("Sound", menuItems, posx, oposy += menuHeight, width, !cfg.noSound,
+		sSoundSwitch = new MenuSwitch("Sound", menuItems, posx, oposy + menuHeight, width, !cfg.noSound,
 				new MenuProc() {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {

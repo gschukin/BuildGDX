@@ -227,10 +227,10 @@ public class WallFrustum3d implements Poolable {
 	}
 
 	public boolean clipBounds(WallFrustum3d viewport) {
-		bounds[0].x = (viewport.bounds[0].x >= bounds[0].x) ? viewport.bounds[0].x : bounds[0].x;
-		bounds[1].x = (viewport.bounds[1].x <= bounds[1].x) ? viewport.bounds[1].x : bounds[1].x;
-		bounds[0].y = (viewport.bounds[0].y >= bounds[0].y) ? viewport.bounds[0].y : bounds[0].y;
-		bounds[1].y = (viewport.bounds[1].y <= bounds[1].y) ? viewport.bounds[1].y : bounds[1].y;
+		bounds[0].x = Math.max(viewport.bounds[0].x, bounds[0].x);
+		bounds[1].x = Math.min(viewport.bounds[1].x, bounds[1].x);
+		bounds[0].y = Math.max(viewport.bounds[0].y, bounds[0].y);
+		bounds[1].y = Math.min(viewport.bounds[1].y, bounds[1].y);
 
 		return !(bounds[1].x - bounds[0].x <= 0) && !(bounds[1].y - bounds[0].y <= 0);
 	}

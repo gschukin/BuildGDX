@@ -93,7 +93,7 @@ public class DataResource extends GroupResource {
 			if(position() >= size) 
 				return -1;
 			
-			int var = -1;
+			int var;
 			bb.position(offset);
 			int p = 0;
 			while(len > 0)

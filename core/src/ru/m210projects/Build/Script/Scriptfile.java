@@ -142,12 +142,10 @@ public class Scriptfile {
 	public int getlinum(int ptr) {
 		int i, stp;
 
-		int ind = ptr;
-
 		for (stp = 1; stp + stp < linenum; stp += stp)
 			; // stp = highest power of 2 less than linenum
 		for (i = 0; stp != 0; stp >>= 1)
-			if ((i + stp < linenum) && (lineoffs[i + stp] < ind))
+			if ((i + stp < linenum) && (lineoffs[i + stp] < ptr))
 				i += stp;
 		return i + 2; // i = index to highest lineoffs which is less than ind; convert to 1-based line
 						// numbers
