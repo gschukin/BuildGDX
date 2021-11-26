@@ -31,13 +31,13 @@ import ru.m210projects.Build.Types.Tile.AnimType;
 
 public class SpriteRenderer {
 
-	private Matrix4 transform;
+	private final Matrix4 transform;
 	private BuildCamera cam;
-	private SpriteComparator comp;
-	private GDXRenderer parent;
-	private Engine engine;
+	private final SpriteComparator comp;
+	private final GDXRenderer parent;
+	private final Engine engine;
 
-	private int spritesz[] = new int[MAXSPRITES];
+	private final int[] spritesz = new int[MAXSPRITES];
 
 	public class SpriteComparator implements Comparator<SPRITE> {
 		@Override

@@ -17,5 +17,5 @@
 package ru.m210projects.Build.Audio;
 
 public interface SourceCallback<T> {
-	public void run(T ch);
+	void run(T ch);
 }

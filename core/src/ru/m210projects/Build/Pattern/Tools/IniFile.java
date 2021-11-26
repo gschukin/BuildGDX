@@ -212,7 +212,7 @@ public class IniFile {
 					length.add(pointer.get(i + 1) - pointer.get(i));
 				}
 			}
-			length.add((int) (data.length - pointer.get(pointer.size() - 1)));
+			length.add(data.length - pointer.get(pointer.size() - 1));
 		}
 	}
 	

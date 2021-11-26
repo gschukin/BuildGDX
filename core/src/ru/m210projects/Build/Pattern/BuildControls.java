@@ -44,7 +44,7 @@ public abstract class BuildControls {
 	protected BuildControllers gpmanager;
 	protected BuildConfig pCfg;
 
-	public enum JoyStick { Turning, Moving };
+	public enum JoyStick { Turning, Moving }
 
 	public BuildControls(BuildConfig cfg, BuildControllers gpmanager)
 	{
@@ -188,10 +188,7 @@ public abstract class BuildControls {
 
 	public boolean ctrlAxisStatus(int keyId)
 	{
-		if(keyId >= 0 && maxisstatus[keyId])
-			return true;
-
-		return false;
+		return keyId >= 0 && maxisstatus[keyId];
 	}
 
 	public boolean ctrlKeyStatusOnce(int keyId)

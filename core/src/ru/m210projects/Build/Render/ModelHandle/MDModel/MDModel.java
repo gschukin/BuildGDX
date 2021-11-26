@@ -168,7 +168,7 @@ public abstract class MDModel implements GLModel {
 
 		MDAnimation anim;
 		for (anim = animations; anim != null && anim.startframe != cframe; anim = anim.next) {
-			/* do nothing */;
+			/* do nothing */
 		}
 
 		if (anim == null) {

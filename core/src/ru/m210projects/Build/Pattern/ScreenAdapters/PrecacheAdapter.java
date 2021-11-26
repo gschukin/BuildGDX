@@ -24,8 +24,8 @@ import ru.m210projects.Build.Types.Tile.AnimType;
 public abstract class PrecacheAdapter extends ScreenAdapter {
 
 	private class PrecacheQueue {
-		private String name;
-		private Runnable runnable;
+		private final String name;
+		private final Runnable runnable;
 
 		public PrecacheQueue(String name, Runnable runnable) {
 			this.name = name;
@@ -33,9 +33,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		}
 	}
 
-	private byte[] tiles;
+	private final byte[] tiles;
 	private int currentIndex = 0;
-	private List<PrecacheQueue> queues = new ArrayList<PrecacheQueue>();
+	private final List<PrecacheQueue> queues = new ArrayList<PrecacheQueue>();
 	protected Runnable toLoad;
 	protected boolean revalidate;
 

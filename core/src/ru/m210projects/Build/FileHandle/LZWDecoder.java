@@ -19,8 +19,11 @@ public class LZWDecoder implements Closeable {
 	private final int sizeof;
 
 	private final int LZWSIZE = 16385;
-	private byte[] lzwbuf1, lzwbuf4, lzwbuf5;
-	private short[] lzwbuf2, lzwbuf3;
+	private final byte[] lzwbuf1;
+	private final byte[] lzwbuf4;
+	private final byte[] lzwbuf5;
+	private final short[] lzwbuf2;
+	private final short[] lzwbuf3;
 
 	public LZWDecoder(Resource res, int sizeof) {
 		this.fil = res;
@@ -143,7 +146,7 @@ public class LZWDecoder implements Closeable {
 		int bitcnt = (4 << 3);
 		int numbits = 8;
 		int oneupnumbits = (1 << 8);
-		short addr = 0;
+		short addr;
 		do {
 			addr = (short) (lzwinbuf[bytecnt1] & 0xFF);
 			do {

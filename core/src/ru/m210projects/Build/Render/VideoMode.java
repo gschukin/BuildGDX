@@ -82,8 +82,8 @@ public class VideoMode {
 		for (int i = 0; i < validmodes.size(); i++) {
 			VideoMode mode = validmodes.get(i);
 			if(mode.xdim == DesktopDisplayMode.width && mode.ydim == DesktopDisplayMode.height)
-				strvmodes[i] = new String("* " + mode.xdim + " x " + mode.ydim);
-			else strvmodes[i] = new String(mode.xdim + " x " + mode.ydim);
+				strvmodes[i] = "* " + mode.xdim + " x " + mode.ydim;
+			else strvmodes[i] = mode.xdim + " x " + mode.ydim;
 		}
 	}
 	
@@ -106,10 +106,7 @@ public class VideoMode {
 		if(!fullscreen)
 			return false;
 		else
-			if(getmodeindex(xdim, ydim) != -1)
-				return true;
-
-		return false;
+			return getmodeindex(xdim, ydim) != -1;
 	}
 	
 	public static DisplayMode getmode(int index) {

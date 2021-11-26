@@ -104,10 +104,7 @@ public class GdxController implements BuildController {
 	@Override
 	public boolean buttonStatus(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode]) 
-			return true;
-
-		return false;
+		return buttonCode >= 0 && buttonCode < allButtonsCount && buttonStatus[buttonCode];
 	}
 	
 	@Override
@@ -136,7 +133,7 @@ public class GdxController implements BuildController {
 		float mag = (float) Math.sqrt(lx*lx + ly*ly);
 		float nlx = lx / mag;
 		float nly = ly / mag;
-		float nlm = 0.0f;
+		float nlm;
 		if (mag > deadZone)
 		{
 			if (mag > 1.0f)
@@ -150,8 +147,6 @@ public class GdxController implements BuildController {
 		}
 		else
 		{
-			mag = 0.0f;
-			nlm = 0.0f;
 			return stickVector.set(0.0f, 0.0f);
 		}
 	}

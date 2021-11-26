@@ -103,7 +103,7 @@ public abstract class MenuCreate extends BuildMenu {
 			}
 		};
 
-		mCreate = new MenuButton("Create", style, 0, posy += (2*menuHeight), 320, 1, 0, null, -1, new MenuProc() {
+		mCreate = new MenuButton("Create", style, 0, posy + (2 * menuHeight), 320, 1, 0, null, -1, new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				String[] param = new String[] { "-n0" + (mPlayers != 2 ? (":" + mPlayers) : ""),

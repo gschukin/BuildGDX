@@ -31,8 +31,8 @@ public class Cache1D {
 		Grp, Rff, Zip, User, PackedGrp, PackedRff, PackedZip
 	}
 
-	private Compat compat;
-	private List<Group> groupfil = new ArrayList<Group>();
+	private final Compat compat;
+	private final List<Group> groupfil = new ArrayList<Group>();
 
 	private final int grpsign = 0x536E654B;
 	private final int zipsign = 0x04034b50;
@@ -43,8 +43,7 @@ public class Cache1D {
 	}
 
 	public List<Group> getGroupList() {
-		List<Group> out = new ArrayList<Group>(groupfil);
-		return out;
+		return new ArrayList<Group>(groupfil);
 	}
 
 	public Group getGroup(String groupname) {
@@ -134,7 +133,7 @@ public class Cache1D {
 	}
 
 	public Group add(GroupResource res, boolean removable) {
-		Group out = null;
+		Group out;
 		if (res.isClosed())
 			res.getParent().open(res);
 

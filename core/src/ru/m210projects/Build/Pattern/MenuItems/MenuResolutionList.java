@@ -32,7 +32,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 
 public class MenuResolutionList extends MenuList {
 
-	private int nBackground;
+	private final int nBackground;
 	protected Engine draw;
 	public int transparent = 1;
 	public int backgroundPal;

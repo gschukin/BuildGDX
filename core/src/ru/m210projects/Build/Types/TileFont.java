@@ -34,13 +34,13 @@ public class TileFont {
 		}
 
 		public abstract ByteBuffer buildAtlas(ByteBuffer data);
-	};
+	}
 
 	public static final HashSet<TileFont> managedFont = new HashSet<TileFont>();
 
 	public enum FontType {
 		Tilemap, Bitmap
-	};
+	}
 
 	public GLTile atlas;
 

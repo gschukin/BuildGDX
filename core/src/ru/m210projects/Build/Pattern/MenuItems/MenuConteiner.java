@@ -140,14 +140,13 @@ public class MenuConteiner extends MenuItem
 		
 		if(list == null) return false;
 		
-		char[] key = null;
+		char[] key;
 		if(num != -1 && num < list.length) {
 			key = list[num];
 			int fontx =  listFont.getWidth(key);
 			int px = x + width - 1 - fontx;
 			if(mx > px && mx < px + fontx)
-				if(my > y && my < y + font.getHeight()) 
-					return true;
+                return my > y && my < y + font.getHeight();
 		}
 		
 		return false;

@@ -161,7 +161,7 @@ public class GDXRenderer implements GLRenderer {
 	private int frameh;
 
 	protected ArrayList<VisibleSector> sectors = new ArrayList<VisibleSector>();
-	private ArrayList<GLSurface> bunchfirst = new ArrayList<GLSurface>();
+	private final ArrayList<GLSurface> bunchfirst = new ArrayList<GLSurface>();
 	protected boolean[] mirrorTextures = new boolean[MAXTILES];
 
 	protected int FOGDISTCONST = 48;
@@ -1092,15 +1092,13 @@ public class GDXRenderer implements GLRenderer {
 				break;
 			case TexturesOnly:
 			case IndexedTexturesOnly:
-				textureCache.invalidateall();
+			case All:
+					textureCache.invalidateall();
 				break;
 			case Palookup:
 				for (int j = 0; j < MAXPALOOKUPS; j++) {
 					textureCache.invalidatepalookup(j);
 				}
-				break;
-			case All:
-				textureCache.invalidateall();
 				break;
 			}
 		}

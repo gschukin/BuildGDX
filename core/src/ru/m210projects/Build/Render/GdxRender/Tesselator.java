@@ -34,9 +34,9 @@ public class Tesselator {
 		public Heinum getHeinum() {
 			return heinum;
 		}
-	};
+	}
 
-	private Pool<Zoid_t> pZoidsPool = new Pool<Zoid_t>() {
+	private final Pool<Zoid_t> pZoidsPool = new Pool<Zoid_t>() {
 		@Override
 		protected Zoid_t newObject() {
 			return new Zoid_t();
@@ -57,11 +57,11 @@ public class Tesselator {
 	private final Vector3 norm = new Vector3();
 	private final Vertex[] vertex = new Vertex[3];
 
-	private ArrayList<Integer> secy = new ArrayList<Integer>();
-	private ArrayList<Float> trapx0 = new ArrayList<Float>();
-	private ArrayList<Float> trapx1 = new ArrayList<Float>();
+	private final ArrayList<Integer> secy = new ArrayList<Integer>();
+	private final ArrayList<Float> trapx0 = new ArrayList<Float>();
+	private final ArrayList<Float> trapx1 = new ArrayList<Float>();
 
-	private WorldMesh mesh;
+	private final WorldMesh mesh;
 
 	public Tesselator(WorldMesh mesh, VertexAttribute... attributes) {
 		this.mesh = mesh;
@@ -568,7 +568,8 @@ public class Tesselator {
 	}
 
 	private static class Zoid_t {
-		private float[] x, y;
+		private final float[] x;
+		private final float[] y;
 
 		public Zoid_t() {
 			x = new float[4];

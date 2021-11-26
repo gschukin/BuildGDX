@@ -52,7 +52,7 @@ public class LwjglGraphics extends BuildGraphics {
 	/** The suppored OpenGL extensions */
 	private static Array<String> extensions;
 	private static GLVersion glVersion;
-	private BuildConfiguration config;
+	private final BuildConfiguration config;
 	private BufferFormat bufferFormat = new BufferFormat(8, 8, 8, 8, 16, 8, 0, false);
 	private boolean usingGL30;
 	private int rate;
@@ -84,7 +84,7 @@ public class LwjglGraphics extends BuildGraphics {
 			System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
 		}
 
-		boolean displayCreated = false;
+		boolean displayCreated;
 		if(!config.fullscreen) {
 			displayCreated = setWindowedMode(config.width, config.height);
 		} else {

@@ -27,8 +27,8 @@ import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 
 public abstract class MD3ModelGL10 extends MDModel {
 
-	private ShortBuffer indices;
-	private FloatBuffer vertices;
+	private final ShortBuffer indices;
+	private final FloatBuffer vertices;
 
 	private final MD3Surface[] surfaces;
 	private final int numSurfaces;
@@ -132,8 +132,7 @@ public abstract class MD3ModelGL10 extends MDModel {
 
 	@Override
 	public void loadSkins(int pal, int skinnum) {
-		int numsurfs = numSurfaces;
-		for (int surfi = 0; surfi < numsurfs; surfi++)
+		for (int surfi = 0; surfi < numSurfaces; surfi++)
 			getSkin(pal, skinnum, surfi);
 	}
 

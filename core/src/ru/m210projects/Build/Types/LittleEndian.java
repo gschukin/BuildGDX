@@ -168,7 +168,7 @@ public class LittleEndian
         int b1 = data[i++] & 0xFF;
         int b2 = data[i++] & 0xFF;
         int b3 = data[i++] & 0xFF;
-        return ( b3 << 24 ) + ( b2 << 16 ) + ( b1 << 8 ) + ( b0 << 0 );
+        return ( b3 << 24 ) + ( b2 << 16 ) + ( b1 << 8 ) + (b0);
     }
 
     /**
@@ -229,7 +229,7 @@ public class LittleEndian
     {
         int b0 = data[offset] & 0xFF;
         int b1 = data[offset + 1] & 0xFF;
-        return (short) ( ( b1 << 8 ) + ( b0 << 0 ) );
+        return (short) ( ( b1 << 8 ) + (b0) );
     }
 
     /**
@@ -348,7 +348,7 @@ public class LittleEndian
     {
         int b0 = data[offset] & 0xFF;
         int b1 = data[offset + 1] & 0xFF;
-        return ( b1 << 8 ) + ( b0 << 0 );
+        return ( b1 << 8 ) + (b0);
     }
 
     /**
@@ -455,7 +455,7 @@ public class LittleEndian
     public static void putInt( byte[] data, int offset, int value )
     {
         int i = offset;
-        data[i++] = (byte) ( ( value >>> 0 ) & 0xFF );
+        data[i++] = (byte) ( (value) & 0xFF );
         data[i++] = (byte) ( ( value >>> 8 ) & 0xFF );
         data[i++] = (byte) ( ( value >>> 16 ) & 0xFF );
         data[i++] = (byte) ( ( value >>> 24 ) & 0xFF );
@@ -474,7 +474,7 @@ public class LittleEndian
     public static void putInt( int value, OutputStream outputStream )
 	throws IOException
     {
-        outputStream.write( (byte) ( ( value >>> 0 ) & 0xFF ) );
+        outputStream.write( (byte) ( (value) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 8 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 16 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 24 ) & 0xFF ) );
@@ -492,7 +492,7 @@ public class LittleEndian
      */
     public static void putLong( byte[] data, int offset, long value )
     {
-        data[offset + 0] = (byte) ( ( value >>> 0 ) & 0xFF );
+        data[offset + 0] = (byte) ( (value) & 0xFF );
         data[offset + 1] = (byte) ( ( value >>> 8 ) & 0xFF );
         data[offset + 2] = (byte) ( ( value >>> 16 ) & 0xFF );
         data[offset + 3] = (byte) ( ( value >>> 24 ) & 0xFF );
@@ -515,7 +515,7 @@ public class LittleEndian
     public static void putLong( long value, OutputStream outputStream )
 	throws IOException
     {
-        outputStream.write( (byte) ( ( value >>> 0 ) & 0xFF ) );
+        outputStream.write( (byte) ( (value) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 8 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 16 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 24 ) & 0xFF ) );
@@ -538,7 +538,7 @@ public class LittleEndian
     public static void putShort( byte[] data, int offset, short value )
     {
         int i = offset;
-        data[i++] = (byte) ( ( value >>> 0 ) & 0xFF );
+        data[i++] = (byte) ( (value) & 0xFF );
         data[i++] = (byte) ( ( value >>> 8 ) & 0xFF );
     }
 
@@ -570,7 +570,7 @@ public class LittleEndian
     public static void putShort( OutputStream outputStream, short value )
 	throws IOException
     {
-        outputStream.write( (byte) ( ( value >>> 0 ) & 0xFF ) );
+        outputStream.write( (byte) ( (value) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 8 ) & 0xFF ) );
     }
 
@@ -629,7 +629,7 @@ public class LittleEndian
     public static void putUInt( byte[] data, int offset, long value )
     {
         int i = offset;
-        data[i++] = (byte) ( ( value >>> 0 ) & 0xFF );
+        data[i++] = (byte) ( (value) & 0xFF );
         data[i++] = (byte) ( ( value >>> 8 ) & 0xFF );
         data[i++] = (byte) ( ( value >>> 16 ) & 0xFF );
         data[i++] = (byte) ( ( value >>> 24 ) & 0xFF );
@@ -663,7 +663,7 @@ public class LittleEndian
     public static void putUInt( long value, OutputStream outputStream )
 	throws IOException
     {
-        outputStream.write( (byte) ( ( value >>> 0 ) & 0xFF ) );
+        outputStream.write( (byte) ( (value) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 8 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 16 ) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 24 ) & 0xFF ) );
@@ -685,7 +685,7 @@ public class LittleEndian
     public static void putUShort( byte[] data, int offset, int value )
     {
         int i = offset;
-        data[i++] = (byte) ( ( value >>> 0 ) & 0xFF );
+        data[i++] = (byte) ( (value) & 0xFF );
         data[i++] = (byte) ( ( value >>> 8 ) & 0xFF );
     }
 
@@ -702,7 +702,7 @@ public class LittleEndian
     public static void putUShort( int value, OutputStream outputStream )
 	throws IOException
     {
-        outputStream.write( (byte) ( ( value >>> 0 ) & 0xFF ) );
+        outputStream.write( (byte) ( (value) & 0xFF ) );
         outputStream.write( (byte) ( ( value >>> 8 ) & 0xFF ) );
     }
 
@@ -717,9 +717,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static int readInt( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static int readInt( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         int ch3 = stream.read();
@@ -728,7 +726,7 @@ public class LittleEndian
         {
             throw new BufferUnderrunException();
         }
-        return ( ch4 << 24 ) + ( ch3 << 16 ) + ( ch2 << 8 ) + ( ch1 << 0 );
+        return ( ch4 << 24 ) + ( ch3 << 16 ) + ( ch2 << 8 ) + (ch1);
     }
 
     /**
@@ -742,9 +740,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static long readUInt( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static long readUInt( InputStream stream ) throws IOException {
 		long retNum = readInt(stream);
 		return retNum & 0x00FFFFFFFFl;
     }
@@ -760,9 +756,7 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static long readLong( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static long readLong( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         int ch3 = stream.read();
@@ -780,7 +774,7 @@ public class LittleEndian
 			+ ( (long) ch6 << 40 ) + ( (long) ch5 << 32 )
 			+ ( (long) ch4 << 24 ) + // cast to long to preserve bit 31
 			// (sign bit for ints)
-			( ch3 << 16 ) + ( ch2 << 8 ) + ( ch1 << 0 );
+			( ch3 << 16 ) + ( ch2 << 8 ) + (ch1);
     }
 
     /**
@@ -794,22 +788,18 @@ public class LittleEndian
      * @exception BufferUnderrunException
      *                if the stream cannot provide enough bytes
      */
-    public static short readShort( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static short readShort( InputStream stream ) throws IOException {
         return (short) readUShort( stream );
     }
 
-    public static int readUShort( InputStream stream ) throws IOException,
-	BufferUnderrunException
-    {
+    public static int readUShort( InputStream stream ) throws IOException {
         int ch1 = stream.read();
         int ch2 = stream.read();
         if ( ( ch1 | ch2 ) < 0 )
         {
             throw new BufferUnderrunException();
         }
-        return ( ch2 << 8 ) + ( ch1 << 0 );
+        return ( ch2 << 8 ) + (ch1);
     }
 
     /**

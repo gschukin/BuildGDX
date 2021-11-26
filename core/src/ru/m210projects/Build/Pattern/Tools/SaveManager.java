@@ -13,8 +13,8 @@ import ru.m210projects.Build.FileHandle.Compat.Path;
 
 public class SaveManager {
 
-	private List<SaveInfo> SavList = new ArrayList<SaveInfo>();
-	private HashMap<String, SaveInfo> SavHash = new HashMap<String, SaveInfo>();
+	private final List<SaveInfo> SavList = new ArrayList<SaveInfo>();
+	private final HashMap<String, SaveInfo> SavHash = new HashMap<String, SaveInfo>();
 	public static final int Screenshot = MAXTILES - 1;
 	
 	public class SaveInfo implements Comparable<SaveInfo> {

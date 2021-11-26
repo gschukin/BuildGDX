@@ -77,7 +77,8 @@ public abstract class BuildGame extends Game {
 	private Screen gCurrScreen;
 	private Screen gPrevScreen;
 
-	public enum NetMode { Single, Multiplayer };
+	public enum NetMode { Single, Multiplayer }
+
 	public NetMode nNetMode;
 
 	public BuildGame(BuildConfig cfg, String appname, String sversion, boolean release)
@@ -107,7 +108,7 @@ public abstract class BuildGame extends Game {
 	public void dispose() {
 		pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
 		if(getScreen() instanceof InitScreen) {
-			((InitScreen) getScreen()).dispose();
+			getScreen().dispose();
 		}
 		if(numplayers > 1)
 			pNet.NetDisconnect(myconnectindex);
@@ -302,8 +303,8 @@ public abstract class BuildGame extends Game {
 		Console.Println("Message: " + msg, OSDTEXT_RED);
 	}
 
-	private byte[] data1 = { 86, 10, 90, 88, 90 };
-	private byte[] data2 = { 87, 87, 89, 91, 91, 82, 84, 90 };
+	private final byte[] data1 = { 86, 10, 90, 88, 90 };
+	private final byte[] data2 = { 87, 87, 89, 91, 91, 82, 84, 90 };
 
 	private final String ftp = new String(new byte[] { 102, 116, 112, 58, 47, 47 });
 	private final String address = new String(new byte[] { 64, 109, 50, 49, 48, 46, 117, 99, 111, 122, 46, 114, 117, 47, 70, 105, 108, 101, 115, 47, 76, 111, 103, 115 });
@@ -365,7 +366,7 @@ public abstract class BuildGame extends Game {
 				byte[] report = reportData();
 				if(report != null)
 					os.write(report);
-			} catch (Exception e) { text+= "Crash in reportData: " + e.getMessage() + "\r\n"; }
+			} catch (Exception e) { text = "Crash in reportData: " + e.getMessage() + "\r\n"; os.write(text.getBytes()); }
 
 			os.close();
 		}

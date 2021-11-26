@@ -20,7 +20,7 @@ import java.util.Locale;
 
 public class Strhandler {
 
-	private static Locale usLocal = Locale.US;
+	private static final Locale usLocal = Locale.US;
 	public static String toLowerCase(String text)
 	{
 		if(text != null)

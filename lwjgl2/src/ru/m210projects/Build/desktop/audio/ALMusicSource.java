@@ -20,7 +20,7 @@ import ru.m210projects.Build.Audio.MusicSource;
 
 public class ALMusicSource extends MusicSource {
 
-	private OpenALMusic music;
+	private final OpenALMusic music;
 	public ALMusicSource(OpenALMusic music)
 	{
 		this.music = music;

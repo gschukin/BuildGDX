@@ -28,15 +28,15 @@ import ru.m210projects.Build.Render.Types.Spriteext;
 public class Maphack extends Scriptfile {
 
 	private long MapCRC;
-	private Spriteext[] spriteext;
+	private final Spriteext[] spriteext;
 
-	private static enum Token {
+	private enum Token {
 		MapCRC, Sprite,
 
 		AngleOffset, XOffset, YOffset, ZOffset, NoModel,
 
-		Error, EOF;
-	}
+		Error, EOF
+    }
 
 	private final static Map<String, Token> basetokens = new HashMap<String, Token>() {
 		private static final long serialVersionUID = 1L;

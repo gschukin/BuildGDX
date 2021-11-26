@@ -30,8 +30,7 @@ public class VisibleSector implements Poolable {
 
 	@Override
 	public String toString() {
-		String text = "index: " + index + " walls: " + walls.size;
-		return text;
+		return "index: " + index + " walls: " + walls.size;
 	}
 
 	@Override

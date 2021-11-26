@@ -9,8 +9,9 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 public class PixmapTileData extends TileData {
 
 	private Pixmap pixmap;
-	private boolean clamped;
-	private int width, height;
+	private final boolean clamped;
+	private final int width;
+	private final int height;
 
 	public PixmapTileData(Pixmap pixmap, boolean clamped, int expflag) {
 		if (pixmap.getFormat() == Format.Alpha || pixmap.getFormat() == Format.Intensity

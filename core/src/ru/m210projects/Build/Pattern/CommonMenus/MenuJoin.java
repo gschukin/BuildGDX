@@ -91,7 +91,7 @@ public abstract class MenuJoin extends BuildMenu {
 			}
 		};
 
-		mConnect = new MenuButton("Connect", style, 0, posy += (2*menuHeight), 320, 1, 0, null, -1, new MenuProc() {
+		mConnect = new MenuButton("Connect", style, 0, posy + (2 * menuHeight), 320, 1, 0, null, -1, new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				if (app.pCfg.mAddress.isEmpty())

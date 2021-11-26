@@ -30,7 +30,9 @@ public class GLFog {
 
 	protected final float[] color = new float[4];
 	protected float start, end;
-	protected float curstart, curend, curcolor[] = new float[4];
+	protected float curstart;
+	protected float curend;
+	protected float[] curcolor = new float[4];
 
 	public void init(TextureManager manager) {
 		if (BuildGdx.graphics.getGLVersion().getVendorString().compareTo("NVIDIA Corporation") == 0) {

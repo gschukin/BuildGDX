@@ -25,7 +25,7 @@ import ru.m210projects.Build.Types.TileFont;
 
 public interface Renderer {
 
-	public enum RenderType {
+	enum RenderType {
 		Software(FrameType.Canvas, "Classic"), Polymost(FrameType.GL, "Polymost"), PolyGDX(FrameType.GL, "PolyGDX");
 
 		FrameType type;
@@ -43,57 +43,57 @@ public interface Renderer {
 		public String getName() {
 			return name;
 		}
-	};
+	}
 
-	public enum Transparent {
+    enum Transparent {
 		None, Bit1, Bit2
 	}
 
-	public PixelFormat getTexFormat();
+	PixelFormat getTexFormat();
 
-	public void init();
+	void init();
 
-	public void uninit();
+	void uninit();
 
-	public boolean isInited();
+	boolean isInited();
 
-	public void drawmasks();
+	void drawmasks();
 
-	public void drawrooms();
+	void drawrooms();
 
-	public void clearview(int dacol);
+	void clearview(int dacol);
 
-	public void changepalette(byte[] palette);
+	void changepalette(byte[] palette);
 
-	public void nextpage();
+	void nextpage();
 
-	public void setview(int x1, int y1, int x2, int y2);
+	void setview(int x1, int y1, int x2, int y2);
 
-	public void invalidatetile(int tilenume, int pal, int how);
+	void invalidatetile(int tilenume, int pal, int how);
 
-	public void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
-			int cy1, int cx2, int cy2);
+	void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
+                      int cy1, int cx2, int cy2);
 
-	public void completemirror();
+	void completemirror();
 
-	public void drawoverheadmap(int cposx, int cposy, int czoom, short cang);
+	void drawoverheadmap(int cposx, int cposy, int czoom, short cang);
 
-	public void drawmapview(int dax, int day, int zoome, int ang);
+	void drawmapview(int dax, int day, int zoome, int ang);
 
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale);
+	void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+                  float scale);
 
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale);
+	void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale);
 
-	public ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz);
+	ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz);
 
-	public byte[] screencapture(int newwidth, int newheight);
+	byte[] screencapture(int newwidth, int newheight);
 
-	public void drawline256(int x1, int y1, int x2, int y2, int col);
+	void drawline256(int x1, int y1, int x2, int y2, int col);
 
-	public void settiltang(int tilt);
+	void settiltang(int tilt);
 
-	public void setDefs(DefScript defs);
+	void setDefs(DefScript defs);
 
-	public RenderType getType();
+	RenderType getType();
 }
