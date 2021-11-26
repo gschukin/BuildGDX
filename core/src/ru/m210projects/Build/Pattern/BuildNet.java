@@ -19,18 +19,18 @@ public abstract class BuildNet {
 	public BuildGame game;
 	public interface NetInput {
 		
-		public int GetInput(byte[] p, int offset, NetInput oldInput);
+		int GetInput(byte[] p, int offset, NetInput oldInput);
 		
-		public int PutInput(byte[] p, int offset, NetInput oldInput);
+		int PutInput(byte[] p, int offset, NetInput oldInput);
 		
-		public void Reset();
+		void Reset();
 		
-		public NetInput Copy(NetInput src);
+		NetInput Copy(NetInput src);
 		
 	}
 	
 	public interface DisconnectCallback {
-		public void invoke(int nDelete);
+		void invoke(int nDelete);
 	}
 
 	public static final byte 	kPacketMasterFrame	= 0;
@@ -49,12 +49,17 @@ public abstract class BuildNet {
 	public boolean ready2send;
 	
 	public int ototalclock = 0;
-	public int gNetFifoTail, gNetFifoHead[] = new int[MAXPLAYERS], gPredictTail, gNetFifoMasterTail;
+	public int gNetFifoTail;
+	public int[] gNetFifoHead = new int[MAXPLAYERS];
+	public int gPredictTail;
+	public int gNetFifoMasterTail;
 	public NetInput gInput;
-	public NetInput gFifoInput[][] = new NetInput[kNetFifoSize][MAXPLAYERS];
+	public NetInput[][] gFifoInput = new NetInput[kNetFifoSize][MAXPLAYERS];
 
 	public int MovesPerPacket = 1;
-	public int myMinLag[] = new int[MAXPLAYERS], otherMinLag, myMaxLag;
+	public int[] myMinLag = new int[MAXPLAYERS];
+	public int otherMinLag;
+	public int myMaxLag;
 	public int bufferJitter = 0;
 	public byte[] playerReady = new byte[MAXPLAYERS];
 	
@@ -64,7 +69,9 @@ public abstract class BuildNet {
 	public final int CheckSize = 4 * 4;
 	public byte[] tempCheck = new byte[CheckSize];
 	public byte[][] gCheckFifo = new byte[MAXPLAYERS][CheckSize * kNetFifoSize];
-	public int gCheckHead[] = new int[MAXPLAYERS], gSendCheckTail, gCheckTail;
+	public int[] gCheckHead = new int[MAXPLAYERS];
+	public int gSendCheckTail;
+	public int gCheckTail;
 	public boolean bOutOfSync = false;
 	public int bOutOfSyncByte = 0;
 	
@@ -251,13 +258,13 @@ public abstract class BuildNet {
 		if(pptr + size >= p.length)
 			game.ThrowError("ptr + size < packbuf.length");
 		System.arraycopy(p, pptr, v, vptr, size); //memcpy(v, p, size);
-		return pptr += size;
+		return pptr + size;
 	}
 	
 	public int PutPacketByte(byte[] p, int ptr, int value)
 	{
 		p[ptr] = (byte) value;
-		return ptr += 1;
+		return ptr + 1;
 	}
 
 	public int PutPacket(byte[] p, int ptr, Object v, int vptr, int size)
@@ -268,7 +275,7 @@ public abstract class BuildNet {
 		{
 			byte[] array = (byte[]) v;
 			System.arraycopy(array, vptr, p, ptr, size); //memcpy(p, v, size);
-			return ptr += size;
+			return ptr + size;
 		} 
 		else if(v instanceof int[])
 		{

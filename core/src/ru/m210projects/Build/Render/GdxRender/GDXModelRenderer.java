@@ -35,9 +35,9 @@ import ru.m210projects.Build.Types.Tile;
 
 public class GDXModelRenderer {
 
-	private Matrix4 transform;
-	private GDXRenderer parent;
-	private Engine engine;
+	private final Matrix4 transform;
+	private final GDXRenderer parent;
+	private final Engine engine;
 
 	public GDXModelRenderer(GDXRenderer parent) {
 		this.transform = new Matrix4();

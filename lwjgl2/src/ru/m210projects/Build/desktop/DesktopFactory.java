@@ -46,7 +46,7 @@ import ru.m210projects.Build.desktop.audio.LwjglAL;
 
 public class DesktopFactory implements ApplicationFactory {
 
-	private BuildConfiguration cfg;
+	private final BuildConfiguration cfg;
 
 	public DesktopFactory(BuildConfiguration cfg)
 	{

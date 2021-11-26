@@ -17,5 +17,5 @@
 package ru.m210projects.Build.Input;
 
 public interface InputCallback {
-	public int run(int ch);
+	int run(int ch);
 }

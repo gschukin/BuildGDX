@@ -49,9 +49,9 @@ public class InitScreen extends ScreenAdapter {
 
 	private int frames;
 	private BuildEngine engine;
-	private BuildFactory factory;
+	private final BuildFactory factory;
 	private Thread thread;
-	private BuildGame game;
+	private final BuildGame game;
 	private boolean gameInitialized;
 	private boolean disposing;
 

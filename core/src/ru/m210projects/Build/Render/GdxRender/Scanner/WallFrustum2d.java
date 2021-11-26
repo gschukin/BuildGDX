@@ -14,7 +14,7 @@ public class WallFrustum2d implements Poolable {
 		Inside, Outside, Expanded
 	}
 
-	private static Vector2 tmp = new Vector2();
+	private static final Vector2 tmp = new Vector2();
 
 	public final Plane[] planes = new Plane[3];
 	public int sectnum;
@@ -140,11 +140,8 @@ public class WallFrustum2d implements Poolable {
 
 		int x2 = wall[wal.point2].x - globalposx;
 		int y2 = wall[wal.point2].y - globalposy;
-		if (tmp.dot(x2, y2) >= 0)
-			return true;
-
-		return false;
-	}
+        return tmp.dot(x2, y2) >= 0;
+    }
 
 	public boolean fieldOfViewClipping(WallFrustum2d frustum) {
 		if (frustum.isFullAngle)
@@ -259,11 +256,8 @@ public class WallFrustum2d implements Poolable {
 			return point1InFrustum && point2InFrustum;
 		}
 
-		if (dot3 >= -precise && dot2 >= -precise && dot1 >= -precise && dot4 >= -precise)
-			return true;
-
-		return false;
-	}
+        return dot3 >= -precise && dot2 >= -precise && dot1 >= -precise && dot4 >= -precise;
+    }
 
 	public FrustumStatus isExpanded(WallFrustum2d frustum) {
 		if (isFullAngle)
@@ -441,7 +435,7 @@ public class WallFrustum2d implements Poolable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
-		sb.append("fov : " + getHFov());
+		sb.append("fov : ").append(getHFov());
 		sb.append(", dir: ").append(this.getDirection(true).angle());
 		sb.append(", plane0 ").append(getPlane(0));
 		sb.append(", plane1 ").append(getPlane(1));

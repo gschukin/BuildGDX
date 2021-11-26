@@ -28,11 +28,11 @@ import ru.m210projects.Build.FileHandle.Compat.Path;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 public class DirectoryEntry {
-	private HashMap<String, DirectoryEntry> subDirectory;
-	private HashMap<String, FileEntry> files;
-	private String name;
+	private final HashMap<String, DirectoryEntry> subDirectory;
+	private final HashMap<String, FileEntry> files;
+	private final String name;
 	private String relativePath;
-	private String absolutePath;
+	private final String absolutePath;
 	private DirectoryEntry parentDir;
 	private boolean inited;
 
@@ -150,7 +150,7 @@ public class DirectoryEntry {
 			return false;
 		int currentSize = files.size() + subDirectory.size();
 		boolean isMain = this == BuildGdx.compat.getDirectory(Path.Game);
-		File directory = null;
+		File directory;
 
 		if (isMain) {
 			directory = new File(Path.Game.getPath());
@@ -225,7 +225,7 @@ public class DirectoryEntry {
 
 	private String getRelativePath(String path) {
 		String mainpath = Path.Game.getPath();
-		if (name == "<userdir>")
+		if (name.equals("<userdir>"))
 			mainpath = Path.User.getPath();
 
 		if (path.length() > mainpath.length()) {

@@ -27,7 +27,7 @@ public class TextureHDInfo {
 
 //	public static final int HICEFFECTMASK = (1 | 2);
 
-	private Palette[] tinting = new Palette[MAXPALOOKUPS];
+	private final Palette[] tinting = new Palette[MAXPALOOKUPS];
 	private final Hicreplctyp[] cache = new Hicreplctyp[MAXTILES];
 
 	public TextureHDInfo() {

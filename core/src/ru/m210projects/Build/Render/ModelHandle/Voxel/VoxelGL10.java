@@ -21,9 +21,10 @@ import ru.m210projects.Build.Render.TextureHandle.GLTile;
 public abstract class VoxelGL10 extends GLVoxel {
 
 	protected Rectangle[] quad;
-	protected int qcnt, qfacind[];
-	private final float dvoxphack[] = { 0.0f, 1.0f / 256.0f }, dvoxclut[] = { 1, 1, 1, 1, 1, 1 };
-	private boolean isVertexArray;
+	protected int qcnt;
+    protected int[] qfacind;
+	private final float[] dvoxphack = { 0.0f, 1.0f / 256.0f }, dvoxclut = { 1, 1, 1, 1, 1, 1 };
+	private final boolean isVertexArray;
 	private ShortBuffer indices;
 	private FloatBuffer vertices;
 	private FloatBuffer uv;

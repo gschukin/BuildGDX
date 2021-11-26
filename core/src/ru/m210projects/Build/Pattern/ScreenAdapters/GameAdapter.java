@@ -134,7 +134,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 		return this;
 	}
 
-	private Runnable startboard = new Runnable() {
+	private final Runnable startboard = new Runnable() {
 		@Override
 		public void run() {
 			pNet.WaitForAllPlayers(0);

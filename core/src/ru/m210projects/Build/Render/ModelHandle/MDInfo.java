@@ -91,7 +91,7 @@ public class MDInfo extends ModelInfo {
 
 	public int setAnimation(String framestart, String frameend, int fpssc, int flags) {
 		MDAnimation ma = new MDAnimation();
-		int i = 0;
+		int i;
 
 		// find index of start frame
 		i = getFrameIndex(framestart);

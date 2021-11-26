@@ -220,7 +220,7 @@ public class AWTInput implements BuildInput, KeyListener {
 					@Override
 					public boolean isOptimizedDrawingEnabled () {
 						return false;
-					};
+					}
 				};
 
 				textPanel.setLayout(new OverlayLayout(textPanel));
@@ -254,10 +254,7 @@ public class AWTInput implements BuildInput, KeyListener {
 					}
 
 					private void updated () {
-						if (textField.getText().length() == 0)
-							placeholderLabel.setVisible(true);
-						else
-							placeholderLabel.setVisible(false);
+						placeholderLabel.setVisible(textField.getText().length() == 0);
 					}
 				});
 
@@ -290,8 +287,8 @@ public class AWTInput implements BuildInput, KeyListener {
 
 				Object selectedValue = pane.getValue();
 
-				if (selectedValue != null && (selectedValue instanceof Integer)
-					&& ((Integer)selectedValue).intValue() == JOptionPane.OK_OPTION) {
+				if ((selectedValue instanceof Integer)
+						&& ((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
 					listener.input(textField.getText());
 				} else {
 					listener.canceled();
@@ -690,8 +687,7 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public boolean isPeripheralAvailable (Peripheral peripheral) {
-		if (peripheral == Peripheral.HardwareKeyboard) return true;
-		return false;
+		return peripheral == Peripheral.HardwareKeyboard;
 	}
 
 	@Override

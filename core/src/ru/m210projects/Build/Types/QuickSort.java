@@ -10,8 +10,8 @@ public class QuickSort {
 		elementData[j] = temp;
 	}
 
-	private static int[] base_stack = new int[4 * 8];
-	private static int[] n_stack = new int[4 * 8];
+	private static final int[] base_stack = new int[4 * 8];
+	private static final int[] n_stack = new int[4 * 8];
 
 	private static <E> int med3(E[] elementData, Comparator<? super E> comp, int a, int b, int c) {
 //		return CompareChannels(rxBucket[a], rxBucket[b]) < 0 ?
@@ -41,7 +41,6 @@ public class QuickSort {
 			return;
 
 		int n = size;
-		final E[] array = elementData;
 
 		int base = 0, sp = 0;
 		while (true) {
@@ -49,7 +48,7 @@ public class QuickSort {
 				if (n < 16) {
 					for (int shell = 3; shell > 0; shell -= 2) {
 						for (int p1 = base + shell; p1 < base + n; p1 += shell) {
-							for (int p2 = p1; p2 > base && c.compare(array[p2 - shell], array[p2]) > 0; p2 -= shell) {
+							for (int p2 = p1; p2 > base && c.compare(elementData[p2 - shell], elementData[p2]) > 0; p2 -= shell) {
 								swap(elementData, p2, p2 - shell);
 							}
 						}
@@ -69,14 +68,14 @@ public class QuickSort {
 						mid = med3(elementData, c, p1, mid, p2);
 					}
 
-					E pv = array[mid];
+					E pv = elementData[mid];
 
 					int pa, pb, pc, comparison;
 					pa = pb = base;
 					int pd = base + (n - 1);
 
 					for (pc = base + (n - 1);; pc--) {
-						while (pb <= pc && (comparison = c.compare(array[pb], pv)) <= 0) {
+						while (pb <= pc && (comparison = c.compare(elementData[pb], pv)) <= 0) {
 							if (comparison == 0) {
 								swap(elementData, pa, pb);
 								pa++;
@@ -84,7 +83,7 @@ public class QuickSort {
 							pb++;
 						}
 
-						while (pb <= pc && (comparison = c.compare(array[pc], pv)) >= 0) {
+						while (pb <= pc && (comparison = c.compare(elementData[pc], pv)) >= 0) {
 							if (comparison == 0) {
 								swap(elementData, pc, pd);
 								pd--;
@@ -139,7 +138,7 @@ public class QuickSort {
 		}
 	}
 
-	public static interface IntComparator {
+	public interface IntComparator {
 		int compare(int o1, int o2);
 	}
 
@@ -173,7 +172,6 @@ public class QuickSort {
 			return;
 
 		int n = size;
-		final int[] array = elementData;
 
 		int base = 0, sp = 0;
 		while (true) {
@@ -181,7 +179,7 @@ public class QuickSort {
 				if (n < 16) {
 					for (int shell = 3; shell > 0; shell -= 2) {
 						for (int p1 = base + shell; p1 < base + n; p1 += shell) {
-							for (int p2 = p1; p2 > base && c.compare(array[p2 - shell], array[p2]) > 0; p2 -= shell) {
+							for (int p2 = p1; p2 > base && c.compare(elementData[p2 - shell], elementData[p2]) > 0; p2 -= shell) {
 								swap(elementData, p2, p2 - shell);
 							}
 						}
@@ -201,14 +199,14 @@ public class QuickSort {
 						mid = med3(elementData, c, p1, mid, p2);
 					}
 
-					int pv = array[mid];
+					int pv = elementData[mid];
 
 					int pa, pb, pc, comparison;
 					pa = pb = base;
 					int pd = base + (n - 1);
 
 					for (pc = base + (n - 1);; pc--) {
-						while (pb <= pc && (comparison = c.compare(array[pb], pv)) <= 0) {
+						while (pb <= pc && (comparison = c.compare(elementData[pb], pv)) <= 0) {
 							if (comparison == 0) {
 								swap(elementData, pa, pb);
 								pa++;
@@ -216,7 +214,7 @@ public class QuickSort {
 							pb++;
 						}
 
-						while (pb <= pc && (comparison = c.compare(array[pc], pv)) >= 0) {
+						while (pb <= pc && (comparison = c.compare(elementData[pc], pv)) >= 0) {
 							if (comparison == 0) {
 								swap(elementData, pc, pd);
 								pd--;

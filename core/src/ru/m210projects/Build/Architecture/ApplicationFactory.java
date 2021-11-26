@@ -26,24 +26,24 @@ import ru.m210projects.Build.Input.BuildControllers;
 
 public interface ApplicationFactory {
 
-	public int getVersion();
+	int getVersion();
 
-	public BuildConfiguration getConfiguration();
+	BuildConfiguration getConfiguration();
 
-	public BuildMessage getMessage();
+	BuildMessage getMessage();
 
-	public BuildAudio getAudio();
+	BuildAudio getAudio();
 
-	public Files getFiles();
+	Files getFiles();
 
-	public BuildControllers getControllers();
+	BuildControllers getControllers();
 
-	public Platform getPlatform();
+	Platform getPlatform();
 
-	public BuildFrame getFrame();
+	BuildFrame getFrame();
 
-	public ApplicationType getApplicationType();
+	ApplicationType getApplicationType();
 
-	public Clipboard getClipboard();
+	Clipboard getClipboard();
 
 }

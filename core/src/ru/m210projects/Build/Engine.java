@@ -99,20 +99,9 @@ public abstract class Engine {
 	 * плохой перенос строк в консоли если строк больше 2х
 	 * оптимизировать Bsprintf
 	 * сохранения в папку (почему то не находит файл)
-	 * render: некоторые горизонтальные модели не там где надо под определенным
-	 * углом пропадает спрайт 2д карта подглюкивает вылазиют полигоны за скайбокс
-	 * потолок
+	 * 2д карта подглюкивает вылазиют
+	 * полигоны за скайбокс потолок
 	 * floor-alignment voxels for maphack
-	 *
-	 * для шейдеров:
-	 * затенения уровня в далеке(туман)
-	 * прекэш вокселей - палитра
-	 * FadeScreen
-	 * Проверить HRP модели для шейдеров
-	 * Отключить GL туман для шейдеров
-	 * Отключить фильтрацию текстур для шейдеров
-	 * Не работают текстуры в userepisode
-	 *
 	 *
 	 * Architecture:
 	 * 	Engine
@@ -279,7 +268,9 @@ public abstract class Engine {
 	public static byte[] palette;
 	public static short numsectors, numwalls, numsprites;
 	public static int totalclock;
-	public static short pskyoff[], zeropskyoff[], pskybits;
+	public static short[] pskyoff;
+	public static short[] zeropskyoff;
+	public static short pskybits;
 //	public static Spriteext[] spriteext;
 	public static byte parallaxtype;
 	public static boolean showinvisibility;
@@ -299,7 +290,7 @@ public abstract class Engine {
 	public static WALL[] wall;
 	public static SPRITE[] sprite;
 	public static SPRITE[] tsprite;
-	protected Tile tiles[];
+	protected Tile[] tiles;
 
 	public static short[] headspritesect, headspritestat;
 	public static short[] prevspritesect, prevspritestat;
@@ -338,7 +329,7 @@ public abstract class Engine {
 	public static int[] picsiz;
 	public static int xdimen = -1, halfxdimen, xdimenscale, xdimscale;
 	public static int wx1, wy1, wx2, wy2, ydimen;
-	public static final short pow2char[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+	public static final short[] pow2char = { 1, 2, 4, 8, 16, 32, 64, 128 };
 	public static final int[] pow2long = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
 			65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728,
 			268435456, 536870912, 1073741824, 2147483647, };
@@ -365,7 +356,7 @@ public abstract class Engine {
 	protected int timerfreq;
 	protected long timerlastsample;
 
-	private int newaspect_enable = 1;
+	private final int newaspect_enable = 1;
 	private int setaspect_new_use_dimen;
 
 	private final char[] artfilename = new char[12];
@@ -378,10 +369,10 @@ public abstract class Engine {
 	protected int[] tilefileoffs;
 	protected int artversion;
 	protected int mapversion;
-	protected long totalclocklock;
+	protected int totalclocklock;
 	protected short[] sqrtable;
 	protected short[] shlookup;
-	private int hitallsprites = 0;
+	private final int hitallsprites = 0;
 	private final int MAXCLIPNUM = 1024;
 	protected final int MAXCLIPDIST = 1024;
 
@@ -400,14 +391,14 @@ public abstract class Engine {
 	private int[] rdist, gdist, bdist;
 	private final int FASTPALGRIDSIZ = 8;
 
-	private byte[] shortbuf = new byte[2];
+	private final byte[] shortbuf = new byte[2];
 
 	private byte[] colhere;
 	private byte[] colhead;
 	private short[] colnext;
 	private final byte[] coldist = { 0, 1, 2, 3, 4, 3, 2, 1 };
 	private int[] colscan;
-	protected int randomseed = 1;
+	protected int randomseed;
 
 	public static short[] radarang;
 	public static byte[] transluc;
@@ -420,16 +411,16 @@ public abstract class Engine {
 	}
 
 	public int animateoffs(int tilenum, int nInfo) { // jfBuild + gdxBuild
-		long clock, index = 0;
+		int clock, index = 0;
 
 		int speed = getTile(tilenum).getSpeed();
 		if ((nInfo & 0xC000) == 0x8000) { // sprite
 			// hash sprite frame by info variable
 
-			shortbuf[0] = (byte) ((nInfo >>> 0) & 0xFF);
+			shortbuf[0] = (byte) ((nInfo) & 0xFF);
 			shortbuf[1] = (byte) ((nInfo >>> 8) & 0xFF);
 
-			clock = (totalclocklock + CRC32.getChecksum(shortbuf)) >> speed;
+			clock = (int) ((totalclocklock + CRC32.getChecksum(shortbuf)) >> speed);
 		} else
 			clock = totalclocklock >> speed;
 
@@ -452,7 +443,7 @@ public abstract class Engine {
 				break;
 			}
 		}
-		return (int) index;
+		return index;
 	}
 
 	public void initksqrt() { // jfBuild
@@ -604,7 +595,7 @@ public abstract class Engine {
 		paletteloaded = 1;
 	}
 
-	protected Byte palcache[] = new Byte[0x40000]; // buffer 256kb
+	protected Byte[] palcache = new Byte[0x40000]; // buffer 256kb
 
 	public byte getclosestcol(byte[] palette, int r, int g, int b) { // jfBuild
 		int i, k, dist;
@@ -657,7 +648,7 @@ public abstract class Engine {
 		}
 
 		mindist = 0x7fffffff;
-		for (i = 255; i >= 0; i--, pal1 -= 3) {
+		for (i = 255; i >= 0; i--) {
 			pal1 = i * 3;
 			dist = gdist[(palette[pal1 + 1] & 0xFF) + g];
 			if (dist >= mindist)
@@ -1424,7 +1415,7 @@ public abstract class Engine {
 
 		timerfreq = 1000;
 		timerticspersec = tickspersecond;
-		timerlastsample = System.nanoTime() * timerticspersec / (timerfreq * 1000000);
+		timerlastsample = System.nanoTime() * timerticspersec / (timerfreq * 1000000L);
 	}
 
 	public void sampletimer() { // jfBuild
@@ -1465,7 +1456,7 @@ public abstract class Engine {
 
 	public synchronized void loadpic(String filename) // gdxBuild
 	{
-		Resource fil = null;
+		Resource fil;
 		if ((fil = BuildGdx.cache.open(filename, 0)) != null) {
 			artversion = fil.readInt();
 			if (artversion != 1)
@@ -1517,7 +1508,7 @@ public abstract class Engine {
 		buildString(artfilename, 0, tilesPath);
 
 		numtilefiles = 0;
-		Resource fil = null;
+		Resource fil;
 		do {
 			k = numtilefiles;
 
@@ -1804,29 +1795,18 @@ public abstract class Engine {
 			if (wal.nextsector >= 0) {
 				if (topbottom == 1) {
 					testz = sector[wal.nextsector].floorz;
-					if (direction == 1) {
-						if ((testz > thez) && (testz < nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					} else {
-						if ((testz < thez) && (testz > nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					}
 				} else {
 					testz = sector[wal.nextsector].ceilingz;
-					if (direction == 1) {
-						if ((testz > thez) && (testz < nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
-					} else {
-						if ((testz < thez) && (testz > nextz)) {
-							nextz = testz;
-							sectortouse = wal.nextsector;
-						}
+				}
+				if (direction == 1) {
+					if ((testz > thez) && (testz < nextz)) {
+						nextz = testz;
+						sectortouse = wal.nextsector;
+					}
+				} else {
+					if ((testz < thez) && (testz > nextz)) {
+						nextz = testz;
+						sectortouse = wal.nextsector;
 					}
 				}
 			}
@@ -1916,10 +1896,7 @@ public abstract class Engine {
 			}
 		}
 		// for(i=danum-1;i>=0;i--) if (clipsectorlist[i] == sect2) return(1);
-		if ((sectbitmap[sect2 >> 3] & (1 << (sect2 & 7))) != 0)
-			return true;
-
-		return false;
+		return (sectbitmap[sect2 >> 3] & (1 << (sect2 & 7))) != 0;
 	}
 
 	public int hitscan(int xs, int ys, int zs, int sectnum, int vx, int vy, int vz, // jfBuild
@@ -2330,7 +2307,7 @@ public abstract class Engine {
 		short tempshortcnt = 0;
 		short tempshortnum = 1;
 
-		Point out = null;
+		Point out;
 		do {
 			dasector = clipsectorlist[tempshortcnt];
 			if (dasector < 0) {
@@ -2629,7 +2606,6 @@ public abstract class Engine {
 					} else {
 						dax = out.getX();
 						day = out.getY();
-						daz = out.getZ();
 					}
 
 					daz = getflorzofslope((short) dasect, dax, day);
@@ -2833,7 +2809,6 @@ public abstract class Engine {
 			}
 		} while (clipsectcnt < clipsectnum);
 
-		hitwall = 0;
 		cnt = clipmoveboxtracenum;
 		do {
 			Clip out = raytrace(clipmove_x, clipmove_y, goalx, goaly);
@@ -2897,12 +2872,7 @@ public abstract class Engine {
 				else
 					templong2 = (sector[j].ceilingz - (clipmove_z));
 
-				if (templong2 > 0) {
-					if (templong2 < templong1) {
-						clipmove_sectnum = j;
-						templong1 = templong2;
-					}
-				} else {
+				if (templong2 <= 0) {
 					if ((sector[j].floorstat & 2) != 0)
 						templong2 = (clipmove_z) - getflorzofslope(j, clipmove_x, clipmove_y);
 					else
@@ -2912,10 +2882,10 @@ public abstract class Engine {
 						clipmove_sectnum = j;
 						return (retval);
 					}
-					if (templong2 < templong1) {
-						clipmove_sectnum = j;
-						templong1 = templong2;
-					}
+				}
+				if (templong2 < templong1) {
+					clipmove_sectnum = j;
+					templong1 = templong2;
 				}
 			}
 
@@ -3924,7 +3894,7 @@ public abstract class Engine {
 
 		ByteBuffer frame = render.getFrame(PixelFormat.Pal8, width, heigth);
 
-		int dptr = 0;
+		int dptr;
 		int sptr = 0;
 		for (int i = width - 1, j; i >= 0; i--) {
 			dptr = i;
@@ -4013,7 +3983,7 @@ public abstract class Engine {
 		public int getValue() {
 			return value;
 		}
-	};
+	}
 
 	public Clockdir clockdir(int wallstart) // Returns: 0 is CW, 1 is CCW
 	{

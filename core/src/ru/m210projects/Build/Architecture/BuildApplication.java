@@ -38,9 +38,9 @@ import ru.m210projects.Build.Render.Renderer.RenderType;
 
 public class BuildApplication implements Application {
 
-	public enum Platform { Windows, Linux, MacOSX, Android };
+	public enum Platform { Windows, Linux, MacOSX, Android }
 
-	protected BuildFrame frame;
+    protected BuildFrame frame;
 	protected final BuildConfiguration config;
 	protected final ApplicationListener listener;
 	protected final Platform platform;
@@ -128,10 +128,9 @@ public class BuildApplication implements Application {
 				break;
 			}
 
-			boolean shouldRender = false;
-			if (executeRunnables()) shouldRender = true;
+			boolean shouldRender = executeRunnables();
 
-			// If one of the runnables set running to false, for example after an exit().
+            // If one of the runnables set running to false, for example after an exit().
 			if (!running) break;
 
 			if(frame.process(shouldRender)) {

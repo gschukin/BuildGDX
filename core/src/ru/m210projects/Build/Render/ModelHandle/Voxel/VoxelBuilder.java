@@ -49,8 +49,15 @@ public class VoxelBuilder {
 	protected int xsiz, ysiz, zsiz, yzsiz;
 	protected HashMap<Integer, Byte> vcol;
 	protected Vector2[] shp;
-	protected int shcntmal[], shcnt, shcntp;
-	protected int mytexo5, zbit[], gmaxx, gmaxy, garea, pow2m1[];
+	protected int[] shcntmal;
+	protected int shcnt;
+	protected int shcntp;
+	protected int mytexo5;
+	protected int[] zbit;
+	protected int gmaxx;
+	protected int gmaxy;
+	protected int garea;
+	protected int[] pow2m1;
 	protected int[] pal;
 	protected int mytexx, mytexy;
 	protected byte[] mytex;
@@ -58,10 +65,11 @@ public class VoxelBuilder {
 	// Output data
 
 	protected Rectangle[] quad;
-	protected int qcnt, qfacind[] = new int[7];
-	private FloatArray vertices;
-	private ShortArray indices;
-	private Tile texture;
+	protected int qcnt;
+	protected int[] qfacind = new int[7];
+	private final FloatArray vertices;
+	private final ShortArray indices;
+	private final Tile texture;
 	private final int vertexSize;
 
 	public VoxelBuilder(VoxelData vox, int voxmip) {
@@ -363,7 +371,22 @@ public class VoxelBuilder {
 	}
 
 	private void vox2poly(VoxelData vox, int mip) {
-		int i, j, x, y, z, v, ov, oz = 0, cnt, sc, x0, y0, dx, dy, bx0[], by0[];
+		int i;
+		int j;
+		int x;
+		int y;
+		int z;
+		int v;
+		int ov;
+		int oz = 0;
+		int cnt;
+		int sc;
+		int x0;
+		int y0;
+		int dx;
+		int dy;
+		int[] bx0;
+		int[] by0;
 
 		xsiz = vox.xsiz[mip];
 		ysiz = vox.ysiz[mip];

@@ -20,8 +20,8 @@ public class BuildCamera extends PerspectiveCamera {
 	public final float xscale, yscale;
 	private final Vector3 tmp = new Vector3();
 
-	private Vector3 projectorX = new Vector3();
-	private Vector3 projectorY = new Vector3();
+	private final Vector3 projectorX = new Vector3();
+	private final Vector3 projectorY = new Vector3();
 	private float halfwidth, halfheight, divhalfw, divhalfh;
 
 	public BuildCamera(float fov, int width, int height, final float xscale, final float yscale) {
@@ -162,7 +162,7 @@ public class BuildCamera extends PerspectiveCamera {
 			Matrix4.inv(invProjectionView.val);
 			frustum.update(invProjectionView);
 
-			float mat[] = combined.val;
+			float[] mat = combined.val;
 			projectorX.set(mat[Matrix4.M00], mat[Matrix4.M01], mat[Matrix4.M02]);
 			projectorY.set(-mat[Matrix4.M10], -mat[Matrix4.M11], -mat[Matrix4.M12]);
 

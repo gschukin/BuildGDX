@@ -2,9 +2,9 @@ package ru.m210projects.Build.Types;
 
 public class Tile {
 
-	public static enum AnimType {
-		Oscil, Forward, Backward, None;
-	};
+	public enum AnimType {
+		Oscil, Forward, Backward, None
+	}
 
 	private int width, height;
 	public int anm;

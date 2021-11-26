@@ -10,7 +10,7 @@ import ru.m210projects.Build.Render.TextureHandle.GLTile;
 
 public abstract class VoxelGL20 extends GLVoxel {
 
-	private Mesh mesh;
+	private final Mesh mesh;
 
 	public VoxelGL20(VoxelData vox, int voxmip, int flags) {
 		super(flags);

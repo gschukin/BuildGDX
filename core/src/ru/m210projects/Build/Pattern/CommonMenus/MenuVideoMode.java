@@ -211,7 +211,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 			public void draw(MenuHandler handler) {
 				int px = x, py = y;
 
-				char[] key = null;
+				char[] key;
 				if (num != -1 && list != null)
 					key = list[num];
 				else
@@ -293,7 +293,6 @@ public abstract class MenuVideoMode extends BuildMenu {
 				else flags = 3;
 			}
 		};
-		posy += itemHeight;
 
 		addItem(mResolution, true);
 		addItem(mRenderer, false);

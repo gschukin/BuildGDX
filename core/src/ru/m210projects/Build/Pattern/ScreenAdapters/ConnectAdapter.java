@@ -41,12 +41,12 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 	private NetFlag gNetFlag;
 	private String[] gNetParam;
 	private int ConnectStep = 0;
-	private int nTile;
-	private BuildFont style;
+	private final int nTile;
+	private final BuildFont style;
 	
 	public enum NetFlag {
-		Create, Connect;
-	}
+		Create, Connect
+    }
 	
 	public ConnectAdapter(BuildGame game, int nTile, BuildFont style)
 	{

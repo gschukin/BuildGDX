@@ -7,12 +7,12 @@ public class VoxelData {
 
 	public static final int MAXVOXMIPS = 5;
 
-	public int xsiz[], ysiz[], zsiz[];
-	public int xpiv[], ypiv[], zpiv[];
-	public short xyoffs[][][];
+	public int[] xsiz, ysiz, zsiz;
+	public int[] xpiv, ypiv, zpiv;
+	public short[][][] xyoffs;
 	public int[][] slabxoffs;
 	public byte[][] data;
-	public int pal[];
+	public int[] pal;
 
 	public VoxelData(Resource dat) throws Exception {
 		int mip = 0;

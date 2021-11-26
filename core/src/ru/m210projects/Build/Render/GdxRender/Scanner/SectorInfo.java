@@ -41,10 +41,7 @@ public class SectorInfo {
 				} else
 					isOccluder[z] = false;
 
-				if (dir == Clockdir.CW && nextsector == -1)
-					isContour[z] = true;
-				else
-					isContour[z] = false;
+                isContour[z] = dir == Clockdir.CW && nextsector == -1;
 
 				if (wal.point2 < z) {
 					numloops++;

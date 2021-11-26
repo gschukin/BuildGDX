@@ -36,9 +36,9 @@ import ru.m210projects.Build.Render.Types.GL10;
 
 public abstract class BuildGraphics implements Graphics {
 	
-	public enum Option { SWChangePalette, SWGetFrame, GLSetConfiguration, GLDefConfiguration };
-	
-	protected GL10 gl10;
+	public enum Option { SWChangePalette, SWGetFrame, GLSetConfiguration, GLDefConfiguration }
+
+    protected GL10 gl10;
 	protected GL20 gl20;
 	protected GL30 gl30;
 	

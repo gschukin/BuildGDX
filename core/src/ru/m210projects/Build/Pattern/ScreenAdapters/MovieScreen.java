@@ -13,7 +13,7 @@ import ru.m210projects.Build.Types.Tile;
 
 public abstract class MovieScreen extends SkippableAdapter {
 
-	public static interface MovieFile {
+	public interface MovieFile {
 
 		int getFrames();
 
@@ -103,7 +103,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 		float kt = pic.getHeight() / (float) pic.getWidth();
 		float kv = xdim / (float) ydim;
 
-		float scale = 1.0f;
+		float scale;
 		if (kv >= kt) {
 			scale = (ydim / (float) pic.getWidth());
 			scale /= (ydim / (float) 200);

@@ -61,9 +61,9 @@ public abstract class FadeEffect {
 		public void setColor(int r, int g, int b, int a) {
 			setUniformf(color, r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
 		}
-	};
+	}
 
-	public static Mesh mesh;
+    public static Mesh mesh;
 
 	private static Mesh buildMesh() {
 		return new Mesh(true, 3, 0, new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE)) {

@@ -14,9 +14,9 @@ import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 
 public abstract class MD2ModelGL20 extends MDModel {
 
-	private Mesh mesh;
-	private MD2Frame[] frames;
-	private MD2Triangle[] tris;
+	private final Mesh mesh;
+	private final MD2Frame[] frames;
+	private final MD2Triangle[] tris;
 	private float oldinterpol;
 
 	public MD2ModelGL20(MD2Info md) {

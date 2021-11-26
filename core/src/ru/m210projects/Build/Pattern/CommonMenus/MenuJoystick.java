@@ -92,7 +92,7 @@ public abstract class MenuJoystick extends BuildMenu {
 				int min = 0;
 				int max = Math.max(0, controllers);
 				int val = cfg.gJoyDevice + 1;
-				this.num = val < min ? min : (val > max ? max : val);
+				this.num = val < min ? min : (Math.min(val, max));
 			}
 		};
 
@@ -196,7 +196,7 @@ public abstract class MenuJoystick extends BuildMenu {
 				}, true);
 		mTurnSpeed.digitalMax = 65536.0f;
 
-		mInvert = new MenuSwitch("Invert look axis", style, posx, posy += separatorHeight, width, cfg.gJoyInvert, new MenuProc() {
+		mInvert = new MenuSwitch("Invert look axis", style, posx, posy + separatorHeight, width, cfg.gJoyInvert, new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				MenuSwitch sw = (MenuSwitch) pItem;

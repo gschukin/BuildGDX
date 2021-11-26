@@ -74,12 +74,12 @@ import ru.m210projects.Build.Types.WALL;
 
 public class SoftwareOrpho extends OrphoRenderer {
 
-	private Software parent;
+	private final Software parent;
 	protected int numpages;
 	private final int MAXPERMS;
 
 	protected final int MAXNODESPERLINE = 42; // Warning: This depends on MAXYSAVES & MAXYDIM!
-	protected int dotp1[] = new int[MAXYDIM], dotp2[] = new int[MAXYDIM];
+	protected int[] dotp1 = new int[MAXYDIM], dotp2 = new int[MAXYDIM];
 
 	protected final int MAXWALLSB = ((MAXWALLS >> 2) + (MAXWALLS >> 3));
 	protected short[] p2 = new short[MAXWALLSB];

@@ -24,7 +24,7 @@ import ru.m210projects.Build.Settings.GLSettings;
 
 public class GLTile extends GLTexture implements Comparable<GLTile> {
 
-	public static enum FlagType {
+	public enum FlagType {
 		Clamped(0), HighTile(1), SkyboxFace(2), HasAlpha(3), Invalidated(7);
 
 		private final int bit;
@@ -40,7 +40,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		public boolean hasBit(int flags) {
 			return (flags & bit) != 0;
 		}
-	};
+	}
 
 	protected int width, height;
 	private boolean isAllocated;
@@ -222,19 +222,19 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 					switch (k) {
 					case 0:
 					case 1:
-						rgb = ((a) << 24) + ((b) << 16) + ((g) << 8) + ((r) << 0);
+						rgb = ((a) << 24) + ((b) << 16) + ((g) << 8) + ((r));
 						break;
 					case 2:
 						rgb = (((a + 1) >> 1) << 24) + (((b + 1) >> 1) << 16) + (((g + 1) >> 1) << 8)
-								+ (((r + 1) >> 1) << 0);
+								+ (((r + 1) >> 1));
 						break;
 					case 3:
 						rgb = (((a * 85 + 128) >> 8) << 24) + (((b * 85 + 128) >> 8) << 16)
-								+ (((g * 85 + 128) >> 8) << 8) + (((r * 85 + 128) >> 8) << 0);
+								+ (((g * 85 + 128) >> 8) << 8) + (((r * 85 + 128) >> 8));
 						break;
 					case 4:
 						rgb = (((a + 2) >> 2) << 24) + (((b + 2) >> 2) << 16) + (((g + 2) >> 2) << 8)
-								+ (((r + 2) >> 2) << 0);
+								+ (((r + 2) >> 2));
 						break;
 					default:
 						continue;

@@ -24,10 +24,10 @@ import ru.m210projects.Build.CRC32;
 import ru.m210projects.Build.Pattern.Tools.NaturalComparator;
 
 public class FileEntry implements Comparable<FileEntry> {
-	private File file;
-	private String extension;
-	private String relPath;
-	private DirectoryEntry parent;
+	private final File file;
+	private final String extension;
+	private final String relPath;
+	private final DirectoryEntry parent;
 	private long checksum;
 	
 	public FileEntry(File file, DirectoryEntry parent, String relPath)

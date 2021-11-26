@@ -200,7 +200,7 @@ public class PolymostModelManager extends ModelManager {
 		if (palnum >= (MAXPALOOKUPS - RESERVEDPALS)) {
 			for (int i = MAXTILES - 1; i >= 0; i--) {
 				GLModel m = models[i];
-				if (m == null || !(m instanceof MDModel))
+				if (!(m instanceof MDModel))
 					continue;
 
 				for (MDSkinmap sk = ((MDModel) m).skinmap; sk != null; sk = sk.next)

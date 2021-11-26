@@ -46,11 +46,11 @@ public abstract class BuildConfig extends IniFile {
 
 	public interface KeyType {
 
-		public int getNum();
+		int getNum();
 
-		public KeyType setNum(int num);
+		KeyType setNum(int num);
 
-		public String getName();
+		String getName();
 
 	}
 
@@ -293,10 +293,10 @@ public abstract class BuildConfig extends IniFile {
 				if (value != -1)
 					fullscreen = value;
 				value = GetKeyInt("ScreenWidth");
-				if (value != -1 && value >= 640)
+				if (value >= 640)
 					ScreenWidth = value;
 				value = GetKeyInt("ScreenHeight");
-				if (value != -1 && value >= 400)
+				if (value >= 400)
 					ScreenHeight = value;
 				borderless = GetKeyInt("BorderlessMode") == 1;
 				gVSync = GetKeyInt("VSync") == 1;

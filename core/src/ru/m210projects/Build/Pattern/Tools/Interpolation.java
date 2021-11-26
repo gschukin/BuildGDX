@@ -32,7 +32,7 @@ public class Interpolation {
 
 	public enum InterpolationType {
 		WallX, WallY, FloorZ, CeilZ, FloorH, CeilH
-	};
+	}
 
 	public class IData {
 		public Object ptr;
@@ -47,16 +47,16 @@ public class Interpolation {
 	}
 
 	protected final int MAXINTERPOLATIONS = 4096;
-	protected ILoc gOldSpriteLoc[] = new ILoc[MAXSPRITES];
+	protected ILoc[] gOldSpriteLoc = new ILoc[MAXSPRITES];
 	protected int InterpolationCount = 0;
 	protected IData[] gInterpolationData = new IData[MAXINTERPOLATIONS];
 
-	protected int gWallLoc[] = new int[MAXWALLS >> 3];
-	protected int gFloorHeinumLoc[] = new int[MAXSECTORS >> 3];
-	protected int gFloorLoc[] = new int[MAXSECTORS >> 3];
-	protected int gCeilLoc[] = new int[MAXSECTORS >> 3];
-	protected int gCeilHeinumLoc[] = new int[MAXSECTORS >> 3];
-	protected int gSpriteLoc[] = new int[MAXSPRITES >> 3];
+	protected int[] gWallLoc = new int[MAXWALLS >> 3];
+	protected int[] gFloorHeinumLoc = new int[MAXSECTORS >> 3];
+	protected int[] gFloorLoc = new int[MAXSECTORS >> 3];
+	protected int[] gCeilLoc = new int[MAXSECTORS >> 3];
+	protected int[] gCeilHeinumLoc = new int[MAXSECTORS >> 3];
+	protected int[] gSpriteLoc = new int[MAXSPRITES >> 3];
 
 	public Interpolation() {
 		for (int i = 0; i < MAXINTERPOLATIONS; i++)

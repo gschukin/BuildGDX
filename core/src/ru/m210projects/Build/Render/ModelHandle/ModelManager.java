@@ -99,7 +99,7 @@ public abstract class ModelManager {
 		if (param == null)
 			return null;
 
-		ModelInfo model = null;
+		ModelInfo model;
 		if ((model = param.model) != null && model.getType() != Type.Voxel) {
 
 			if (param.next != null && param.palette != pal) {
@@ -159,7 +159,7 @@ public abstract class ModelManager {
 		if (mdInfo == null)
 			return null;
 
-		VoxelInfo model = null;
+		VoxelInfo model;
 		if ((model = mdInfo.getVoxelInfo(tile)) != null) {
 			GLModel glmodel = models[tile];
 			if (glmodel != null && glmodel.getType() == Type.Voxel)

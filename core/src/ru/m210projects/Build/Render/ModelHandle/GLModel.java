@@ -9,22 +9,22 @@ import ru.m210projects.Build.Render.TextureHandle.GLTile;
 
 public interface GLModel {
 
-	public boolean render(int pal, int shade, int skinnum, int visibility, float alpha);
+	boolean render(int pal, int shade, int skinnum, int visibility, float alpha);
 
-	public ShaderProgram getShader();
+	ShaderProgram getShader();
 
-	public void dispose();
+	void dispose();
 
-	public Iterator<GLTile> getSkins();
+	Iterator<GLTile> getSkins();
 
-	public void clearSkins();
+	void clearSkins();
 
-	public Type getType();
+	Type getType();
 
-	public boolean isRotating();
+	boolean isRotating();
 
-	public boolean isTintAffected();
+	boolean isTintAffected();
 
-	public float getScale();
+	float getScale();
 
 }

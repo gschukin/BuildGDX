@@ -58,7 +58,7 @@ public abstract class MenuControls extends BuildMenu {
 		ResetClassicMenu = getResetClassicMenu(app, style, questionPos, questionPal);
 		
 		MenuButton mKeyReset = new MenuButton("Reset Keys to default", style, 0, posy += menuHeight, 320, 1, pal, ResetDefaultMenu, -1, null, 0);
-		MenuButton mKeyReset2 = new MenuButton("Reset Keys to classic", style, 0, posy += menuHeight, 320, 1, pal, ResetClassicMenu, -1, null, 0);
+		MenuButton mKeyReset2 = new MenuButton("Reset Keys to classic", style, 0, posy + menuHeight, 320, 1, pal, ResetClassicMenu, -1, null, 0);
 	
 		addItem(mMouse, true);
 		addItem(mGamepad, false);

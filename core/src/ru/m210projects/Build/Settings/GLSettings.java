@@ -85,7 +85,7 @@ public class GLSettings extends BuildSettings {
 			@Override
 			public Integer check(Object value) {
 				if (value instanceof Integer) {
-					Integer anisotropy = (Integer) value;
+					int anisotropy = (Integer) value;
 					if (GLInfo.maxanisotropy > 1.0) {
 						if (anisotropy <= 0 || anisotropy > GLInfo.maxanisotropy)
 							anisotropy = (int) GLInfo.maxanisotropy;

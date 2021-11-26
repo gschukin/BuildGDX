@@ -60,16 +60,16 @@ import ru.m210projects.Build.Types.Tile;
 
 public class PolymostModelRenderer {
 
-	private Polymost parent;
-	private Engine engine;
+	private final Polymost parent;
+	private final Engine engine;
 	private GL10 gl;
 	private final Color polyColor = new Color();
 	private final float[][] matrix = new float[4][4];
 
 	private final Vector3 dvoxm0 = new Vector3(), modela0 = new Vector3();
 
-	private Vector3 cScale = new Vector3();
-	private Vector3 nScale = new Vector3();
+	private final Vector3 cScale = new Vector3();
+	private final Vector3 nScale = new Vector3();
 
 	public PolymostModelRenderer(Polymost parent) {
 		this.parent = parent;
