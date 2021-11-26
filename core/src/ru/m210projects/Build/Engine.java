@@ -84,6 +84,7 @@ public abstract class Engine {
 
 	/*
 	 * TODO:
+	 * Add try/catch to findsaves, load, save in each game
 	 * Software renderer: and the draw distance for voxel detail is really low
 	 * Software renderer: You might want to look at wall sprites. I noticed a lot of them clipping through geometry in classic render
 	 * Software renderer: Voxel is not clipped by ceiling geometry
@@ -1748,9 +1749,8 @@ public abstract class Engine {
 		if (xvect == -yvect)
 			return (short) (768 + ((xvect > 0 ? 1 : 0) << 10));
 
-		if (klabs(xvect) > klabs(yvect)) {
+		if (Math.abs((long) xvect) > Math.abs((long) yvect)) // GDX 26.11.2021 Integer.MIN issue fix
 			return (short) (((radarang[640 + scale(160, yvect, xvect)] >> 6) + ((xvect < 0 ? 1 : 0) << 10)) & 2047);
-		}
 		return (short) (((radarang[640 - scale(160, xvect, yvect)] >> 6) + 512 + ((yvect < 0 ? 1 : 0) << 10)) & 2047);
 	}
 
@@ -4126,6 +4126,9 @@ public abstract class Engine {
 	}
 
 	public Tile getTile(int tilenum) {
+		if(!Gameutils.isValidTile(tilenum))
+			return null;
+
 		if (tiles[tilenum] == null)
 			tiles[tilenum] = new Tile();
 		return tiles[tilenum];

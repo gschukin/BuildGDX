@@ -178,6 +178,9 @@ public class GDXOrtho extends OrphoRenderer {
 	@Override
 	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
+		if(col < 0)
+			return;
+
 		if (font.type == FontType.Tilemap) {
 			if (palookup[col] == null)
 				col = 0;

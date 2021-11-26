@@ -3567,8 +3567,13 @@ public class Software implements Renderer {
 
 	@Override
 	public void nextpage() {
-		byte[] frameplace = a.getframeplace();
-		System.arraycopy(frameplace, 0, BuildGdx.graphics.extra(Option.SWGetFrame), 0, frameplace.length); // Math.min(frameplace.length,
+		byte[] src = a.getframeplace();
+		byte[] dst = (byte[]) BuildGdx.graphics.extra(Option.SWGetFrame);
+		int len = src.length;
+		if(dst.length < src.length)
+			len = dst.length;
+
+		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
 	}
 
 	@Override
