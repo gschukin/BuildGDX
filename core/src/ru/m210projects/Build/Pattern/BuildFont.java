@@ -19,6 +19,7 @@ package ru.m210projects.Build.Pattern;
 import static ru.m210projects.Build.Engine.xdim;
 import static ru.m210projects.Build.Engine.ydim;
 import static ru.m210projects.Build.Pragmas.*;
+import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.toCharArray;
 
 import ru.m210projects.Build.Engine;
@@ -89,7 +90,7 @@ public class BuildFont {
 		if (text != null) {
 			int pos = 0;
 			while (pos < text.length && text[pos] != 0) {
-				if (!charBounds(text[pos])) {
+				if (!charBounds(text[pos]) || charInfo[text[pos]].nTile == -1) {
 					pos++;
 					continue;
 				}
@@ -153,13 +154,22 @@ public class BuildFont {
 	// Scale font
 
 	public int getWidth(char ch, int scale) {
-		int zoom = mulscale(0x10000, mulscale(scale, nScale, 16), 16);
-		return scale(getWidth(ch), zoom, nScale);
+		return scale(getWidth(ch), scale, 0x10000);
 	}
 
 	public int getWidth(char[] text, int scale) {
-		int zoom = mulscale(0x10000, mulscale(scale, nScale, 16), 16);
-		return scale(getWidth(text), zoom, nScale);
+		int width = 0;
+		if (text != null) {
+			int pos = 0;
+			while (pos < text.length && text[pos] != 0) {
+				if (!charBounds(text[pos]) || charInfo[text[pos]].nTile == -1) {
+					pos++;
+					continue;
+				}
+				width += scale(charInfo[text[pos++]].nWidth, scale, 0x10000);
+			}
+		}
+		return width;
 	}
 
 	public int getWidth(String text, int scale) {
@@ -167,8 +177,7 @@ public class BuildFont {
 	}
 
 	public int getHeight(int scale) {
-		int zoom = mulscale(0x10000, mulscale(scale, nScale, 16), 16);
-		return scale(getHeight(), zoom, nScale);
+		return scale(getHeight(), scale, 0x10000);
 	}
 
 	public int drawChar(int x, int y, char ch, int scale, int shade, int pal, int nBits, boolean shadow) {
@@ -184,7 +193,7 @@ public class BuildFont {
 			draw.rotatesprite((x + charInfo[ch].xOffset) << 16, (y + charInfo[ch].yOffset) << 16, zoom, 0,
 					charInfo[ch].nTile, shade, pal, nFlags | nBits, 0, 0, xdim - 1, ydim - 1);
 		}
-		return scale(charInfo[ch].nWidth, zoom, nScale);
+		return scale(charInfo[ch].nWidth, scale, 0x10000);
 	}
 
 	public int drawText(int x, int y, char[] text, int scale, int shade, int pal, TextAlign textAlign, int nBits,
@@ -203,6 +212,7 @@ public class BuildFont {
 		for (int i = 0; i < text.length && text[i] != 0; i++) {
 			if (!charBounds(text[i]))
 				continue;
+
 			alignx += drawChar(x + alignx, y, text[i], scale, shade, pal, nBits, shadow);
 		}
 		return alignx;

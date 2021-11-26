@@ -4096,9 +4096,6 @@ public abstract class Engine {
 	}
 
 	public Tile getTile(int tilenum) {
-		if(!Gameutils.isValidTile(tilenum))
-			return null;
-
 		if (tiles[tilenum] == null)
 			tiles[tilenum] = new Tile();
 		return tiles[tilenum];
