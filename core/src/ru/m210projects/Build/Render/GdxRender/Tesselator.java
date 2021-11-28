@@ -4,6 +4,8 @@ import static java.lang.Math.sqrt;
 import static ru.m210projects.Build.Engine.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -15,9 +17,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.Tile;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.*;
 
 public class Tesselator {
 
@@ -57,7 +57,12 @@ public class Tesselator {
 	private final Vector3 norm = new Vector3();
 	private final Vertex[] vertex = new Vertex[3];
 
-	private final ArrayList<Integer> secy = new ArrayList<Integer>();
+	private final RuntimeArray<Integer> secy = new RuntimeArray<Integer>() {
+		@Override
+		public void sort(Comparator<? super Integer> c) {
+			Arrays.sort(elementData, 0, size);
+		}
+	};
 	private final ArrayList<Float> trapx0 = new ArrayList<Float>();
 	private final ArrayList<Float> trapx1 = new ArrayList<Float>();
 

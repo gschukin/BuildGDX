@@ -7,8 +7,8 @@ import java.util.Comparator;
 public class RuntimeArray<E> extends AbstractList<E> {
 
 	private static final Object[] EMPTY_ELEMENTDATA = {};
-	private E[] elementData;
-	private int size;
+	protected E[] elementData;
+	protected int size;
 
 	@SuppressWarnings("unchecked")
 	public RuntimeArray() {
@@ -101,7 +101,6 @@ public class RuntimeArray<E> extends AbstractList<E> {
 		return elementData;
 	}
 
-	@Override
 	public void sort(Comparator<? super E> c) {
 //		Arrays.sort(elementData, 0, size, c);
 		QuickSort.sort(elementData, size, c);

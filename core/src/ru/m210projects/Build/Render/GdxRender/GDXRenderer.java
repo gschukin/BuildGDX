@@ -108,7 +108,6 @@ public class GDXRenderer implements GLRenderer {
 //	TODO:
 //  Skies panning
 //  Tekwar skies bug
-//  Tekwar mirror + orto bug
 //	Hires detail, glow
 //  Overheadmap sector visible check
 //  Hires sprite alpha
@@ -798,8 +797,9 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void setview(int x1, int y1, int x2, int y2) {
+		if (orphoRen.isDrawing())
+			orphoRen.end();
 		orphoRen.resize(x2, y2);
-		gloy1 = -1;
 	}
 
 	@Override

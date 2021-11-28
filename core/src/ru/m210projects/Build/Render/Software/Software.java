@@ -171,7 +171,7 @@ public class Software implements Renderer {
 	public int[] rxi = new int[8], ryi = new int[8], rzi = new int[8], rxi2 = new int[8], ryi2 = new int[8],
 			rzi2 = new int[8];
 	public int[] xsi = new int[8], ysi = new int[8];
-	public int horizlookup, horizlookup2;
+	public int horizlookup2;
 	public int horizycent;
 
 	public short[] p2 = new short[MAXWALLSB], thesector = new short[MAXWALLSB], thewall = new short[MAXWALLSB];
@@ -246,7 +246,6 @@ public class Software implements Renderer {
 
 			lookups = new int[j << 1];
 
-			horizlookup = 0;
 			horizlookup2 = j;
 			horizycent = ((ydim * 4) >> 1);
 
@@ -3144,7 +3143,15 @@ public class Software implements Renderer {
 		if (x2 < x1)
 			return;
 
-		v = mulscale(globalzd, lookups[horizlookup + y - (int) globalhoriz + horizycent], 20);
+		if(y - (int) globalhoriz + horizycent < 0 || y - (int) globalhoriz + horizycent >= lookups.length) {
+			Console.Println("Crash catcher:");
+			Console.Println("y = " + y);
+			Console.Println("globalhoriz = " + globalhoriz);
+			Console.Println("horizycent = " + horizycent);
+			Console.Println("globalzd = " + globalzd);
+		}
+
+		v = mulscale(globalzd, lookups[y - (int) globalhoriz + horizycent], 20);
 		bx = mulscale(globalx2 * x1 + globalx1, v, 14) + globalxpanning;
 		by = mulscale(globaly2 * x1 + globaly1, v, 14) + globalypanning;
 
@@ -3706,8 +3713,8 @@ public class Software implements Renderer {
 			lookups[horizlookup2 + horizycent - 1] = divscale(131072, j, 26);
 			for (i = ydim * 4 - 1; i >= 0; i--)
 				if (i != (horizycent - 1)) {
-					lookups[horizlookup + i] = divscale(1, i - (horizycent - 1), 28);
-					lookups[horizlookup2 + i] = divscale(klabs(lookups[horizlookup + i]), j, 14);
+					lookups[i] = divscale(1, i - (horizycent - 1), 28);
+					lookups[horizlookup2 + i] = divscale(klabs(lookups[i]), j, 14);
 				}
 		}
 
