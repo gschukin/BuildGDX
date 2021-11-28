@@ -45,6 +45,7 @@ public class DesktopMessage implements BuildMessage {
 		if(panel == null && (panel = InitPanel()) == null)
 			return false;
 
+		BuildGdx.input.setCursorCatched(false);
 		if(message.length() >= 384)
 		{
 			message = message.substring(0, 384);

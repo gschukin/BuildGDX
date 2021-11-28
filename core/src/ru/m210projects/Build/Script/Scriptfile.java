@@ -246,6 +246,9 @@ public class Scriptfile {
 	}
 
 	public Scriptfile(String filename, byte[] data) {
+		if(data == null)
+			throw new RuntimeException("byte[] data == NULL");
+
 		int flen = data.length;
 		byte[] tx = Arrays.copyOf(data, flen + 2);
 		tx[flen] = tx[flen + 1] = 0;

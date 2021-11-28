@@ -265,7 +265,9 @@ public class Console {
     			if(isdigit(num1))
     			{
     				number += num1;
-    				char num2 = text.charAt(++chp+1);
+					char num2 = ' ';
+					if(++chp+1 < text.length())
+						num2 = text.charAt(chp+1);
     				if(!isdigit(num2))
     				{
     					pal = Integer.parseInt(number, 10);
