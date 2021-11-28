@@ -315,9 +315,9 @@ public class GDXRenderer implements GLRenderer {
 		// отрисовать скайбокс с совпадением по глубине
 		// после отрисовки, отчистить буфер глубины и записать значения mirrors
 
-//		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++) {
-//			drawSector(sectors.get(i));
-//		}
+		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++) {
+			drawSector(sectors.get(i));
+		}
 
 		spritesortcnt = scanner.getSpriteCount();
 		tsprite = scanner.getSprites();
@@ -327,27 +327,26 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void drawmasks() {
-		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++) {
-			VisibleSector sec = sectors.get(i);
+//		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++) {
+//			VisibleSector sec = sectors.get(i);
+//
+//			// TODO: make stencil buffer
+//			int sectnum = sec.index;
+//			for(int s = 0; s < spritesortcnt; s++) {
+//				if (tsprite[s] != null && tsprite[s].sectnum == sectnum) {
+//					drawsprite(s);
+//				}
+//			}
+//
+//			drawSector(sec);
+//			// TODO: clear stencil buffer
+//		}
+//
+//		int[] maskwalls = scanner.getMaskwalls();
+//		int maskwallcnt = scanner.getMaskwallCount();
+//		while (maskwallcnt > 0)
+//			drawmaskwall(--maskwallcnt);
 
-			// TODO: make stencil buffer
-			int sectnum = sec.index;
-			for(int s = 0; s < spritesortcnt; s++) {
-				if (tsprite[s] != null && tsprite[s].sectnum == sectnum) {
-					drawsprite(s);
-				}
-			}
-
-			drawSector(sec);
-			// TODO: clear stencil buffer
-		}
-
-		int[] maskwalls = scanner.getMaskwalls();
-		int maskwallcnt = scanner.getMaskwallCount();
-		while (maskwallcnt > 0)
-			drawmaskwall(--maskwallcnt);
-
-		/*
 		int[] maskwalls = scanner.getMaskwalls();
 		int maskwallcnt = scanner.getMaskwallCount();
 
@@ -379,7 +378,6 @@ public class GDXRenderer implements GLRenderer {
 
 		while (maskwallcnt > 0)
 			drawmaskwall(--maskwallcnt);
-		*/
 
 		renderDrunkEffect();
 		manager.unbind();
