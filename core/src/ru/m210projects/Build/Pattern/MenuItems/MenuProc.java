@@ -17,5 +17,5 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
 public interface MenuProc {
-	public void run( MenuHandler handler, MenuItem pItem );
+	void run(MenuHandler handler, MenuItem pItem);
 }

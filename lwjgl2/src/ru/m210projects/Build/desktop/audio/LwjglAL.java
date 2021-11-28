@@ -30,11 +30,11 @@ import com.badlogic.gdx.backends.lwjgl.LwjglNativesLoader;
 
 public class LwjglAL implements ALAudio {
 
-	private String name;
-	private String version;
+	private final String name;
+	private final String version;
 
 	//EFX Effects
-	private boolean alEfxSupport;
+	private final boolean alEfxSupport;
 	private int alEffectSlot = -1;
 	private int alEffect = -1;
 	

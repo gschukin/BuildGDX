@@ -28,15 +28,15 @@ import ru.m210projects.Build.Render.Types.Spriteext;
 public class Maphack extends Scriptfile {
 
 	private long MapCRC;
-	private Spriteext[] spriteext;
+	private final Spriteext[] spriteext;
 
-	private static enum Token {
+	private enum Token {
 		MapCRC, Sprite,
 
 		AngleOffset, XOffset, YOffset, ZOffset, NoModel,
 
-		Error, EOF;
-	}
+		Error, EOF
+    }
 
 	private final static Map<String, Token> basetokens = new HashMap<String, Token>() {
 		private static final long serialVersionUID = 1L;
@@ -60,16 +60,16 @@ public class Maphack extends Scriptfile {
 	public Maphack() { // new maphack
 		super("", new byte[0]);
 
-		spriteext = new Spriteext[MAXSPRITES];
-		for (int i = 0; i < MAXSPRITES; i++)
+		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
+		for (int i = 0; i < spriteext.length; i++)
 			spriteext[i] = new Spriteext();
 	}
 
 	public Maphack(String filename) {
 		super(filename, BuildGdx.cache.getBytes(filename, 0));
 
-		spriteext = new Spriteext[MAXSPRITES];
-		for (int i = 0; i < MAXSPRITES; i++)
+		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
+		for (int i = 0; i < spriteext.length; i++)
 			spriteext[i] = new Spriteext();
 
 		Integer value;
@@ -136,6 +136,8 @@ public class Maphack extends Scriptfile {
 	}
 
 	public Spriteext getSpriteInfo(int spriteid) {
+		if (spriteid < 0 || spriteid >= spriteext.length)
+			return null;
 		return spriteext[spriteid];
 	}
 

@@ -46,8 +46,8 @@ abstract class GatewayFinder {
 
     private class GatewayListener extends Thread {
 
-        private Inet4Address ip;
-        private String req;
+        private final Inet4Address ip;
+        private final String req;
 
         public GatewayListener(Inet4Address ip, String req) {
             setName("WaifUPnP - Gateway Listener");
@@ -79,7 +79,7 @@ abstract class GatewayFinder {
         }
     }
 
-    private LinkedList<GatewayListener> listeners = new LinkedList<GatewayListener>();
+    private final LinkedList<GatewayListener> listeners = new LinkedList<GatewayListener>();
 
     public GatewayFinder() {
         for (Inet4Address ip : getLocalIPs()) {

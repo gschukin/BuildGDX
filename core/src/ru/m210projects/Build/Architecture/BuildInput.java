@@ -20,18 +20,18 @@ import com.badlogic.gdx.Input;
 
 public interface BuildInput extends Input {
 
-	public void init(BuildFrame frame);
+	void init(BuildFrame frame);
 
-	public void dispose();
+	void dispose();
 
 	void update();
 
 	void processEvents();
 
-	public void processMessages();
+	void processMessages();
 
-	public boolean cursorHandler();
+	boolean cursorHandler();
 
-	public int getDWheel();
+	int getDWheel();
 
 }

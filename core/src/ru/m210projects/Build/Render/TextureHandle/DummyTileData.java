@@ -1,21 +1,45 @@
 package ru.m210projects.Build.Render.TextureHandle;
 
+import static com.badlogic.gdx.graphics.GL20.GL_ALPHA;
+import static com.badlogic.gdx.graphics.GL20.GL_LUMINANCE;
+import static com.badlogic.gdx.graphics.GL20.GL_RGB;
 import static com.badlogic.gdx.graphics.GL20.GL_RGBA;
 import static com.badlogic.gdx.graphics.GL20.GL_UNSIGNED_BYTE;
 
 import java.nio.ByteBuffer;
-
-import ru.m210projects.Build.Render.Types.TextureBuffer;
+import java.nio.ByteOrder;
 
 public class DummyTileData extends TileData {
 
-	public final TextureBuffer data;
+	public final ByteBuffer data;
 	public final int width, height;
+	public final PixelFormat fmt;
+	public int format, internalformat;
 
-	public DummyTileData(int width, int height) {
+	public DummyTileData(PixelFormat fmt, int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.data = getTmpBuffer(width * height * 4);
+		this.fmt = fmt;
+		this.data = ByteBuffer.allocateDirect(width * height * fmt.getLength()).order(ByteOrder.LITTLE_ENDIAN);
+
+		switch (fmt) {
+		case Rgba:
+			format = GL_RGBA;
+			internalformat = GL_RGBA;
+			break;
+		case Rgb:
+			format = GL_RGB;
+			internalformat = GL_RGB;
+			break;
+		case Pal8:
+			format = GL_LUMINANCE;
+			internalformat = GL_LUMINANCE;
+			break;
+		case Bitmap:
+			format = GL_ALPHA;
+			internalformat = GL_ALPHA;
+			break;
+		}
 	}
 
 	@Override
@@ -30,7 +54,8 @@ public class DummyTileData extends TileData {
 
 	@Override
 	public ByteBuffer getPixels() {
-		return data.getBuffer();
+		data.rewind();
+		return data;
 	}
 
 	@Override
@@ -40,17 +65,17 @@ public class DummyTileData extends TileData {
 
 	@Override
 	public int getGLInternalFormat() {
-		return GL_RGBA;
+		return internalformat;
 	}
 
 	@Override
 	public int getGLFormat() {
-		return GL_RGBA;
+		return format;
 	}
 
 	@Override
 	public PixelFormat getPixelFormat() {
-		return PixelFormat.Rgba;
+		return fmt;
 	}
 
 	@Override

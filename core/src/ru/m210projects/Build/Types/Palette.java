@@ -5,8 +5,8 @@ import ru.m210projects.Build.CRC32;
 public class Palette {
 	
 	private long crc32;
-	private byte[] bytes;
-	private int[] values;
+	private final byte[] bytes;
+	private final int[] values;
 	
 	public Palette() {
 		bytes = new byte[768];

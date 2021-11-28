@@ -16,30 +16,31 @@
 
 package ru.m210projects.Build.Types;
 
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 
 import ru.m210projects.Build.Render.TextureHandle.DummyTileData;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.TextureManager;
-import ru.m210projects.Build.Render.Types.TextureBuffer;
+import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 
 public class TileFont {
 
 	public abstract static class TileFontData extends DummyTileData {
 
 		public TileFontData(int width, int height) {
-			super(width, height);
+			super(PixelFormat.Rgba, width, height);
 			buildAtlas(data);
 		}
 
-		public abstract TextureBuffer buildAtlas(TextureBuffer data);
-	};
+		public abstract ByteBuffer buildAtlas(ByteBuffer data);
+	}
 
 	public static final HashSet<TileFont> managedFont = new HashSet<TileFont>();
 
 	public enum FontType {
 		Tilemap, Bitmap
-	};
+	}
 
 	public GLTile atlas;
 
@@ -64,8 +65,14 @@ public class TileFont {
 		managedFont.add(this);
 	}
 
-	public GLTile getGL(TextureManager textureCache, int col) {
-		return textureCache.bind((Integer) ptr, col, 0, 0, 0);
+	public GLTile getGL(TextureManager textureCache, PixelFormat fmt, int col) {
+		GLTile tile = textureCache.get(fmt, (Integer) ptr, col, 0, 0);
+		if (tile != null) {
+			textureCache.bind(tile);
+			return tile;
+		}
+
+		return null;
 	}
 
 	public void uninit() {

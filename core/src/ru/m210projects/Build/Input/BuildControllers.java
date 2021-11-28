@@ -35,7 +35,7 @@ public abstract class BuildControllers {
 	private List<BuildController> gamepads;
 	private float deadZone = 0.01f;
 	
-	private boolean TestGamepad = false;
+	private final boolean TestGamepad = false;
 
 	public BuildControllers init() {
 		gamepads = new ArrayList<BuildController>();

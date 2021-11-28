@@ -1,10 +1,5 @@
 package ru.m210projects.Build.Render.TextureHandle;
 
-import static com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA;
-import static com.badlogic.gdx.graphics.GL20.GL_REPLACE;
-import static com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA;
-import static com.badlogic.gdx.graphics.GL20.GL_SRC_COLOR;
-import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE;
 import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_2D;
 import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_MAX_ANISOTROPY_EXT;
 import static com.badlogic.gdx.graphics.GL20.GL_UNPACK_ALIGNMENT;
@@ -13,23 +8,6 @@ import static ru.m210projects.Build.Engine.DETAILPAL;
 import static ru.m210projects.Build.Engine.GLOWPAL;
 import static ru.m210projects.Build.Render.GLInfo.gltexmaxsize;
 import static ru.m210projects.Build.Render.GLInfo.supportsGenerateMipmaps;
-import static ru.m210projects.Build.Render.Types.GL10.GL_COMBINE_ALPHA_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_COMBINE_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_COMBINE_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_INTERPOLATE_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_MODULATE;
-import static ru.m210projects.Build.Render.Types.GL10.GL_OPERAND0_ALPHA_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_OPERAND0_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_OPERAND1_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_OPERAND2_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_PREVIOUS_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_RGB_SCALE;
-import static ru.m210projects.Build.Render.Types.GL10.GL_SOURCE0_ALPHA_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_SOURCE0_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_SOURCE1_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_SOURCE2_RGB_ARB;
-import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
-import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV_MODE;
 
 import java.nio.ByteBuffer;
 
@@ -46,7 +24,7 @@ import ru.m210projects.Build.Settings.GLSettings;
 
 public class GLTile extends GLTexture implements Comparable<GLTile> {
 
-	public static enum FlagType {
+	public enum FlagType {
 		Clamped(0), HighTile(1), SkyboxFace(2), HasAlpha(3), Invalidated(7);
 
 		private final int bit;
@@ -62,10 +40,11 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		public boolean hasBit(int flags) {
 			return (flags & bit) != 0;
 		}
-	};
+	}
 
 	protected int width, height;
-	private boolean isRequireShader;
+	private boolean isAllocated;
+	protected PixelFormat fmt;
 	protected float anisotropicFilterLevel = 1.0f;
 
 	protected int flags;
@@ -76,15 +55,34 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	protected int palnum;
 	protected GLTile next;
 
-	public GLTile(int width, int height) {
+	protected GLTile(PixelFormat fmt, int width, int height) {
 		super(GL_TEXTURE_2D);
 		this.width = width;
 		this.height = height;
-		this.isRequireShader = false;
+		this.fmt = fmt;
+		this.isAllocated = false;
+
+		this.scalex = this.scaley = 1.0f;
+	}
+
+	protected GLTile(GLTile src) {
+		super(src.glTarget, src.glHandle);
+		this.width = src.width;
+		this.height = src.height;
+		this.fmt = src.fmt;
+		this.isAllocated = src.isAllocated;
+		this.palnum = src.palnum;
+		this.anisotropicFilterLevel = src.anisotropicFilterLevel;
+		this.flags = src.flags;
+		this.skyface = src.skyface;
+		this.hicr = src.hicr;
+
+		this.scalex = src.scalex;
+		this.scaley = src.scaley;
 	}
 
 	public GLTile(TileData pic, int palnum, boolean useMipMaps) {
-		this(pic.getWidth(), pic.getHeight());
+		this(pic.getPixelFormat(), pic.getWidth(), pic.getHeight());
 		this.palnum = palnum;
 
 		alloc(pic);
@@ -94,14 +92,10 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		setClamped(pic.isClamped());
 		setHasAlpha(pic.hasAlpha());
 
-		scalex = scaley = 1.0f;
+		this.scalex = this.scaley = 1.0f;
 	}
 
 	protected void alloc(TileData pic) {
-		this.isRequireShader = false;
-		if (pic.getPixelFormat() == PixelFormat.Pal8 || pic.getPixelFormat() == PixelFormat.Pal8A)
-			this.isRequireShader = true;
-
 		BuildGdx.gl.glBindTexture(glTarget, glHandle);
 
 		BuildGdx.gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -111,44 +105,57 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 		setupTextureFilter(GLSettings.textureFilter.get(), GLSettings.textureAnisotropy.get());
 		setupTextureWrap(!pic.isClamped() ? TextureWrap.Repeat : TextureWrap.ClampToEdge);
+
+		this.isAllocated = true;
 	}
 
-	public void setColor(float r, float g, float b, float a) {
-		BuildGdx.gl.glColor4f(r, g, b, a);
+	public PixelFormat getPixelFormat() {
+		return fmt;
 	}
 
-	public void update(TileData pic, boolean useMipMaps) {
-		BuildGdx.gl.glBindTexture(glTarget, glHandle);
+	public void update(TileData pic, int pal, boolean useMipMaps) {
+		this.bind();
 
-		int width = pic.getWidth();
-		int height = pic.getHeight();
-		if(pic instanceof PixmapTileData) {
-			width = ((PixmapTileData) pic).getTileWidth();
-			height = ((PixmapTileData) pic).getTileHeight();
+		if(pic != null) {
+			int width = pic.getWidth();
+			int height = pic.getHeight();
+			if (pic instanceof PixmapTileData) {
+				width = ((PixmapTileData) pic).getTileWidth();
+				height = ((PixmapTileData) pic).getTileHeight();
+			}
+
+			// Realloc, because the texture size isn't match
+			if ((getWidth() != width || getHeight() != height)) {
+				delete();
+
+				this.glHandle = BuildGdx.gl.glGenTexture();
+				this.width = pic.getWidth();
+				this.height = pic.getHeight();
+
+				alloc(pic);
+			} else {
+				if (!isAllocated)
+					alloc(pic);
+				else
+					BuildGdx.gl.glTexSubImage2D(glTarget, 0, 0, 0, pic.getWidth(), pic.getHeight(), pic.getGLFormat(),
+							GL_UNSIGNED_BYTE, pic.getPixels());
+			}
+
+			if (useMipMaps)
+				generateMipmap(pic, false);
+
+			setClamped(pic.isClamped());
+			setHasAlpha(pic.hasAlpha());
+
+			pic.dispose();
 		}
 
-		//Realloc, because the texture size isn't match
-		if ((getWidth() != width || getHeight() != height)) {
-			delete();
-
-			this.glHandle = BuildGdx.gl.glGenTexture();
-			this.width = pic.getWidth();
-			this.height = pic.getHeight();
-
-			alloc(pic);
-		} else BuildGdx.gl.glTexSubImage2D(glTarget, 0, 0, 0, pic.getWidth(), pic.getHeight(), pic.getGLFormat(),
-				GL_UNSIGNED_BYTE, pic.getPixels());
-
-		if (useMipMaps)
-			generateMipmap(pic, false);
-
-		pic.dispose();
+		this.palnum = pal;
 	}
 
 	protected int calcMipLevel(int xsiz, int ysiz, int maxsize) {
 		int mipLevel = 0;
-		while ((xsiz >> mipLevel) > (1 << maxsize)
-				|| (ysiz >> mipLevel) > (1 << maxsize))
+		while ((xsiz >> mipLevel) > (1 << maxsize) || (ysiz >> mipLevel) > (1 << maxsize))
 			mipLevel++;
 		return mipLevel;
 	}
@@ -166,93 +173,89 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		int r, g, b, a, k, wpptr, rpptr, wp, rp, index, rgb;
 
 		ByteBuffer pic = data.getPixels();
-	    for (int j = 1, x, y; (x2 > 1) || (y2 > 1); j++)
-	    {
-	        x3 = Math.max(1, x2 >> 1);
-	        y3 = Math.max(1, y2 >> 1);		// this came from the GL_ARB_texture_non_power_of_two spec
-	        for (y = 0; y < y3; y++)
-	        {
-	            wpptr = y * x3;
-	            rpptr = (y << 1) * x2;
-	            for (x = 0; x < x3; x++, wpptr++, rpptr += 2)
-	            {
-	            	wp = wpptr << 2;
-	            	rp = rpptr << 2;
-	            	r = g = b = a = k = 0;
+		for (int j = 1, x, y; (x2 > 1) || (y2 > 1); j++) {
+			x3 = Math.max(1, x2 >> 1);
+			y3 = Math.max(1, y2 >> 1); // this came from the GL_ARB_texture_non_power_of_two spec
+			for (y = 0; y < y3; y++) {
+				wpptr = y * x3;
+				rpptr = (y << 1) * x2;
+				for (x = 0; x < x3; x++, wpptr++, rpptr += 2) {
+					wp = wpptr << 2;
+					rp = rpptr << 2;
+					r = g = b = a = k = 0;
 
-	            	index = rp;
-	                if (pic.get(index + 3) != 0)
-	                {
-	                	r += pic.get(index + 0) & 0xFF;
+					index = rp;
+					if (pic.get(index + 3) != 0) {
+						r += pic.get(index + 0) & 0xFF;
 						g += pic.get(index + 1) & 0xFF;
 						b += pic.get(index + 2) & 0xFF;
 						a += pic.get(index + 3) & 0xFF;
-	                	k++;
-	                }
-	                index = rp + 4;
-	                if (((x << 1) + 1 < x2) && (pic.get(index + 3) != 0))
-	                {
-	                	r += pic.get(index + 0) & 0xFF;
+						k++;
+					}
+					index = rp + 4;
+					if (((x << 1) + 1 < x2) && (pic.get(index + 3) != 0)) {
+						r += pic.get(index + 0) & 0xFF;
 						g += pic.get(index + 1) & 0xFF;
 						b += pic.get(index + 2) & 0xFF;
 						a += pic.get(index + 3) & 0xFF;
-	                	k++;
-	                }
-	                if ((y << 1) + 1 < y2)
-	                {
-	                	index = rp + (x2 << 2);
-	                    if (pic.get(index + 3) != 0)
-	                    {
-	                    	r += pic.get(index + 0) & 0xFF;
+						k++;
+					}
+					if ((y << 1) + 1 < y2) {
+						index = rp + (x2 << 2);
+						if (pic.get(index + 3) != 0) {
+							r += pic.get(index + 0) & 0xFF;
 							g += pic.get(index + 1) & 0xFF;
 							b += pic.get(index + 2) & 0xFF;
 							a += pic.get(index + 3) & 0xFF;
-	                    	k++;
-	                    }
+							k++;
+						}
 
-	                    index = rp + ((x2 + 1) << 2);
-	                    if (((x << 1) + 1 < x2) && pic.get(index + 3) != 0)
-	                    {
-	                    	r += pic.get(index + 0) & 0xFF;
+						index = rp + ((x2 + 1) << 2);
+						if (((x << 1) + 1 < x2) && pic.get(index + 3) != 0) {
+							r += pic.get(index + 0) & 0xFF;
 							g += pic.get(index + 1) & 0xFF;
 							b += pic.get(index + 2) & 0xFF;
 							a += pic.get(index + 3) & 0xFF;
-	                    	k++;
-	                    }
-	                }
-	                switch (k)
-	                {
-		                case 0:
-		                case 1:
-					        rgb = ( (a) << 24 ) + ( (b) << 16 ) + ( (g) << 8 ) + ( (r) << 0 );
-							break;
-						case 2:
-							rgb = ( ((a + 1) >> 1) << 24 ) + ( ((b + 1) >> 1) << 16 ) + ( ((g + 1) >> 1) << 8 ) + ( ((r + 1) >> 1) << 0 );
-							break;
-						case 3:
-							rgb = ( ((a * 85 + 128) >> 8) << 24 ) + ( ((b * 85 + 128) >> 8) << 16 ) + ( ((g * 85 + 128) >> 8) << 8 ) + ( ((r * 85 + 128) >> 8) << 0 );
-							break;
-						case 4:
-							rgb = ( ((a + 2) >> 2) << 24 ) + ( ((b + 2) >> 2) << 16 ) + ( ((g + 2) >> 2) << 8 ) + ( ((r + 2) >> 2) << 0 );
-							break;
-						default:
-							continue;
-	                }
+							k++;
+						}
+					}
+					switch (k) {
+					case 0:
+					case 1:
+						rgb = ((a) << 24) + ((b) << 16) + ((g) << 8) + ((r));
+						break;
+					case 2:
+						rgb = (((a + 1) >> 1) << 24) + (((b + 1) >> 1) << 16) + (((g + 1) >> 1) << 8)
+								+ (((r + 1) >> 1));
+						break;
+					case 3:
+						rgb = (((a * 85 + 128) >> 8) << 24) + (((b * 85 + 128) >> 8) << 16)
+								+ (((g * 85 + 128) >> 8) << 8) + (((r * 85 + 128) >> 8));
+						break;
+					case 4:
+						rgb = (((a + 2) >> 2) << 24) + (((b + 2) >> 2) << 16) + (((g + 2) >> 2) << 8)
+								+ (((r + 2) >> 2));
+						break;
+					default:
+						continue;
+					}
 
-	                pic.putInt(wp, rgb);
-	            }
-	        }
-
-	        if (j >= mipLevel)
-	        {
-	        	if (doalloc) {
-	        		BuildGdx.gl.glTexImage2D(GL_TEXTURE_2D, j - mipLevel, data.getGLInternalFormat(), x3, y3, 0, data.getGLFormat(), GL_UNSIGNED_BYTE, pic); // loading 1st time
-				} else {
-					BuildGdx.gl.glTexSubImage2D(GL_TEXTURE_2D, j - mipLevel, 0, 0, x3, y3, data.getGLFormat(), GL_UNSIGNED_BYTE, pic); // overwrite old texture
+					pic.putInt(wp, rgb);
 				}
-	        }
-	        x2 = x3; y2 = y3;
-	    }
+			}
+
+			if (j >= mipLevel) {
+				if (doalloc) {
+					BuildGdx.gl.glTexImage2D(GL_TEXTURE_2D, j - mipLevel, data.getGLInternalFormat(), x3, y3, 0,
+							data.getGLFormat(), GL_UNSIGNED_BYTE, pic); // loading 1st time
+				} else {
+					BuildGdx.gl.glTexSubImage2D(GL_TEXTURE_2D, j - mipLevel, 0, 0, x3, y3, data.getGLFormat(),
+							GL_UNSIGNED_BYTE, pic); // overwrite old texture
+				}
+			}
+			x2 = x3;
+			y2 = y3;
+		}
 
 	}
 
@@ -269,7 +272,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	public void setupTextureFilter(GLFilter filter, int anisotropy) {
-		if(isRequireShader) {
+		if (fmt == PixelFormat.Pal8) {
 			unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
 			unsafeSetAnisotropicFilter(1, true);
 			return;
@@ -280,61 +283,19 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	public float unsafeSetAnisotropicFilter(float level, boolean force) {
-		// 1 if you want to disable anisotropy
+		if (fmt == PixelFormat.Pal8)
+			return 1.0f;
 
+		// 1 if you want to disable anisotropy
 		float max = GLInfo.getMaxAnisotropicFilterLevel();
-		if (max == 1.0f) return 1.0f;
+		if (max == 1.0f)
+			return 1.0f;
 
 		level = Math.min(level, max);
 		if (!force && MathUtils.isEqual(level, anisotropicFilterLevel, 0.1f))
 			return anisotropicFilterLevel;
 		BuildGdx.gl.glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
 		return anisotropicFilterLevel = level;
-	}
-
-	public void setupTextureGlow() {
-		if (!isGlowTexture())
-			return;
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_ONE_MINUS_SRC_ALPHA);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-
-		setupTextureWrap(TextureWrap.Repeat);
-	}
-
-	public void setupTextureDetail() {
-		if (!isDetailTexture())
-			return;
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 2.0f);
-
-		setupTextureWrap(TextureWrap.Repeat);
 	}
 
 	@Override
@@ -353,9 +314,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 	@Override
 	public void bind() {
-		if (glHandle != 0) {
-			BuildGdx.gl.glBindTexture(glTarget, glHandle);
-		}
+		BuildGdx.gl.glBindTexture(glTarget, glHandle);
 	}
 
 	@Override
@@ -365,6 +324,11 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 				BuildGdx.gl.glDeleteTexture(glHandle);
 			glHandle = 0;
 		}
+	}
+
+	@Override
+	public GLTile clone() {
+		return new GLTile(this);
 	}
 
 	public boolean isClamped() {
@@ -414,6 +378,14 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		return palnum;
 	}
 
+	public float getHiresXScale() {
+		return hicr.xscale;
+	}
+
+	public float getHiresYScale() {
+		return hicr.yscale;
+	}
+
 	public boolean isGlowTexture() {
 		return hicr != null && (hicr.palnum == GLOWPAL);
 	}
@@ -439,10 +411,6 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 			flags |= bit.getBit();
 		else
 			flags &= ~bit.getBit();
-	}
-
-	public boolean isRequireShader() {
-		return isRequireShader;
 	}
 
 	@Override
@@ -473,5 +441,6 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	@Override
-	protected void reload() {}
+	protected void reload() {
+	}
 }

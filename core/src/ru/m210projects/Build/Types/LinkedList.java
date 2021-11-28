@@ -21,6 +21,11 @@ public class LinkedList<T> implements Iterable<T> {
 			return node.getValue();
 		}
 
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove");
+		}
+
 		public Iterator<T> init() {
 			this.node = head;
 

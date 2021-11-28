@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.DataResource;
@@ -42,13 +43,19 @@ import ru.m210projects.Build.Script.DefScript;
 
 public class Gameutils {
 
+	public static final float degreesToBuildAngle = 1024.0f / 180.0f;
+	public static final float radiansToBuildAngle = 1024.0f / MathUtils.PI;
+
+	public static final float buildAngleToDegrees = 180.0f / 1024.0f;
+	public static final float buildAngleToRadians = MathUtils.PI / 1024.0f;
+
 	public static void fill(byte[] array, int value) {
 		int len = array.length;
 		if (len > 0)
 			array[0] = (byte) value;
 
 		for (int i = 1; i < len; i += i)
-			System.arraycopy(array, 0, array, i, ((len - i) < i) ? (len - i) : i);
+			System.arraycopy(array, 0, array, i, Math.min((len - i), i));
 	}
 
 	public static void fill(byte[] array, int start, int end, int value) {
@@ -58,29 +65,29 @@ public class Gameutils {
 		int len = end - start;
 
 		for (int i = 1; i < len; i += i)
-			System.arraycopy(array, start, array, start + i, ((len - i) < i) ? (len - i) : i);
+			System.arraycopy(array, start, array, start + i, Math.min((len - i), i));
 	}
-	
+
 	public static float invSqrt(float x) {
-	    float xhalf = 0.5f * x;
-	    int i = Float.floatToIntBits(x);
-	    i = 0x5f3759df - (i >> 1);
-	    x = Float.intBitsToFloat(i);
-	    x *= (1.5f - xhalf * x * x);
-	    return x;
+		float xhalf = 0.5f * x;
+		int i = Float.floatToIntBits(x);
+		i = 0x5f3759df - (i >> 1);
+		x = Float.intBitsToFloat(i);
+		x *= (1.5f - xhalf * x * x);
+		return x;
 	}
-	
+
 	public static float Sqrt(float x) {
-	    return x > 0.0f ? x * invSqrt(x) : 0.0f;
+		return x > 0.0f ? x * invSqrt(x) : 0.0f;
 	}
 
 	public static double angle(double dx, double dy, boolean deg) {
 		double k = deg ? 90.0 : Math.PI / 2.0;
-		if (dy >= 0.0f)
+		if (dy >= 0.0)
 			return k * ((dx >= 0 ? dy / (dx + dy) : 1 - dx / (-dx + dy)));
 		return k * ((dx < 0 ? 2 - dy / (-dx - dy) : 3 + dx / (dx - dy)));
 	}
-	
+
 	public static float BClampAngle(float angle) {
 		return angle < 0 ? (angle % 2048) + 2048 : angle % 2048;
 	}
@@ -88,19 +95,15 @@ public class Gameutils {
 	public static float BClipRange(float value, float min, float max) {
 		if (value < min)
 			return min;
-		if (value > max)
-			return max;
+		return Math.min(value, max);
 
-		return value;
 	}
 
 	public static int BClipRange(int value, int min, int max) {
 		if (value < min)
 			return min;
-		if (value > max)
-			return max;
+		return Math.min(value, max);
 
-		return value;
 	}
 
 	public static short BClipLow(short value, short min) {
@@ -112,11 +115,11 @@ public class Gameutils {
 	}
 
 	public static int BClipLow(int value, int min) {
-		return value < min ? min : value;
+		return Math.max(value, min);
 	}
 
 	public static int BClipHigh(int value, int max) {
-		return value > max ? max : value;
+		return Math.min(value, max);
 	}
 
 	public static float BClipLow(float value, int min) {
@@ -171,7 +174,7 @@ public class Gameutils {
 
 	public enum ConvertType {
 		Normal, AlignLeft, AlignRight, Stretch
-	};
+	}
 
 	public static int coordsConvertXScaled(int coord, ConvertType type) {
 		int oxdim = xdim;
@@ -206,9 +209,8 @@ public class Gameutils {
 		int ydim = (3 * xdim) / 4;
 		int buildim = 200 * ydim / oydim;
 		int normxofs = coord - (buildim << 15);
-		int wy = (ydim << 15) + scale(normxofs, ydim, buildim);
 
-		return wy;
+		return (ydim << 15) + scale(normxofs, ydim, buildim);
 	}
 
 	public static byte[] getInternalResource(String name) {
@@ -265,7 +267,8 @@ public class Gameutils {
 		if (data != null) {
 			DataResource res = new DataResource(null, filename, -1, data);
 			Group group = BuildGdx.cache.add(res, filename);
-			if (group == null) return;
+			if (group == null)
+				return;
 
 			GroupResource def = group.open(appdef);
 			if (def != null) {

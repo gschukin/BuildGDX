@@ -27,8 +27,8 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 public abstract class MenuItem {
 	
 	public FocusListener listener;
-	protected static interface FocusListener {
-		public boolean isFocused();
+	protected interface FocusListener {
+		boolean isFocused();
 	}
 
 	public BuildMenu m_pMenu;

@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class AudioInfo {
 
-	private HashMap<String, String> midToMusic;
+	private final HashMap<String, String> midToMusic;
 	public AudioInfo()
 	{
 		midToMusic = new HashMap<String, String>();

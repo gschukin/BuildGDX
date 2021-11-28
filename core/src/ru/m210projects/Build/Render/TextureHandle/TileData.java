@@ -7,23 +7,19 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.PixmapIO;
 
-import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Compat.Path;
 import ru.m210projects.Build.FileHandle.FileResource;
 import ru.m210projects.Build.FileHandle.FileResource.Mode;
 import ru.m210projects.Build.Render.GLInfo;
-import ru.m210projects.Build.Render.Types.AndroidTextureBuffer;
-import ru.m210projects.Build.Render.Types.DirectTextureBuffer;
-import ru.m210projects.Build.Render.Types.FastTextureBuffer;
-import ru.m210projects.Build.Render.Types.TextureBuffer;
 
 public abstract class TileData {
 
 	public enum PixelFormat {
-		Rgb(3), Rgba(4), Pal8(1), Pal8A(3);
+		Rgb(3), Rgba(4), Pal8(1), Bitmap(1);
 
 		private final int bytes;
+
 		PixelFormat(int bytes) {
 			this.bytes = bytes;
 		}
@@ -32,9 +28,6 @@ public abstract class TileData {
 			return bytes;
 		}
 	}
-
-	private static final int TEX_MAX_SIZE = 1024;
-	private static TextureBuffer tmp_buffer;
 
 	public abstract int getWidth();
 
@@ -66,21 +59,28 @@ public abstract class TileData {
 
 		ByteBuffer pixels = getPixels();
 		int bytes = getPixelFormat().getLength();
-		if(bytes == 1) {
+		if (bytes == 1) {
 			FileResource raw = BuildGdx.compat.open(name + ".raw", Path.Absolute, Mode.Write);
+			String path = raw.getPath();
 			raw.writeBytes(pixels, width * height);
 			raw.close();
+
+			System.out.println(path + " saved!");
 			return;
 		}
 
 		name += ".png";
-		Pixmap pixmap = new Pixmap(width, height, Format.RGB888);
+		Pixmap pixmap = new Pixmap(width, height,
+				getPixelFormat() == PixelFormat.Rgba ? Format.RGBA8888 : Format.RGB888);
 		float[] color = new float[4];
+		if(bytes == 3)
+			color[3] = 1.0f;
+
 		for (int i = 0; i < (width * height); i++) {
-			for(int c = 0; c < bytes; c++)
+			for (int c = 0; c < bytes; c++)
 				color[c] = (pixels.get((i * bytes) + c) & 0xFF) / 255.f;
 
-			pixmap.setColor(color[0], color[1], color[2], 1.0f);
+			pixmap.setColor(color[0], color[1], color[2], color[3]);
 			int row = (int) Math.floor(i / width);
 			int col = i % width;
 			pixmap.drawPixel(col, row);
@@ -96,24 +96,10 @@ public abstract class TileData {
 	protected int calcSize(int size) {
 		int nsize = 1;
 		if (GLInfo.texnpot == 0) {
-			for (; nsize < size; nsize *= 2);
+			for (; nsize < size; nsize *= 2)
+				;
 			return nsize;
 		}
 		return size == 0 ? 1 : size;
-	}
-
-	protected static TextureBuffer getTmpBuffer(int size) {
-		if(tmp_buffer == null) {
-			size = TEX_MAX_SIZE * TEX_MAX_SIZE * 4;
-			try {
-				if(BuildGdx.app.getPlatform() != Platform.Android)
-					tmp_buffer = new FastTextureBuffer(size);
-				else tmp_buffer = new AndroidTextureBuffer(size);
-			} catch (Exception e) {
-				e.printStackTrace();
-				tmp_buffer = new DirectTextureBuffer(size);
-			}
-		}
-		return tmp_buffer;
 	}
 }

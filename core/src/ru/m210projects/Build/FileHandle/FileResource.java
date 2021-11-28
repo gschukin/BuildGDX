@@ -19,42 +19,34 @@ package ru.m210projects.Build.FileHandle;
 import java.io.EOFException;
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-
 import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Architecture.BuildApplication.Platform;
-import ru.m210projects.Build.Architecture.BuildGdx;
-import sun.misc.Unsafe;
 
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 public class FileResource implements Resource {
 
-	private static Unsafe unsafe;
-	static {
-		try {
-			Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-			theUnsafe.setAccessible(true);
-			unsafe = (Unsafe) theUnsafe.get(null);
-		} catch (Exception e) {
-		}
-	}
+//	private static Unsafe unsafe;
+//	static {
+//		try {
+//			Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+//			theUnsafe.setAccessible(true);
+//			unsafe = (Unsafe) theUnsafe.get(null);
+//		} catch (Exception e) {
+//		}
+//	}
 
-	private static byte[] tmpbuf = new byte[1024];
+	private final byte[] tmpbuf = new byte[1024];
 
-	public static enum Mode {
+	public enum Mode {
 		Read, Write
 	}
 
 	private RandomAccessFile raf;
 	private Mode mode;
-	private String ext;
-	private MappedByteBuffer fbuf;
+	private String ext, path;
+	private ByteBuffer fbuf;
 
 	protected FileResource open(File file, Mode mode) {
 		this.mode = mode;
@@ -64,7 +56,12 @@ public class FileResource implements Resource {
 				raf = new RandomAccessFile(file, "r");
 				try {
 					FileChannel ch = raf.getChannel();
-					fbuf = ch.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
+
+					fbuf = ByteBuffer.allocate((int) ch.size());
+					ch.read(fbuf);
+					fbuf.flip();
+
+//					fbuf = ch.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -87,21 +84,22 @@ public class FileResource implements Resource {
 	private void handle(File file) {
 		String filename = toLowerCase(file.getName());
 		ext = filename.substring(filename.lastIndexOf('.') + 1);
+		path = file.getPath();
 	}
 
 	public String getPath() {
 		if (isClosed())
 			return null;
 
-		try {
-			Field path = raf.getClass().getDeclaredField("path");
-			path.setAccessible(true);
-			return (String) path.get(raf);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Field path = raf.getClass().getDeclaredField("path");
+//			path.setAccessible(true);
+//			return (String) path.get(raf);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
-		return null;
+		return path;
 	}
 
 	public Mode getMode() {
@@ -119,39 +117,39 @@ public class FileResource implements Resource {
 			return;
 
 		try {
-			if (fbuf != null) {
-				free(fbuf);
+			if (fbuf != null)
 				fbuf = null;
-			}
 			raf.close();
 			raf = null;
+			path = null;
+			ext = null;
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void freeJRE8(MappedByteBuffer bb) throws Exception {
-		Object cleaner = ((sun.nio.ch.DirectBuffer) bb).cleaner();
-		Method invokeCleaner = cleaner.getClass().getDeclaredMethod("clean");
-		invokeCleaner.setAccessible(true);
-		invokeCleaner.invoke(cleaner);
-	}
-
-	private void freeJRE9(MappedByteBuffer bb) throws Exception {
-		Method invokeCleaner = Unsafe.class.getMethod("invokeCleaner", ByteBuffer.class);
-		invokeCleaner.invoke(unsafe, bb);
-	}
-
-	private void free(MappedByteBuffer bb) {
-		try {
-			if (BuildGdx.app.getPlatform() != Platform.Android && BuildGdx.app.getVersion() < 9) {
-				freeJRE8(bb);
-			} else {
-				freeJRE9(bb);
-			}
-		} catch (Throwable e) {
-		}
-	}
+//	private void freeJRE8(MappedByteBuffer bb) throws Exception {
+//		Object cleaner = ((sun.nio.ch.DirectBuffer) bb).cleaner();
+//		Method invokeCleaner = cleaner.getClass().getDeclaredMethod("clean");
+//		invokeCleaner.setAccessible(true);
+//		invokeCleaner.invoke(cleaner);
+//	}
+//
+//	private void freeJRE9(MappedByteBuffer bb) throws Exception {
+//		Method invokeCleaner = Unsafe.class.getMethod("invokeCleaner", ByteBuffer.class);
+//		invokeCleaner.invoke(unsafe, bb);
+//	}
+//
+//	private void free(MappedByteBuffer bb) {
+//		try {
+//			if (BuildGdx.app.getPlatform() != Platform.Android && BuildGdx.app.getVersion() < 9) {
+//				freeJRE8(bb);
+//			} else {
+//				freeJRE9(bb);
+//			}
+//		} catch (Throwable ignored) {
+//		}
+//	}
 
 	@Override
 	public int seek(long offset, Whence whence) {
@@ -216,7 +214,7 @@ public class FileResource implements Resource {
 	@Override
 	public int read(ByteBuffer bb, int offset, int len) {
 		try {
-			int var = -1;
+			int var;
 			bb.position(offset);
 			int p = 0;
 			while (len > 0) {
@@ -311,27 +309,27 @@ public class FileResource implements Resource {
 		return null;
 	}
 
-	protected ByteBuffer readBuffer(int len) {
-		ByteBuffer out = null;
-		if (isClosed())
-			return null;
-
-		try {
-			FileChannel ch = raf.getChannel();
-			long pos = ch.position();
-			out = ch.map(FileChannel.MapMode.READ_ONLY, pos, len);
-			ch.position(pos + len);
-		} catch (EOFException e) {
-			return null;
-		} catch (Exception e) {
-			throw new RuntimeException("Couldn't read file \r\n" + e.getMessage());
-		}
-
-		return out;
-	}
+//	protected ByteBuffer readBuffer(int len) {
+//		ByteBuffer out;
+//		if (isClosed())
+//			return null;
+//
+//		try {
+//			FileChannel ch = raf.getChannel();
+//			long pos = ch.position();
+//			out = ch.map(FileChannel.MapMode.READ_ONLY, pos, len);
+//			ch.position(pos + len);
+//		} catch (EOFException e) {
+//			return null;
+//		} catch (Exception e) {
+//			throw new RuntimeException("Couldn't read file \r\n" + e.getMessage());
+//		}
+//
+//		return out;
+//	}
 
 	public int writeBytes(Object array) {
-		int len = 0;
+		int len;
 		if (array instanceof byte[])
 			len = ((byte[]) array).length;
 		else if (array instanceof ByteBuffer)
@@ -415,38 +413,31 @@ public class FileResource implements Resource {
 	}
 
 	public int writeByte(int value) {
-		int var = -1;
 		if (isClosed() || getMode() != Mode.Write)
-			return var;
+			return -1;
 
 		tmpbuf[0] = (byte) value;
-
 		try {
 			raf.write(tmpbuf, 0, 1);
-			var = 1;
+			return 1;
 		} catch (Exception e) {
 			throw new RuntimeException("Couldn't write to file \r\n" + e.getMessage());
 		}
-
-		return var;
 	}
 
 	public int writeShort(int value) {
-		int var = -1;
 		if (isClosed() || getMode() != Mode.Write)
-			return var;
+			return -1;
 
-		tmpbuf[0] = (byte) ((value >>> 0) & 0xFF);
+		tmpbuf[0] = (byte) (value & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
 
 		try {
 			raf.write(tmpbuf, 0, 2);
-			var = 2;
+			return 2;
 		} catch (Exception e) {
 			throw new RuntimeException("Couldn't write to file \r\n" + e.getMessage());
 		}
-
-		return var;
 	}
 
 	public int writeInt(int value) {
@@ -454,7 +445,7 @@ public class FileResource implements Resource {
 		if (isClosed() || getMode() != Mode.Write)
 			return var;
 
-		tmpbuf[0] = (byte) ((value >>> 0) & 0xFF);
+		tmpbuf[0] = (byte) (value & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
 		tmpbuf[2] = (byte) ((value >>> 16) & 0xFF);
 		tmpbuf[3] = (byte) ((value >>> 24) & 0xFF);

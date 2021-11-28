@@ -17,14 +17,15 @@ import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Render.GLRenderer;
+import ru.m210projects.Build.Render.GLRenderer.GLPreloadFlag;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Tile.AnimType;
 
 public abstract class PrecacheAdapter extends ScreenAdapter {
 
 	private class PrecacheQueue {
-		private String name;
-		private Runnable runnable;
+		private final String name;
+		private final Runnable runnable;
 
 		public PrecacheQueue(String name, Runnable runnable) {
 			this.name = name;
@@ -32,9 +33,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		}
 	}
 
-	private byte[] tiles;
+	private final byte[] tiles;
 	private int currentIndex = 0;
-	private List<PrecacheQueue> queues = new ArrayList<PrecacheQueue>();
+	private final List<PrecacheQueue> queues = new ArrayList<PrecacheQueue>();
 	protected Runnable toLoad;
 	protected boolean revalidate;
 
@@ -46,11 +47,17 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 	public void addQueue(String name, Runnable runnable) {
 		if (!game.pCfg.gPrecache)
 			return;
+
+		if(queues.size() == 0)
+			queues.add(new PrecacheQueue("Preload models...", glmodels));
+
 		queues.add(new PrecacheQueue(name, runnable));
 	}
 
 	public void clearQueue() {
 		queues.clear();
+
+		queues.add(new PrecacheQueue("Models loading...", glmodels));
 	}
 
 	public PrecacheAdapter(BuildGame game) {
@@ -95,10 +102,19 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		public void run() {
 			GLRenderer gl = engine.glrender();
 			if (gl != null)
-				gl.preload();
+				gl.preload(GLPreloadFlag.Other);
 
 			BuildGdx.app.postRunnable(toLoad);
 			toLoad = null;
+		}
+	};
+
+	protected Runnable glmodels = new Runnable() {
+		@Override
+		public void run() {
+			GLRenderer gl = engine.glrender();
+			if (gl != null)
+				gl.preload(GLPreloadFlag.Models);
 		}
 	};
 

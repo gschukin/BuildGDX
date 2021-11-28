@@ -24,9 +24,9 @@ import ru.m210projects.Build.StringUtils;
 
 public abstract class GroupResource implements Resource {
 
-	public static enum ResourceType { Data, GroupFile };
-	
-	protected ByteBuffer buffer;
+	public enum ResourceType { Data, GroupFile }
+
+    protected ByteBuffer buffer;
 	protected Group parent;
 	
 	protected String filename;
@@ -105,7 +105,6 @@ public abstract class GroupResource implements Resource {
 	
 	public String toString()
 	{
-		String txt = getFullName() + " fileid: " + getIdentification() + " parent: " + (parent != null ? parent.name : "") + "\r\n";	
-		return txt;
+		return getFullName() + " fileid: " + getIdentification() + " parent: " + (parent != null ? parent.name : "") + "\r\n";
 	}
 }

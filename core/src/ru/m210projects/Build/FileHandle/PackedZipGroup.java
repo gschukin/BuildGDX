@@ -75,7 +75,7 @@ public class PackedZipGroup extends Group {
 		}
 	}
 
-	private Resource file;
+	private final Resource file;
 
 	public PackedZipGroup(Resource file) throws IOException
 	{
@@ -110,7 +110,7 @@ public class PackedZipGroup extends Group {
 						byte[] data = new byte[512];
 						res.buffer = ByteBuffer.allocateDirect(res.size);
 						res.buffer.order(ByteOrder.LITTLE_ENDIAN);
-						int len = 0;
+						int len;
 						while((len = zis.read(data)) != -1) 
 							res.buffer.put(data, 0, len);
 						res.buffer.rewind();
@@ -158,10 +158,7 @@ public class PackedZipGroup extends Group {
 	protected boolean open(GroupResource res) {
 		ZipResource available = (ZipResource) res;
 
-		if(findEntry(available)) 
-			return true;
-
-		return false;
+		return findEntry(available);
 	}
 	
 	@Override

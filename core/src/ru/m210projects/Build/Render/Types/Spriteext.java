@@ -7,8 +7,12 @@
 package ru.m210projects.Build.Render.Types;
 
 public class Spriteext {
-	public long mdanimtims;
-	public short mdanimcur;
+
+	public static final int SPREXT_NOTMD = 1;
+	public static final int SPREXT_NOMDANIM = 2;
+	public static final int SPREXT_AWAY1 = 4;
+	public static final int SPREXT_AWAY2 = 8;
+
 	public short angoff, pitch, roll;
 	public int xoff, yoff, zoff;
 	public short flags;
@@ -20,8 +24,6 @@ public class Spriteext {
 	}
 
 	public Spriteext(Spriteext src) {
-		this.mdanimtims = src.mdanimtims;
-		this.mdanimcur = src.mdanimcur;
 		this.angoff = src.angoff;
 		this.pitch = src.pitch;
 		this.roll = src.roll;
@@ -35,8 +37,6 @@ public class Spriteext {
 	}
 
 	public void clear() {
-		mdanimtims = 0;
-		mdanimcur = 0;
 		angoff = 0;
 		pitch = 0;
 		roll = 0;
@@ -47,5 +47,13 @@ public class Spriteext {
 		xpanning = 0;
 		ypanning = 0;
 		alpha = 0;
+	}
+
+	public boolean isNotModel() {
+		return (this.flags & SPREXT_NOTMD) != 0;
+	}
+
+	public boolean isAnimationDisabled() {
+		return (this.flags & SPREXT_NOMDANIM) != 0;
 	}
 }

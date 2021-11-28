@@ -18,10 +18,10 @@ package ru.m210projects.Build.Types;
 
 public abstract class BuildVariable<T> {
 	
-	public static enum RespondType { Success, Fail, Description }
+	public enum RespondType { Success, Fail, Description }
 	
 	private T value;
-	private String description;
+	private final String description;
 	
 	protected abstract void execute(T value);
 	
