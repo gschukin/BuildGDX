@@ -17,6 +17,7 @@
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
 import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
+import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +29,7 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.Audio.BuildAudio.Driver;
 import ru.m210projects.Build.FileHandle.Compat.Path;
+import ru.m210projects.Build.FileHandle.DirectoryEntry;
 import ru.m210projects.Build.FileHandle.Group;
 import ru.m210projects.Build.FileHandle.GroupResource;
 import ru.m210projects.Build.OnSceenDisplay.Console;
@@ -105,6 +107,7 @@ public class InitScreen extends ScreenAdapter {
 
 	public InitScreen(final BuildGame game) {
 		this.game = game;
+		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
 
 		Console.SetLogFile(game.appname + ".log");
@@ -149,6 +152,7 @@ public class InitScreen extends ScreenAdapter {
 		game.pSavemgr = new SaveManager();
 
 		Console.setFunction(factory.console());
+		Console.ResizeDisplay(cfg.ScreenWidth, cfg.ScreenHeight);
 
 		if (engine.loadpics() == 0) {
 			BuildGdx.message.show("Build Engine Initialization Error!",
@@ -158,7 +162,6 @@ public class InitScreen extends ScreenAdapter {
 			return;
 		}
 
-		BuildConfig cfg = game.pCfg;
 		game.pFonts = factory.fonts();
 
 		BuildSettings.init(engine, cfg);
@@ -171,6 +174,15 @@ public class InitScreen extends ScreenAdapter {
 
 		if (!engine.setgamemode(cfg.fullscreen, cfg.ScreenWidth, cfg.ScreenHeight))
 			cfg.fullscreen = 0;
+
+		if(cfg.autoloadFolder) {
+			DirectoryEntry autoloadDir = BuildGdx.compat.checkDirectory("autoload");
+			if(autoloadDir == null) { // not found
+				File f = new File(Path.Game.getPath() + File.separator + "autoload");
+				if(!f.exists() && !f.mkdirs() && !f.isDirectory())
+					Console.Println("Can't create autoload folder", OSDTEXT_RED);
+			}
+		}
 
 		thread = new Thread(new Runnable() {
 			@Override
