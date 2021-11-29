@@ -442,6 +442,7 @@ public class DefScript {
 			put("sound", tok);
 			put("music", tok);
 			put("includeif", new AddonToken());
+			put("echo", new EchoToken());
 		}
 	};
 
@@ -546,6 +547,17 @@ public class DefScript {
 				def.addonsIncludes.get(addon).add(fn);
 			}
 
+			return BaseToken.Ok;
+		}
+	}
+
+	protected class EchoToken implements Token {
+		@Override
+		public BaseToken parse(Scriptfile script) {
+			String message = script.getstring();
+			if(message != null)
+				Console.Println(message, Console.OSDTEXT_GOLD);
+			else Console.Println("");
 			return BaseToken.Ok;
 		}
 	}
