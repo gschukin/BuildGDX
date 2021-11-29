@@ -192,11 +192,14 @@ public class GLSettings extends BuildSettings {
 			@Override
 			protected Integer check(Object value) {
 				if (value instanceof Integer) {
-					float gamma = (Integer) value / 4096.0f;
-					if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(Option.GLSetConfiguration,
-							//1 - gamma, cfg.fbrightness, cfg.fcontrast))
-							1 - gamma, 0.0f, 1.0f))
-						return (Integer) value;
+					try {
+						float gamma = (Integer) value / 4096.0f;
+						if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(Option.GLSetConfiguration,
+								//1 - gamma, cfg.fbrightness, cfg.fcontrast))
+								1 - gamma, 0.0f, 1.0f))
+							return (Integer) value;
+					} catch(Throwable ignored) {
+					}
 				}
 				return null;
 			}
