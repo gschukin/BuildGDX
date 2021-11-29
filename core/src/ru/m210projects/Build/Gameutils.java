@@ -204,6 +204,10 @@ public class Gameutils {
 		return wx - 1;
 	}
 
+	public static boolean isSquareResolution(int width, int height) {
+		return (3 * width / 4) == height || (4 * width / 5) == height;
+	}
+
 	public static int coordsConvertYScaled(int coord) {
 		int oydim = ydim;
 		int ydim = (3 * xdim) / 4;
