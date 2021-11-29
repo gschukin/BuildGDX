@@ -797,8 +797,6 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void setview(int x1, int y1, int x2, int y2) {
-		if (orphoRen.isDrawing())
-			orphoRen.end();
 		orphoRen.resize(x2, y2);
 	}
 
