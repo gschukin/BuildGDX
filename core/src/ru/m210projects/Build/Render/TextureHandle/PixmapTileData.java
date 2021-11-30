@@ -31,7 +31,7 @@ public class PixmapTileData extends TileData {
 			ysiz = calcSize(height);
 
 		if (xsiz != width || ysiz != height) {
-			Pixmap npix = new Pixmap(xsiz, ysiz, pixmap.getFormat());
+			Pixmap npix = new Pixmap(xsiz, ysiz, !clamped ? pixmap.getFormat() : Format.RGBA8888);
 			npix.setFilter(Filter.NearestNeighbour);
 
 			if (!clamped) {

@@ -702,9 +702,10 @@ public class GDXRenderer implements GLRenderer {
 
 				if (pth.isHighTile()) {
 					int tsizy = 1;
-					for (; tsizy < pic.getHeight(); tsizy += tsizy)
-						;
-					texture_transform.scale(1.0f, (tsizy * pth.getYScale()) / pth.getHeight());
+					for (; tsizy < pic.getHeight(); tsizy += tsizy);
+					if((pic.getWidth() / (float) pic.getHeight()) != (pth.getWidth() / (float) pth.getHeight())) {
+						texture_transform.scale(1.0f, (tsizy * pth.getYScale()) / pth.getHeight());
+					}
 					manager.textureTransform(texture_transform, 0);
 				}
 

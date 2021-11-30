@@ -626,7 +626,7 @@ public class SpriteRenderer {
 		else
 			BuildGdx.gl.glFrontFace(GL_CW);
 
-		Gdx.gl.glDepthFunc(GL20.GL_LESS);
+		Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
 		Gdx.gl.glDepthRangef(0.0f, 0.99999f);
 
 		Matrix4 mat = getMatrix(tspr, tsizx, tsizy);
@@ -658,7 +658,7 @@ public class SpriteRenderer {
 
 	public void end() {
 		Gdx.gl.glDepthFunc(GL20.GL_LESS);
-		Gdx.gl.glDepthRangef(0.001f, 1.0f);
+		Gdx.gl.glDepthRangef(parent.defznear, parent.defzfar);
 	}
 
 }
