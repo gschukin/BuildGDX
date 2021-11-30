@@ -154,7 +154,10 @@ public class WorldShader {
 			+ "		 || gl_FragCoord.y < u_viewport.w || gl_FragCoord.y > u_viewport.y))" //
 			+ "		   discard;" //
 			+ "\n" //
-			+ "	   vec4 src = u_color * v_color * texture2D(u_texture, v_texCoords);\n" //
+			+ "    vec4 tex_color = texture2D(u_texture, v_texCoords);\n"
+			+ "    if(tex_color.a == 0.0)\n"	// alpha cut
+			+ "		   discard;" //
+			+ "	   vec4 src = u_color * v_color * tex_color;\n" //
 			+ "	   if(u_fogEnable) {\n" //
 			+ "        gl_FragColor = mix(src, vec4(u_fogColor, 1.0), calcFog((gl_FragCoord.z / gl_FragCoord.w) / 64.0));\n" //
 			+ "        gl_FragColor.a = src.a;\n" //

@@ -91,6 +91,7 @@ import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.Hudtyp;
+import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.SECTOR;
@@ -390,7 +391,29 @@ public class GDXOrtho extends OrphoRenderer {
 		setViewport(cx1, cy1, cx2, cy2);
 		if (pth.getPixelFormat() != PixelFormat.Pal8) {
 			float shade = (numshades - min(max(dashade, 0), numshades)) / (float) numshades;
-			setColor(shade, shade, shade, alpha);
+			float r = shade, g = shade, b = shade;
+
+			if (pth.isHighTile()) {
+				if (parent.defs != null && parent.defs.texInfo != null) {
+					if (pth.getPal() != dapalnum) {
+						// apply tinting for replaced textures
+
+						Palette p = parent.defs.texInfo.getTints(dapalnum);
+						r *= p.r / 255.0f;
+						g *= p.g / 255.0f;
+						b *= p.b / 255.0f;
+					}
+
+					Palette pdetail = parent.defs.texInfo.getTints(MAXPALOOKUPS - 1);
+					if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
+						r *= pdetail.r / 255.0f;
+						g *= pdetail.g / 255.0f;
+						b *= pdetail.b / 255.0f;
+					}
+				}
+			}
+
+			setColor(r, g, b, alpha);
 		} else
 			switchTextureParams(dapalnum, dashade, alpha, blendingDisabled || (method & 256) != 0);
 

@@ -110,7 +110,6 @@ public class GDXRenderer implements GLRenderer {
 //  Tekwar skies bug
 //	Hires detail, glow
 //  Overheadmap sector visible check
-//  Hires sprite alpha
 //  Duke E2L2 model invisible
 
 //	Sprite ZFighting
@@ -700,6 +699,7 @@ public class GDXRenderer implements GLRenderer {
 					calcFog(surf.getPal(), surf.getShade(), combvis);
 				}
 
+				manager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				if (pth.isHighTile()) {
 					int tsizy = 1;
 					for (; tsizy < pic.getHeight(); tsizy += tsizy);
@@ -707,6 +707,26 @@ public class GDXRenderer implements GLRenderer {
 						texture_transform.scale(1.0f, (tsizy * pth.getYScale()) / pth.getHeight());
 					}
 					manager.textureTransform(texture_transform, 0);
+
+					if (defs != null && defs.texInfo != null) {
+						float r = 1, g = 1, b = 1;
+						if (pth.getPal() != surf.getPal()) {
+							// apply tinting for replaced textures
+
+							Palette p = defs.texInfo.getTints(surf.getPal());
+							r *= p.r / 255.0f;
+							g *= p.g / 255.0f;
+							b *= p.b / 255.0f;
+						}
+
+						Palette pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
+						if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
+							r *= pdetail.r / 255.0f;
+							g *= pdetail.g / 255.0f;
+							b *= pdetail.b / 255.0f;
+						}
+						manager.color(r, g, b, 1.0f);
+					}
 				}
 
 				if (worldTransform == null)
