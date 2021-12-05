@@ -28,7 +28,7 @@ import ru.m210projects.Build.Architecture.BuildMessage;
 public class DesktopMessage implements BuildMessage {
 	private JOptionPane panel;
 	private BuildFrame frame;
-	private boolean update;
+	private final boolean update;
 
 	public DesktopMessage(boolean update)
 	{
@@ -45,6 +45,7 @@ public class DesktopMessage implements BuildMessage {
 		if(panel == null && (panel = InitPanel()) == null)
 			return false;
 
+		BuildGdx.input.setCursorCatched(false);
 		if(message.length() >= 384)
 		{
 			message = message.substring(0, 384);
@@ -78,8 +79,7 @@ public class DesktopMessage implements BuildMessage {
 
 	        Object selectedValue = panel.getValue();
 	        if (selectedValue instanceof Integer) {
-	        	if(((Integer)selectedValue).intValue() == JOptionPane.YES_OPTION)
-					return true;
+				return ((Integer) selectedValue).intValue() == JOptionPane.YES_OPTION;
             }
 
 			return false;

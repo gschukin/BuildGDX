@@ -45,8 +45,8 @@ public class MenuTextField extends MenuItem {
 	public int inputlen;
 	public int oinputlen;
 	
-	private InputCallback inputCallback;
-	private MenuProc confirmCallback;
+	private final InputCallback inputCallback;
+	private final MenuProc confirmCallback;
 	
 	public MenuTextField(Object text, String input, BuildFont font, int x, int y, int width, final int charFlag, MenuProc confirmCallback) {
 		super(text, font);
@@ -102,15 +102,13 @@ public class MenuTextField extends MenuItem {
 	private void type(char ch, int charFlag) {
 		if (inputlen < 15 && ch != 0) {
         	boolean canType;
-        	if( (isalpha((char)ch) && (charFlag & LETTERS) != 0) 
-        			|| (isdigit((char)ch) && (charFlag & NUMBERS) != 0) 
-        			|| (!isdigit((char)ch) && !isalpha((char)ch)
-        					&& ((charFlag & SYMBOLS) != 0 || (charFlag & POINT) != 0 && ch == '.') ))
-        		canType = true;
-        	else canType = false;
+			canType = (isalpha(ch) && (charFlag & LETTERS) != 0)
+					|| (isdigit(ch) && (charFlag & NUMBERS) != 0)
+					|| (!isdigit(ch) && !isalpha(ch)
+					&& ((charFlag & SYMBOLS) != 0 || (charFlag & POINT) != 0 && ch == '.'));
 
         	if (canType) 
-        		typingBuf[inputlen++]=(char)ch;
+        		typingBuf[inputlen++]= ch;
     	}
 	}
 	
@@ -210,8 +208,7 @@ public class MenuTextField extends MenuItem {
 					return true;
 
 			if(mx > x + width - font.getWidth(typingBuf) && mx < x + width - 1)
-				if(my > y && my < y + font.getHeight())
-					return true;
+				return my > y && my < y + font.getHeight();
 		}
 
 		return false;

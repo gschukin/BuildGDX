@@ -57,8 +57,8 @@ public class ALMusicDrv implements Music {
 	protected IntBuffer musicBuffers;
 	protected final int musicBufferCount = 3;
 	
-	private ALSoundDrv drv;
-	private ALAudio al;
+	private final ALSoundDrv drv;
+	private final ALAudio al;
 	public ALMusicDrv(ALSoundDrv drv) {
 		this.drv = drv;
 		this.al = drv.getALAudio();
@@ -158,16 +158,16 @@ abstract class OpenALMusic {
 	static private final byte[] tempBytes = new byte[bufferSize];
 	static private final ByteBuffer tempBuffer = BufferUtils.newByteBuffer(bufferSize);
 
-	private SourceManager sourceManager;
+	private final SourceManager sourceManager;
 	private Source source = null;
 	private int format, sampleRate;
 	private boolean isLooping, isPlaying;
 	private float renderedSeconds, secondsPerBuffer;
 	protected byte[] data;
 	private float musicVolume;
-	private IntBuffer musicBuffers;
-	private ALSoundDrv drv;
-	private ALAudio al;
+	private final IntBuffer musicBuffers;
+	private final ALSoundDrv drv;
+	private final ALAudio al;
 	
 	public OpenALMusic (ALSoundDrv drv, IntBuffer ALbuffers, byte[] data) {
 		this.drv = drv;

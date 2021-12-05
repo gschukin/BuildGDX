@@ -102,8 +102,7 @@ public class MenuButton extends MenuItem
 				px = x + width - 1 - wd;
 
 			if(mx > px && mx < px + wd)
-				if(my > y && my < y + font.getHeight())
-					return true;
+                return my > y && my < y + font.getHeight();
 		}
 		return false;
 	}

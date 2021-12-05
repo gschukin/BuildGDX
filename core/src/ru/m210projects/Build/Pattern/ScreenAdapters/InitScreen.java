@@ -16,8 +16,8 @@
 
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
-import static ru.m210projects.Build.Engine.fullscreen;
 import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
+import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +29,7 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.Audio.BuildAudio.Driver;
 import ru.m210projects.Build.FileHandle.Compat.Path;
+import ru.m210projects.Build.FileHandle.DirectoryEntry;
 import ru.m210projects.Build.FileHandle.Group;
 import ru.m210projects.Build.FileHandle.GroupResource;
 import ru.m210projects.Build.OnSceenDisplay.Console;
@@ -38,6 +39,7 @@ import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.Tools.Interpolation;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
+import ru.m210projects.Build.Render.Renderer.RenderType;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
@@ -49,9 +51,9 @@ public class InitScreen extends ScreenAdapter {
 
 	private int frames;
 	private BuildEngine engine;
-	private BuildFactory factory;
+	private final BuildFactory factory;
 	private Thread thread;
-	private BuildGame game;
+	private final BuildGame game;
 	private boolean gameInitialized;
 	private boolean disposing;
 
@@ -105,12 +107,13 @@ public class InitScreen extends ScreenAdapter {
 
 	public InitScreen(final BuildGame game) {
 		this.game = game;
+		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
 
 		Console.SetLogFile(game.appname + ".log");
 
 		Console.Println("BUILD engine by Ken Silverman (http://www.advsys.net/ken) \r\n" + game.appname + " "
-				+ game.sversion + "(BuildGdx v" + Engine.version + ") by [M210®] (http://m210.duke4.net)");
+				+ game.sversion + "(BuildGdx v" + Engine.version + ") by [M210ï¿½] (http://m210.duke4.net)");
 
 		Console.Println("Current date " + game.date.getLaunchDate());
 
@@ -149,6 +152,7 @@ public class InitScreen extends ScreenAdapter {
 		game.pSavemgr = new SaveManager();
 
 		Console.setFunction(factory.console());
+		Console.ResizeDisplay(cfg.ScreenWidth, cfg.ScreenHeight);
 
 		if (engine.loadpics() == 0) {
 			BuildGdx.message.show("Build Engine Initialization Error!",
@@ -158,16 +162,27 @@ public class InitScreen extends ScreenAdapter {
 			return;
 		}
 
-		BuildConfig cfg = game.pCfg;
 		game.pFonts = factory.fonts();
 
 		BuildSettings.init(engine, cfg);
 		GLSettings.init(engine, cfg);
 
-		engine.setrendermode(factory.renderer(cfg.renderType));
+		if(!engine.setrendermode(factory.renderer(cfg.renderType))) {
+			engine.setrendermode(factory.renderer(RenderType.Software));
+			cfg.renderType = RenderType.Software;
+		}
+
 		if (!engine.setgamemode(cfg.fullscreen, cfg.ScreenWidth, cfg.ScreenHeight))
 			cfg.fullscreen = 0;
-		fullscreen = cfg.fullscreen;
+
+		if(cfg.autoloadFolder) {
+			DirectoryEntry autoloadDir = BuildGdx.compat.checkDirectory("autoload");
+			if(autoloadDir == null) { // not found
+				File f = new File(Path.Game.getPath() + File.separator + "autoload");
+				if(!f.exists() && !f.mkdirs() && !f.isDirectory())
+					Console.Println("Can't create autoload folder", OSDTEXT_RED);
+			}
+		}
 
 		thread = new Thread(new Runnable() {
 			@Override
@@ -226,7 +241,7 @@ public class InitScreen extends ScreenAdapter {
 					BuildGdx.message.show("File not found!", message, MessageType.Info);
 					System.exit(1);
 				} catch (Throwable e) {
-					if(!disposing) {
+					if (!disposing) {
 						game.ThrowError("InitScreen error", e);
 						System.exit(1);
 					}
@@ -234,7 +249,7 @@ public class InitScreen extends ScreenAdapter {
 			}
 		});
 		thread.setName("InitEngine thread");
-		thread.setDaemon(true); //to make the thread as background process and kill it if the app was closed
+		thread.setDaemon(true); // to make the thread as background process and kill it if the app was closed
 	}
 
 	public void start() {
@@ -252,7 +267,7 @@ public class InitScreen extends ScreenAdapter {
 	@Override
 	public void render(float delta) {
 		synchronized (Engine.lock) {
-			if(!disposing) { //don't draw anything after disposed
+			if (!disposing && engine.getrender().isInited()) { // don't draw anything after disposed
 				engine.clearview(0);
 
 //				engine.rotatesprite(0, 0, 65536, 0, factory.getInitTile(), -128, 0, 10 | 16, 0, 0, xdim - 1, ydim - 1);

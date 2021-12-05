@@ -21,34 +21,34 @@ import java.nio.ByteBuffer;
 
 public interface Sound {
 	
-	public enum SystemType { Mono, Stereo }
+	enum SystemType { Mono, Stereo }
 	
 	//Driver
-	public boolean init(SystemType system, int kMaxSFXChannels, int softResampler);
-	public void uninit();
-	public boolean isInited();
-	public void dispose();
-	public String getName();
-	public Music getDigitalMusic();
+    boolean init(SystemType system, int kMaxSFXChannels, int softResampler);
+	void uninit();
+	boolean isInited();
+	void dispose();
+	String getName();
+	Music getDigitalMusic();
 	
 	//EFX
-	public float getReverb();
-	public void setReverb(boolean enable, float delay);
-	public void setListener(int x, int y, int z, int ang);
-	public void resetListener();
+    float getReverb();
+	void setReverb(boolean enable, float delay);
+	void setListener(int x, int y, int z, int ang);
+	void resetListener();
 	
 	///Soft resampler
-	public String getSoftResamplerName(int num);
-	public int getNumResamplers();
-	public int getCurrentSoftResampler();
-	public void setSoftResampler(int num);
+    String getSoftResamplerName(int num);
+	int getNumResamplers();
+	int getCurrentSoftResampler();
+	void setSoftResampler(int num);
 	
 	//Source handler
-	public float getVolume();
-	public void setVolume(float vol);
-	public void stopAllSounds();
-	public boolean isAvailable(int priority);
-	public Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority);
-	public SoundData decodeSound(byte[] data);
-	public void update();
+    float getVolume();
+	void setVolume(float vol);
+	void stopAllSounds();
+	boolean isAvailable(int priority);
+	Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority);
+	SoundData decodeSound(byte[] data);
+	void update();
 }

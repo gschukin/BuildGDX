@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ThreadProcessor {
 	
-	private List<Thread> list = new ArrayList<Thread>();
+	private final List<Thread> list = new ArrayList<Thread>();
 	public Thread add(Runnable runnable)
 	{
 		Thread thread = new Thread(runnable);

@@ -83,8 +83,7 @@ import static ru.m210projects.Build.Engine.xyaspect;
 import static ru.m210projects.Build.Engine.ydim;
 import static ru.m210projects.Build.Engine.ydimen;
 import static ru.m210projects.Build.Engine.yxaspect;
-import static ru.m210projects.Build.Loader.Model.MD_ROTATE;
-import static ru.m210projects.Build.Loader.Voxels.Voxel.MAXVOXMIPS;
+import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.klabs;
@@ -99,8 +98,12 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
-import ru.m210projects.Build.Loader.Voxels.Voxel;
+import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.Renderer;
+import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
+import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
+import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
@@ -112,9 +115,10 @@ import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.WALL;
 
-public abstract class Software implements Renderer {
+public class Software implements Renderer {
 
 	public final int BITSOFPRECISION = 3;
+	public static final int MAXVOXMIPS = 5;
 
 	protected A a;
 	protected Engine engine;
@@ -125,7 +129,7 @@ public abstract class Software implements Renderer {
 	protected int guniqhudid;
 
 	protected final int MAXPERMS = 512;
-	protected PermFifo permfifo[] = new PermFifo[MAXPERMS];
+	protected PermFifo[] permfifo = new PermFifo[MAXPERMS];
 	protected int permhead = 0, permtail = 0;
 
 	public short[] umost = new short[MAXXDIM], dmost = new short[MAXXDIM];
@@ -167,7 +171,7 @@ public abstract class Software implements Renderer {
 	public int[] rxi = new int[8], ryi = new int[8], rzi = new int[8], rxi2 = new int[8], ryi2 = new int[8],
 			rzi2 = new int[8];
 	public int[] xsi = new int[8], ysi = new int[8];
-	public int horizlookup, horizlookup2;
+	public int horizlookup2;
 	public int horizycent;
 
 	public short[] p2 = new short[MAXWALLSB], thesector = new short[MAXWALLSB], thewall = new short[MAXWALLSB];
@@ -184,16 +188,19 @@ public abstract class Software implements Renderer {
 	public int[] reciptable = new int[2048];
 	public int xdimenrecip;
 
-	public int smostwall[] = new int[MAXWALLSB], smostwallcnt = -1, smostcnt;
-	public short smost[] = new short[MAXYSAVES];
-	public int smoststart[] = new int[MAXWALLSB];
+	public int[] smostwall = new int[MAXWALLSB];
+	public int smostwallcnt = -1;
+	public int smostcnt;
+	public short[] smost = new short[MAXYSAVES];
+	public int[] smoststart = new int[MAXWALLSB];
 	public byte[] smostwalltype = new byte[MAXWALLSB];
 
-	public int maskwall[] = new int[MAXWALLSB], maskwallcnt;
-	private int spritesx[] = new int[MAXSPRITESONSCREEN];
-	private int spritesy[] = new int[MAXSPRITESONSCREEN + 1];
-	private int spritesz[] = new int[MAXSPRITESONSCREEN];
-	private SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
+	public int[] maskwall = new int[MAXWALLSB];
+	public int maskwallcnt;
+	private final int[] spritesx = new int[MAXSPRITESONSCREEN];
+	private final int[] spritesy = new int[MAXSPRITESONSCREEN + 1];
+	private final int[] spritesz = new int[MAXSPRITESONSCREEN];
+	private final SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
 
 	public short[] sectorborder = new short[256];
 	public short sectorbordercnt;
@@ -203,23 +210,25 @@ public abstract class Software implements Renderer {
 
 	protected int oxyaspect, oxdimen, oviewingrange;
 
-	private int[] zofslope = new int[2];
+	private final int[] zofslope = new int[2];
 
 	private final int MAXXSIZ = 256;
-	private int[] ggxinc = new int[MAXXSIZ + 1], ggyinc = new int[MAXXSIZ + 1];
-	protected int lowrecip[] = new int[1024], nytooclose, nytoofar;
+	private final int[] ggxinc = new int[MAXXSIZ + 1];
+	private final int[] ggyinc = new int[MAXXSIZ + 1];
+	protected int[] lowrecip = new int[1024];
+	protected int nytooclose;
+	protected int nytoofar;
 	protected int[] distrecip = new int[65536];
 	public boolean novoxmips = false;
 	public boolean isInited = false;
 
-	protected SoftwareOrpho orpho;
+	protected SoftwareOrpho ortho;
 
-	public Software(Engine engine) {
-		if (BuildGdx.graphics.getFrameType() != FrameType.Canvas)
-			BuildGdx.app.setFrame(FrameType.Canvas);
+	public Software(Engine engine, IOverheadMapSettings settings) {
+
 		this.engine = engine;
 
-		orpho = new SoftwareOrpho(this);
+		ortho = allocOrphoRenderer(settings);
 	}
 
 	@Override
@@ -227,48 +236,54 @@ public abstract class Software implements Renderer {
 		if (xdim == 0 && ydim == 0)
 			return;
 
-		bytesperline = xdim;
+		try {
+			if (BuildGdx.graphics.getFrameType() != FrameType.Canvas)
+				BuildGdx.app.setFrame(FrameType.Canvas);
 
-		int j = ydim * 4 * 4;
+			bytesperline = xdim;
 
-		lookups = new int[j << 1];
+			int j = ydim * 4 * 4;
 
-		horizlookup = 0;
-		horizlookup2 = j;
-		horizycent = ((ydim * 4) >> 1);
+			lookups = new int[j << 1];
 
-		// Force drawrooms to call dosetaspect & recalculate stuff
-		oxyaspect = oxdimen = oviewingrange = -1;
+			horizlookup2 = j;
+			horizycent = ((ydim * 4) >> 1);
 
-		globalpalwritten = 0;
+			// Force drawrooms to call dosetaspect & recalculate stuff
+			oxyaspect = oxdimen = oviewingrange = -1;
 
-		changepalette(curpalette.getBytes());
+			globalpalwritten = 0;
 
-		j = 0;
-		for (int i = 0; i <= ydim; i++) {
-			ylookup[i] = j;
-			j += bytesperline;
+			changepalette(curpalette.getBytes());
+
+			j = 0;
+			for (int i = 0; i <= ydim; i++) {
+				ylookup[i] = j;
+				j += bytesperline;
+			}
+
+			for (int i = 0; i < 2048; i++)
+				reciptable[i] = divscale(2048, i + 2048, 30);
+
+			updateview();
+
+			for (int i = 1; i < 1024; i++)
+				lowrecip[i] = ((1 << 24) - 1) / i;
+
+			a = new Ac(xdim, ydim, reciptable);
+			a.setvlinebpl(bytesperline);
+
+			a.fixtransluscence(transluc);
+			a.setpalookupaddress(palookup[globalpalwritten]);
+
+			Console.Println("Software renderer is initialized", OSDTEXT_GOLD);
+			isInited = true;
+		} catch (Throwable t) {
+			isInited = false;
 		}
-
-		for (int i = 0; i < 2048; i++)
-			reciptable[i] = divscale(2048, i + 2048, 30);
-
-		updateview();
-
-		for (int i = 1; i < 1024; i++)
-			lowrecip[i] = ((1 << 24) - 1) / i;
-
-		a = new Ac(xdim, ydim, reciptable);
-		a.setvlinebpl(bytesperline);
-
-		a.fixtransluscence(transluc);
-		a.setpalookupaddress(palookup[globalpalwritten]);
-
-		isInited = true;
 	}
 
-	protected A getA()
-	{
+	protected A getA() {
 		return a;
 	}
 
@@ -292,6 +307,11 @@ public abstract class Software implements Renderer {
 			startumost[i] = 1;
 			startdmost[i] = 0;
 		}
+	}
+
+	@Override
+	public void setview(int x1, int y1, int x2, int y2) {
+		updateview();
 	}
 
 	public void setviewtotile(int tilenume, int xsiz, int ysiz) {
@@ -342,8 +362,7 @@ public abstract class Software implements Renderer {
 		isInited = false;
 	}
 
-	public void swapsprite(int k, int l, boolean z)
-	{
+	public void swapsprite(int k, int l, boolean z) {
 		SPRITE stmp = tspriteptr[k];
 		tspriteptr[k] = tspriteptr[l];
 		tspriteptr[l] = stmp;
@@ -355,7 +374,7 @@ public abstract class Software implements Renderer {
 		spritesy[k] = spritesy[l];
 		spritesy[l] = tmp;
 
-		if(z) {
+		if (z) {
 			tmp = spritesz[k];
 			spritesz[k] = spritesz[l];
 			spritesz[l] = tmp;
@@ -398,7 +417,7 @@ public abstract class Software implements Renderer {
 				for (l = i; l >= 0; l -= gap) {
 					if (spritesy[l] <= spritesy[l + gap])
 						break;
-					swapsprite(l, l+gap, false);
+					swapsprite(l, l + gap, false);
 				}
 
 		if (spritesortcnt > 0)
@@ -413,7 +432,7 @@ public abstract class Software implements Renderer {
 			if (j > i + 1) {
 				for (k = i; k < j; k++) {
 					spritesz[k] = tspriteptr[k].z;
-					if(tspriteptr[k].picnum < 0 || tspriteptr[k].picnum > MAXTILES)
+					if (tspriteptr[k].picnum < 0 || tspriteptr[k].picnum > MAXTILES)
 						continue;
 
 					if ((tspriteptr[k].cstat & 48) != 32) {
@@ -488,6 +507,8 @@ public abstract class Software implements Renderer {
 
 	@Override
 	public void drawrooms() {
+		globalhoriz = (globalhoriz * xdimenscale / viewingrange) + (ydimen >> 1);
+
 		globaluclip = (0 - (int) globalhoriz) * xdimscale;
 		globaldclip = (ydimen - (int) globalhoriz) * xdimscale;
 
@@ -623,8 +644,8 @@ public abstract class Software implements Renderer {
 		}
 	}
 
-	private int[] cz = new int[5];
-	private int[] fz = new int[5];
+	private final int[] cz = new int[5];
+	private final int[] fz = new int[5];
 
 	@Override
 	public void completemirror() {
@@ -676,7 +697,7 @@ public abstract class Software implements Renderer {
 			else if ((sec.ceilingstat & 1) == 0)
 				ceilscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else
-				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 0, bunch);
+				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 0, bunch);
 		}
 		if ((andwstat2 & 12) != 12) // draw floors
 		{
@@ -685,7 +706,7 @@ public abstract class Software implements Renderer {
 			else if ((sec.floorstat & 1) == 0) // solid
 				florscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else // background
-				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 1, bunch);
+				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 1, bunch);
 		}
 
 		// DRAW WALLS SECTION!
@@ -1025,7 +1046,7 @@ public abstract class Software implements Renderer {
 			return;
 
 		int tilenum = tspr.picnum;
-		Voxel vtilenum = null;
+		VoxelInfo vtilenum = null;
 		short spritenum = tspr.owner;
 		short cstat = tspr.cstat;
 
@@ -1040,14 +1061,11 @@ public abstract class Software implements Renderer {
 		if ((tspr.xrepeat <= 0) || (tspr.yrepeat <= 0))
 			return;
 
-		int mflags = 0;
 		if (BuildSettings.useVoxels.get()) {
 			Tile2model entry = defs != null ? defs.mdInfo.getParams(tilenum) : null;
 			if (entry != null && entry.voxel != null) {
 				if ((sprite[tspr.owner].cstat & 48) != 32) {
 					vtilenum = entry.voxel;
-					if (vtilenum.getModel() != null)
-						mflags = vtilenum.getModel().flags;
 					cstat |= 48;
 				}
 			}
@@ -1740,8 +1758,8 @@ public abstract class Software implements Renderer {
 					xsi[z] = 0;
 				if (xsi[z] > (xdimen << 16))
 					xsi[z] = (xdimen << 16);
-				if (ysi[z] < (0 << 16))
-					ysi[z] = (0 << 16);
+				if (ysi[z] < (0))
+					ysi[z] = (0);
 				if (ysi[z] > (ydimen << 16))
 					ysi[z] = (ydimen << 16);
 				if (xsi[z] < lmax) {
@@ -1944,12 +1962,12 @@ public abstract class Software implements Renderer {
 			if (vtilenum == null)
 				break;
 
-			if (vtilenum.scale == 65536)
+			if (vtilenum.getScale() == 65536)
 				nyrepeat = ((tspr.yrepeat) << 16);
 			else
-				nyrepeat = tspr.yrepeat * vtilenum.scale;
-			xv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2560 + 1536) & 2047]) * (vtilenum.scale / 65536.0f));
-			yv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2048 + 1536) & 2047]) * (vtilenum.scale / 65536.0f));
+				nyrepeat = (long) (tspr.yrepeat * vtilenum.getScale());
+			xv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2560 + 1536) & 2047]) * (vtilenum.getScale() / 65536.0f));
+			yv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2048 + 1536) & 2047]) * (vtilenum.getScale() / 65536.0f));
 
 			tspr.x -= mulscale(xoff, xv, 16) / 1.25f;
 			tspr.y -= mulscale(xoff, yv, 16) / 1.25f;
@@ -1958,10 +1976,10 @@ public abstract class Software implements Renderer {
 			if ((cstat & 128) == 0)
 				// tspr.z -= mulscale(tilesizy[tspr.picnum], nyrepeat, 15); // GDX this more
 				// correct, but disabled for compatible with eduke
-				tspr.z -= mulscale(vtilenum.zpiv[0], nyrepeat, 22);
+				tspr.z -= mulscale(vtilenum.getData().zpiv[0], nyrepeat, 22);
 
 			if ((cstat & 8) != 0 && (cstat & 16) != 0)
-				tspr.z += mulscale((pic.getHeight() / 2) - vtilenum.zpiv[0], nyrepeat, 36);
+				tspr.z += mulscale((pic.getHeight() / 2) - vtilenum.getData().zpiv[0], nyrepeat, 36);
 
 			globvis = globalvisibility;
 			globalorientation = cstat;
@@ -1969,11 +1987,11 @@ public abstract class Software implements Renderer {
 				globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
 
 			i = tspr.ang + 1536;
-			if ((mflags & MD_ROTATE) != 0)
+			if (vtilenum.isRotating())
 				i -= (5 * totalclock) & 2047;
 
 			Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.owner);
-			if(sprext != null)
+			if (sprext != null)
 				i += sprext.angoff;
 
 			float f = 1.0f;
@@ -1991,7 +2009,8 @@ public abstract class Software implements Renderer {
 
 	}
 
-	private void voxdraw(SPRITE daspr, int dasprang, int daxscale, int dayscale, Voxel daindex, int[] daumost, int[] dadmost) {
+	private void voxdraw(SPRITE daspr, int dasprang, int daxscale, int dayscale, VoxelInfo daindex, int[] daumost,
+			int[] dadmost) {
 		int i, j, k, x, y, syoff, ggxstart, ggystart, nxoff;
 		int cosang, sinang, sprcosang, sprsinang, backx, backy, gxinc, gyinc;
 		int daxsiz, daysiz, daxpivot, daypivot, dazpivot;
@@ -2041,25 +2060,29 @@ public abstract class Software implements Renderer {
 		} else
 			mip = 0;
 
-		Voxel davox = daindex;
+		VoxelData davox = daindex.getData();
+		int scale = (int) daindex.getScale();
 		if (davox == null)
 			return;
 
 		if (davox.data[mip] == null && mip > 0)
 			mip = 0;
 
-		if (davox.scale == 65536) {
+		if (scale == 65536) {
 			daxscale <<= (mip + 8);
 			dayscale <<= (mip + 8);
 		} else {
-			daxscale = mulscale(daxscale << mip, davox.scale, 8);
-			dayscale = mulscale(dayscale << mip, davox.scale, 8);
+			daxscale = mulscale(daxscale << mip, scale, 8);
+			dayscale = mulscale(dayscale << mip, scale, 8);
 		}
 
-		int odayscale = dayscale; //tspr.yrepeat
+		int odayscale = dayscale; // tspr.yrepeat
 		daxscale = mulscale(daxscale, xyaspect, 16);
 		daxscale = scale(daxscale, xdimenscale, xdimen << 8);
 		dayscale = scale(dayscale, mulscale(xdimenscale, viewingrangerecip, 16), xdimen << 8);
+
+		if(daxscale == 0 || dayscale == 0)
+			return;
 
 		daxscalerecip = (1 << 30) / daxscale;
 		dayscalerecip = (1 << 30) / dayscale;
@@ -2114,7 +2137,7 @@ public abstract class Software implements Renderer {
 		short[] shortptr;
 
 		int dm = divscale(sec.floorz - globalposz, odayscale, 21);
-	    int um = divscale(sec.ceilingz - globalposz, odayscale, 21);
+		int um = divscale(sec.ceilingz - globalposz, odayscale, 21);
 		for (cnt = 0; cnt < 8; cnt++) {
 			switch (cnt) {
 			case 0:
@@ -2236,7 +2259,8 @@ public abstract class Software implements Renderer {
 				break;
 			}
 			short oand = (short) (pow2char[((xs < backx) ? 1 : 0) + 0] + pow2char[((ys < backy) ? 1 : 0) + 2]);
-			if(xflip) oand ^= 3;
+			if (xflip)
+				oand ^= 3;
 
 			short oand16 = (short) (oand + 16);
 			short oand32 = (short) (oand + 32);
@@ -2935,12 +2959,12 @@ public abstract class Software implements Renderer {
 //		engine.faketimerhandler();
 	}
 
-	private void parascan(int dax1, int dax2, short sectnum, int dastat, int bunch) {
+	private void parascan(int dax1, int dax2, int dastat, int bunch) {
 		SECTOR sec;
 		int j, k, l, m, n, x, z, wallnum, nextsectnum, globalhorizbak;
 		short[] topptr, botptr;
 
-		sectnum = thesector[bunchfirst[bunch]];
+		short sectnum = thesector[bunchfirst[bunch]];
 		sec = sector[sectnum];
 		globalhorizbak = (int) globalhoriz;
 		if (parallaxyscale != 65536)
@@ -3111,15 +3135,23 @@ public abstract class Software implements Renderer {
 	private void ceilspritehline(int x2, int y) {
 		int x1, v, bx, by;
 
-		// x = x1 + (x2-x1)t + (y1-y2)u ³ x = 160v
-		// y = y1 + (y2-y1)t + (x2-x1)u ³ y = (scrx-160)v
-		// z = z1 = z2 ³ z = posz + (scry-horiz)v
+		// x = x1 + (x2-x1)t + (y1-y2)u ï¿½ x = 160v
+		// y = y1 + (y2-y1)t + (x2-x1)u ï¿½ y = (scrx-160)v
+		// z = z1 = z2 ï¿½ z = posz + (scry-horiz)v
 
 		x1 = lastx[y];
 		if (x2 < x1)
 			return;
 
-		v = mulscale(globalzd, lookups[horizlookup + y - (int) globalhoriz + horizycent], 20);
+		if(y - (int) globalhoriz + horizycent < 0 || y - (int) globalhoriz + horizycent >= lookups.length) {
+			Console.Println("Crash catcher:");
+			Console.Println("y = " + y);
+			Console.Println("globalhoriz = " + globalhoriz);
+			Console.Println("horizycent = " + horizycent);
+			Console.Println("globalzd = " + globalzd);
+		}
+
+		v = mulscale(globalzd, lookups[y - (int) globalhoriz + horizycent], 20);
 		bx = mulscale(globalx2 * x1 + globalx1, v, 14) + globalxpanning;
 		by = mulscale(globaly2 * x1 + globaly1, v, 14) + globalypanning;
 
@@ -3269,8 +3301,8 @@ public abstract class Software implements Renderer {
 		globvis = mulscale(globvis, xdimscale, 16);
 
 		j = globalpal;
-		a.setupslopevlin((picsiz[globalpicnum] & 15) + (((picsiz[globalpicnum] >> 4)) << 8), pic.data,
-				-ylookup[1], -(globalzd >> (16 - BITSOFPRECISION)));
+		a.setupslopevlin((picsiz[globalpicnum] & 15) + (((picsiz[globalpicnum] >> 4)) << 8), pic.data, -ylookup[1],
+				-(globalzd >> (16 - BITSOFPRECISION)));
 
 		l = (globalzd >> 16);
 
@@ -3316,8 +3348,8 @@ public abstract class Software implements Renderer {
 
 				globalx3 = globalx2 >> 10;
 				globaly3 = globaly2 >> 10;
-				a.slopevlin(ylookup[y2] + x + frameoffset, palookup[j], nptr2, y2 - y1 + 1, globalx1, globaly1, globalx3,
-						globaly3, slopalookup, mulscale(y2, globalzd, 16) + (globalzx >> 6));
+				a.slopevlin(ylookup[y2] + x + frameoffset, palookup[j], nptr2, y2 - y1 + 1, globalx1, globaly1,
+						globalx3, globaly3, slopalookup, mulscale(y2, globalzd, 16) + (globalzx >> 6));
 
 //				if ((x & 15) == 0)
 //					engine.faketimerhandler();
@@ -3548,14 +3580,19 @@ public abstract class Software implements Renderer {
 
 	@Override
 	public void nextpage() {
-		byte[] frameplace = a.getframeplace();
-		System.arraycopy(frameplace, 0, BuildGdx.graphics.extra(Option.SWGetFrame), 0, frameplace.length); // Math.min(frameplace.length,
+		byte[] src = a.getframeplace();
+		byte[] dst = (byte[]) BuildGdx.graphics.extra(Option.SWGetFrame);
+		int len = src.length;
+		if(dst.length < src.length)
+			len = dst.length;
+
+		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
 	}
 
 	@Override
 	public void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
 			int cy1, int cx2, int cy2) {
-		orpho.rotatesprite(sx, sy, z, a, picnum, dashade, dapalnum, dastat, cx1, cy1, cx2, cy2);
+		ortho.rotatesprite(sx, sy, z, a, picnum, dashade, dapalnum, dastat, cx1, cy1, cx2, cy2);
 	}
 
 	protected void qinterpolatedown16short(short[] bufptr, int offset, int num, long val, long add) { // ...maybe the
@@ -3586,18 +3623,23 @@ public abstract class Software implements Renderer {
 
 	@Override
 	public void drawmapview(int dax, int day, int zoome, int ang) {
-		orpho.drawmapview(dax, day, zoome, ang);
+		ortho.drawmapview(dax, day, zoome, ang);
+	}
+
+	@Override
+	public void drawoverheadmap(int cposx, int cposy, int czoom, short cang) {
+		ortho.drawoverheadmap(cposx, cposy, czoom, cang);
 	}
 
 	@Override
 	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
-		orpho.printext(font, xpos, ypos, text, col, shade, bit, scale);
+		ortho.printext(font, xpos, ypos, text, col, shade, bit, scale);
 	}
 
 	@Override
 	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		orpho.printext(xpos, ypos, col, backcol, text, fontsize, scale);
+		ortho.printext(xpos, ypos, col, backcol, text, fontsize, scale);
 	}
 
 	private ByteBuffer indexbuffer;
@@ -3639,8 +3681,27 @@ public abstract class Software implements Renderer {
 	}
 
 	@Override
+	public byte[] screencapture(int newwidth, int newheight) {
+		byte[] capture = new byte[newwidth * newheight];
+
+		int xf = divscale(xdim, newwidth, 16);
+		int yf = divscale(ydim, newheight, 16);
+
+		byte[] frameplace = a.getframeplace();
+		int base;
+		for (int fx, fy = 0; fy < newheight; fy++) {
+			base = mulscale(fy, yf, 16) * xdim;
+			for (fx = 0; fx < newwidth; fx++) {
+				capture[newheight * fx + fy] = frameplace[base + mulscale(fx, xf, 16)];
+			}
+		}
+
+		return capture;
+	}
+
+	@Override
 	public void drawline256(int x1, int y1, int x2, int y2, int c) {
-		orpho.drawline256(x1, y1, x2, y2, c);
+		ortho.drawline256(x1, y1, x2, y2, c);
 	}
 
 	public void dosetaspect() {
@@ -3652,8 +3713,8 @@ public abstract class Software implements Renderer {
 			lookups[horizlookup2 + horizycent - 1] = divscale(131072, j, 26);
 			for (i = ydim * 4 - 1; i >= 0; i--)
 				if (i != (horizycent - 1)) {
-					lookups[horizlookup + i] = divscale(1, i - (horizycent - 1), 28);
-					lookups[horizlookup2 + i] = divscale(klabs(lookups[horizlookup + i]), j, 14);
+					lookups[i] = divscale(1, i - (horizycent - 1), 28);
+					lookups[horizlookup2 + i] = divscale(klabs(lookups[i]), j, 14);
 				}
 		}
 
@@ -3753,9 +3814,7 @@ public abstract class Software implements Renderer {
 				x2 = wal2.x - globalposx;
 				y2 = wal2.y - globalposy;
 
-				if ((nextsectnum >= 0)
-						&& ((wal.cstat & 32) == 0)
-						&& sectorbordercnt < sectorborder.length
+				if ((nextsectnum >= 0) && ((wal.cstat & 32) == 0) && sectorbordercnt < sectorborder.length
 						&& ((gotsector[nextsectnum >> 3] & pow2char[nextsectnum & 7]) == 0)) {
 					templong = x1 * y2 - x2 * y1;
 
@@ -3870,7 +3929,7 @@ public abstract class Software implements Renderer {
 	}
 
 	private boolean spritewallfront(SPRITE s, int w) {
-		if(s == null)
+		if (s == null)
 			return false;
 
 		WALL wal = wall[w];
@@ -3900,7 +3959,8 @@ public abstract class Software implements Renderer {
 			return (wallfront(b1f, i));
 		}
 
-		for (i = b1f; xb2[i] <= x1b2 && p2[i] != -1; i = p2[i]);
+		for (i = b1f; xb2[i] <= x1b2 && p2[i] != -1; i = p2[i])
+			;
 		return (wallfront(i, b2f));
 	}
 
@@ -3998,7 +4058,7 @@ public abstract class Software implements Renderer {
 					ix2 = xcross;
 				}
 				for (i = (xcross + 1); i <= xb2[w]; i++) {
-					if(i < 0 || i >= mostbuf.length)
+					if (i < 0 || i >= mostbuf.length)
 						return (bad);
 					mostbuf[i] = 0;
 				}
@@ -4008,7 +4068,7 @@ public abstract class Software implements Renderer {
 					ix1 = xcross;
 				}
 				for (i = xb1[w]; i <= xcross; i++) {
-					if(i < 0 || i >= mostbuf.length)
+					if (i < 0 || i >= mostbuf.length)
 						return (bad);
 					mostbuf[i] = 0;
 				}
@@ -4026,7 +4086,7 @@ public abstract class Software implements Renderer {
 					ix2 = xcross;
 				}
 				for (i = (xcross + 1); i <= xb2[w]; i++) {
-					if(i < 0 || i >= mostbuf.length)
+					if (i < 0 || i >= mostbuf.length)
 						return (bad);
 					mostbuf[i] = (short) ydimen;
 				}
@@ -4037,7 +4097,7 @@ public abstract class Software implements Renderer {
 				}
 
 				for (i = xb1[w]; i <= xcross; i++) {
-					if(i < 0 || i >= mostbuf.length)
+					if (i < 0 || i >= mostbuf.length)
 						return (bad);
 					mostbuf[i] = (short) ydimen;
 				}
@@ -4050,19 +4110,23 @@ public abstract class Software implements Renderer {
 		qinterpolatedown16short(mostbuf, ix1, ix2 - ix1 + 1, y + ((int) globalhoriz << 16), yinc);
 
 		if (ix1 < 0 || (ix1 < mostbuf.length && mostbuf[ix1] < 0)) {
-			if(ix1 < 0) ix1 = 0;
+			if (ix1 < 0)
+				ix1 = 0;
 			mostbuf[ix1] = 0;
 		}
 		if (ix1 >= mostbuf.length || mostbuf[ix1] > ydimen) {
-			if(ix1 >= mostbuf.length) ix1 = mostbuf.length - 1;
+			if (ix1 >= mostbuf.length)
+				ix1 = mostbuf.length - 1;
 			mostbuf[ix1] = (short) ydimen;
 		}
 		if (ix2 < 0 || (ix2 < mostbuf.length && mostbuf[ix2] < 0)) {
-			if(ix2 < 0) ix2 = 0;
+			if (ix2 < 0)
+				ix2 = 0;
 			mostbuf[ix2] = 0;
 		}
 		if (ix2 >= mostbuf.length || mostbuf[ix2] > ydimen) {
-			if(ix2 >= mostbuf.length) ix2 = mostbuf.length - 1;
+			if (ix2 >= mostbuf.length)
+				ix2 = mostbuf.length - 1;
 			mostbuf[ix2] = (short) ydimen;
 		}
 
@@ -4274,6 +4338,10 @@ public abstract class Software implements Renderer {
 				globalx2 * r + globalypanning - yinc * (xr - xl), ylookup[yp] + xl + frameoffset);
 	}
 
+	protected SoftwareOrpho allocOrphoRenderer(IOverheadMapSettings settings) {
+		return new SoftwareOrpho(this, settings);
+	}
+
 	private void copybufreverse(byte[] s, int sptr, byte[] d, int dptr, int c) {
 		while ((c--) > 0)
 			d[dptr++] = s[sptr--];
@@ -4293,4 +4361,10 @@ public abstract class Software implements Renderer {
 	public void setDefs(DefScript defs) {
 		this.defs = defs;
 	}
+
+	@Override
+	public void invalidatetile(int tilenume, int pal, int how) {
+		/* nothing */
+	}
+
 }

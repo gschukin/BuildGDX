@@ -21,9 +21,11 @@ import static ru.m210projects.Build.Engine.pow2char;
 import static ru.m210projects.Build.Engine.textfont;
 import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
+import java.nio.ByteBuffer;
+
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.TextureManager;
-import ru.m210projects.Build.Render.Types.TextureBuffer;
+import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 
 public class TextFont extends TileFont {
 
@@ -35,18 +37,18 @@ public class TextFont extends TileFont {
 	}
 
 	@Override
-	public GLTile getGL(TextureManager textureCache, int col) {
-		if(atlas == null)
-			init();
+	public GLTile getGL(TextureManager textureCache, PixelFormat fmt, int col) {
+		if (atlas == null)
+			init(textureCache);
 
 		return atlas;
 	}
 
-	private GLTile init() {
+	private GLTile init(TextureManager textureCache) {
 		// construct a 8-bit alpha-only texture for the font glyph matrix
 		TileFontData dat = new TileFontData(sizx, sizy) {
 			@Override
-			public TextureBuffer buildAtlas(TextureBuffer data) {
+			public ByteBuffer buildAtlas(ByteBuffer data) {
 				int tptr;
 
 				for (int h = 0; h < 256; h++) {
@@ -72,13 +74,7 @@ public class TextFont extends TileFont {
 			}
 		};
 
-		atlas = new GLTile(dat, 0, false) {
-			@Override
-			public void delete() {
-				super.delete();
-				atlas = null;
-			}
-		};
+		atlas = textureCache.newTile(dat, 0, false);
 		atlas.setupTextureFilter(glfiltermodes[0], 1);
 		return atlas;
 	}

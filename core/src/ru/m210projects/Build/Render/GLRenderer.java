@@ -23,37 +23,49 @@ import ru.m210projects.Build.Render.Types.FadeEffect;
 
 public interface GLRenderer extends Renderer {
 
-	public enum GLInvalidateFlag {
-		Uninit,
-		SkinsOnly,
-		TexturesOnly,
-		IndexedTexturesOnly,
-		Palookup,
-		All
+	enum Rendering {
+		Nothing, Sprite, Wall, MaskWall, Floor, Ceiling, Skybox, Model, Tile;
+
+		private int index;
+
+		public int getIndex() {
+			return index;
+		}
+
+		public Rendering setIndex(int i) {
+			this.index = i;
+			return this;
+		}
 	}
 
-	public TextureManager getTextureManager();
+	enum GLPreloadFlag {
+		Models, Other
+	}
 
-	public void enableShader(boolean enable);
+	enum GLInvalidateFlag {
+		Uninit, SkinsOnly, TexturesOnly, IndexedTexturesOnly, Palookup, All
+	}
 
-	public void palfade(HashMap<String, FadeEffect> fades);
+	TextureManager getTextureManager();
 
-	public void preload();
+	void enableIndexedShader(boolean enable);
 
-	public void precache(int dapicnum, int dapalnum, int datype);
+	void palfade(HashMap<String, FadeEffect> fades);
 
-	public void gltexapplyprops();
+	void preload(GLPreloadFlag... flags);
 
-	public void gltexinvalidateall(GLInvalidateFlag... flags);
+	void precache(int dapicnum, int dapalnum, int datype);
 
-	public void gltexinvalidate(int dapicnum, int dapalnum, int dameth);
+	void gltexapplyprops();
 
-	public void setdrunk(float intensive);
+	void gltexinvalidateall(GLInvalidateFlag... flags);
 
-	public float getdrunk();
+	void setdrunk(float intensive);
 
-	public void addSpriteCorr(int snum);
+	float getdrunk();
 
-	public void removeSpriteCorr(int snum);
+	void addSpriteCorr(int snum);
+
+	void removeSpriteCorr(int snum);
 
 }

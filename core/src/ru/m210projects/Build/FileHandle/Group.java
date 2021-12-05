@@ -41,7 +41,7 @@ public abstract class Group {
 	protected HashMap<String, Integer> lookup = new HashMap<String, Integer>();
 	protected List<GroupResource> filelist = new ArrayList<GroupResource>();
 	
-//	Hashmap не возволяет добавлять два одинаковых файла с разными fileid
+//	Hashmap РЅРµ РІРѕР·РІРѕР»СЏРµС‚ РґРѕР±Р°РІР»СЏС‚СЊ РґРІР° РѕРґРёРЅР°РєРѕРІС‹С… С„Р°Р№Р»Р° СЃ СЂР°Р·РЅС‹РјРё fileid
 //	protected HashMap<String, GroupResource> filelist =  new HashMap<String, GroupResource>();
 	protected HashSet<String> fmtlist =  new HashSet<String>();
 	
@@ -76,8 +76,7 @@ public abstract class Group {
 	public boolean contains(String filename) {
 		if (filename != null) {
 			Integer out = lookup.get(toLowerCase(filename));
-			if(out != null) 
-				return true;
+            return out != null;
 			
 //			GroupResource res = filelist.get(toLowerCase(filename));
 //			if(res != null) 
@@ -147,9 +146,7 @@ public abstract class Group {
 	protected abstract boolean open(GroupResource res);
 	
 	public List<GroupResource> getList() {
-		List<GroupResource> list = new ArrayList<GroupResource>();
-		list.addAll(filelist);
-		return list;
+		return new ArrayList<GroupResource>(filelist);
 	}
 	
 	public boolean containsType(String type)
@@ -182,14 +179,14 @@ public abstract class Group {
 	
 	public String toString()
 	{
-		String txt = "Group name: " + name + "\r\n";
-		txt += "Num files: " + numfiles + "\r\n";
-		txt += "File list: \r\n";
+		StringBuilder txt = new StringBuilder("Group name: " + name + "\r\n");
+		txt.append("Num files: ").append(numfiles).append("\r\n");
+		txt.append("File list: \r\n");
 
 		for(GroupResource res : filelist)
-			txt += res.toString();
+			txt.append(res.toString());
 		
-		return txt;
+		return txt.toString();
 	}
 	
 }

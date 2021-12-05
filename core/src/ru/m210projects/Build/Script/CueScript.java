@@ -51,24 +51,14 @@ public class CueScript extends Scriptfile {
 	private int nTracks;
 	private final Map<Integer, String> pTrackList;
 	
-	public CueScript(String filename, byte[] data)
-	{
+	public CueScript(String filename, byte[] data) throws RuntimeException {
 		super(filename, data);
-		
+
 		nTracks = 0;
 		pTrackList = new HashMap<Integer, String>();
 		process();
 	}
-	
-	public CueScript(FileEntry file)
-	{
-		super(file.getName(), BuildGdx.compat.getBytes(file));
-		
-		nTracks = 0;
-		pTrackList = new HashMap<Integer, String>();
-		process();
-	}
-	
+
 	private int gettoken(Map<String , Integer> list) {
 		int tok;
 		if ((tok = gettoken()) == -2) 
@@ -94,8 +84,7 @@ public class CueScript extends Scriptfile {
 		}
 	}
 	
-	private void process()
-	{
+	private void process() {
 		while (!eof()) {
 			int line = getlinum(textptr);
 			if(textptr < lineoffs[0])
@@ -132,8 +121,7 @@ public class CueScript extends Scriptfile {
 		}
 	}
 	
-	public String[] getTracks()
-	{
+	public String[] getTracks() {
 		String[] out = new String[nTracks];
 		for(int i = 1; i <= nTracks; i++)
 			out[i - 1] = pTrackList.get(i);

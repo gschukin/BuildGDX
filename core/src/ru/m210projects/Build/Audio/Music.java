@@ -18,13 +18,13 @@
 package ru.m210projects.Build.Audio;
 
 public interface Music {
-	public MusicSource newMusic(byte[] data);
-	public MusicSource newMusic(String name);
+	MusicSource newMusic(byte[] data);
+	MusicSource newMusic(String name);
 
-	public void setVolume(float volume);
-	public boolean init();
-	public boolean isInited();
-	public String getName();
-	public void update();
-	public void dispose();
+	void setVolume(float volume);
+	boolean init();
+	boolean isInited();
+	String getName();
+	void update();
+	void dispose();
 }

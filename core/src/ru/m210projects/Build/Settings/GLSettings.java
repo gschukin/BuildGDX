@@ -85,7 +85,7 @@ public class GLSettings extends BuildSettings {
 			@Override
 			public Integer check(Object value) {
 				if (value instanceof Integer) {
-					Integer anisotropy = (Integer) value;
+					int anisotropy = (Integer) value;
 					if (GLInfo.maxanisotropy > 1.0) {
 						if (anisotropy <= 0 || anisotropy > GLInfo.maxanisotropy)
 							anisotropy = (int) GLInfo.maxanisotropy;
@@ -150,7 +150,7 @@ public class GLSettings extends BuildSettings {
 			public void execute(Boolean value) {
 				GLRenderer gl = engine.glrender();
 				if (gl != null)
-					gl.enableShader(value);
+					gl.enableIndexedShader(value);
 				cfg.paletteEmulation = value;
 			}
 		};
@@ -192,11 +192,14 @@ public class GLSettings extends BuildSettings {
 			@Override
 			protected Integer check(Object value) {
 				if (value instanceof Integer) {
-					float gamma = (Integer) value / 4096.0f;
-					if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(Option.GLSetConfiguration,
-							//1 - gamma, cfg.fbrightness, cfg.fcontrast))
-							1 - gamma, 0.0f, 1.0f))
-						return (Integer) value;
+					try {
+						float gamma = (Integer) value / 4096.0f;
+						if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(Option.GLSetConfiguration,
+								//1 - gamma, cfg.fbrightness, cfg.fcontrast))
+								1 - gamma, 0.0f, 1.0f))
+							return (Integer) value;
+					} catch(Throwable ignored) {
+					}
 				}
 				return null;
 			}

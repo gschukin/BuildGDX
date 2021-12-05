@@ -20,7 +20,6 @@ import static ru.m210projects.Build.Engine.RESERVEDPALS;
 import static ru.m210projects.Build.Engine.SPECULARPAL;
 import static ru.m210projects.Build.Engine.palette;
 import static ru.m210projects.Build.Gameutils.BClipRange;
-import static ru.m210projects.Build.Loader.Model.MD_ROTATE;
 import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
@@ -43,21 +42,22 @@ import ru.m210projects.Build.FileHandle.FileEntry;
 import ru.m210projects.Build.FileHandle.FileUtils;
 import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.FileHandle.Resource.Whence;
-import ru.m210projects.Build.Loader.MDModel;
-import ru.m210projects.Build.Loader.Model;
-import ru.m210projects.Build.Loader.MD2.MD2Loader;
-import ru.m210projects.Build.Loader.MD3.MD3Loader;
-import ru.m210projects.Build.Loader.Voxels.KVXLoader;
-import ru.m210projects.Build.Loader.Voxels.Voxel;
 import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.Render.ModelHandle.MDInfo;
+import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
+import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
+import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
+import ru.m210projects.Build.Render.ModelHandle.MDModel.MD2.MD2Info;
+import ru.m210projects.Build.Render.ModelHandle.MDModel.MD3.MD3Info;
+import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
 import ru.m210projects.Build.Types.Tile;
 
 public class DefScript {
 
 	protected boolean disposable;
 	public final TextureHDInfo texInfo;
-	public final ModelInfo mdInfo;
+	public final ModelsInfo mdInfo;
 	public final AudioInfo audInfo;
 	public final MapHackInfo mapInfo;
 	protected final Engine engine;
@@ -116,7 +116,7 @@ public class DefScript {
 	public DefScript(DefScript src, FileEntry addon) {
 		this.disposable = true;
 		this.texInfo = new TextureHDInfo(src.texInfo);
-		this.mdInfo = new ModelInfo(src.mdInfo, src.disposable);
+		this.mdInfo = new ModelsInfo(src.mdInfo, src.disposable);
 		this.audInfo = new AudioInfo(src.audInfo);
 		this.mapInfo = createMapHackInfo(src.mapInfo);
 		this.engine = src.engine;
@@ -145,7 +145,7 @@ public class DefScript {
 	public DefScript(BuildEngine engine, boolean disposable) {
 		this.disposable = disposable;
 		texInfo = new TextureHDInfo();
-		mdInfo = new ModelInfo();
+		mdInfo = new ModelsInfo();
 		audInfo = new AudioInfo();
 		mapInfo = createMapHackInfo(null);
 
@@ -153,7 +153,7 @@ public class DefScript {
 	}
 
 	protected MapHackInfo createMapHackInfo(MapHackInfo src) {
-		if(src != null)
+		if (src != null)
 			return new MapHackInfo(src);
 		return new MapHackInfo();
 	}
@@ -376,9 +376,7 @@ public class DefScript {
 			if (tile.waloff == null)
 				continue;
 
-			engine.invalidatetile(i, -1, -1);
-
-
+			engine.getrender().invalidatetile(i, -1, -1);
 
 			pic.data = new byte[tile.waloff.length];
 			System.arraycopy(tile.waloff, 0, pic.data, 0, tile.waloff.length);
@@ -393,15 +391,15 @@ public class DefScript {
 			engine.setpicsiz(i);
 
 			// replace hrp info
-			texInfo.addTexture(i, 0, tile.hrp, (0xFF - (tile.alphacut & 0xFF)) * (1.0f / 255.0f), 1.0f, 1.0f,
-					1.0f, 1.0f, 0);
+			texInfo.addTexture(i, 0, tile.hrp, (0xFF - (tile.alphacut & 0xFF)) * (1.0f / 255.0f), 1.0f, 1.0f, 1.0f,
+					1.0f, 0);
 		}
 	}
 
 	// Tokens logic
 
 	public interface Token {
-		public BaseToken parse(Scriptfile script);
+		BaseToken parse(Scriptfile script);
 	}
 
 	public enum BaseToken implements Token {
@@ -411,7 +409,7 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			return this;
 		}
-	};
+	}
 
 	private final Map<String, Token> basetokens = new HashMap<String, Token>() {
 		private static final long serialVersionUID = 1L;
@@ -428,6 +426,7 @@ public class DefScript {
 			put("model", new ModelToken());
 			put("voxel", new VoxelToken());
 			put("skybox", new SkyboxToken());
+			put("tint", new TintToken());
 
 			tok = new TextureToken();
 			put("tile", tok);
@@ -443,12 +442,13 @@ public class DefScript {
 			put("sound", tok);
 			put("music", tok);
 			put("includeif", new AddonToken());
+			put("echo", new EchoToken());
 		}
 	};
 
 	public enum MapHackTokens {
-		FILE, MHK, MD4;
-	};
+		FILE, MHK, MD4, TITLE
+	}
 
 	protected class MaphackToken implements Token {
 		private final Map<String, MapHackTokens> maptokens = new HashMap<String, MapHackTokens>() {
@@ -457,6 +457,7 @@ public class DefScript {
 				put("mapfile", MapHackTokens.FILE);
 				put("mhkfile", MapHackTokens.MHK);
 				put("mapmd4", MapHackTokens.MD4);
+				put("maptitle", MapHackTokens.TITLE);
 			}
 		};
 
@@ -470,11 +471,14 @@ public class DefScript {
 			String file = null, mhk = null, md4 = null;
 			while (script.textptr < end) {
 				tk = gettoken(script, maptokens);
-				if(checkErrorToken(script, tk))
+				if (checkErrorToken(script, tk))
 					continue;
 
 				switch ((MapHackTokens) tk) {
 				default:
+					break;
+				case TITLE:
+					script.getstring(); // XXX
 					break;
 				case FILE:
 					file = getFile(script);
@@ -488,7 +492,7 @@ public class DefScript {
 				}
 			}
 
-			if(mapInfo.addMapInfo(file, mhk, md4))
+			if (mapInfo.addMapInfo(file, mhk, md4))
 				return BaseToken.Ok;
 
 			return BaseToken.Error;
@@ -547,6 +551,17 @@ public class DefScript {
 		}
 	}
 
+	protected class EchoToken implements Token {
+		@Override
+		public BaseToken parse(Scriptfile script) {
+			String message = script.getstring();
+			if(message != null)
+				Console.Println(message, Console.OSDTEXT_GOLD);
+			else Console.Println("");
+			return BaseToken.Ok;
+		}
+	}
+
 	protected class AnimRangeToken implements Token {
 		@Override
 		public BaseToken parse(Scriptfile script) {
@@ -576,7 +591,7 @@ public class DefScript {
 	}
 
 	public enum TileTextureTokens {
-		FILE, ALPHACUT, XOFFSET, YOFFSET, TEXTURE, CRC;
+		FILE, ALPHACUT, XOFFSET, YOFFSET, TEXTURE, CRC
 	}
 
 	protected class TileFromTextureToken implements Token {
@@ -601,7 +616,7 @@ public class DefScript {
 
 			int ttexturetokptr = script.ltextptr, ttextureend;
 			String fn = null;
-			Integer tile = -1, value;
+			Integer tile, value;
 			int talphacut = 255;
 			Byte xoffset = null, yoffset = null;
 			long tilecrc = 0;
@@ -616,9 +631,13 @@ public class DefScript {
 				Object tk = def.gettoken(script, tilefromtexturetokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					Console.Println(
+							script.filename + " has unknown token \""
+									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+									+ "\" on line: "
+									+ toLowerCase(
+											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+							OSDTEXT_RED);
 					continue;
 				}
 				switch ((TileTextureTokens) tk) {
@@ -635,7 +654,7 @@ public class DefScript {
 					break;
 				case XOFFSET:
 					String xoffs = script.getstring();
-					if (xoffs.toUpperCase().equals("ART"))
+					if (xoffs.equalsIgnoreCase("ART"))
 						xoffset = engine.getTile(tile).getOffsetX();
 					else {
 						try {
@@ -649,7 +668,7 @@ public class DefScript {
 					break;
 				case YOFFSET:
 					String yoffs = script.getstring();
-					if (yoffs.toUpperCase().equals("ART"))
+					if (yoffs.equalsIgnoreCase("ART"))
 						yoffset = engine.getTile(tile).getOffsetY();
 					else {
 						try {
@@ -669,7 +688,7 @@ public class DefScript {
 					break;
 				}
 			}
-			script.skipbrace(ttextureend); //close bracke
+			script.skipbrace(ttextureend); // close bracke
 
 			if (addTile(script, fn, tile, xoffset, yoffset, tilecrc, talphacut, istexture, ttexturetokptr) != null)
 				return BaseToken.Ok;
@@ -691,8 +710,8 @@ public class DefScript {
 				// data
 
 				String ext = FileUtils.getExtension(script.filename);
-				DefTile deftile = new DefTile(engine.getTile(tile).getWidth(), engine.getTile(tile).getHeight(), tilecrc,
-						ext != null && ext.equals("dat"));
+				DefTile deftile = new DefTile(engine.getTile(tile).getWidth(), engine.getTile(tile).getHeight(),
+						tilecrc, ext != null && ext.equals("dat"));
 				if (xoffset != null)
 					deftile.xoffset = xoffset;
 				if (yoffset != null)
@@ -738,10 +757,10 @@ public class DefScript {
 				return null;
 			}
 
-			Pixmap pix = null;
+			Pixmap pix;
 			try {
 				pix = new Pixmap(data, 0, data.length);
-			} catch(Throwable e) { //if native code didn't load
+			} catch (Throwable e) { // if native code didn't load
 				Console.Println("ImportTileFromTexture error: " + e.getMessage(), Console.OSDTEXT_RED);
 				return null;
 			}
@@ -780,11 +799,12 @@ public class DefScript {
 
 			return deftile;
 		}
-	};
+	}
 
 	protected enum ModelTokens {
 		SCALE, SHADE, XADD, YADD, ZADD, FRAME, FRAME0, FRAME1, ANIM, SKIN, HUD, TILE, TILE0, TILE1, FPS, FLAGS, PAL,
-		FILE, SURF, ANGADD, HIDE, NOBOB, FLIPPED, NODEPTH
+		FILE, SURF, ANGADD, FOV, HIDE, NOBOB, FLIPPED, NODEPTH, DETAIL, NORMAL, SPECULAR, GLOW, SPECPOWER, SPECFACTOR,
+		PARAM, PARALLAXSCALE, PARALLAXBIAS, SMOOTHDURATION
 	}
 
 	protected class ModelToken implements Token {
@@ -799,7 +819,12 @@ public class DefScript {
 				put("frame", ModelTokens.FRAME);
 				put("anim", ModelTokens.ANIM);
 				put("skin", ModelTokens.SKIN);
+				put("detail", ModelTokens.DETAIL);
+				put("glow", ModelTokens.GLOW);
+				put("specular", ModelTokens.SPECULAR);
+				put("normal", ModelTokens.NORMAL);
 				put("hud", ModelTokens.HUD);
+				put("flags", ModelTokens.FLAGS);
 			}
 		};
 
@@ -811,6 +836,8 @@ public class DefScript {
 				put("tile", ModelTokens.TILE);
 				put("tile0", ModelTokens.TILE0);
 				put("tile1", ModelTokens.TILE1);
+				put("smoothduration", ModelTokens.SMOOTHDURATION);
+				put("pal", ModelTokens.PAL);
 			}
 		};
 
@@ -831,6 +858,11 @@ public class DefScript {
 				put("file", ModelTokens.FILE);
 				put("surf", ModelTokens.SURF);
 				put("surface", ModelTokens.SURF);
+
+				put("specpower", ModelTokens.SPECPOWER);
+				put("specfactor", ModelTokens.SPECFACTOR);
+				put("parallaxscale", ModelTokens.PARALLAXSCALE);
+				put("parallaxbias", ModelTokens.PARALLAXBIAS);
 			}
 		};
 
@@ -843,6 +875,7 @@ public class DefScript {
 				put("xadd", ModelTokens.XADD);
 				put("yadd", ModelTokens.YADD);
 				put("zadd", ModelTokens.ZADD);
+				put("fov", ModelTokens.FOV);
 				put("angadd", ModelTokens.ANGADD);
 				put("hide", ModelTokens.HIDE);
 				put("nobob", ModelTokens.NOBOB);
@@ -862,7 +895,7 @@ public class DefScript {
 			int modelend;
 			String modelfn;
 			double mdscale = 1.0, mzadd = 0.0, myoffset = 0.0;
-			int shadeoffs = 0, mdflags = 0;
+			int /* shadeoffs = 0, */ mdflags = 0, mdpal = 0;
 			int model_ok = 1;
 
 			modelskin = lastmodelskin = 0;
@@ -880,25 +913,29 @@ public class DefScript {
 				return BaseToken.Warning;
 			}
 
-			Model m = null;
-			int sign = res.readInt();
-			res.seek(0, Whence.Set);
-			switch (sign) {
-			case 0x32504449: // IDP2
-				m = MD2Loader.load(res);
-				break;
-			case 0x33504449: // IDP3
-				m = MD3Loader.load(res);
-				break;
-			default:
-				if (res.getExtension().equals("kvx"))
-					m = KVXLoader.load(res).model;
-				break;
+			ModelInfo m = null;
+			try {
+				int sign = res.readInt();
+				res.seek(0, Whence.Set);
+				switch (sign) {
+				case 0x32504449: // IDP2
+					m = new MD2Info(res, modelfn);
+					break;
+				case 0x33504449: // IDP3
+					m = new MD3Info(res, modelfn);
+					break;
+				default:
+					if (res.getExtension().equals("kvx"))
+						m = new ModelInfo(modelfn, Type.Voxel);
+					break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			res.close();
 
 			if (m == null) {
-				Console.Println("Warning: Failed loading MD2/MD3 model " + modelfn, OSDTEXT_YELLOW);
+				Console.Println("Warning: Failed loading model " + modelfn, OSDTEXT_YELLOW);
 				script.textptr = modelend + 1;
 				return BaseToken.Warning;
 			}
@@ -907,9 +944,13 @@ public class DefScript {
 				tk = gettoken(script, modeltokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					Console.Println(
+							script.filename + " has unknown token \""
+									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+									+ "\" on line: "
+									+ toLowerCase(
+											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+							OSDTEXT_RED);
 					continue;
 				}
 
@@ -922,9 +963,10 @@ public class DefScript {
 					if (dvalue != null)
 						mdscale = dvalue;
 					break;
-				case SHADE:
-					if ((ivalue = script.getsymbol()) != null)
-						shadeoffs = ivalue;
+				case SHADE: // XXX
+					if ((ivalue = script.getsymbol()) != null) {
+//						shadeoffs = ivalue;
+					}
 					break;
 				case ZADD:
 					if ((dvalue = script.getdouble()) != null)
@@ -934,15 +976,15 @@ public class DefScript {
 //					if ((dvalue = script.getdouble()) != null)
 //						myoffset = dvalue;
 //					break;
-//				case FLAGS:
-//					if ((ivalue = script.getsymbol()) != null)
-//						mdflags = ivalue;
-//					break;
+				case FLAGS:
+					if ((ivalue = script.getsymbol()) != null)
+						mdflags = ivalue;
+					break;
 				case FRAME: {
 					int frametokptr = script.ltextptr;
 					int frameend, happy = 1;
 					String framename = null;
-					int ftilenume = -1, ltilenume = -1, tilex = 0;
+					int ftilenume = -1, ltilenume = -1, tilex;
 					double smoothduration = 0.1;
 
 					if ((frameend = script.getbraces()) == -1)
@@ -952,14 +994,21 @@ public class DefScript {
 						tk = gettoken(script, modelframetokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-									+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							Console.Println(
+									script.filename + " has unknown token \""
+											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+											+ "\" on line: " + toLowerCase(script.textbuf
+													.substring(getPtr(script, line), getPtr(script, line + 1))),
+									OSDTEXT_RED);
 							continue;
 						}
 
 						switch ((ModelTokens) tk) {
 						default:
+							break;
+						case PAL:
+							if ((ivalue = script.getsymbol()) != null)
+								mdpal = ivalue;
 							break;
 						case FRAME:
 							framename = script.getstring();
@@ -978,13 +1027,13 @@ public class DefScript {
 							if ((ivalue = script.getsymbol()) != null)
 								ltilenume = ivalue;
 							break; // last tile number (inclusive)
-//						case SMOOTHDURATION:
-//							if ((dvalue = script.getdouble()) != null)
-//								smoothduration = dvalue;
-//							break;
+						case SMOOTHDURATION:
+							if ((dvalue = script.getdouble()) != null)
+								smoothduration = dvalue;
+							break;
 						}
 					}
-					script.skipbrace(frameend); //close bracke
+					script.skipbrace(frameend); // close bracke
 
 					if (check_tile_range("model: frame", ftilenume, ltilenume, script, frametokptr)) {
 						model_ok = 0;
@@ -992,8 +1041,8 @@ public class DefScript {
 					}
 
 					for (tilex = ftilenume; tilex <= ltilenume && happy != 0; tilex++) {
-						switch (mdInfo.addModelInfo(m, tilex, framename, Math.max(0, modelskin),
-								(float) smoothduration)) {
+						switch (mdInfo.addModelInfo(m, tilex, framename, Math.max(0, modelskin), (float) smoothduration,
+								mdpal)) {
 						case -1:
 							happy = 0;
 							break; // invalid model id!?
@@ -1030,9 +1079,12 @@ public class DefScript {
 						tk = gettoken(script, modelanimtokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-									+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							Console.Println(
+									script.filename + " has unknown token \""
+											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+											+ "\" on line: " + toLowerCase(script.textbuf
+													.substring(getPtr(script, line), getPtr(script, line + 1))),
+									OSDTEXT_RED);
 							continue;
 						}
 
@@ -1055,7 +1107,7 @@ public class DefScript {
 							break;
 						}
 					}
-					script.skipbrace(animend); //close bracke
+					script.skipbrace(animend); // close bracke
 
 					if (startframe == null) {
 						Console.Println("Error: missing 'start frame' for anim definition near line " + script.filename
@@ -1069,10 +1121,10 @@ public class DefScript {
 						happy = 0;
 					}
 					model_ok &= happy;
-					if (happy == 0 || m.mdnum < 2)
+					if (happy == 0 || m.getType() == Type.Voxel)
 						break;
 
-					switch (((MDModel) m).setAnimation(startframe, endframe, (int) (dfps * (65536.0 * .001)), flags)) {
+					switch (((MDInfo) m).setAnimation(startframe, endframe, (int) (dfps * (65536.0 * .001)), flags)) {
 					case -2:
 						Console.Println("Invalid starting frame name on line " + script.filename + ":"
 								+ script.getlinum(animtokptr), OSDTEXT_RED);
@@ -1087,10 +1139,10 @@ public class DefScript {
 				}
 					break;
 				case SKIN:
-//				case DETAIL:
-//				case GLOW:
-//				case SPECULAR:
-//				case NORMAL: {
+				case DETAIL:
+				case GLOW:
+				case SPECULAR:
+				case NORMAL:
 					int skintokptr = script.ltextptr;
 					int skinend;
 					String skinfn = null;
@@ -1104,9 +1156,12 @@ public class DefScript {
 						tk = gettoken(script, modelskintokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-									+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							Console.Println(
+									script.filename + " has unknown token \""
+											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+											+ "\" on line: " + toLowerCase(script.textbuf
+													.substring(getPtr(script, line), getPtr(script, line + 1))),
+									OSDTEXT_RED);
 							continue;
 						}
 
@@ -1116,18 +1171,25 @@ public class DefScript {
 						case PAL:
 							palnum = script.getsymbol();
 							break;
-//						case PARAM:
-//							if ((dvalue = script.getdouble()) != null)
-//								param = dvalue;
-//							break;
-//						case SPECPOWER:
-//							if ((dvalue = script.getdouble()) != null)
-//								specpower = dvalue;
-//							break;
-//						case SPECFACTOR:
-//							if ((dvalue = script.getdouble()) != null)
-//								specfactor = dvalue;
-//							break;
+						case PARAM:
+							if ((dvalue = script.getdouble()) != null)
+								param = dvalue;
+							break;
+						case PARALLAXSCALE:
+							script.getdouble(); // XXX
+							break;
+
+						case PARALLAXBIAS:
+							script.getdouble(); // XXX
+							break;
+						case SPECPOWER:
+							if ((dvalue = script.getdouble()) != null)
+								specpower = dvalue;
+							break;
+						case SPECFACTOR:
+							if ((dvalue = script.getdouble()) != null)
+								specfactor = dvalue;
+							break;
 						case FILE:
 							skinfn = getFile(script);
 							break; // skin filename
@@ -1137,7 +1199,7 @@ public class DefScript {
 							break; // getnumber
 						}
 					}
-					script.skipbrace(skinend); //close bracke
+					script.skipbrace(skinend); // close bracke
 
 					if (skinfn == null) {
 						Console.Println("Error: missing 'skin filename' for skin definition near line "
@@ -1154,25 +1216,25 @@ public class DefScript {
 					switch (token) {
 					default:
 						break;
-//					case DETAIL:
-//						palnum = DETAILPAL;
-//						param = 1.0f / param;
-//						break;
-//					case GLOW:
-//						palnum = GLOWPAL;
-//						break;
-//					case SPECULAR:
-//						palnum = SPECULARPAL;
-//						break;
-//					case NORMAL:
-//						palnum = NORMALPAL;
-//						break;
+					case DETAIL:
+						palnum = DETAILPAL;
+						param = 1.0f / param;
+						break;
+					case GLOW:
+						palnum = GLOWPAL;
+						break;
+					case SPECULAR:
+						palnum = SPECULARPAL;
+						break;
+					case NORMAL:
+						palnum = NORMALPAL;
+						break;
 					}
 
-					if (!BuildGdx.cache.contains(skinfn, 0) || m.mdnum < 2)
+					if (!BuildGdx.cache.contains(skinfn, 0) || m.getType() == Type.Voxel)
 						break;
 
-					switch (((MDModel) m).setSkin(skinfn, palnum, Math.max(0, modelskin), surfnum, param, specpower,
+					switch (((MDInfo) m).setSkin(skinfn, palnum, Math.max(0, modelskin), surfnum, param, specpower,
 							specfactor)) {
 					case -2:
 						Console.Println(
@@ -1192,7 +1254,7 @@ public class DefScript {
 				case HUD:
 					int hudtokptr = script.ltextptr;
 					int happy = 1, frameend;
-					int ftilenume = -1, ltilenume = -1, tilex = 0, flags = 0, fov = -1;
+					int ftilenume = -1, ltilenume = -1, tilex, flags = 0, fov = -1;
 					double xadd = 0.0, yadd = 0.0, zadd = 0.0, angadd = 0.0;
 
 					if ((frameend = script.getbraces()) == -1)
@@ -1202,9 +1264,12 @@ public class DefScript {
 						tk = gettoken(script, modelhudtokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-									+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							Console.Println(
+									script.filename + " has unknown token \""
+											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+											+ "\" on line: " + toLowerCase(script.textbuf
+													.substring(getPtr(script, line), getPtr(script, line + 1))),
+									OSDTEXT_RED);
 							continue;
 						}
 
@@ -1240,10 +1305,10 @@ public class DefScript {
 							if ((dvalue = script.getdouble()) != null)
 								angadd = dvalue;
 							break;
-//						case FOV:
-//							if ((ivalue = script.getsymbol()) != null)
-//								fov = ivalue;
-//							break;
+						case FOV:
+							if ((ivalue = script.getsymbol()) != null)
+								fov = ivalue;
+							break;
 						case HIDE:
 							flags |= 1;
 							break;
@@ -1259,7 +1324,7 @@ public class DefScript {
 						}
 					}
 
-					script.skipbrace(frameend); //close bracke
+					script.skipbrace(frameend); // close bracke
 
 					if (check_tile_range("hud", ftilenume, ltilenume, script, hudtokptr)) {
 						model_ok = 0;
@@ -1280,7 +1345,7 @@ public class DefScript {
 					break;
 				}
 			}
-			script.skipbrace(modelend); //close bracke
+			script.skipbrace(modelend); // close bracke
 
 			if (model_ok == 0) {
 				if (m != null) {
@@ -1290,7 +1355,7 @@ public class DefScript {
 				return BaseToken.Error;
 			}
 
-			m.setMisc((float) mdscale, shadeoffs, (float) mzadd, (float) myoffset, mdflags);
+			m.setMisc((float) mdscale, (float) mzadd, (float) myoffset, mdflags);
 
 			modelskin = lastmodelskin = 0;
 			seenframe = 0;
@@ -1301,7 +1366,7 @@ public class DefScript {
 
 	protected enum TextureTokens {
 		FILE, PAL, DETAIL, GLOW, SPECULAR, NORMAL, ALPHACUT, XSCALE, YSCALE, SPECPOWER, SPECFACTOR, NOCOMPRESS,
-		NODOWNSIZE
+		NODOWNSIZE, PARALLAXBIAS, PARALLAXSCALE
 	}
 
 	protected class TextureToken implements Token {
@@ -1323,10 +1388,10 @@ public class DefScript {
 				put("yscale", TextureTokens.YSCALE);
 				put("specpower", TextureTokens.SPECPOWER);
 				put("specularpower", TextureTokens.SPECPOWER);
-				put("parallaxscale", TextureTokens.SPECPOWER);
+				put("parallaxscale", TextureTokens.PARALLAXSCALE);
 				put("specfactor", TextureTokens.SPECFACTOR);
 				put("specularfactor", TextureTokens.SPECFACTOR);
-				put("parallaxbias", TextureTokens.SPECFACTOR);
+				put("parallaxbias", TextureTokens.PARALLAXBIAS);
 				put("nocompress", TextureTokens.NOCOMPRESS);
 				put("nodownsize", TextureTokens.NODOWNSIZE);
 			}
@@ -1336,7 +1401,7 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			int textureend;
 			Double dvalue;
-			Integer ttile = -1;
+			Integer ttile;
 			Object tk;
 
 			if ((ttile = script.getsymbol()) == null)
@@ -1348,9 +1413,13 @@ public class DefScript {
 				tk = gettoken(script, texturetokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					Console.Println(
+							script.filename + " has unknown token \""
+									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+									+ "\" on line: "
+									+ toLowerCase(
+											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+							OSDTEXT_RED);
 					continue;
 				}
 
@@ -1377,9 +1446,12 @@ public class DefScript {
 						tk = gettoken(script, texturetokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-									+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							Console.Println(
+									script.filename + " has unknown token \""
+											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+											+ "\" on line: " + toLowerCase(script.textbuf
+													.substring(getPtr(script, line), getPtr(script, line + 1))),
+									OSDTEXT_RED);
 							continue;
 						}
 
@@ -1411,6 +1483,15 @@ public class DefScript {
 							if ((dvalue = script.getdouble()) != null)
 								specfactor = dvalue;
 							break;
+
+						case PARALLAXSCALE:
+							script.getdouble(); // XXX
+							break;
+
+						case PARALLAXBIAS:
+							script.getdouble(); // XXX
+							break;
+
 						case NOCOMPRESS:
 							flags |= 1;
 							break;
@@ -1419,7 +1500,7 @@ public class DefScript {
 							break;
 						}
 					}
-					script.skipbrace(palend); //close bracke
+					script.skipbrace(palend); // close bracke
 
 					switch (token) {
 					default:
@@ -1469,7 +1550,7 @@ public class DefScript {
 					break;
 				}
 			}
-			script.skipbrace(textureend); //close bracke
+			script.skipbrace(textureend); // close bracke
 
 			if (ttile >= MAXTILES) {
 				Console.Println("Error: missing or invalid 'tile number' for texture definition near line "
@@ -1506,7 +1587,7 @@ public class DefScript {
 
 			int vmodelend;
 			double vscale = 1.0;
-			int tile0 = MAXTILES, tile1 = -1, tilex = -1;
+			int tile0 = MAXTILES, tile1 = -1, tilex;
 			boolean vrotate = false;
 
 			if ((fn = getFile(script)) == null) // voxel filename
@@ -1521,10 +1602,17 @@ public class DefScript {
 				script.textptr = vmodelend + 1;
 				return BaseToken.Warning;
 			}
-			Voxel vox = KVXLoader.load(res);
+
+			VoxelInfo vox = null;
+			try {
+				vox = new VoxelInfo(new VoxelData(res));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			res.close();
+
 			if (vox == null) {
-				Console.Println("Warning: Failed loading MD2/MD3 model " + fn, OSDTEXT_YELLOW);
+				Console.Println("Warning: Failed loading voxel model " + fn, OSDTEXT_YELLOW);
 				script.textptr = vmodelend + 1;
 
 				return BaseToken.Warning;
@@ -1534,9 +1622,13 @@ public class DefScript {
 				Object tk = gettoken(script, voxeltokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					Console.Println(
+							script.filename + " has unknown token \""
+									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+									+ "\" on line: "
+									+ toLowerCase(
+											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+							OSDTEXT_RED);
 					continue;
 				}
 
@@ -1559,8 +1651,9 @@ public class DefScript {
 
 					if (check_tile_range("voxel", tile0, tile1, script, script.ltextptr))
 						break;
-					for (tilex = tile0; tilex <= tile1; tilex++)
+					for (tilex = tile0; tilex <= tile1; tilex++) {
 						mdInfo.addVoxelInfo(vox, tilex);
+					}
 					break; // last tile number (inclusive)
 				case SCALE:
 					if ((dvalue = script.getdouble()) != null)
@@ -1573,20 +1666,20 @@ public class DefScript {
 					break;
 				}
 			}
-			script.skipbrace(vmodelend); //close bracke
+			script.skipbrace(vmodelend); // close bracke
 
-			vox.getModel().setMisc((float) vscale, 0, 0, 0, vrotate ? MD_ROTATE : 0);
+			vox.setMisc((float) vscale * 65536, 0, 0, vrotate ? ModelInfo.MD_ROTATE : 0);
 			return BaseToken.Ok;
 		}
 	}
 
 	public enum SkyboxTokens {
-		TILE, PAL, FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM
+		TILE, PAL, FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM, NOCOMPRESS, NODOWNSIZE
 	}
 
 	protected class SkyboxToken implements Token {
 
-		private final String skyfaces[] = { "front face", "right face", "back face", "left face", "top face",
+		private final String[] skyfaces = { "front face", "right face", "back face", "left face", "top face",
 				"bottom face" };
 
 		private final Map<String, SkyboxTokens> skyboxtokens = new HashMap<String, SkyboxTokens>() {
@@ -1613,8 +1706,8 @@ public class DefScript {
 				put("floor", SkyboxTokens.BOTTOM);
 				put("down", SkyboxTokens.BOTTOM);
 
-//				put("nocompress", TextureTokens.NOCOMPRESS);
-//				put("nodownsize", TextureTokens.NODOWNSIZE);
+				put("nocompress", SkyboxTokens.NOCOMPRESS);
+				put("nodownsize", SkyboxTokens.NODOWNSIZE);
 			}
 		};
 
@@ -1632,9 +1725,11 @@ public class DefScript {
 					Object tk = gettoken(script, skyboxtokens);
 					if (tk instanceof BaseToken) {
 						int line = script.getlinum(script.ltextptr);
-						Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
+						Console.Println(script.filename + " has unknown token \""
+								+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+								+ "\" on line: "
 								+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-						OSDTEXT_RED);
+								OSDTEXT_RED);
 						continue;
 					}
 
@@ -1665,13 +1760,21 @@ public class DefScript {
 					case BOTTOM:
 						sfn[5] = getFile(script);
 						break;
+
+					case NOCOMPRESS: // XXX
+
+						break;
+					case NODOWNSIZE:
+
+						break;
+
 					default:
 						break;
 					}
 				} catch (Exception e) {
 				}
 			}
-			script.skipbrace(sskyend); //close bracke
+			script.skipbrace(sskyend); // close bracke
 			if (addSkybox(script, stile, spal, sfn))
 				return BaseToken.Ok;
 			return BaseToken.Error;
@@ -1745,7 +1848,88 @@ public class DefScript {
 			if ((f = script.getsymbol()) == null)
 				return BaseToken.Error;
 
+			Console.Println("Loading tint " + pal);
 			texInfo.setPaletteTint(pal.intValue(), r.intValue(), g.intValue(), b.intValue(), f.intValue());
+
+			return BaseToken.Ok;
+		}
+	}
+
+	protected enum TintTokens {
+		PAL, RED, GREEN, BLUE, FLAGS
+	}
+
+	protected class TintToken implements Token {
+
+		private final Map<String, TintTokens> tinttokens = new HashMap<String, TintTokens>() {
+			private static final long serialVersionUID = 1L;
+			{
+				put("pal", TintTokens.PAL);
+				put("red", TintTokens.RED);
+				put("green", TintTokens.GREEN);
+				put("blue", TintTokens.BLUE);
+				put("flags", TintTokens.FLAGS);
+			}
+		};
+
+		@Override
+		public BaseToken parse(Scriptfile script) {
+			int pal = -1, r = 255, g = 255, b = 255, f = 0;
+			Integer ivalue;
+			int send;
+
+			if ((send = script.getbraces()) == -1)
+				return BaseToken.Error;
+
+			while (script.textptr < send) {
+				try {
+					Object tk = gettoken(script, tinttokens);
+					if (tk instanceof BaseToken) {
+						int line = script.getlinum(script.ltextptr);
+						Console.Println(script.filename + " has unknown token \""
+								+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+								+ "\" on line: "
+								+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+								OSDTEXT_RED);
+						continue;
+					}
+
+					switch ((TintTokens) tk) {
+					case PAL:
+						if ((ivalue = script.getsymbol()) != null)
+							pal = ivalue;
+						break;
+					case RED:
+						if ((ivalue = script.getsymbol()) != null)
+							r = ivalue;
+						break;
+					case GREEN:
+						if ((ivalue = script.getsymbol()) != null)
+							g = ivalue;
+						break;
+					case BLUE:
+						if ((ivalue = script.getsymbol()) != null)
+							b = ivalue;
+						break;
+					case FLAGS:
+						if ((ivalue = script.getsymbol()) != null)
+							f = ivalue;
+						break;
+
+					default:
+						break;
+					}
+				} catch (Exception e) {
+				}
+			}
+			script.skipbrace(send); // close bracke
+			if (pal == -1) {
+				Console.Println("Tint palette is not found!", OSDTEXT_RED);
+				return BaseToken.Error;
+			}
+
+			Console.Println("Loading tint " + pal);
+			texInfo.setPaletteTint((int) pal, r, g, b, f);
 
 			return BaseToken.Ok;
 		}
@@ -1778,9 +1962,13 @@ public class DefScript {
 				Object tk = gettoken(script, sound_musictokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					Console.Println(
+							script.filename + " has unknown token \""
+									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
+									+ "\" on line: "
+									+ toLowerCase(
+											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+							OSDTEXT_RED);
 					continue;
 				}
 
@@ -1797,7 +1985,7 @@ public class DefScript {
 					break;
 				}
 			}
-			script.skipbrace(dummy); //close bracke
+			script.skipbrace(dummy); // close bracke
 
 			audInfo.addDigitalInfo(t_id, t_file);
 
@@ -1808,9 +1996,11 @@ public class DefScript {
 	protected boolean checkErrorToken(Scriptfile script, Object tk) {
 		if (tk instanceof BaseToken) {
 			int line = script.getlinum(script.ltextptr);
-			Console.Println(script.filename + " has unknown token \"" + toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
-					+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-			OSDTEXT_RED);
+			Console.Println(
+					script.filename + " has unknown token \""
+							+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
+							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
+					OSDTEXT_RED);
 			return true;
 		}
 

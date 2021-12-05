@@ -265,7 +265,9 @@ public class Console {
     			if(isdigit(num1))
     			{
     				number += num1;
-    				char num2 = text.charAt(++chp+1);
+					char num2 = ' ';
+					if(++chp+1 < text.length())
+						num2 = text.charAt(chp+1);
     				if(!isdigit(num2))
     				{
     					pal = Integer.parseInt(number, 10);
@@ -453,22 +455,22 @@ public class Console {
 				if(foundText.size() > 1) {
 					Collections.sort(foundText);
 					Println("Symbol listing:", OSDTEXT_RED);
-					String msg = "  ";
+					StringBuilder msg = new StringBuilder("  ");
 					for(int i = 0; i < foundText.size(); i ++)
 		            {
-						msg += foundText.get(i);
+						msg.append(foundText.get(i));
 						for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
-							msg += " ";
+							msg.append(" ");
 		                if (msg.length() > (osdcols - maxwidth))
 		                {
-		                    msg += "\n";
-		                    Print(msg);
+		                    msg.append("\n");
+		                    Print(msg.toString());
 		                    if (i < foundText.size())
-		                    	msg = "  ";
+		                    	msg = new StringBuilder("  ");
 		                }
 		            }
 					if(msg.length() > 2)
-		        	  Println(msg);
+		        	  Println(msg.toString());
 					Println("Found " + foundText.size() + " symbols", OSDTEXT_RED);
 				}
 			}
@@ -778,11 +780,9 @@ public class Console {
 
 	                if (osdhistorysize < OSD_HISTORYDEPTH) osdhistorysize++;
 	                osdhistorytotal++;
-	                osdexeccount++;
-	            }
-	            else
-	            	osdexeccount++;
-	            osdhistorypos=-1;
+				}
+				osdexeccount++;
+				osdhistorypos=-1;
 	            String input = new String(osdeditbuf, 0, osdeditlen);
 
 	            if(Dispatch(input) == -1) {
@@ -882,7 +882,7 @@ public class Console {
 		Arrays.fill(osd_argv, null);
 		String osdvar = toLowerCase(text).trim();
 		osd_argv[osd_argc-1] = osdvar;
-    	String var = null;
+    	String var;
     	int index = osdvar.indexOf(" ");
     	while(index != -1) {
     		var = osdvar.substring(0, index);
@@ -904,7 +904,7 @@ public class Console {
         if (osdlines < MAXLINES) osdlines++;
 	}
 
-	private static List<String> foundText = new ArrayList<String>();
+	private static final List<String> foundText = new ArrayList<String>();
 	private static void ListCommands()
 	{
 		if(!lastmatch) {
@@ -930,22 +930,22 @@ public class Console {
 			} else if(foundText.size() > 1) {
 				Collections.sort(foundText);
 				Println("Found " + foundText.size() + " possible completions for " + "\"" + inputText + "\"", OSDTEXT_RED);
-				String msg = "  ";
+				StringBuilder msg = new StringBuilder("  ");
 				for(int i = 0; i < foundText.size(); i ++)
 	            {
-					msg += foundText.get(i);
+					msg.append(foundText.get(i));
 					for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
-						msg += " ";
+						msg.append(" ");
 	                if (msg.length() > (osdcols - maxwidth))
 	                {
-	                    msg += "\n";
-	                    Print(msg);
+	                    msg.append("\n");
+	                    Print(msg.toString());
 	                    if (i < foundText.size() - 1)
-	                    	msg = "  ";
+	                    	msg = new StringBuilder("  ");
 	                }
 	            }
 				if(msg.length() > 2)
-	        	  Println(msg);
+	        	  Println(msg.toString());
 				Println("Press TAB again to cycle through matches", OSDTEXT_RED);
 				tabc = 0;
 				lastmatch = true;

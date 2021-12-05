@@ -15,31 +15,31 @@ import static java.lang.Math.abs;
 public class PolyClipper {
 
 	class vsptyp {
-		double x, cy[] = new double[2], fy[] = new double[2];
+		double x;
+		double[] cy = new double[2];
+		double[] fy = new double[2];
 		int n, p, tag, ctag, ftag;
 
 		public void set(vsptyp src) {
 			this.x = src.x;
-			for (int i = 0; i < 2; i++)
-				this.cy[i] = src.cy[i];
-			for (int i = 0; i < 2; i++)
-				this.fy[i] = src.fy[i];
+			System.arraycopy(src.cy, 0, this.cy, 0, 2);
+			System.arraycopy(src.fy, 0, this.fy, 0, 2);
 			this.n = src.n;
 			this.p = src.p;
 			this.tag = src.tag;
 			this.ctag = src.ctag;
 			this.ftag = src.ftag;
 		}
-	};
+	}
 
 	private int domostpolymethod = 0;
 	private final float DOMOST_OFFSET = 0.01f;
 	private int vcnt, gtag;
 	private final int VSPMAX = 4096; // <- careful!
-	private vsptyp[] vsp = new vsptyp[VSPMAX];
+	private final vsptyp[] vsp = new vsptyp[VSPMAX];
 	private final Surface[] domost = new Surface[4];
 	private final double[] domost_cy = new double[2], domost_cv = new double[2];
-	private Polymost r;
+	private final Polymost r;
 
 	public PolyClipper(Polymost render)
 	{

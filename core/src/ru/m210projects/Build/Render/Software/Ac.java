@@ -20,7 +20,7 @@ public class Ac implements A {
 	private int gshade;
 	private int bpl, gpinc;
 	private byte[] gtrans, gbuf, frameplace, gpal, ghlinepal, hlinepal;
-	private int[] reciptable;
+	private final int[] reciptable;
 
 	private int bzinc;
 	private int asm1, asm2;
@@ -114,7 +114,6 @@ public class Ac implements A {
 			int bz) {
 
 		int u, v, i, index;
-		byte[] remap = pal;
 		int shiftx = 32 - glogx;
 		int shifty = 32 - glogy;
 		int inc = gpinc; //it affects on fps
@@ -127,7 +126,7 @@ public class Ac implements A {
 				v = by + y3 * i;
 
 				index = ((u >>> shiftx) << glogy) + (v >>> shifty);
-				drawpixel(p, remap[(gbuf[index] & 0xFF) + slopalookup[slopaloffs]]);
+				drawpixel(p, pal[(gbuf[index] & 0xFF) + slopalookup[slopaloffs]]);
 				slopaloffs--;
 				p += inc;
 			}
@@ -148,7 +147,6 @@ public class Ac implements A {
 
 	@Override
 	public void vlineasm1(int vinc, byte[] pal, int shade, int cnt, int vplc, byte[] bufplc, int bufoffs, int p) {
-		byte[] remap = pal;
 		int pl = bpl; //it affects on fps
 
 		try {
@@ -158,7 +156,7 @@ public class Ac implements A {
 					return;
 
 				int ch = (bufplc[index] & 0xFF) + shade;
-				drawpixel(p, remap[ch]);
+				drawpixel(p, pal[ch]);
 				p += pl;
 				vplc += vinc;
 			}
@@ -173,7 +171,6 @@ public class Ac implements A {
 
 	@Override
 	public void mvlineasm1(int vinc, byte[] pal, int shade, int cnt, int vplc, byte[] bufplc, int bufoffs, int p) {
-		byte[] remap = pal;
 		int pl = bpl; //it affects on fps
 
 		try {
@@ -184,7 +181,7 @@ public class Ac implements A {
 
 				int ch = bufplc[index] & 0xFF;
 				if (ch != 255)
-					drawpixel(p, remap[ch + shade]);
+					drawpixel(p, pal[ch + shade]);
 				p += pl;
 				vplc += vinc;
 			}
@@ -199,7 +196,6 @@ public class Ac implements A {
 
 	@Override
 	public void tvlineasm1(int vinc, byte[] pal, int shade, int cnt, int vplc, byte[] bufplc, int bufoffs, int p) {
-		byte[] remap = pal;
 		int pl = bpl; //it affects on fps
 
 		try {
@@ -208,7 +204,7 @@ public class Ac implements A {
 					int index = bufoffs + (vplc >>> glogy);
 					int ch = bufplc[index] & 0xFF;
 					if (ch != 255) {
-						int dacol = remap[ch + shade] & 0xFF;
+						int dacol = pal[ch + shade] & 0xFF;
 						drawpixel(p, gtrans[(frameplace[p] & 0xFF) + (dacol << 8)]);
 					}
 					p += pl;
@@ -219,7 +215,7 @@ public class Ac implements A {
 					int index = bufoffs + (vplc >>> glogy);
 					int ch = bufplc[index] & 0xFF;
 					if (ch != 255) {
-						int dacol = remap[ch + shade] & 0xFF;
+						int dacol = pal[ch + shade] & 0xFF;
 						drawpixel(p, gtrans[((frameplace[p] & 0xFF) << 8) + dacol]);
 					}
 					p += pl;

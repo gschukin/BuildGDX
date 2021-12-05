@@ -136,20 +136,16 @@ public class Scriptfile {
 
 	public boolean eof() {
 		skipoverws();
-		if (textptr >= eof)
-			return true;
-		return false;
+		return textptr >= eof;
 	}
 
 	public int getlinum(int ptr) {
 		int i, stp;
 
-		int ind = ptr;
-
 		for (stp = 1; stp + stp < linenum; stp += stp)
 			; // stp = highest power of 2 less than linenum
 		for (i = 0; stp != 0; stp >>= 1)
-			if ((i + stp < linenum) && (lineoffs[i + stp] < ind))
+			if ((i + stp < linenum) && (lineoffs[i + stp] < ptr))
 				i += stp;
 		return i + 2; // i = index to highest lineoffs which is less than ind; convert to 1-based line
 						// numbers
@@ -246,10 +242,13 @@ public class Scriptfile {
 
 		textbuf = new String(data, 0, flen);
 		textptr = 0;
-		eof = nflen - 1;
+		eof = textbuf.length() - 1;
 	}
 
 	public Scriptfile(String filename, byte[] data) {
+		if(data == null)
+			throw new RuntimeException("byte[] data == NULL");
+
 		int flen = data.length;
 		byte[] tx = Arrays.copyOf(data, flen + 2);
 		tx[flen] = tx[flen + 1] = 0;

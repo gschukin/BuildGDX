@@ -160,7 +160,7 @@ public abstract class MenuMouse extends BuildMenu {
 
 		posy += separatorHeight;
 
-		mAdvance = new MenuButton("Digital axis setup", style, posx, posy += menuHeight, width, 1, buttonPal, advancedMenu, -1, null, 0);
+		mAdvance = new MenuButton("Digital axis setup", style, posx, posy + menuHeight, width, 1, buttonPal, advancedMenu, -1, null, 0);
 		
 		addItem(mEnable, true);
 		addItem(mMenuEnab, false);

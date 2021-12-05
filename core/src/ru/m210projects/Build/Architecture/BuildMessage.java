@@ -18,12 +18,12 @@ package ru.m210projects.Build.Architecture;
 
 public interface BuildMessage {
 	
-	public enum MessageType { Question, Info, Crash }
+	enum MessageType { Question, Info, Crash }
 	
-	public void setFrame(BuildFrame frame);
+	void setFrame(BuildFrame frame);
 
-	public boolean show(String header, String text, MessageType type);
+	boolean show(String header, String text, MessageType type);
 	
-	public void dispose();
+	void dispose();
 	
 }

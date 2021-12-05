@@ -38,7 +38,7 @@ import org.w3c.dom.traversal.NodeIterator;
  */
 class Gateway {
 
-    private Inet4Address iface;
+    private final Inet4Address iface;
 
     private String serviceType = null, controlURL = null;
 
@@ -98,16 +98,16 @@ class Gateway {
 
     private Map<String, String> command(String action, Map<String, String> params) throws Exception {
         Map<String, String> ret = new HashMap<String, String>();
-        String soap = "<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+        StringBuilder soap = new StringBuilder("<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
                 + "<SOAP-ENV:Body>"
-                + "<m:" + action + " xmlns:m=\"" + serviceType + "\">";
+                + "<m:" + action + " xmlns:m=\"" + serviceType + "\">");
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                soap += "<" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">";
+                soap.append("<").append(entry.getKey()).append(">").append(entry.getValue()).append("</").append(entry.getKey()).append(">");
             }
         }
-        soap += "</m:" + action + "></SOAP-ENV:Body></SOAP-ENV:Envelope>";
-        byte[] req = soap.getBytes();
+        soap.append("</m:").append(action).append("></SOAP-ENV:Body></SOAP-ENV:Envelope>");
+        byte[] req = soap.toString().getBytes();
         HttpURLConnection conn = (HttpURLConnection) new URL(controlURL).openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);

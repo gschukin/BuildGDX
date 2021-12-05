@@ -63,13 +63,13 @@ public class ALSoundDrv implements Sound {
 	
 	protected DriverCallback driverCallback;
 	public interface DriverCallback {
-		public ALAudio InitDriver() throws Throwable;
+		ALAudio InitDriver() throws Throwable;
 	}
 
 	protected boolean noDevice = true;
 
 	private final static FloatBuffer NULLVECTOR = BufferUtils.newFloatBuffer(3);
-	private final static FloatBuffer orientation = (FloatBuffer)BufferUtils.newFloatBuffer(6);
+	private final static FloatBuffer orientation = BufferUtils.newFloatBuffer(6);
 	private final float[] deforientation = new float[] {0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f};
 
 	protected SystemType system;
@@ -78,7 +78,7 @@ public class ALSoundDrv implements Sound {
 	protected SourceManager sourceManager;
 	private float soundVolume = 0.5f;
 
-	private String name;
+	private final String name;
 	protected List<Source> loopedSource = new ArrayList<Source>();
 	
 	private boolean alReverbEnable = false;
@@ -336,7 +336,7 @@ public class ALSoundDrv implements Sound {
 
 		Iterator<Source> it = sourceManager.iterator();
 	    while(it.hasNext()) {
-	    	Source s = (Source)it.next();
+	    	Source s = it.next();
 	    	if(s.flags != Source.Locked) //Don't set reverb for music
 	    		al.setSourceReverb(s.sourceId, alReverbEnable, alReverbDelay);
 	    }
@@ -366,7 +366,7 @@ public class ALSoundDrv implements Sound {
 		alCurrentSoftResampler = num;
 		Iterator<Source> it = sourceManager.iterator();
 	    while(it.hasNext()) {
-	    	Source s = (Source)it.next();
+	    	Source s = it.next();
 	    	al.setSourceSoftResampler(s.sourceId, alCurrentSoftResampler);
 	    }
 	}
@@ -394,7 +394,7 @@ public class ALSoundDrv implements Sound {
 	protected class SourceManager extends java.util.PriorityQueue<Source>
 	{
 		private static final long serialVersionUID = 1L;
-		private Source[] allSources;
+		private final Source[] allSources;
 		
 		public SourceManager(int maxSources) {
 			allSources = new Source[maxSources];
@@ -513,7 +513,7 @@ public class ALSoundDrv implements Sound {
 	{
 		Iterator<Source> it = sourceManager.iterator();
 	    while(it.hasNext()) {
-	      Source obj = (Source)it.next();
+	      Source obj = it.next();
 	      System.out.println("#" + obj.sourceId + " isFree: " + obj.free + " pri: " + obj.priority + " vol: " + String.format("%.2f", obj.getVolume()).replace(',', '.') + " pitch: " + String.format("%.2f", obj.getPitch()).replace(',', '.') + " flags: " + obj.flags);
 	    }
 	    System.out.println();

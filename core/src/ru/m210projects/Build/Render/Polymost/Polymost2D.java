@@ -13,14 +13,12 @@ package ru.m210projects.Build.Render.Polymost;
 import static com.badlogic.gdx.graphics.GL20.GL_BLEND;
 import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_BUFFER_BIT;
 import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_TEST;
-import static com.badlogic.gdx.graphics.GL20.GL_FALSE;
 import static com.badlogic.gdx.graphics.GL20.GL_FLOAT;
 import static com.badlogic.gdx.graphics.GL20.GL_LINES;
 import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE;
 import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_2D;
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLE_FAN;
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLE_STRIP;
-import static com.badlogic.gdx.graphics.GL20.GL_TRUE;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ru.m210projects.Build.Engine.MAXSPRITES;
@@ -88,10 +86,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.BufferUtils;
 
 import ru.m210projects.Build.Render.GLInfo;
+import ru.m210projects.Build.Render.IOverheadMapSettings;
+import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.OrphoRenderer;
 import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.TextureManager;
+import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.Hudtyp;
 import ru.m210projects.Build.Render.Types.Tile2model;
@@ -106,7 +107,7 @@ import ru.m210projects.Build.Types.WALL;
 
 public class Polymost2D extends OrphoRenderer {
 
-	private Polymost parent;
+	private final Polymost parent;
 	private GL10 gl;
 	private final TextureManager textureCache;
 
@@ -125,7 +126,9 @@ public class Polymost2D extends OrphoRenderer {
 	protected float[] rx1 = new float[MAXWALLSB];
 	protected float[] ry1 = new float[MAXWALLSB];
 
-	private int allocpoints = 0, slist[], npoint2[];
+	private int allocpoints = 0;
+	private int[] slist;
+	private int[] npoint2;
 	private raster[] rst;
 	private final float[] trapextx = new float[2];
 
@@ -145,14 +148,13 @@ public class Polymost2D extends OrphoRenderer {
 	private short globalpicnum;
 	private int globalorientation;
 
-	private final Polygon drawpoly[] = new Polygon[4];
+	private final Polygon[] drawpoly = new Polygon[4];
 
 	// Overhead map settings
 
-	public Polymost2D(Polymost parent) {
-		super(parent.engine);
+	public Polymost2D(Polymost parent, IOverheadMapSettings settings) {
+		super(parent.engine, settings);
 		this.parent = parent;
-		this.gl = parent.gl;
 		this.textureCache = parent.textureCache;
 
 		for (int i = 0; i < 4; i++)
@@ -198,7 +200,7 @@ public class Polymost2D extends OrphoRenderer {
 		for (s = 0; s < numsectors; s++) {
 			sec = sector[s];
 
-			if (fullmap || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
+			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				npoints = 0;
 				i = 0;
 				startwall = sec.wallptr;
@@ -230,13 +232,15 @@ public class Polymost2D extends OrphoRenderer {
 				bakx1 = (int) rx1[0];
 				baky1 = mulscale((int) ry1[0] - (ydim << 11), xyaspect, 16) + (ydim << 11);
 
-				if (showflspr) {
+				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
 					for (i = headspritesect[s]; i >= 0; i = nextspritesect[i])
 						if ((sprite[i].cstat & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
-							if ((sprite[i].cstat & (64 + 8)) == (64 + 8))
+
+							if ((sprite[i].cstat & (64 + 8)) == (64 + 8)
+									|| !mapSettings.isSpriteVisible(MapView.Polygons, i))
 								continue;
 
 							if (tsprite[sortnum] == null)
@@ -246,11 +250,13 @@ public class Polymost2D extends OrphoRenderer {
 						}
 				}
 
-				if(showspr)
-				{
+				if (mapSettings.isShowSprites(MapView.Polygons)) {
 					for (i = headspritesect[s]; i >= 0; i = nextspritesect[i])
 						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)
+								continue;
+
+							if (!mapSettings.isSpriteVisible(MapView.Polygons, i))
 								continue;
 
 							if (tsprite[sortnum] == null)
@@ -354,7 +360,7 @@ public class Polymost2D extends OrphoRenderer {
 			}
 		}
 
-		if (showspr) {
+		if (mapSettings.isShowSprites(MapView.Polygons) || mapSettings.isShowFloorSprites()) {
 			// Sort sprite list
 			int gap = 1;
 			while (gap < sortnum)
@@ -380,8 +386,8 @@ public class Polymost2D extends OrphoRenderer {
 
 					Tile pic = engine.getTile(spr.picnum);
 
-					xoff = (byte)(pic.getOffsetX() + spr.xoffset);
-					yoff = (byte)(pic.getOffsetY() + spr.yoffset);
+					xoff = (byte) (pic.getOffsetX() + spr.xoffset);
+					yoff = (byte) (pic.getOffsetY() + spr.yoffset);
 					if ((spr.cstat & 4) > 0)
 						xoff = -xoff;
 					if ((spr.cstat & 8) > 0)
@@ -560,16 +566,17 @@ public class Polymost2D extends OrphoRenderer {
 		gl.glEnable(GL_ALPHA_TEST);
 		gl.glEnable(GL_TEXTURE_2D);
 		int method = (globalorientation >> 7) & 3;
-		if(method == 0)
+		if (method == 0)
 			gl.glDisable(GL_BLEND);
-		else gl.glEnable(GL_BLEND);
+		else
+			gl.glEnable(GL_BLEND);
 
-		GLTile pth = textureCache.bind(globalpicnum, globalpal, globalshade, 0, method);
+		GLTile pth = parent.bind(parent.getTextureFormat(), globalpicnum, globalpal, globalshade, 0, method);
 		if (pth == null)
 			return;
 
-		textureCache.unbind(); //deactivate effects
-		textureCache.bind(pth);
+		textureCache.deactivateEffects(); // deactivate effects
+		parent.bind(pth);
 
 		globalx1 = mulscale(globalx1, xyaspect, 16);
 		globaly2 = mulscale(globaly2, xyaspect, 16);
@@ -823,7 +830,11 @@ public class Polymost2D extends OrphoRenderer {
 	}
 
 	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit, float scale) {
+	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+			float scale) {
+
+		if(col < 0)
+			return;
 
 		if (font.type == FontType.Tilemap) {
 			if (palookup[col] == null)
@@ -834,23 +845,23 @@ public class Polymost2D extends OrphoRenderer {
 				return;
 		}
 
-		GLTile atlas = font.getGL(textureCache, col);
+		GLTile atlas = font.getGL(textureCache, parent.getTextureFormat(), col);
 		if (atlas == null)
 			return;
 
 		int opal = globalpal;
 		globalpal = col;
 
-		textureCache.bind(atlas);
+		parent.bind(atlas);
 
 		setpolymost2dview();
 		gl.glDisable(GL_ALPHA_TEST);
-		gl.glDepthMask(GL_FALSE); // disable writing to the z-buffer
+		gl.glDepthMask(false); // disable writing to the z-buffer
 
 		gl.glEnable(GL_TEXTURE_2D);
 		gl.glEnable(GL_BLEND);
 
-		Color polyColor = textureCache.getshadefactor(shade, 0);
+		Color polyColor = parent.getshadefactor(shade, 0);
 		if (bit == Transparent.Bit1)
 			polyColor.a = TRANSLUSCENT1;
 		if (bit == Transparent.Bit2)
@@ -868,10 +879,10 @@ public class Polymost2D extends OrphoRenderer {
 		float txc = font.charsizx / (float) font.sizx, tx;
 		float tyc = font.charsizy / (float) font.sizy, ty;
 
-		if(atlas.isRequireShader()) {
-			textureCache.getShader().setShaderParams(col, shade);
-			textureCache.getShader().shaderDrawLastIndex(false);
-			textureCache.getShader().shaderTransparent(polyColor.a);
+		if (atlas.getPixelFormat() == PixelFormat.Pal8) {
+			parent.getShader().setTextureParams(col, shade);
+			parent.getShader().setDrawLastIndex(false);
+			parent.getShader().setTransparent(polyColor.a);
 		}
 		parent.globalfog.apply();
 
@@ -911,11 +922,11 @@ public class Polymost2D extends OrphoRenderer {
 
 		gl.glEnd();
 
-		gl.glDepthMask(GL_TRUE); // re-enable writing to the z-buffer
+		gl.glDepthMask(true); // re-enable writing to the z-buffer
 
 		globalpal = opal;
 
-		textureCache.unbind();
+		textureCache.deactivateEffects();
 	}
 
 	@Override
@@ -929,9 +940,9 @@ public class Polymost2D extends OrphoRenderer {
 
 		parent.globalfog.apply();
 
-		boolean hasShader = textureCache.isUseShader();
-		if(hasShader)
-			textureCache.getShader().unbind();
+		boolean hasShader = parent.getShader() != null && parent.getShader().isBinded();
+		if (hasShader)
+			parent.getShader().end();
 
 		col = palookup[0][col] & 0xFF;
 		gl.glBegin(GL_LINES);
@@ -940,8 +951,8 @@ public class Polymost2D extends OrphoRenderer {
 		gl.glVertex2f(x2 / 4096.0f, y2 / 4096.0f);
 		gl.glEnd();
 
-		if(hasShader)
-			textureCache.getShader().bind();
+		if (hasShader)
+			parent.getShader().begin();
 	}
 
 	@Override
@@ -973,7 +984,8 @@ public class Polymost2D extends OrphoRenderer {
 			int cx1, int cy1, int cx2, int cy2, int uniqid) {
 
 		int ourxyaspect = xyaspect;
-		if (GLSettings.useModels.get() && parent.defs != null && parent.defs.mdInfo.getHudInfo(picnum, dastat) != null && parent.defs.mdInfo.getHudInfo(picnum, dastat).angadd != 0) {
+		if (GLSettings.useModels.get() && parent.defs != null && parent.defs.mdInfo.getHudInfo(picnum, dastat) != null
+				&& parent.defs.mdInfo.getHudInfo(picnum, dastat).angadd != 0) {
 			Tile2model entry = parent.defs != null ? parent.defs.mdInfo.getParams(picnum) : null;
 			if (entry != null && entry.model != null && entry.framenum >= 0) {
 				dorotatesprite3d(sx, sy, z, a, picnum, dashade, dapalnum, dastat, cx1, cy1, cx2, cy2, uniqid);
@@ -1058,7 +1070,6 @@ public class Polymost2D extends OrphoRenderer {
 			// nasty hacks go here
 			if ((dastat & 8) == 0) {
 				int twice_midcx = (cx1 + cx2) + 2;
-
 
 				// screen x center to sx1, scaled to viewport
 				int scaledxofs = scale(normxofs, scale(xdimen, xdim, oxdim), 320);
@@ -1151,7 +1162,7 @@ public class Polymost2D extends OrphoRenderer {
 			}
 		}
 
-		GLTile pth = textureCache.bind(globalpicnum, globalpal, globalshade, 0, method);
+		GLTile pth = parent.bind(parent.getTextureFormat(), globalpicnum, globalpal, globalshade, 0, method);
 		if (pth == null) // hires texture not found
 			return;
 
@@ -1176,9 +1187,11 @@ public class Polymost2D extends OrphoRenderer {
 		}
 
 		if (GLInfo.texnpot == 0) {
-			for (xx = 1; xx < tsizx; xx += xx);
+			for (xx = 1; xx < tsizx; xx += xx)
+				;
 			ox2 = 1.0f / xx;
-			for (yy = 1; yy < tsizy; yy += yy);
+			for (yy = 1; yy < tsizy; yy += yy)
+				;
 			oy2 = 1.0f / yy;
 		} else {
 			xx = tsizx;
@@ -1198,12 +1211,13 @@ public class Polymost2D extends OrphoRenderer {
 		gl.glEnableClientState(GL_VERTEX_ARRAY);
 		gl.glVertexPointer(2, GL_FLOAT, 0, vertices);
 
-		j = GL_TEXTURE0;
+		j = 0;
 		while (j <= texunits) {
 			if (GLInfo.multisample != 0) {
-				gl.glActiveTexture(j);
-				gl.glClientActiveTexture(j++);
-			} else j++;
+				gl.glActiveTexture(GL_TEXTURE0 + j);
+				gl.glClientActiveTexture(GL_TEXTURE0 + j++);
+			} else
+				j++;
 			gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			gl.glTexCoordPointer(2, GL_FLOAT, 0, textures);
 
@@ -1222,7 +1236,7 @@ public class Polymost2D extends OrphoRenderer {
 		gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		if (GLInfo.multisample != 0) {
-			j = GL_TEXTURE0;
+			j = 0;
 			while (j <= texunits) {
 				gl.glMatrixMode(GL_TEXTURE);
 				gl.glLoadIdentity();
@@ -1230,17 +1244,18 @@ public class Polymost2D extends OrphoRenderer {
 				gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0f);
 				gl.glDisable(GL_TEXTURE_2D);
 
-				gl.glClientActiveTexture(j++);
+				gl.glClientActiveTexture(GL_TEXTURE0 + j++);
 				gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			}
-		} else gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		} else
+			gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		gl.glDisableClientState(GL_VERTEX_ARRAY);
 
 		gl.glMatrixMode(GL_TEXTURE);
 		gl.glPopMatrix();
 
-		textureCache.unbind();
+		textureCache.deactivateEffects();
 	}
 
 	private void dorotatesprite3d(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat,
@@ -1255,7 +1270,8 @@ public class Polymost2D extends OrphoRenderer {
 		hudsprite.reset((byte) 0);
 
 		Hudtyp hudInfo = null;
-		if (parent.defs == null || ((hudInfo = parent.defs.mdInfo.getHudInfo(picnum, dastat)) != null && (hudInfo.flags & 1) != 0))
+		if (parent.defs == null
+				|| ((hudInfo = parent.defs.mdInfo.getHudInfo(picnum, dastat)) != null && (hudInfo.flags & 1) != 0))
 			return; // "HIDE" is specified in DEF
 
 		float ogchang = parent.gchang;
@@ -1315,18 +1331,21 @@ public class Polymost2D extends OrphoRenderer {
 				y1 += fy / 100.0 - 1.0; // -1: top of screen, +1: bottom of screen
 			}
 		}
-		hudsprite.ang = (short) (hudInfo.angadd + globalang);
 
 		if ((dastat & 4) != 0) {
 			x1 = -x1;
 			y1 = -y1;
 		}
 
+		hudsprite.ang = (short) (hudInfo.angadd + globalang);
 		hudsprite.xrepeat = hudsprite.yrepeat = 32;
 
-		hudsprite.x = (int) (((double) parent.gcosang * z1 - (double) parent.gsinang * x1) * 16384.0 + globalposx);
-		hudsprite.y = (int) (((double) parent.gsinang * z1 + (double) parent.gcosang * x1) * 16384.0 + globalposy);
-		hudsprite.z = (int) (globalposz + y1 * 16384.0 * 0.8);
+		float cos = parent.gcosang * 16.0f;
+		float sin = parent.gsinang * 16.0f;
+
+		hudsprite.x = (int) ((cos * z1 - sin * x1) * 1024.0f + globalposx);
+		hudsprite.y = (int) ((sin * z1 + cos * x1) * 1024.0f + globalposy);
+		hudsprite.z = (int) (globalposz + y1 * 16384.0f * 0.8f);
 
 		hudsprite.picnum = (short) picnum;
 		hudsprite.shade = (byte) dashade;
@@ -1343,18 +1362,25 @@ public class Polymost2D extends OrphoRenderer {
 
 		gl.glMatrixMode(GL_PROJECTION);
 
+		float f = 1.0f;
+		if (hudInfo.fov != -1)
+			f = (float) (1.0 / Math.tan((hudInfo.fov * 2.56) * ((0.5 * Math.PI) * (1.0 / 2048.0))));
+
 		if ((dastat & 10) == 2) {
 			float ratioratio = (float) xdim / ydim;
-			parent.matrix[0][0] = ydimen * (ratioratio >= 1.6f ? 1.2f : 1);
+
+			parent.matrix[0][0] = f * ydimen * (ratioratio >= 1.6f ? 1.2f : 1);
 			parent.matrix[0][2] = 1.0f;
-			parent.matrix[1][1] = xdimen;
+			parent.matrix[1][1] = f * xdimen;
 			parent.matrix[1][2] = 1.0f;
 			parent.matrix[2][2] = 1.0f;
 			parent.matrix[2][3] = ydimen * (ratioratio >= 1.6f ? 1.2f : 1);
 			parent.matrix[3][2] = -1.0f;
 		} else {
 			parent.matrix[0][0] = parent.matrix[2][3] = 1.0f;
-			parent.matrix[1][1] = ((float) xdim) / ((float) ydim);
+			parent.matrix[0][0] *= f;
+			parent.matrix[1][1] = (float) xdim / ydim;
+			parent.matrix[1][1] *= f;
 			parent.matrix[2][2] = 1.0001f;
 			parent.matrix[3][2] = 1 - parent.matrix[2][2];
 		}
@@ -1370,7 +1396,7 @@ public class Polymost2D extends OrphoRenderer {
 		}
 
 		parent.globalorientation = hudsprite.cstat;
-		parent.mdrenderer.mddraw(hudsprite, 0, 0);
+		parent.mdrenderer.mddraw(parent.modelManager.getModel(picnum, dapalnum), hudsprite, 0, 0);
 
 		viewingrange = oldviewingrange;
 		parent.gxyaspect = ogxyaspect;
@@ -1384,6 +1410,7 @@ public class Polymost2D extends OrphoRenderer {
 
 	@Override
 	public void init() {
+		this.gl = parent.gl;
 	}
 
 	@Override
@@ -1403,5 +1430,6 @@ public class Polymost2D extends OrphoRenderer {
 	}
 
 	@Override
-	public void nextpage() {};
+	public void nextpage() {
+	}
 }

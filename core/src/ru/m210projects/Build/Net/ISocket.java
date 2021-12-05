@@ -17,7 +17,7 @@
 package ru.m210projects.Build.Net;
 
 public interface ISocket {
-	public Object recvfrom (byte[] dabuf, int bufsiz);
-	public void sendto (Object sockaddr, byte[] dabuf, int bufsiz);
-	public void dispose();	
+	Object recvfrom(byte[] dabuf, int bufsiz);
+	void sendto(Object sockaddr, byte[] dabuf, int bufsiz);
+	void dispose();
 }

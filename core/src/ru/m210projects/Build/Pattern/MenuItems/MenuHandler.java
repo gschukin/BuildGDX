@@ -155,7 +155,7 @@ public abstract class MenuHandler {
 		int xdim = (4 * ydim) / 3;
 		int normxofs = x - oxdim / 2;
 		int touchX = scale(normxofs, 320, xdim) + 320 / 2;
-		int touchY = (int) mulscale(y, divscale(200, ydim, 16), 16);
+		int touchY = mulscale(y, divscale(200, ydim, 16), 16);
 
 		for(short i = 0; i < pMenu.m_pItems.length; i++)
 		{

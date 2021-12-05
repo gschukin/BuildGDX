@@ -21,50 +21,50 @@ import java.nio.ByteBuffer;
 
 public interface Resource extends Closeable {
 
-	public static enum Whence { Set, Current, End };
-	
-	public String getFullName();
+	enum Whence { Set, Current, End }
 
-	public String getExtension();
+    String getFullName();
+
+	String getExtension();
 	
-	public Group getParent();
+	Group getParent();
 	
-	public void close();
+	void close();
 	
-	public boolean isClosed();
+	boolean isClosed();
 	
-	public int seek(long offset, Whence whence);
+	int seek(long offset, Whence whence);
 	
-	public int read(byte[] buf, int offset, int len);
+	int read(byte[] buf, int offset, int len);
 	
-	public int read(byte[] buf);
+	int read(byte[] buf);
 	
-	public int read(ByteBuffer bb, int offset, int len);
+	int read(ByteBuffer bb, int offset, int len);
 	
-	public String readString(int len);
+	String readString(int len);
 	
-	public Integer readInt();
+	Integer readInt();
 	
-	public Short readShort();
+	Short readShort();
 	
-	public Byte readByte();
+	Byte readByte();
 	
-	public Boolean readBoolean();
+	Boolean readBoolean();
 	
-	public Long readLong();
+	Long readLong();
 	
-	public Float readFloat();
+	Float readFloat();
 	
-	public int size();
+	int size();
 	
-	public int position();
+	int position();
 	
-	public int remaining();
+	int remaining();
 	
-	public boolean hasRemaining();
+	boolean hasRemaining();
 	
-	public void toMemory();
+	void toMemory();
 	
-	public byte[] getBytes();
+	byte[] getBytes();
 
 }

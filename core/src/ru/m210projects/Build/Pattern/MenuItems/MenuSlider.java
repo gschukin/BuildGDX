@@ -45,7 +45,7 @@ public class MenuSlider extends MenuItem {
 	private int touchX;
 	private boolean isTouched;
 	private static MenuSlider touchedObj;
-	private SliderDrawable slider;
+	private final SliderDrawable slider;
 	
 	public MenuSlider(SliderDrawable slider, Object text, BuildFont textStyle, int x, int y, int width, int value, int min, int max, 
 			int step, MenuProc callback, boolean digital) {

@@ -39,7 +39,7 @@ public class HMIMIDIP {
 		byte[] tmp = new byte[32];
 		bb.get(tmp);
 
-		int TRACK_OFFSET = -1;
+		int TRACK_OFFSET;
 		String signature = new String(tmp, 0, 32);
 		int index = signature.indexOf((char) 0);
 		signature = signature.substring(0, index).toUpperCase();

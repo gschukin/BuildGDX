@@ -7,10 +7,18 @@ import ru.m210projects.Build.Gameutils;
 
 public class BufferResource extends ByteArrayOutputStream {
 
-	private static byte[] tmpbuf = new byte[1024];
+	private static final byte[] tmpbuf = new byte[1024];
+
+	public BufferResource() {
+		super();
+	}
+
+	public BufferResource(int size) {
+		super(size);
+	}
 
 	public int writeBytes(Object array) {
-		int len = 0;
+		int len;
 		if (array instanceof byte[])
 			len = ((byte[]) array).length;
 		else if (array instanceof ByteBuffer)
@@ -94,7 +102,7 @@ public class BufferResource extends ByteArrayOutputStream {
 	public int writeBoolean(boolean value) {
 		return writeByte(value ? 1 : 0);
 	}
-	
+
 	public int writeByte(int value) {
 		tmpbuf[0] = (byte) value;
 
@@ -103,7 +111,7 @@ public class BufferResource extends ByteArrayOutputStream {
 	}
 
 	public int writeShort(int value) {
-		tmpbuf[0] = (byte) ((value >>> 0) & 0xFF);
+		tmpbuf[0] = (byte) ((value) & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
 
 		this.write(tmpbuf, 0, 2);
@@ -111,7 +119,7 @@ public class BufferResource extends ByteArrayOutputStream {
 	}
 
 	public int writeInt(int value) {
-		tmpbuf[0] = (byte) ((value >>> 0) & 0xFF);
+		tmpbuf[0] = (byte) ((value) & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
 		tmpbuf[2] = (byte) ((value >>> 16) & 0xFF);
 		tmpbuf[3] = (byte) ((value >>> 24) & 0xFF);
@@ -121,7 +129,7 @@ public class BufferResource extends ByteArrayOutputStream {
 	}
 
 	public int writeLong(long value) {
-		tmpbuf[0] = (byte) ((value >>> 0) & 0xFF);
+		tmpbuf[0] = (byte) ((value) & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
 		tmpbuf[2] = (byte) ((value >>> 16) & 0xFF);
 		tmpbuf[3] = (byte) ((value >>> 24) & 0xFF);
@@ -129,11 +137,18 @@ public class BufferResource extends ByteArrayOutputStream {
 		tmpbuf[5] = (byte) ((value >>> 40) & 0xFF);
 		tmpbuf[6] = (byte) ((value >>> 48) & 0xFF);
 		tmpbuf[7] = (byte) ((value >>> 56) & 0xFF);
-		
+
 		this.write(tmpbuf, 0, 8);
 		return 8;
 	}
 
+	public void skip(int count) {
+		tmpbuf[0] = 0;
+		while (count-- > 0)
+			this.write(tmpbuf, 0, 1);
+	}
+
+	@Override
 	public int size() {
 		return count;
 	}

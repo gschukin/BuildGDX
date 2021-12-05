@@ -1,15 +1,18 @@
 package ru.m210projects.Build.Render.TextureHandle;
 
-import static com.badlogic.gdx.graphics.GL20.*;
+import static com.badlogic.gdx.graphics.GL20.GL_LUMINANCE;
+import static com.badlogic.gdx.graphics.GL20.GL_RGB;
+import static com.badlogic.gdx.graphics.GL20.GL_RGBA;
+import static com.badlogic.gdx.graphics.GL20.GL_UNSIGNED_BYTE;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import ru.m210projects.Build.Render.Types.TextureBuffer;
 import ru.m210projects.Build.Types.Tile;
 
 public class IndexedTileData extends TileData {
 
-	public final TextureBuffer data;
+	public final ByteBuffer data;
 	public final boolean hasalpha;
 	public final int width, height;
 	public final boolean clamped;
@@ -19,34 +22,34 @@ public class IndexedTileData extends TileData {
 		int tsizx = tile.getWidth();
 		int tsizy = tile.getHeight();
 
-		if(data != null && (data.length == 0 || tile.getSize() > data.length))
+		if (data != null && (data.length == 0 || tile.getSize() > data.length))
 			data = null;
 
 		int xsiz = tsizx;
 		int ysiz = tsizy;
-		if((expflag & 1) != 0)
+		if ((expflag & 1) != 0)
 			xsiz = calcSize(tsizx);
-		if((expflag & 2) != 0)
+		if ((expflag & 2) != 0)
 			ysiz = calcSize(tsizy);
 
-		TextureBuffer buffer = getTmpBuffer(xsiz * ysiz);
-		buffer.clear();
+		ByteBuffer buffer = ByteBuffer.allocateDirect(data != null ? xsiz * ysiz : 1).order(ByteOrder.LITTLE_ENDIAN);
 
 		boolean hasalpha = false;
 		if (data == null) {
-			buffer.put(0, (byte) 0);
-			tsizx = tsizy = 1;
+			buffer.put(0, (byte) 255);
+			// tsizx = tsizy = 1;
 			hasalpha = true;
+			// if (buffer.getBuffer().capacity() < xsiz * ysiz)
+			xsiz = ysiz = 1;
 		} else {
-			int dptr = 0;
+			int dptr;
 			int sptr = 0;
-			int xoffs = xsiz;
-			if(clamped) {
-				for (int y = (ysiz - 1); y >= 0; y--) {
+			if (clamped) {
+				for (int y = ysiz - 1; y >= 0; y--) {
 					sptr = y >= tsizy ? 0 : tsizx;
-					dptr = (xsiz * y + (sptr - 1));
+					dptr = (xsiz * y + sptr);
 					for (int x = sptr; x < xsiz; x++)
-						buffer.put(dptr++, (byte) 0);
+						buffer.put(dptr++, (byte) 255);
 				}
 
 				sptr = 0;
@@ -54,23 +57,23 @@ public class IndexedTileData extends TileData {
 					dptr = i;
 					for (j = 0; j < tsizy; j++) {
 						buffer.put(dptr, data[sptr++]);
-						dptr += xoffs;
+						dptr += xsiz;
 					}
 				}
 				hasalpha = true;
-			}
-			else
-			{
+			} else {
 				int p, len = data.length;
-				for (int i = 0, j; i < xoffs; i++) {
+				for (int i = 0, j; i < xsiz; i++) {
 					p = 0;
 					dptr = i;
 					for (j = 0; j < ysiz; j++) {
 						buffer.put(dptr, data[sptr + p++]);
-						dptr += xoffs;
-						if(p >= tsizy) p = 0;
+						dptr += xsiz;
+						if (p >= tsizy)
+							p = 0;
 					}
-					if((sptr += tsizy) >= len) sptr = 0;
+					if ((sptr += tsizy) >= len)
+						sptr = 0;
 				}
 			}
 		}
@@ -89,7 +92,8 @@ public class IndexedTileData extends TileData {
 
 	@Override
 	public ByteBuffer getPixels() {
-		return data.getBuffer();
+		data.rewind();
+		return data;
 	}
 
 	@Override
@@ -99,7 +103,7 @@ public class IndexedTileData extends TileData {
 
 	@Override
 	public int getGLFormat() {
-		return GL_LUMINANCE; //GL_RED;
+		return GL_LUMINANCE; // GL_RED;
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class UDPSocket implements ISocket {
 
 	public DatagramChannel sock;
 	public int port;
-	private ByteBuffer buf = ByteBuffer.allocate(MAXPAKSIZ);
+	private final ByteBuffer buf = ByteBuffer.allocate(MAXPAKSIZ);
 	
 	public UDPSocket(int port) throws IOException
 	{
