@@ -411,7 +411,7 @@ public abstract class Engine {
 	}
 
 	public int animateoffs(int tilenum, int nInfo) { // jfBuild + gdxBuild
-		int clock, index = 0;
+		long clock, index = 0;
 
 		int speed = getTile(tilenum).getSpeed();
 		if ((nInfo & 0xC000) == 0x8000) { // sprite
@@ -420,7 +420,7 @@ public abstract class Engine {
 			shortbuf[0] = (byte) ((nInfo) & 0xFF);
 			shortbuf[1] = (byte) ((nInfo >>> 8) & 0xFF);
 
-			clock = (int) ((totalclocklock + CRC32.getChecksum(shortbuf)) >> speed);
+			clock = (totalclocklock + CRC32.getChecksum(shortbuf)) >> speed;
 		} else
 			clock = totalclocklock >> speed;
 
@@ -443,7 +443,7 @@ public abstract class Engine {
 				break;
 			}
 		}
-		return index;
+		return (int) index;
 	}
 
 	public void initksqrt() { // jfBuild
