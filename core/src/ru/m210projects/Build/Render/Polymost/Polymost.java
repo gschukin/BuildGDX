@@ -191,12 +191,8 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.WALL;
 
 public class Polymost implements GLRenderer {
 
@@ -1755,7 +1751,7 @@ public class Polymost implements GLRenderer {
 						if ((spr.cstat & (64 + 48)) != (64 + 16) || dmulscale(sintable[(spr.ang + 512) & 2047], -xs,
 								sintable[spr.ang & 2047], -ys, 6) > 0) {
 							if (tsprite[spritesortcnt] == null)
-								tsprite[spritesortcnt] = new SPRITE();
+								tsprite[spritesortcnt] = new TSprite();
 							tsprite[spritesortcnt].set(sprite[z]);
 
 							tsprite[spritesortcnt++].owner = (short) z;
@@ -2742,7 +2738,7 @@ public class Polymost implements GLRenderer {
 
 		tspr = tspriteptr[snum];
 
-		if (tspr.owner < 0 || tspr.picnum < 0 || tspr.picnum >= MAXTILES || tspr.sectnum < 0)
+		if (tspr.owner < 0 || tspr.picnum < 0 || tspr.picnum >= MAXTILES || tspr.getSectnum() < 0)
 			return;
 
 		globalpicnum = tspr.picnum;
@@ -2794,7 +2790,7 @@ public class Polymost implements GLRenderer {
 			if (GLSettings.useModels.get()) {
 				GLModel md = modelManager.getModel(globalpicnum, globalpal);
 				if (md != null) {
-					calc_and_apply_fog(shade, sector[tspr.sectnum].visibility, sector[tspr.sectnum].floorpal);
+					calc_and_apply_fog(shade, sector[tspr.getSectnum()].visibility, sector[tspr.getSectnum()].floorpal);
 
 					if (tspr.owner < 0 || tspr.owner >= MAXSPRITES /* || tspr.statnum == TSPR_MIRROR */ ) {
 						if (mdrenderer.mddraw(md, tspr, xoff, yoff) != 0)
@@ -2813,7 +2809,7 @@ public class Polymost implements GLRenderer {
 				if (dist < 48000L * 48000L) {
 					GLVoxel vox = (GLVoxel) modelManager.getVoxel(globalpicnum);
 					if (vox != null) {
-						calc_and_apply_fog(shade, sector[tspr.sectnum].visibility, sector[tspr.sectnum].floorpal);
+						calc_and_apply_fog(shade, sector[tspr.getSectnum()].visibility, sector[tspr.getSectnum()].floorpal);
 
 						if ((tspr.cstat & 48) != 48) {
 							if (mdrenderer.voxdraw(vox, tspr) != 0)
@@ -2832,7 +2828,7 @@ public class Polymost implements GLRenderer {
 		}
 
 		rendering = Rendering.Sprite.setIndex(snum);
-		calc_and_apply_fog(shade, sector[tspr.sectnum].visibility, sector[tspr.sectnum].floorpal);
+		calc_and_apply_fog(shade, sector[tspr.getSectnum()].visibility, sector[tspr.getSectnum()].floorpal);
 
 //		if (sprext != null) {
 //			if ((sprext.flags & SPREXT_AWAY1) != 0) {
@@ -2944,13 +2940,13 @@ public class Polymost implements GLRenderer {
 
 			// Clip sprites to ceilings/floors when no parallaxing and not
 			// sloped
-			if ((sector[tspr.sectnum].ceilingstat & 3) == 0) {
-				sy0 = ((sector[tspr.sectnum].ceilingz - globalposz)) * gyxscale * ryp0 + ghoriz;
+			if ((sector[tspr.getSectnum()].ceilingstat & 3) == 0) {
+				sy0 = ((sector[tspr.getSectnum()].ceilingz - globalposz)) * gyxscale * ryp0 + ghoriz;
 				if (dsprite[0].py < sy0)
 					dsprite[0].py = dsprite[1].py = sy0;
 			}
-			if ((sector[tspr.sectnum].floorstat & 3) == 0) {
-				sy0 = ((sector[tspr.sectnum].floorz - globalposz)) * gyxscale * ryp0 + ghoriz;
+			if ((sector[tspr.getSectnum()].floorstat & 3) == 0) {
+				sy0 = ((sector[tspr.getSectnum()].floorz - globalposz)) * gyxscale * ryp0 + ghoriz;
 				if (dsprite[2].py > sy0)
 					dsprite[2].py = dsprite[3].py = sy0;
 			}
@@ -3074,17 +3070,17 @@ public class Polymost implements GLRenderer {
 			}
 
 			// Clip sprites to ceilings/floors when no parallaxing
-			if (tspr.sectnum != -1 && (sector[tspr.sectnum].ceilingstat & 1) == 0) {
+			if (tspr.getSectnum() != -1 && (sector[tspr.getSectnum()].ceilingstat & 1) == 0) {
 				f = ((float) tspr.yrepeat) * (float) tsizy * 4;
-				if (sector[tspr.sectnum].ceilingz > tspr.z - f) {
-					sc0 = ((sector[tspr.sectnum].ceilingz - globalposz)) * ryp0 + ghoriz;
-					sc1 = ((sector[tspr.sectnum].ceilingz - globalposz)) * ryp1 + ghoriz;
+				if (sector[tspr.getSectnum()].ceilingz > tspr.z - f) {
+					sc0 = ((sector[tspr.getSectnum()].ceilingz - globalposz)) * ryp0 + ghoriz;
+					sc1 = ((sector[tspr.getSectnum()].ceilingz - globalposz)) * ryp1 + ghoriz;
 				}
 			}
-			if (tspr.sectnum != -1 && (sector[tspr.sectnum].floorstat & 1) == 0) {
-				if (sector[tspr.sectnum].floorz < tspr.z) {
-					sf0 = ((sector[tspr.sectnum].floorz - globalposz)) * ryp0 + ghoriz;
-					sf1 = ((sector[tspr.sectnum].floorz - globalposz)) * ryp1 + ghoriz;
+			if (tspr.getSectnum() != -1 && (sector[tspr.getSectnum()].floorstat & 1) == 0) {
+				if (sector[tspr.getSectnum()].floorz < tspr.z) {
+					sf0 = ((sector[tspr.getSectnum()].floorz - globalposz)) * ryp0 + ghoriz;
+					sf1 = ((sector[tspr.getSectnum()].floorz - globalposz)) * ryp1 + ghoriz;
 				}
 			}
 
@@ -3531,7 +3527,7 @@ public class Polymost implements GLRenderer {
 							swapsprite(k, l, true);
 				for (k = i + 1; k < j; k++)
 					for (l = i; l < k; l++) {
-						if (tspriteptr[k].statnum < tspriteptr[l].statnum)
+						if (tspriteptr[k].getStatnum() < tspriteptr[l].getStatnum())
 							swapsprite(k, l, false);
 						if ((tspriteptr[k].cstat & 2) != 0) // transparent sort
 							swapsprite(k, l, true);
@@ -3841,7 +3837,7 @@ public class Polymost implements GLRenderer {
 
 	public int nearwall(int i, int range) {
 		SPRITE spr = sprite[i];
-		short sectnum = spr.sectnum;
+		short sectnum = spr.getSectnum();
 		int xs = spr.x;
 		int ys = spr.y;
 
@@ -3930,7 +3926,7 @@ public class Polymost implements GLRenderer {
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
 					SPRITE spr = sprite[i];
-					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.statnum == MAXSTATUS)
+					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
 					addSpriteCorr(i);

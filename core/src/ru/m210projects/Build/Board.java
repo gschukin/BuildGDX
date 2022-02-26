@@ -113,7 +113,7 @@ public abstract class Board {
 			sprite[i] = new SPRITE();
 			prevspritesect[i] = (short) (i - 1);
 			nextspritesect[i] = (short) (i + 1);
-			sprite[i].sectnum = (short) getMaxSectors();
+			sprite[i].setSectnum(getMaxSectors());
 		}
 		prevspritesect[0] = -1;
 		nextspritesect[getMaxSprites() - 1] = -1;
@@ -123,7 +123,7 @@ public abstract class Board {
 		for (int i = 0; i < getMaxSprites(); i++) {
 			prevspritestat[i] = (short) (i - 1);
 			nextspritestat[i] = (short) (i + 1);
-			sprite[i].statnum = (short) MAXSTATUS;
+			sprite[i].setStatnum(MAXSTATUS);
 		}
 		prevspritestat[0] = -1;
 		nextspritestat[getMaxSprites() - 1] = -1;
@@ -157,7 +157,7 @@ public abstract class Board {
 			prevspritesect[headspritesect[sectnum]] = blanktouse;
 		headspritesect[sectnum] = blanktouse;
 
-		sprite[blanktouse].sectnum = sectnum;
+		sprite[blanktouse].setSectnum(sectnum);
 
 		return (blanktouse);
 	}
@@ -178,7 +178,7 @@ public abstract class Board {
 			prevspritestat[headspritestat[newstatnum]] = blanktouse;
 		headspritestat[newstatnum] = blanktouse;
 
-		sprite[blanktouse].statnum = newstatnum;
+		sprite[blanktouse].setStatnum(newstatnum);
 
 		return (blanktouse);
 	}
@@ -196,9 +196,9 @@ public abstract class Board {
 	public boolean changespritesect(short spritenum, short newsectnum) {
 		if ((newsectnum < 0) || (newsectnum > getMaxSectors()))
 			return false;
-		if (sprite[spritenum].sectnum == newsectnum)
+		if (sprite[spritenum].getSectnum() == newsectnum)
 			return true;
-		if (sprite[spritenum].sectnum == getMaxSectors())
+		if (sprite[spritenum].getSectnum() == getMaxSectors())
 			return false;
 		if (!deletespritesect(spritenum))
 			return false;
@@ -209,9 +209,9 @@ public abstract class Board {
 	public boolean changespritestat(short spritenum, short newstatnum) {
 		if ((newstatnum < 0) || (newstatnum > MAXSTATUS))
 			return false;
-		if (sprite[spritenum].statnum == newstatnum)
+		if (sprite[spritenum].getStatnum() == newstatnum)
 			return true;
-		if (sprite[spritenum].statnum == MAXSTATUS)
+		if (sprite[spritenum].getStatnum() == MAXSTATUS)
 			return false;
 		if (!deletespritestat(spritenum))
 			return false;
@@ -220,11 +220,11 @@ public abstract class Board {
 	}
 
 	public boolean deletespritesect(short spritenum) {
-		if (sprite[spritenum].sectnum == getMaxSectors())
+		if (sprite[spritenum].getSectnum() == getMaxSectors())
 			return false;
 
-		if (headspritesect[sprite[spritenum].sectnum] == spritenum)
-			headspritesect[sprite[spritenum].sectnum] = nextspritesect[spritenum];
+		if (headspritesect[sprite[spritenum].getSectnum()] == spritenum)
+			headspritesect[sprite[spritenum].getSectnum()] = nextspritesect[spritenum];
 
 		if (prevspritesect[spritenum] >= 0)
 			nextspritesect[prevspritesect[spritenum]] = nextspritesect[spritenum];
@@ -237,16 +237,16 @@ public abstract class Board {
 		nextspritesect[spritenum] = headspritesect[getMaxSectors()];
 		headspritesect[getMaxSectors()] = spritenum;
 
-		sprite[spritenum].sectnum = (short) getMaxSectors();
+		sprite[spritenum].setSectnum(getMaxSectors());
 		return true;
 	}
 
 	public boolean deletespritestat(short spritenum) {
-		if (sprite[spritenum].statnum == MAXSTATUS)
+		if (sprite[spritenum].getStatnum() == MAXSTATUS)
 			return false;
 
-		if (headspritestat[sprite[spritenum].statnum] == spritenum)
-			headspritestat[sprite[spritenum].statnum] = nextspritestat[spritenum];
+		if (headspritestat[sprite[spritenum].getStatnum()] == spritenum)
+			headspritestat[sprite[spritenum].getStatnum()] = nextspritestat[spritenum];
 
 		if (prevspritestat[spritenum] >= 0)
 			nextspritestat[prevspritestat[spritenum]] = nextspritestat[spritenum];
@@ -259,7 +259,7 @@ public abstract class Board {
 		nextspritestat[spritenum] = headspritestat[MAXSTATUS];
 		headspritestat[MAXSTATUS] = spritenum;
 
-		sprite[spritenum].statnum = MAXSTATUS;
+		sprite[spritenum].setStatnum(MAXSTATUS);
 		return true;
 	}
 
@@ -268,14 +268,14 @@ public abstract class Board {
 		sprite[spritenum].y = newy;
 		sprite[spritenum].z = newz;
 
-		short tempsectnum = sprite[spritenum].sectnum;
+		short tempsectnum = sprite[spritenum].getSectnum();
 		if (SETSPRITEZ == 1)
 			tempsectnum = updatesectorz(newx, newy, newz, tempsectnum);
 		else
 			tempsectnum = updatesector(newx, newy, tempsectnum);
 		if (tempsectnum < 0)
 			return false;
-		if (tempsectnum != sprite[spritenum].sectnum)
+		if (tempsectnum != sprite[spritenum].getSectnum())
 			changespritesect(spritenum, tempsectnum);
 
 		return true;

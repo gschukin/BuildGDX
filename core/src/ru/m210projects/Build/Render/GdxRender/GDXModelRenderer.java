@@ -115,8 +115,8 @@ public class GDXModelRenderer {
 
 	private int getVisibility(SPRITE tspr) {
 		int vis = globalvisibility;
-		if (sector[tspr.sectnum].visibility != 0)
-			vis = mulscale(globalvisibility, (sector[tspr.sectnum].visibility + 16) & 0xFF, 4);
+		if (sector[tspr.getSectnum()].visibility != 0)
+			vis = mulscale(globalvisibility, (sector[tspr.getSectnum()].visibility + 16) & 0xFF, 4);
 		return vis;
 	}
 

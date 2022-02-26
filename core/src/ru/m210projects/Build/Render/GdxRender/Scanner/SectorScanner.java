@@ -14,11 +14,8 @@ import com.badlogic.gdx.math.Vector3;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Pragmas;
-import ru.m210projects.Build.Types.QuickSort;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.QuickSort.IntComparator;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.WALL;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
 import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
@@ -69,7 +66,7 @@ public abstract class SectorScanner {
 
 		portqueue = new WallFrustum3d[512];
 		queuemask = portqueue.length - 1;
-		tsprite = new SPRITE[MAXSPRITESONSCREEN + 1];
+		tsprite = new TSprite[MAXSPRITESONSCREEN + 1];
 
 		gotviewport = new WallFrustum3d[MAXSECTORS];
 		skyviewport = new WallFrustum3d[MAXSECTORS];
@@ -434,7 +431,7 @@ public abstract class SectorScanner {
 
 	private SPRITE addTSprite() {
 		if (tsprite[spritesortcnt] == null)
-			tsprite[spritesortcnt] = new SPRITE();
+			tsprite[spritesortcnt] = new TSprite();
 		return tsprite[spritesortcnt++];
 	}
 
@@ -504,7 +501,7 @@ public abstract class SectorScanner {
 		return spritesortcnt;
 	}
 
-	public SPRITE[] getSprites() {
+	public TSprite[] getSprites() {
 		return tsprite;
 	}
 

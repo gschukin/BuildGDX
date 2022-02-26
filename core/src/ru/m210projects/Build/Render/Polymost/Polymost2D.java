@@ -97,13 +97,9 @@ import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.Hudtyp;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.WALL;
 
 public class Polymost2D extends OrphoRenderer {
 
@@ -244,7 +240,7 @@ public class Polymost2D extends OrphoRenderer {
 								continue;
 
 							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new SPRITE();
+								tsprite[sortnum] = new TSprite();
 							tsprite[sortnum].set(sprite[i]);
 							tsprite[sortnum++].owner = (short) i;
 						}
@@ -260,7 +256,7 @@ public class Polymost2D extends OrphoRenderer {
 								continue;
 
 							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new SPRITE();
+								tsprite[sortnum] = new TSprite();
 							tsprite[sortnum].set(sprite[i]);
 							tsprite[sortnum++].owner = (short) i;
 						}
@@ -477,10 +473,10 @@ public class Polymost2D extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((sector[spr.sectnum].ceilingstat & 1) > 0)
-						globalshade = (sector[spr.sectnum].ceilingshade);
+					if ((sector[spr.getSectnum()].ceilingstat & 1) > 0)
+						globalshade = (sector[spr.getSectnum()].ceilingshade);
 					else
-						globalshade = (sector[spr.sectnum].floorshade);
+						globalshade = (sector[spr.getSectnum()].floorshade);
 					globalshade = max(min(globalshade + spr.shade + 6, numshades - 1), 0);
 
 					// relative alignment stuff

@@ -9,7 +9,6 @@ import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Pragmas.klabs;
 import static ru.m210projects.Build.Pragmas.mulscale;
 
-import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Types.SECTOR;
 import ru.m210projects.Build.Types.SPRITE;
 import ru.m210projects.Build.Types.WALL;
@@ -102,7 +101,7 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 	public int getPlayerZoom(int player, int czoom) {
 		SPRITE pPlayer = sprite[getPlayerSprite(player)];
 		int nZoom = mulscale(yxaspect,
-				czoom * (klabs((sector[pPlayer.sectnum].floorz - pPlayer.z) >> 8) + pPlayer.yrepeat), 16);
+				czoom * (klabs((sector[pPlayer.getSectnum()].floorz - pPlayer.z) >> 8) + pPlayer.yrepeat), 16);
 		return BClipRange(nZoom, 22000, 0x20000);
 	}
 

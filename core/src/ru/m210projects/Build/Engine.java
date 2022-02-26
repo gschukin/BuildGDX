@@ -67,18 +67,7 @@ import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Settings.BuildSettings;
-import ru.m210projects.Build.Types.BuildPos;
-import ru.m210projects.Build.Types.Hitscan;
-import ru.m210projects.Build.Types.InvalidVersionException;
-import ru.m210projects.Build.Types.Neartag;
-import ru.m210projects.Build.Types.Palette;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.SmallTextFont;
-import ru.m210projects.Build.Types.TextFont;
-import ru.m210projects.Build.Types.Tile;
-import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.*;
 
 public abstract class Engine {
 
@@ -289,7 +278,7 @@ public abstract class Engine {
 	public static SECTOR[] sector;
 	public static WALL[] wall;
 	public static SPRITE[] sprite;
-	public static SPRITE[] tsprite;
+	public static TSprite[] tsprite;
 	protected Tile[] tiles;
 
 	public static short[] headspritesect, headspritestat;
@@ -689,7 +678,7 @@ public abstract class Engine {
 			prevspritesect[headspritesect[sectnum]] = blanktouse;
 		headspritesect[sectnum] = blanktouse;
 
-		sprite[blanktouse].sectnum = (short) sectnum;
+		sprite[blanktouse].setSectnum(sectnum);
 
 		return (blanktouse);
 	}
@@ -711,7 +700,7 @@ public abstract class Engine {
 			prevspritestat[headspritestat[newstatnum]] = blanktouse;
 		headspritestat[newstatnum] = blanktouse;
 
-		sprite[blanktouse].statnum = (short) newstatnum;
+		sprite[blanktouse].setStatnum(newstatnum);
 
 		return (blanktouse);
 	}
@@ -735,9 +724,9 @@ public abstract class Engine {
 	{
 		if ((newsectnum < 0) || (newsectnum > MAXSECTORS))
 			return (-1);
-		if (sprite[spritenum].sectnum == newsectnum)
+		if (sprite[spritenum].getSectnum() == newsectnum)
 			return (0);
-		if (sprite[spritenum].sectnum == MAXSECTORS)
+		if (sprite[spritenum].getSectnum() == MAXSECTORS)
 			return (-1);
 		if (deletespritesect((short) spritenum) < 0)
 			return (-1);
@@ -749,9 +738,9 @@ public abstract class Engine {
 	{
 		if ((newstatnum < 0) || (newstatnum > MAXSTATUS))
 			return (-1);
-		if (sprite[spritenum].statnum == newstatnum)
+		if (sprite[spritenum].getStatnum() == newstatnum)
 			return (0);
-		if (sprite[spritenum].statnum == MAXSTATUS)
+		if (sprite[spritenum].getStatnum() == MAXSTATUS)
 			return (-1);
 		if (deletespritestat((short) spritenum) < 0)
 			return (-1);
@@ -761,11 +750,11 @@ public abstract class Engine {
 
 	public short deletespritesect(int spritenum) // jfBuild
 	{
-		if (sprite[spritenum].sectnum == MAXSECTORS)
+		if (sprite[spritenum].getSectnum() == MAXSECTORS)
 			return (-1);
 
-		if (headspritesect[sprite[spritenum].sectnum] == spritenum)
-			headspritesect[sprite[spritenum].sectnum] = nextspritesect[spritenum];
+		if (headspritesect[sprite[spritenum].getSectnum()] == spritenum)
+			headspritesect[sprite[spritenum].getSectnum()] = nextspritesect[spritenum];
 
 		if (prevspritesect[spritenum] >= 0)
 			nextspritesect[prevspritesect[spritenum]] = nextspritesect[spritenum];
@@ -778,17 +767,17 @@ public abstract class Engine {
 		nextspritesect[spritenum] = headspritesect[MAXSECTORS];
 		headspritesect[MAXSECTORS] = (short) spritenum;
 
-		sprite[spritenum].sectnum = (short) MAXSECTORS;
+		sprite[spritenum].setSectnum(MAXSECTORS);
 		return (0);
 	}
 
 	public short deletespritestat(int spritenum) // jfBuild
 	{
-		if (sprite[spritenum].statnum == MAXSTATUS)
+		if (sprite[spritenum].getStatnum() == MAXSTATUS)
 			return (-1);
 
-		if (headspritestat[sprite[spritenum].statnum] == spritenum)
-			headspritestat[sprite[spritenum].statnum] = nextspritestat[spritenum];
+		if (headspritestat[sprite[spritenum].getStatnum()] == spritenum)
+			headspritestat[sprite[spritenum].getStatnum()] = nextspritestat[spritenum];
 
 		if (prevspritestat[spritenum] >= 0)
 			nextspritestat[prevspritestat[spritenum]] = nextspritestat[spritenum];
@@ -801,7 +790,7 @@ public abstract class Engine {
 		nextspritestat[spritenum] = headspritestat[MAXSTATUS];
 		headspritestat[MAXSTATUS] = (short) spritenum;
 
-		sprite[spritenum].statnum = MAXSTATUS;
+		sprite[spritenum].setStatnum(MAXSTATUS);
 		return (0);
 	}
 
@@ -979,7 +968,7 @@ public abstract class Engine {
 		sector = new SECTOR[MAXSECTORS];
 		wall = new WALL[MAXWALLS];
 		sprite = new SPRITE[MAXSPRITES];
-		tsprite = new SPRITE[MAXSPRITESONSCREEN + 1];
+		tsprite = new TSprite[MAXSPRITESONSCREEN + 1];
 		headspritesect = new short[MAXSECTORS + 1];
 		headspritestat = new short[MAXSTATUS + 1];
 		prevspritesect = new short[MAXSPRITES];
@@ -1091,7 +1080,7 @@ public abstract class Engine {
 				sprite[i].reset();
 			prevspritesect[i] = (short) (i - 1);
 			nextspritesect[i] = (short) (i + 1);
-			sprite[i].sectnum = (short) MAXSECTORS;
+			sprite[i].setSectnum(MAXSECTORS);
 		}
 		prevspritesect[0] = -1;
 		nextspritesect[MAXSPRITES - 1] = -1;
@@ -1102,14 +1091,14 @@ public abstract class Engine {
 		for (int i = 0; i < MAXSPRITES; i++) {
 			prevspritestat[i] = (short) (i - 1);
 			nextspritestat[i] = (short) (i + 1);
-			sprite[i].statnum = (short) MAXSTATUS;
+			sprite[i].setStatnum(MAXSTATUS);
 		}
 		prevspritestat[0] = -1;
 		nextspritestat[MAXSPRITES - 1] = -1;
 
 		for (int i = 0; i < MAXSPRITESONSCREEN; i++) {
 			if (tsprite[i] == null)
-				tsprite[i] = new SPRITE();
+				tsprite[i] = new TSprite();
 			else
 				tsprite[i].reset();
 		}
@@ -1202,7 +1191,7 @@ public abstract class Engine {
 			sprite[s].buildSprite(fil);
 
 		for (int i = 0; i < numsprites; i++)
-			insertsprite(sprite[i].sectnum, sprite[i].statnum);
+			insertsprite(sprite[i].getSectnum(), sprite[i].getStatnum());
 
 		// Must be after loading sectors, etc!
 		pos.sectnum = updatesector(pos.x, pos.y, pos.sectnum);
@@ -1312,15 +1301,15 @@ public abstract class Engine {
 			spr.yvel = fil.readShort();
 			spr.zvel = fil.readShort();
 			spr.owner = fil.readShort();
-			spr.sectnum = fil.readShort();
-			spr.statnum = fil.readShort();
+			spr.setSectnum(fil.readShort());
+			spr.setStatnum(fil.readShort());
 			spr.lotag = fil.readShort();
 			spr.hitag = fil.readShort();
 			spr.extra = fil.readShort();
 		}
 
 		for (int i = 0; i < numsprites; i++)
-			insertsprite(sprite[i].sectnum, sprite[i].statnum);
+			insertsprite(sprite[i].getSectnum(), sprite[i].getStatnum());
 
 		// Must be after loading sectors, etc!
 		pos.sectnum = updatesector(pos.x, pos.y, pos.sectnum);
@@ -1768,14 +1757,14 @@ public abstract class Engine {
 		sprite[spritenum].y = newy;
 		sprite[spritenum].z = newz;
 
-		short tempsectnum = sprite[spritenum].sectnum;
+		short tempsectnum = sprite[spritenum].getSectnum();
 		if (SETSPRITEZ == 1)
 			tempsectnum = updatesectorz(newx, newy, newz, tempsectnum);
 		else
 			tempsectnum = updatesector(newx, newy, tempsectnum);
 		if (tempsectnum < 0)
 			return (-1);
-		if (tempsectnum != sprite[spritenum].sectnum)
+		if (tempsectnum != sprite[spritenum].getSectnum())
 			changespritesect((short) spritenum, tempsectnum);
 
 		return (0);

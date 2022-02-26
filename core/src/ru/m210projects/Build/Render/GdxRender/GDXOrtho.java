@@ -1,7 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender;
 
 import static com.badlogic.gdx.graphics.GL20.*;
-import static com.badlogic.gdx.graphics.GL20.GL_CW;
 import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_BUFFER_BIT;
 import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_TEST;
 import static java.lang.Math.max;
@@ -35,9 +34,6 @@ import static ru.m210projects.Build.Engine.sintable;
 import static ru.m210projects.Build.Engine.sprite;
 import static ru.m210projects.Build.Engine.tsprite;
 import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
 import static ru.m210projects.Build.Engine.windowy2;
 import static ru.m210projects.Build.Engine.wx1;
 import static ru.m210projects.Build.Engine.wx2;
@@ -48,7 +44,6 @@ import static ru.m210projects.Build.Engine.xdimen;
 import static ru.m210projects.Build.Engine.xdimenscale;
 import static ru.m210projects.Build.Engine.xyaspect;
 import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.ydimen;
 import static ru.m210projects.Build.Engine.yxaspect;
 import static ru.m210projects.Build.Gameutils.AngleToRadians;
 import static ru.m210projects.Build.Gameutils.buildAngleToDegrees;
@@ -72,8 +67,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.NumberUtils;
 
 import ru.m210projects.Build.Gameutils;
@@ -89,18 +82,13 @@ import ru.m210projects.Build.Render.TextureHandle.DummyTileData;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
-import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.Hudtyp;
 import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.WALL;
 
 public class GDXOrtho extends OrphoRenderer {
 
@@ -719,7 +707,7 @@ public class GDXOrtho extends OrphoRenderer {
 		// draw player
 		for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(sprite[spr].sectnum))
+			if (spr == -1 || !isValidSector(sprite[spr].getSectnum()))
 				continue;
 
 			SPRITE pPlayer = sprite[spr];
@@ -815,7 +803,7 @@ public class GDXOrtho extends OrphoRenderer {
 								continue;
 
 							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new SPRITE();
+								tsprite[sortnum] = new TSprite();
 							tsprite[sortnum].set(sprite[i]);
 							tsprite[sortnum++].owner = (short) i;
 						}
@@ -837,7 +825,7 @@ public class GDXOrtho extends OrphoRenderer {
 								continue;
 
 							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new SPRITE();
+								tsprite[sortnum] = new TSprite();
 							tsprite[sortnum].set(sprite[i]);
 							tsprite[sortnum++].owner = (short) i;
 						}

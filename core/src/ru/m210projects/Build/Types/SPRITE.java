@@ -28,7 +28,8 @@ public class SPRITE {
 	public int clipdist = 32;
 	public short xrepeat = 32, yrepeat = 32; //2
 	public short xoffset, yoffset; //2
-	public short sectnum, statnum; //4
+	protected short sectnum;
+	protected short statnum; //4
 	public short ang, owner = -1, xvel, yvel, zvel; //10
 	public short lotag, hitag;
 	public short extra = -1;
@@ -50,7 +51,8 @@ public class SPRITE {
     	xoffset = bb.readByte();
     	yoffset = bb.readByte();
     	sectnum = bb.readShort();
-    	if(sectnum < 0 || sectnum >= MAXSECTORS) sectnum = 0;
+    	if(sectnum < 0 || sectnum >= MAXSECTORS)
+			sectnum = 0;
     	statnum = bb.readShort();
     	ang = bb.readShort();
     	owner = bb.readShort();
@@ -79,8 +81,8 @@ public class SPRITE {
     	buffer.put((byte)this.yrepeat);
     	buffer.put((byte)this.xoffset);
     	buffer.put((byte)this.yoffset);
-    	buffer.putShort(this.sectnum);
-    	buffer.putShort(this.statnum);
+    	buffer.putShort(this.getSectnum());
+    	buffer.putShort(this.getStatnum());
     	buffer.putShort(this.ang);
     	buffer.putShort(this.owner);
     	buffer.putShort(this.xvel);
@@ -109,8 +111,8 @@ public class SPRITE {
 		out += "yrepeat " + yrepeat + " \r\n";
 		out += "xoffset " + xoffset + " \r\n";
 		out += "yoffset " + yoffset + " \r\n";
-		out += "sectnum " + sectnum + " \r\n";
-		out += "statnum " + statnum + " \r\n";
+		out += "sectnum " + getSectnum() + " \r\n";
+		out += "statnum " + getStatnum() + " \r\n";
 		out += "ang " + ang + " \r\n";
 		out += "owner " + owner + " \r\n";
 		out += "xvel " + xvel + " \r\n";
@@ -184,6 +186,22 @@ public class SPRITE {
 		this.lotag = src.lotag;
 		this.hitag = src.hitag;
 		this.extra = src.extra;
+	}
+
+	public short getSectnum() {
+		return sectnum;
+	}
+
+	public void setSectnum(int sectnum) {
+		this.sectnum = (short) sectnum;
+	}
+
+	public short getStatnum() {
+		return statnum;
+	}
+
+	public void setStatnum(int statnum) {
+		this.statnum = (short) statnum;
 	}
 }
 

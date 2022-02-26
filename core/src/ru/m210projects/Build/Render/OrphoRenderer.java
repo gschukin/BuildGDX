@@ -340,7 +340,7 @@ public abstract class OrphoRenderer {
 		// draw player
 		for (i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(sprite[spr].sectnum))
+			if (spr == -1 || !isValidSector(sprite[spr].getSectnum()))
 				continue;
 
 			SPRITE pPlayer = sprite[spr];

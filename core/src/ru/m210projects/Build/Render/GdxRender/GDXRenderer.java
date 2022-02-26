@@ -1056,7 +1056,7 @@ public class GDXRenderer implements GLRenderer {
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
 					SPRITE spr = sprite[i];
-					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.statnum == MAXSTATUS)
+					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
 					addSpriteCorr(i);

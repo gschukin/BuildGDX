@@ -347,7 +347,7 @@ public class PolymostModelRenderer {
 		DefScript defs = parent.defs;
 		if (defs != null) {
 			if (m.isTintAffected()
-					|| (!(tspr.owner >= MAXSPRITES) && sector[sprite[tspr.owner].sectnum].floorpal != 0)) {
+					|| (!(tspr.owner >= MAXSPRITES) && sector[sprite[tspr.owner].getSectnum()].floorpal != 0)) {
 				Palette p = defs.texInfo.getTints(globalpal);
 				polyColor.r *= p.r / 255.0f;
 				polyColor.g *= p.g / 255.0f;

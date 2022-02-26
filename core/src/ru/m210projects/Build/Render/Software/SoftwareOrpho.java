@@ -64,13 +64,9 @@ import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.OrphoRenderer;
 import ru.m210projects.Build.Render.Renderer.Transparent;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.WALL;
 
 public class SoftwareOrpho extends OrphoRenderer {
 
@@ -373,7 +369,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 								continue;
 
 							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new SPRITE();
+								tsprite[sortnum] = new TSprite();
 							tsprite[sortnum].set(sprite[i]);
 							tsprite[sortnum++].owner = (short) i;
 						}
@@ -608,10 +604,10 @@ public class SoftwareOrpho extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((sector[spr.sectnum].ceilingstat & 1) > 0)
-						globalshade = (sector[spr.sectnum].ceilingshade);
+					if ((sector[spr.getSectnum()].ceilingstat & 1) > 0)
+						globalshade = (sector[spr.getSectnum()].ceilingshade);
 					else
-						globalshade = (sector[spr.sectnum].floorshade);
+						globalshade = (sector[spr.getSectnum()].floorshade);
 					globalshade = max(min(globalshade + spr.shade + 6, numshades - 1), 0);
 
 					parent.globvis = parent.globalhisibility;

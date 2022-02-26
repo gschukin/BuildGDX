@@ -108,12 +108,8 @@ import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Settings.BuildSettings;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.WALL;
 
 public class Software implements Renderer {
 
@@ -452,7 +448,7 @@ public class Software implements Renderer {
 							swapsprite(k, l, true);
 				for (k = i + 1; k < j; k++)
 					for (l = i; l < k; l++)
-						if (tspriteptr[k].statnum < tspriteptr[l].statnum)
+						if (tspriteptr[k].getStatnum() < tspriteptr[l].getStatnum())
 							swapsprite(k, l, false);
 			}
 			i = j;
@@ -1042,7 +1038,7 @@ public class Software implements Renderer {
 		int xb = spritesx[snum];
 		int yp = spritesy[snum];
 
-		if (tspr == null || tspr.owner < 0 || tspr.picnum < 0 || tspr.picnum >= MAXTILES || tspr.sectnum < 0)
+		if (tspr == null || tspr.owner < 0 || tspr.picnum < 0 || tspr.picnum >= MAXTILES || tspr.getSectnum() < 0)
 			return;
 
 		int tilenum = tspr.picnum;
@@ -1071,7 +1067,7 @@ public class Software implements Renderer {
 			}
 		}
 
-		short sectnum = tspr.sectnum;
+		short sectnum = tspr.getSectnum();
 		SECTOR sec = sector[sectnum];
 		globalpal = tspr.pal;
 		if (palookup[globalpal] == null)
@@ -1479,7 +1475,7 @@ public class Software implements Renderer {
 								x = -(z1 + z2);
 							else {
 								if ((xp2 - xp1) * (tspr.y - yp1) == (tspr.x - xp1) * (yp2 - yp1)) {
-									if (wall[thewall[j]].nextsector == tspr.sectnum)
+									if (wall[thewall[j]].nextsector == tspr.getSectnum())
 										x = 0x80000000;
 									else
 										x = 0x7fffffff;
@@ -1827,7 +1823,7 @@ public class Software implements Renderer {
 				x = (xp2 - xp1) * (tspr.y - yp1) - (tspr.x - xp1) * (yp2 - yp1);
 				if ((yp > yb1[j]) && (yp > yb2[j]))
 					x = -1;
-				if ((x >= 0) && ((x != 0) || (wall[thewall[j]].nextsector != tspr.sectnum)))
+				if ((x >= 0) && ((x != 0) || (wall[thewall[j]].nextsector != tspr.getSectnum())))
 					continue;
 
 				dalx2 = Math.max(xb1[j], lx);
@@ -2025,7 +2021,7 @@ public class Software implements Renderer {
 		int dasprz = daspr.z;
 		int dashade = daspr.shade;
 		int dapal = daspr.pal;
-		SECTOR sec = sector[daspr.sectnum];
+		SECTOR sec = sector[daspr.getSectnum()];
 
 		cosang = sintable[(int) (globalang + 512) & 2047];
 		sinang = sintable[(int) globalang & 2047];
@@ -3778,7 +3774,7 @@ public class Software implements Renderer {
 					ys = spr.y - globalposy;
 					if (((spr.cstat & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
 						if (tsprite[spritesortcnt] == null)
-							tsprite[spritesortcnt] = new SPRITE();
+							tsprite[spritesortcnt] = new TSprite();
 						tsprite[spritesortcnt].set(sprite[z]);
 
 						tsprite[spritesortcnt++].owner = (short) z;

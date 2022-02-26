@@ -59,7 +59,7 @@ public class SpriteRenderer {
 			if ((o2.cstat & 2) != 0)
 				return 1;
 
-			return (o1.statnum <= o2.statnum) ? -1 : 0;
+			return (o1.getStatnum() <= o2.getStatnum()) ? -1 : 0;
 		}
 
 		public int getDist(SPRITE spr) {
@@ -333,7 +333,7 @@ public class SpriteRenderer {
 	}
 
 	public boolean draw(SPRITE tspr) {
-		if (tspr.owner < 0 || !Gameutils.isValidTile(tspr.picnum) || !Gameutils.isValidSector(tspr.sectnum))
+		if (tspr.owner < 0 || !Gameutils.isValidTile(tspr.picnum) || !Gameutils.isValidSector(tspr.getSectnum()))
 			return false;
 
 //		ShaderManager manager = parent.manager;
@@ -587,8 +587,8 @@ public class SpriteRenderer {
 		}
 
 		int vis = globalvisibility;
-		if (sector[tspr.sectnum].visibility != 0)
-			vis = mulscale(globalvisibility, (sector[tspr.sectnum].visibility + 16) & 0xFF, 4);
+		if (sector[tspr.getSectnum()].visibility != 0)
+			vis = mulscale(globalvisibility, (sector[tspr.getSectnum()].visibility + 16) & 0xFF, 4);
 
 		if (tex.getPixelFormat() == PixelFormat.Pal8)
 			((IndexedShader) manager.getProgram()).setVisibility((int) (-vis / 64.0f));
