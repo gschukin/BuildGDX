@@ -32,7 +32,7 @@ import ru.m210projects.Build.Script.ModelsInfo;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Script.ModelsInfo.Spritesmooth;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sprite;
 
 public abstract class MDModel implements GLModel {
 
@@ -152,7 +152,7 @@ public abstract class MDModel implements GLModel {
 		return (flags & 1) == 0;
 	}
 
-	public void updateanimation(ModelsInfo mdInfo, SPRITE tspr) {
+	public void updateanimation(ModelsInfo mdInfo, Sprite tspr) {
 		if (numframes < 2) {
 			interpol = 0;
 			return;

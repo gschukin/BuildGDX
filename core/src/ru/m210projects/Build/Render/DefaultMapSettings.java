@@ -9,9 +9,9 @@ import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Pragmas.klabs;
 import static ru.m210projects.Build.Pragmas.mulscale;
 
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sprite;
+import ru.m210projects.Build.Types.Wall;
 
 public class DefaultMapSettings implements IOverheadMapSettings {
 
@@ -53,8 +53,8 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 
 	@Override
 	public boolean isWallVisible(int w, int s) {
-		WALL wal = wall[w];
-		SECTOR sec = sector[s];
+		Wall wal = wall[w];
+		Sector sec = sector[s];
 		if (wal.nextsector != 0) // red wall
 			return (wal.nextwall <= w && ((sector[wal.nextsector].ceilingz != sec.ceilingz //
 					|| sector[wal.nextsector].floorz != sec.floorz //
@@ -65,7 +65,7 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 
 	@Override
 	public int getWallColor(int w, int sec) {
-		WALL wal = wall[w];
+		Wall wal = wall[w];
 //		if (Gameutils.isValidSector(wal.nextsector)) // red wall
 //			return 31;
 		return 31; // white wall
@@ -73,7 +73,7 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 
 	@Override
 	public int getSpriteColor(int s) {
-		SPRITE spr = sprite[s];
+		Sprite spr = sprite[s];
 //		switch (spr.cstat & 48) {
 //		case 0:
 //			return 31;
@@ -99,7 +99,7 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 
 	@Override
 	public int getPlayerZoom(int player, int czoom) {
-		SPRITE pPlayer = sprite[getPlayerSprite(player)];
+		Sprite pPlayer = sprite[getPlayerSprite(player)];
 		int nZoom = mulscale(yxaspect,
 				czoom * (klabs((sector[pPlayer.getSectnum()].floorz - pPlayer.z) >> 8) + pPlayer.yrepeat), 16);
 		return BClipRange(nZoom, 22000, 0x20000);

@@ -55,7 +55,7 @@ import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Script.DefScript;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 
 public class PolymostModelRenderer {
@@ -80,7 +80,7 @@ public class PolymostModelRenderer {
 		this.gl = parent.gl;
 	}
 
-	public int voxdraw(GLVoxel m, SPRITE tspr) {
+	public int voxdraw(GLVoxel m, Sprite tspr) {
 		float f, g;
 
 		if (m == null)
@@ -223,7 +223,7 @@ public class PolymostModelRenderer {
 		return rendered ? 1 : 0;
 	}
 
-	private void modelPrepare(MDModel m, SPRITE tspr) {
+	private void modelPrepare(MDModel m, Sprite tspr) {
 		Tile pic = engine.getTile(tspr.picnum);
 		float f = m.interpol;
 		float g = 1 - f;
@@ -385,7 +385,7 @@ public class PolymostModelRenderer {
 		gl.glColor4f(polyColor.r, polyColor.g, polyColor.b, polyColor.a);
 	}
 
-	public boolean mddraw(MDModel m, SPRITE tspr) {
+	public boolean mddraw(MDModel m, Sprite tspr) {
 		DefScript defs = parent.defs;
 
 		m.updateanimation(defs.mdInfo, tspr);
@@ -400,7 +400,7 @@ public class PolymostModelRenderer {
 		return m.render(globalpal, globalshade, skinnum, globalvisibility, 1.0f);
 	}
 
-	public int mddraw(GLModel vm, SPRITE tspr, int xoff, int yoff) {
+	public int mddraw(GLModel vm, Sprite tspr, int xoff, int yoff) {
 		if (vm == null)
 			return 0;
 
@@ -413,7 +413,7 @@ public class PolymostModelRenderer {
 		return 0;
 	}
 
-	public void md3_vox_calcmat_common(SPRITE tspr, Vector3 a0, float f, float[][] mat) {
+	public void md3_vox_calcmat_common(Sprite tspr, Vector3 a0, float f, float[][] mat) {
 		float g;
 		float k0, k1, k2, k3, k4, k5, k6, k7;
 
@@ -470,7 +470,7 @@ public class PolymostModelRenderer {
 		mat[3][2] += a0.y * mat[0][2] + a0.z * mat[1][2] + a0.x * mat[2][2];
 	}
 
-	public void md3_vox_calcmat_common(SPRITE tspr, Vector3 a0, float f, Matrix4 mat) {
+	public void md3_vox_calcmat_common(Sprite tspr, Vector3 a0, float f, Matrix4 mat) {
 		float yaw = globalang / (2048.0f / 360.0f) - 90.0f;
 		float roll = parent.gtang * 57.3f; // XXX 57.3f WFT
 		Spriteext sprext = parent.defs.mapInfo.getSpriteInfo(tspr.owner);
@@ -514,7 +514,7 @@ public class PolymostModelRenderer {
 		 */
 	}
 
-	public void md3_vox_calcmat_common(SPRITE tspr, Vector3 a0) {
+	public void md3_vox_calcmat_common(Sprite tspr, Vector3 a0) {
 		float yaw = globalang / (2048.0f / 360.0f) - 90.0f;
 		float roll = parent.gtang * 57.3f; // XXX 57.3f WTF
 		Spriteext sprext = parent.defs.mapInfo.getSpriteInfo(tspr.owner);

@@ -96,12 +96,12 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 
 public class GDXRenderer implements GLRenderer {
 
@@ -177,7 +177,7 @@ public class GDXRenderer implements GLRenderer {
 		this.orphoRen = allocOrphoRenderer(settings);
 		this.scanner = new SectorScanner(engine) {
 			@Override
-			protected Matrix4 getSpriteMatrix(SPRITE tspr) {
+			protected Matrix4 getSpriteMatrix(Sprite tspr) {
 				Tile pic = engine.getTile(tspr.picnum);
 				return sprR.getMatrix(tspr, pic.getWidth(), pic.getHeight());
 			}
@@ -448,7 +448,7 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	public void drawsprite(int i) {
-		SPRITE tspr = tsprite[i];
+		Sprite tspr = tsprite[i];
 		if (tspr == null || tspr.owner == -1)
 			return;
 
@@ -570,7 +570,7 @@ public class GDXRenderer implements GLRenderer {
 		gl.glDisable(GL_CULL_FACE);
 		gl.glDepthMask(false);
 
-		SECTOR skysector;
+		Sector skysector;
 		if ((skysector = scanner.getLastSkySector(Heinum.SkyUpper)) != null) {
 			int pal = skysector.ceilingpal;
 			int shade = skysector.ceilingshade;
@@ -1055,7 +1055,7 @@ public class GDXRenderer implements GLRenderer {
 
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					SPRITE spr = sprite[i];
+					Sprite spr = sprite[i];
 					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
@@ -1324,11 +1324,11 @@ public class GDXRenderer implements GLRenderer {
 		inpreparemirror = false;
 	}
 
-	private boolean spritewallfront(SPRITE s, int w) {
+	private boolean spritewallfront(Sprite s, int w) {
 		if (s == null)
 			return false;
 
-		WALL wal = wall[w];
+		Wall wal = wall[w];
 		int x1 = wal.x;
 		int y1 = wal.y;
 		wal = wall[wal.point2];

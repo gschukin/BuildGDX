@@ -21,49 +21,7 @@ import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLE_FAN;
 import static com.badlogic.gdx.graphics.GL20.GL_TRIANGLE_STRIP;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ru.m210projects.Build.Engine.MAXSPRITES;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT1;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT2;
-import static ru.m210projects.Build.Engine.beforedrawrooms;
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.globalang;
-import static ru.m210projects.Build.Engine.globalpal;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.globalshade;
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.pSmallTextfont;
-import static ru.m210projects.Build.Engine.pTextfont;
-import static ru.m210projects.Build.Engine.palookup;
-import static ru.m210projects.Build.Engine.picsiz;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.pow2long;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.show2dsprite;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.tsprite;
-import static ru.m210projects.Build.Engine.viewingrange;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.xdimen;
-import static ru.m210projects.Build.Engine.xdimenscale;
-import static ru.m210projects.Build.Engine.xyaspect;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.ydimen;
-import static ru.m210projects.Build.Engine.yxaspect;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
@@ -128,7 +86,7 @@ public class Polymost2D extends OrphoRenderer {
 	private raster[] rst;
 	private final float[] trapextx = new float[2];
 
-	private SPRITE hudsprite;
+	private Sprite hudsprite;
 
 //	private final int ROTATESPRITE_MAX = 2048;
 	private final int RS_CENTERORIGIN = (1 << 30);
@@ -164,8 +122,8 @@ public class Polymost2D extends OrphoRenderer {
 
 	@Override
 	public void drawmapview(int dax, int day, int zoome, int ang) {
-		WALL wal;
-		SECTOR sec = null;
+		Wall wal;
+		Sector sec = null;
 
 		int i, j, x, y, bakx1, baky1;
 		int s, w, ox, oy, startwall, cx1, cy1, cx2, cy2;
@@ -230,37 +188,37 @@ public class Polymost2D extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (i = headspritesect[s]; i >= 0; i = nextspritesect[i])
-						if ((sprite[i].cstat & 48) == 32) {
+					for(int j1 : spriteSectMap.getIndicesOf(s))
+						if ((sprite[j1].cstat & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
 
-							if ((sprite[i].cstat & (64 + 8)) == (64 + 8)
-									|| !mapSettings.isSpriteVisible(MapView.Polygons, i))
+							if ((sprite[j1].cstat & (64 + 8)) == (64 + 8)
+									|| !mapSettings.isSpriteVisible(MapView.Polygons, j1))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i]);
-							tsprite[sortnum++].owner = (short) i;
+							tsprite[sortnum].set(sprite[j1]);
+							tsprite[sortnum++].owner = (short) j1;
 						}
 				}
 
-				if (mapSettings.isShowSprites(MapView.Polygons)) {
-					for (i = headspritesect[s]; i >= 0; i = nextspritesect[i])
-						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {
+				if (mapSettings.isShowSprites(MapView.Polygons))
+					for(int i1 : spriteSectMap.getIndicesOf(s)) {
+						if ((show2dsprite[i1 >> 3] & pow2char[i1 & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
 
-							if (!mapSettings.isSpriteVisible(MapView.Polygons, i))
+							if (!mapSettings.isSpriteVisible(MapView.Polygons, i1))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i]);
-							tsprite[sortnum++].owner = (short) i;
+							tsprite[sortnum].set(sprite[i1]);
+							tsprite[sortnum++].owner = (short) i1;
 						}
-				}
+					}
 
 				gotsector[s >> 3] |= pow2char[s & 7];
 
@@ -373,7 +331,7 @@ public class Polymost2D extends OrphoRenderer {
 					}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				SPRITE spr = sprite[tsprite[s].owner];
+				Sprite spr = sprite[tsprite[s].owner];
 				if ((spr.cstat & 32768) == 0) {
 					npoints = 0;
 
@@ -1262,7 +1220,7 @@ public class Polymost2D extends OrphoRenderer {
 		int oldviewingrange;
 		float x1, y1, z1;
 		if (hudsprite == null)
-			hudsprite = new SPRITE();
+			hudsprite = new Sprite();
 		hudsprite.reset((byte) 0);
 
 		Hudtyp hudInfo = null;

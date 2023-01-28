@@ -56,7 +56,7 @@ public abstract class SectorScanner {
 	public int[] maskwall = new int[MAXWALLS];
 	public int maskwallcnt;
 
-	private SECTOR skyFloor, skyCeiling;
+	private Sector skyFloor, skyCeiling;
 
 	private final PolygonClipper cl = new PolygonClipper();
 
@@ -120,7 +120,7 @@ public abstract class SectorScanner {
 				int startwall = sector[sectnum].wallptr;
 				int endwall = sector[sectnum].wallnum + startwall;
 				for (int z = startwall; z < endwall; z++) {
-					WALL wal = wall[z];
+					Wall wal = wall[z];
 					if (!pvs.checkWall(z))
 						continue;
 
@@ -251,7 +251,7 @@ public abstract class SectorScanner {
 			int startwall = sector[sectnum].wallptr;
 			int endwall = sector[sectnum].wallnum + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				WALL wal = wall[z];
+				Wall wal = wall[z];
 				int nextsectnum = wal.nextsector;
 
 				if ((gotwall[z >> 3] & pow2char[z & 7]) == 0)
@@ -314,14 +314,14 @@ public abstract class SectorScanner {
 		}
 	};
 
-	protected boolean wallfront(WALL w1, WALL w2) {
-		WALL wp1 = wall[w1.point2];
+	protected boolean wallfront(Wall w1, Wall w2) {
+		Wall wp1 = wall[w1.point2];
 		float x11 = w1.x;
 		float y11 = w1.y;
 		float x21 = wp1.x;
 		float y21 = wp1.y;
 
-		WALL wp2 = wall[w2.point2];
+		Wall wp2 = wall[w2.point2];
 		float x12 = w2.x;
 		float y12 = w2.y;
 		float x22 = wp2.x;
@@ -372,7 +372,7 @@ public abstract class SectorScanner {
 		return false;
 	}
 
-	public SECTOR getLastSkySector(Heinum h) {
+	public Sector getLastSkySector(Heinum h) {
 		if (h == Heinum.SkyLower)
 			return skyFloor;
 		return skyCeiling;
@@ -383,8 +383,8 @@ public abstract class SectorScanner {
 	}
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
-		for (int z = headspritesect[sectnum]; z >= 0; z = nextspritesect[z]) {
-			SPRITE spr = sprite[z];
+		for(int z : spriteSectMap.getIndicesOf(sectnum)) {
+			Sprite spr = sprite[z];
 
 			if ((((spr.cstat & 0x8000) == 0) || showinvisibility) && (spr.xrepeat > 0) && (spr.yrepeat > 0)
 					&& (spritesortcnt < MAXSPRITESONSCREEN)) {
@@ -393,7 +393,7 @@ public abstract class SectorScanner {
 				if ((spr.cstat & (64 + 48)) != (64 + 16) || Pragmas.dmulscale(sintable[(spr.ang + 512) & 2047], -xs,
 						sintable[spr.ang & 2047], -ys, 6) > 0) {
 					if (spriteInFrustum(pFrustum, spr)) {
-						SPRITE tspr = addTSprite();
+						Sprite tspr = addTSprite();
 						tspr.set(spr);
 						tspr.owner = (short) z;
 					}
@@ -404,7 +404,7 @@ public abstract class SectorScanner {
 
 	private static final Vector3[] tmpVec = { new Vector3(), new Vector3(), new Vector3(), new Vector3() };
 
-	public boolean spriteInFrustum(WallFrustum3d frustum, SPRITE tspr) {
+	public boolean spriteInFrustum(WallFrustum3d frustum, Sprite tspr) {
 		Vector3[] points = tmpVec;
 		float SIZEX = 0.5f;
 		float SIZEY = 0.5f;
@@ -427,9 +427,9 @@ public abstract class SectorScanner {
 		return false;
 	}
 
-	protected abstract Matrix4 getSpriteMatrix(SPRITE tspr);
+	protected abstract Matrix4 getSpriteMatrix(Sprite tspr);
 
-	private SPRITE addTSprite() {
+	private Sprite addTSprite() {
 		if (tsprite[spritesortcnt] == null)
 			tsprite[spritesortcnt] = new TSprite();
 		return tsprite[spritesortcnt++];
@@ -444,7 +444,7 @@ public abstract class SectorScanner {
 			int startwall = sector[sectnum].wallptr;
 			int endwall = sector[sectnum].wallnum + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				WALL wal = wall[z];
+				Wall wal = wall[z];
 				int wz = isFloor ? engine.getflorzofslope((short) sectnum, wal.x, wal.y)
 						: engine.getceilzofslope((short) sectnum, wal.x, wal.y);
 
@@ -473,8 +473,8 @@ public abstract class SectorScanner {
 		return false;
 	}
 
-	public boolean projectionToWall(float posx, float posy, WALL w, Vector2 n) {
-		WALL p2 = wall[w.point2];
+	public boolean projectionToWall(float posx, float posy, Wall w, Vector2 n) {
+		Wall p2 = wall[w.point2];
 		int dx = p2.x - w.x;
 		int dy = p2.y - w.y;
 

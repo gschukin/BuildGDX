@@ -41,76 +41,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
-import static ru.m210projects.Build.Engine.DETAILPAL;
-import static ru.m210projects.Build.Engine.GLOWPAL;
-import static ru.m210projects.Build.Engine.MAXDRUNKANGLE;
-import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXSPRITES;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXSTATUS;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.RESERVEDPALS;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT1;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT2;
-import static ru.m210projects.Build.Engine.automapping;
-import static ru.m210projects.Build.Engine.beforedrawrooms;
-import static ru.m210projects.Build.Engine.cosglobalang;
-import static ru.m210projects.Build.Engine.cosviewingrangeglobalang;
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.globalang;
-import static ru.m210projects.Build.Engine.globalcursectnum;
-import static ru.m210projects.Build.Engine.globalhoriz;
-import static ru.m210projects.Build.Engine.globalpal;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.globalshade;
-import static ru.m210projects.Build.Engine.globalvisibility;
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.halfxdimen;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.inpreparemirror;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.offscreenrendering;
-import static ru.m210projects.Build.Engine.palette;
-import static ru.m210projects.Build.Engine.palfadergb;
-import static ru.m210projects.Build.Engine.palookup;
-import static ru.m210projects.Build.Engine.parallaxyoffs;
-import static ru.m210projects.Build.Engine.picsiz;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.pow2long;
-import static ru.m210projects.Build.Engine.pskybits;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.setviewcnt;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.show2dsprite;
-import static ru.m210projects.Build.Engine.showinvisibility;
-import static ru.m210projects.Build.Engine.singlobalang;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sinviewingrangeglobalang;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.spritesortcnt;
-import static ru.m210projects.Build.Engine.tsprite;
-import static ru.m210projects.Build.Engine.viewingrange;
-import static ru.m210projects.Build.Engine.visibility;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.xdimen;
-import static ru.m210projects.Build.Engine.xdimenscale;
-import static ru.m210projects.Build.Engine.xdimscale;
-import static ru.m210projects.Build.Engine.xyaspect;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.ydimen;
-import static ru.m210projects.Build.Engine.yxaspect;
-import static ru.m210projects.Build.Engine.zeropskyoff;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Gameutils.isCorruptWall;
 import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
@@ -212,7 +143,7 @@ public class Polymost implements GLRenderer {
 	private boolean drunk;
 	private float drunkIntensive = 1.0f;
 
-	protected SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
+	protected Sprite[] tspriteptr = new Sprite[MAXSPRITESONSCREEN + 1];
 
 	private final int[] spritesx = new int[MAXSPRITESONSCREEN + 1];
 	private final int[] spritesy = new int[MAXSPRITESONSCREEN + 1];
@@ -1134,7 +1065,7 @@ public class Polymost implements GLRenderer {
 		double fx, fy, ox, oy, oz, ox2, oy2, r;
 		int i;
 
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 
 		if ((globalorientation & 64) == 0) {
 			nonparallaxed_ft[0] = globalposx;
@@ -1346,11 +1277,11 @@ public class Polymost implements GLRenderer {
 	}
 
 	private final double[] drawalls_dd = new double[3], drawalls_vv = new double[3], drawalls_ft = new double[4];
-	private final WALL drawalls_nwal = new WALL();
+	private final Wall drawalls_nwal = new Wall();
 
 	private void drawalls(int bunch) {
-		SECTOR sec, nextsec;
-		WALL wal, wal2;
+		Sector sec, nextsec;
+		Wall wal, wal2;
 		float x0, x1, cy0, cy1, fy0, fy1, xp0, yp0, xp1, yp1, ryp0, ryp1, nx0, ny0, nx1, ny1;
 		float t, t0, t1, ocy0, ocy1, ofy0, ofy1, oxp0, oyp0, fwalxrepeat;
 		double oguo, ogux, oguy;
@@ -1672,7 +1603,7 @@ public class Polymost implements GLRenderer {
 	}
 
 	protected int wallfront(int l1, int l2) {
-		WALL wal;
+		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
 		wal = wall[thewall[l1]];
@@ -1724,9 +1655,9 @@ public class Polymost implements GLRenderer {
 
 	private void scansector(int sectnum) {
 		double d, xp1, yp1, xp2, yp2;
-		WALL wal, wal2;
-		SPRITE spr;
-		int z, zz, startwall, endwall, numscansbefore, scanfirst, bunchfrst, nextsectnum;
+		Wall wal, wal2;
+		Sprite spr;
+		int zz, startwall, endwall, numscansbefore, scanfirst, bunchfrst, nextsectnum;
 		int xs, ys, x1, y1, x2, y2;
 
 		if (sectnum < 0)
@@ -1740,7 +1671,7 @@ public class Polymost implements GLRenderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (z = headspritesect[sectnum]; z >= 0; z = nextspritesect[z]) {
+			for(int z : spriteSectMap.getIndicesOf(sectnum)) {
 				spr = sprite[z];
 				if ((((spr.cstat & 0x8000) == 0) || showinvisibility) && (spr.xrepeat > 0) && (spr.yrepeat > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
@@ -1774,7 +1705,7 @@ public class Polymost implements GLRenderer {
 			yp2 = 0;
 			if (startwall < 0 || endwall < 0)
 				continue;
-			for (z = startwall; z < endwall; z++) {
+			for (int z = startwall; z < endwall; z++) {
 				if (isCorruptWall(z))
 					continue;
 
@@ -1828,14 +1759,14 @@ public class Polymost implements GLRenderer {
 				}
 			}
 
-			for (z = numscansbefore; z < numscans; z++) {
+			for (int z = numscansbefore; z < numscans; z++) {
 				if ((wall[thewall[z]].point2 != thewall[p2[z]]) || (dxb2[z] > dxb1[p2[z]])) {
 					bunchfirst[numbunches++] = p2[z];
 					p2[z] = -1;
 				}
 			}
 
-			for (z = bunchfrst; z < numbunches; z++) {
+			for (int z = bunchfrst; z < numbunches; z++) {
 				for (zz = bunchfirst[z]; p2[zz] >= 0; zz = p2[zz])
 					;
 				bunchlast[z] = (short) zz;
@@ -1879,7 +1810,7 @@ public class Polymost implements GLRenderer {
 
 		Tile pic = engine.getTile(globalpicnum);
 
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		drawalls_dd[0] = xdimen * .0000001; // Adjust sky depth based on screen size!
 		t = pic.getWidth() << dapskybits; // (1 << (picsiz[globalpicnum] & 15)) << dapskybits;
 
@@ -2244,7 +2175,7 @@ public class Polymost implements GLRenderer {
 	private void drawbackground(int sectnum, double x0, double x1, double y0, double y1, boolean floor) {
 		// Parallaxing sky... hacked for Ken's mountain texture;
 
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		int shade = sec.floorshade;
 		int pal = sec.floorpal;
 		if (!floor) {
@@ -2470,8 +2401,8 @@ public class Polymost implements GLRenderer {
 		int i, j, n, n2, z, sectnum, method;
 
 		int m0, m1;
-		SECTOR sec, nsec;
-		WALL wal, wal2;
+		Sector sec, nsec;
+		Wall wal, wal2;
 
 		// cullcheckcnt = 0;
 
@@ -2692,8 +2623,8 @@ public class Polymost implements GLRenderer {
 	private static final Vector2 projPoint = new Vector2();
 
 	private int getclosestpointonwall(int posx, int posy, int dawall, Vector2 n) {
-		WALL w = wall[dawall];
-		WALL p2 = wall[wall[dawall].point2];
+		Wall w = wall[dawall];
+		Wall p2 = wall[wall[dawall].point2];
 		int dx = p2.x - w.x;
 		int dy = p2.y - w.y;
 
@@ -2716,7 +2647,7 @@ public class Polymost implements GLRenderer {
 
 	private final float TSPR_OFFSET_FACTOR = 0.000008f;
 
-	private float TSPR_OFFSET(SPRITE tspr, long dist) {
+	private float TSPR_OFFSET(Sprite tspr, long dist) {
 		float offset = (TSPR_OFFSET_FACTOR + ((tspr.owner != -1 ? tspr.owner & 31 : 1) * TSPR_OFFSET_FACTOR)) * dist
 				* 0.025f;
 		return -offset;
@@ -2732,7 +2663,7 @@ public class Polymost implements GLRenderer {
 		float f, c, s, fx, fy, sx0, sy0, sx1, xp0, yp0, xp1, yp1, oxp0, oyp0, ryp0, ryp1;
 		float x0, y0, x1, y1, sc0, sf0, sc1, sf1, xv, yv, t0, t1;
 		int i, j, spritenum, xoff = 0, yoff = 0, method, npoints;
-		SPRITE tspr;
+		Sprite tspr;
 		int oldsizx, oldsizy;
 		int tsizx, tsizy;
 
@@ -3417,7 +3348,7 @@ public class Polymost implements GLRenderer {
 	}
 
 	public void swapsprite(int k, int l, boolean z) {
-		SPRITE stmp = tspriteptr[k];
+		Sprite stmp = tspriteptr[k];
 		tspriteptr[k] = tspriteptr[l];
 		tspriteptr[l] = stmp;
 
@@ -3836,7 +3767,7 @@ public class Polymost implements GLRenderer {
 	}
 
 	public int nearwall(int i, int range) {
-		SPRITE spr = sprite[i];
+		Sprite spr = sprite[i];
 		short sectnum = spr.getSectnum();
 		int xs = spr.x;
 		int ys = spr.y;
@@ -3852,8 +3783,8 @@ public class Polymost implements GLRenderer {
 		short startwall = sector[sectnum].wallptr;
 		int endwall = (startwall + sector[sectnum].wallnum - 1);
 		for (int z = startwall; z <= endwall; z++) {
-			WALL wal = wall[z];
-			WALL wal2 = wall[wal.point2];
+			Wall wal = wall[z];
+			Wall wal2 = wall[wal.point2];
 			int x1 = wal.x;
 			int y1 = wal.y;
 			int x2 = wal2.x;
@@ -3925,7 +3856,7 @@ public class Polymost implements GLRenderer {
 			case Other:
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					SPRITE spr = sprite[i];
+					Sprite spr = sprite[i];
 					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
@@ -3939,7 +3870,7 @@ public class Polymost implements GLRenderer {
 	@Override
 	public void addSpriteCorr(int snum) {
 		int spr_wall;
-		SPRITE spr = sprite[snum];
+		Sprite spr = sprite[snum];
 		if ((spr_wall = nearwall(snum, -64)) == -1)
 			if ((spr.cstat & 64) != 0 || (spr_wall = nearwall(snum, 64)) == -1)
 				return;
@@ -4005,7 +3936,7 @@ public class Polymost implements GLRenderer {
 		if ((sector[sectnum].floorstat & 2) == 0)
 			return (sector[sectnum].floorz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		long i = (engine.ksqrt(dx * dx + dy * dy) << 5);
@@ -4020,7 +3951,7 @@ public class Polymost implements GLRenderer {
 		if ((sector[sectnum].ceilingstat & 2) == 0)
 			return (sector[sectnum].ceilingz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		long i = (engine.ksqrt(dx * dx + dy * dy) << 5);
@@ -4034,14 +3965,14 @@ public class Polymost implements GLRenderer {
 	private static float dceilzsofslope, dfloorzsofslope;
 
 	public void polymost_getzsofslope(int sectnum, double dax, double day) {
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		if (sec == null)
 			return;
 		dceilzsofslope = sec.ceilingz;
 		dfloorzsofslope = sec.floorz;
 		if (((sec.ceilingstat | sec.floorstat) & 2) != 0) {
-			WALL wal = wall[sec.wallptr];
-			WALL wal2 = wall[wal.point2];
+			Wall wal = wall[sec.wallptr];
+			Wall wal2 = wall[wal.point2];
 			int dx = wal2.x - wal.x;
 			int dy = wal2.y - wal.y;
 			long i = (engine.ksqrt(dx * dx + dy * dy) << 5);

@@ -25,7 +25,7 @@ import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Types.QuickSort;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Tile.AnimType;
 
@@ -39,9 +39,9 @@ public class SpriteRenderer {
 
 	private final int[] spritesz = new int[MAXSPRITES];
 
-	public class SpriteComparator implements Comparator<SPRITE> {
+	public class SpriteComparator implements Comparator<Sprite> {
 		@Override
-		public int compare(SPRITE o1, SPRITE o2) {
+		public int compare(Sprite o1, Sprite o2) {
 			if (o1 == null || o2 == null)
 				return 0;
 
@@ -62,7 +62,7 @@ public class SpriteRenderer {
 			return (o1.getStatnum() <= o2.getStatnum()) ? -1 : 0;
 		}
 
-		public int getDist(SPRITE spr) {
+		public int getDist(Sprite spr) {
 			int dx1 = spr.x - globalposx;
 			int dy1 = spr.y - globalposy;
 			int dz1 = (spritesz[spr.owner] - globalposz) >> 4;
@@ -78,9 +78,9 @@ public class SpriteRenderer {
 		this.engine = engine;
 	}
 
-	public void sort(SPRITE[] array, int len) {
+	public void sort(Sprite[] array, int len) {
 		for(int i = 0; i < len; i++) {
-			SPRITE spr = array[i];
+			Sprite spr = array[i];
 			int s = spr.owner;
 			if(s == -1)
 				continue;
@@ -108,7 +108,7 @@ public class SpriteRenderer {
 		this.cam = cam;
 	}
 
-	public Matrix4 getMatrix(SPRITE tspr, int texx, int texy) {
+	public Matrix4 getMatrix(Sprite tspr, int texx, int texy) {
 		int picnum = tspr.picnum;
 		int orientation = tspr.cstat;
 		int spritenum = tspr.owner;
@@ -332,7 +332,7 @@ public class SpriteRenderer {
 		return transform.rotate(1, 0, 0, 90);
 	}
 
-	public boolean draw(SPRITE tspr) {
+	public boolean draw(Sprite tspr) {
 		if (tspr.owner < 0 || !Gameutils.isValidTile(tspr.picnum) || !Gameutils.isValidSector(tspr.getSectnum()))
 			return false;
 

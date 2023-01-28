@@ -11,7 +11,7 @@ import static ru.m210projects.Build.Engine.wall;
 import java.util.Arrays;
 
 import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
 import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh;
@@ -87,7 +87,7 @@ public class PotentiallyVisibleSet {
 				int startwall = sector[sectnum].wallptr;
 				int endwall = sector[sectnum].wallnum + startwall;
 				for (int z = startwall; z < endwall; z++) {
-					WALL wal = wall[z];
+					Wall wal = wall[z];
 					int nextsectnum = wal.nextsector;
 
 					if (!WallFacingCheck(wal))
@@ -155,9 +155,9 @@ public class PotentiallyVisibleSet {
 					int endwall = sector[sectnum].wallnum + startwall;
 					for (int z = startwall; z < endwall; z++) {
 						if ((gotwall[z >> 3] & pow2char[z & 7]) != 0) {
-							WALL w = wall[z];
+							Wall w = wall[z];
 //							if(w.nextsector != -1) { //XXX E2L8 near wall bug fix
-							WALL p2 = wall[w.point2];
+							Wall p2 = wall[w.point2];
 							int dx = p2.x - w.x;
 							int dy = p2.y - w.y;
 							float i = dx * (globalposx - w.x) + dy * (globalposy - w.y);
@@ -200,7 +200,7 @@ public class PotentiallyVisibleSet {
 		return gotviewport[z] != null;
 	}
 
-	private boolean WallFacingCheck(WALL wal) {
+	private boolean WallFacingCheck(Wall wal) {
 		float x1 = wal.x - globalposx;
 		float y1 = wal.y - globalposy;
 		float x2 = wall[wal.point2].x - globalposx;

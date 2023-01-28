@@ -18,9 +18,9 @@ import java.util.Arrays;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.Types.BuildPos;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sprite;
+import ru.m210projects.Build.Types.Wall;
 
 public abstract class Board {
 
@@ -54,9 +54,9 @@ public abstract class Board {
 	protected final short[] prevspritesect, prevspritestat;
 	protected final short[] nextspritesect, nextspritestat;
 
-	protected final SECTOR[] sector;
-	protected final WALL[] wall;
-	protected final SPRITE[] sprite;
+	protected final Sector[] sector;
+	protected final Wall[] wall;
+	protected final Sprite[] sprite;
 
 	protected BuildPos dapos;
 	protected final String name;
@@ -82,9 +82,9 @@ public abstract class Board {
 	}
 
 	public Board(String name, Resource bb) throws Exception {
-		sector = new SECTOR[getMaxSectors()];
-		wall = new WALL[getMaxWalls()];
-		sprite = new SPRITE[getMaxSprites()];
+		sector = new Sector[getMaxSectors()];
+		wall = new Wall[getMaxWalls()];
+		sprite = new Sprite[getMaxSprites()];
 
 		headspritesect = new short[getMaxSectors() + 1];
 		headspritestat = new short[MAXSTATUS + 1];
@@ -110,7 +110,7 @@ public abstract class Board {
 		headspritesect[getMaxSectors()] = 0;
 
 		for (int i = 0; i < getMaxSprites(); i++) {
-			sprite[i] = new SPRITE();
+			sprite[i] = new Sprite();
 			prevspritesect[i] = (short) (i - 1);
 			nextspritesect[i] = (short) (i + 1);
 			sprite[i].setSectnum(getMaxSectors());
@@ -131,9 +131,9 @@ public abstract class Board {
 
 	protected ByteBuffer initmapbuffer() {
 		int size = 20 + // Point
-				(2 + (numwalls * WALL.sizeof)) + // walls
-				(2 + (numsectors * SECTOR.sizeof)) + // sectors
-				(2 + (getMaxSprites() * SPRITE.sizeof)) + // sprites
+				(2 + (numwalls * Wall.sizeof)) + // walls
+				(2 + (numsectors * Sector.sizeof)) + // sectors
+				(2 + (getMaxSprites() * Sprite.sizeof)) + // sprites
 				 2 * (getMaxSectors() + 1) + 2 * (MAXSTATUS + 1) + 8 * getMaxSprites(); // sprite array
 
 		return ByteBuffer.allocate(size);
@@ -315,7 +315,7 @@ public abstract class Board {
 	////////// SECTOR MANIPULATION FUNCTIONS ////////
 
 	public void alignceilslope(short dasect, int x, int y, int z) {
-		WALL wal = wall[sector[dasect].wallptr];
+		Wall wal = wall[sector[dasect].wallptr];
 		int dax = wall[wal.point2].x - wal.x;
 		int day = wall[wal.point2].y - wal.y;
 
@@ -331,7 +331,7 @@ public abstract class Board {
 	}
 
 	public void alignflorslope(short dasect, int x, int y, int z) {
-		WALL wal = wall[sector[dasect].wallptr];
+		Wall wal = wall[sector[dasect].wallptr];
 		int dax = wall[wal.point2].x - wal.x;
 		int day = wall[wal.point2].y - wal.y;
 
@@ -352,7 +352,7 @@ public abstract class Board {
 		if ((sector[sectnum].ceilingstat & 2) == 0)
 			return (sector[sectnum].ceilingz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		int i = sqrt(dx * dx + dy * dy) << 5;
@@ -369,7 +369,7 @@ public abstract class Board {
 		if ((sector[sectnum].floorstat & 2) == 0)
 			return (sector[sectnum].floorz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		int i = sqrt(dx * dx + dy * dy) << 5;
@@ -393,7 +393,7 @@ public abstract class Board {
 			do {
 				if (wallid >= getMaxWalls())
 					break;
-				WALL wal = wall[wallid];
+				Wall wal = wall[wallid];
 				if (wal == null) {
 					wallid++;
 					j--;
@@ -431,7 +431,7 @@ public abstract class Board {
 			do {
 				if (wallid >= getMaxWalls())
 					break;
-				WALL wal = wall[wallid];
+				Wall wal = wall[wallid];
 				if (wal == null) {
 					wallid++;
 					j--;
@@ -473,7 +473,7 @@ public abstract class Board {
 		int x1, y1, x2, y2;
 
 		do {
-			WALL wal = wall[wallid];
+			Wall wal = wall[wallid];
 			if (wal == null || wal.point2 < 0 || wall[wal.point2] == null)
 				return -1;
 			y1 = wal.y - y;
@@ -498,7 +498,7 @@ public abstract class Board {
 		if (sectnum == -1 || sector[sectnum] == null)
 			return null;
 
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		if (sec == null)
 			return null;
 
@@ -507,8 +507,8 @@ public abstract class Board {
 		zofslope.setFloor(floorz);
 		zofslope.setCeiling(ceilingz);
 		if (((sec.ceilingstat | sec.floorstat) & 2) != 0) {
-			WALL wal = wall[sec.wallptr];
-			WALL wal2 = wall[wal.point2];
+			Wall wal = wall[sec.wallptr];
+			Wall wal2 = wall[wal.point2];
 			int dx = wal2.x - wal.x;
 			int dy = wal2.y - wal.y;
 			int i = sqrt(dx * dx + dy * dy) << 5;
@@ -569,15 +569,15 @@ public abstract class Board {
 	
 	// COMMON FUNCTIONS
 
-	public SPRITE getSprite(int num) {
+	public Sprite getSprite(int num) {
 		return sprite[num];
 	}
 
-	public SECTOR getSector(int num) {
+	public Sector getSector(int num) {
 		return sector[num];
 	}
 
-	public WALL getWall(int num) {
+	public Wall getWall(int num) {
 		return wall[num];
 	}
 

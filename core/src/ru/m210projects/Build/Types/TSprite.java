@@ -1,6 +1,6 @@
 package ru.m210projects.Build.Types;
 
-public class TSprite extends SPRITE {
+public class TSprite extends Sprite {
 
     public int getSpriteNum() {
         return this.owner;

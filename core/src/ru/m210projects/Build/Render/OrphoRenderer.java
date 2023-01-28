@@ -16,22 +16,7 @@
 
 package ru.m210projects.Build.Render;
 
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.yxaspect;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Gameutils.isValidSector;
 import static ru.m210projects.Build.Net.Mmulti.connecthead;
 import static ru.m210projects.Build.Net.Mmulti.connectpoint2;
@@ -42,11 +27,11 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.Renderer.Transparent;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 
 public abstract class OrphoRenderer {
 
@@ -95,11 +80,11 @@ public abstract class OrphoRenderer {
 	protected IOverheadMapSettings mapSettings;
 
 	public void drawoverheadmap(int cposx, int cposy, int czoom, short cang) {
-		int i, j, k, x1, y1, x2 = 0, y2 = 0, ox, oy;
+		int i, k, x1, y1, x2 = 0, y2 = 0, ox, oy;
 		int startwall, endwall;
 		int xvect, yvect, xvect2, yvect2;
 
-		WALL wal;
+		Wall wal;
 
 		xvect = sintable[(-cang) & 2047] * czoom;
 		yvect = sintable[(1536 - cang) & 2047] * czoom;
@@ -112,7 +97,7 @@ public abstract class OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			SECTOR sec = sector[i];
+			Sector sec = sector[i];
 			if (!Gameutils.isValidWall(sec.wallptr) || sec.wallnum < 3)
 				continue;
 
@@ -122,7 +107,7 @@ public abstract class OrphoRenderer {
 			if (startwall < 0 || endwall < 0)
 				continue;
 
-			for (j = startwall; j < endwall; j++) {
+			for (int j = startwall; j < endwall; j++) {
 				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(wall[j].point2))
 					continue;
 
@@ -157,8 +142,8 @@ public abstract class OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (j = headspritesect[i]; j >= 0; j = nextspritesect[j]) {
-					SPRITE spr = sprite[j];
+				for(int j : spriteSectMap.getIndicesOf(i)) {
+					Sprite spr = sprite[j];
 
 					if ((spr.cstat & 0x8000) != 0 || spr.xrepeat == 0 || spr.yrepeat == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
@@ -299,7 +284,7 @@ public abstract class OrphoRenderer {
 				continue;
 
 			k = -1;
-			for (j = startwall; j < endwall; j++) {
+			for (int j = startwall; j < endwall; j++) {
 				wal = wall[j];
 				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(wall[j].point2))
 					continue;
@@ -343,7 +328,7 @@ public abstract class OrphoRenderer {
 			if (spr == -1 || !isValidSector(sprite[spr].getSectnum()))
 				continue;
 
-			SPRITE pPlayer = sprite[spr];
+			Sprite pPlayer = sprite[spr];
 			ox = mapSettings.getSpriteX(spr) - cposx;
 			oy = mapSettings.getSpriteY(spr) - cposy;
 

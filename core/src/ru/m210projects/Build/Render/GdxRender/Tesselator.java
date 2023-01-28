@@ -100,7 +100,7 @@ public class Tesselator {
 	}
 
 	private void initZoids(final int sectnum) {
-		final SECTOR sec = sector[sectnum];
+		final Sector sec = sector[sectnum];
 		final int n = sec.wallnum;
 
 		zoids.clear();
@@ -139,8 +139,8 @@ public class Tesselator {
 			startwall = sec.wallptr;
 			endwall = startwall + sec.wallnum - 1;
 			for (int w = startwall; w <= endwall; w++) {
-				WALL wal = wall[w];
-				WALL wal2 = wall[wal.point2];
+				Wall wal = wall[w];
+				Wall wal2 = wall[wal.point2];
 
 				x0 = wal.x;
 				y0 = wal.y;
@@ -256,7 +256,7 @@ public class Tesselator {
 		}
 		case Floor:
 		case Ceiling: {
-			SECTOR sec = sector[num];
+			Sector sec = sector[num];
 			surf.picnum = type == Type.Floor ? sec.floorpicnum : sec.ceilingpicnum;
 			surf.obj = sec;
 //			surf.shade = type == Type.Floor ? sec.floorshade : sec.ceilingshade;
@@ -313,8 +313,8 @@ public class Tesselator {
 
 								// Texture Relativity
 								if ((type == Type.Floor) ? sec.isRelativeTexFloor() : sec.isRelativeTexCeiling()) {
-									WALL wal = wall[sec.wallptr];
-									WALL wal2 = wall[wal.point2];
+									Wall wal = wall[sec.wallptr];
+									Wall wal2 = wall[wal.point2];
 
 									float vecx = wal.x - wal2.x;
 									float vecy = wal.y - wal2.y;
@@ -390,7 +390,7 @@ public class Tesselator {
 		}
 		case Wall:
 		case Sky: {
-			WALL wal = wall[num];
+			Wall wal = wall[num];
 			Heinum heinum = type.getHeinum();
 
 			ArrayList<Vertex> pol;
@@ -405,7 +405,7 @@ public class Tesselator {
 				else if (heinum == Heinum.Lower)
 					k = 1;
 
-				WALL ptr = wal;
+				Wall ptr = wal;
 				if (k == 1 && wal.nextsector != -1 && wal.isSwapped())
 					ptr = wall[wal.nextwall];
 				vOffs = getVCoord(wal, sectnum, k);
@@ -499,7 +499,7 @@ public class Tesselator {
 		return surf;
 	}
 
-	private int getVCoord(WALL wal, int sectnum, int k) {
+	private int getVCoord(Wall wal, int sectnum, int k) {
 		short nextsectnum = wal.nextsector;
 		int s3 = sectnum;
 		int align = 0;
@@ -529,7 +529,7 @@ public class Tesselator {
 		} else
 			align = wal.isBottomAligned() ? 1 : 0;
 
-		WALL ptr = wall[sector[s3].wallptr];
+		Wall ptr = wall[sector[s3].wallptr];
 		if (align == 0)
 			return engine.getceilzofslope((short) s3, ptr.x, ptr.y);
 		return engine.getflorzofslope((short) s3, ptr.x, ptr.y);
@@ -544,7 +544,7 @@ public class Tesselator {
 			this.v = v;
 		}
 
-		protected void set(WALL i, float z, float u, float v) {
+		protected void set(Wall i, float z, float u, float v) {
 			this.set(i.x, i.y, z);
 			this.u = u;
 			this.v = v;

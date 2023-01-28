@@ -17,7 +17,7 @@ import java.nio.ByteOrder;
 
 import ru.m210projects.Build.FileHandle.Resource;
 
-public class SPRITE {
+public class Sprite {
 	public static final int sizeof = 44;
 	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order( ByteOrder.LITTLE_ENDIAN);
 
@@ -161,7 +161,7 @@ public class SPRITE {
 		this.extra = var;
 	}
 
-	public void set(SPRITE src) {
+	public void set(Sprite src) {
 		this.x = src.x;
 		this.y = src.y;
 		this.z = src.z;

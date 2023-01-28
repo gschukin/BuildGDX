@@ -15,7 +15,7 @@ import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
 import ru.m210projects.Build.Types.LinkedList;
 import ru.m210projects.Build.Types.LinkedList.Node;
 import ru.m210projects.Build.Types.RuntimeArray;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 
 public class RayCaster {
 
@@ -227,8 +227,8 @@ public class RayCaster {
 	}
 
 	public void add(int z, WallFrustum2d frust) {
-		WALL wal = wall[z];
-		WALL wal2 = wall[wal.point2];
+		Wall wal = wall[z];
+		Wall wal2 = wall[wal.point2];
 
 		if (frust == null || frust.sectnum == globalcursectnum) {
 			addSegment(z, wal.x, wal.y, wal2.x, wal2.y);
@@ -248,8 +248,8 @@ public class RayCaster {
 
 	public void addClippedSegment(WallFrustum2d frustum, int z) {
 		Plane[] planes = frustum.planes;
-		WALL p1 = wall[z];
-		WALL p2 = wall[p1.point2];
+		Wall p1 = wall[z];
+		Wall p2 = wall[p1.point2];
 
 		float p1x = p1.x;
 		float p1y = p1.y;

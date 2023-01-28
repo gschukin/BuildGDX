@@ -12,46 +12,7 @@ package ru.m210projects.Build.Render.Software;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.MAXYDIM;
-import static ru.m210projects.Build.Engine.beforedrawrooms;
-import static ru.m210projects.Build.Engine.globalpal;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalshade;
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.palookup;
-import static ru.m210projects.Build.Engine.picsiz;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.pow2long;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.smalltextfont;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.textfont;
-import static ru.m210projects.Build.Engine.tsprite;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.wx1;
-import static ru.m210projects.Build.Engine.wx2;
-import static ru.m210projects.Build.Engine.wy1;
-import static ru.m210projects.Build.Engine.wy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.xdimen;
-import static ru.m210projects.Build.Engine.xdimenscale;
-import static ru.m210projects.Build.Engine.xyaspect;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.yxaspect;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.klabs;
@@ -289,8 +250,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 	@Override
 	public void drawmapview(int dax, int day, int zoome, int ang) {
-		WALL wal;
-		SECTOR sec = null;
+		Wall wal;
+		Sector sec = null;
 
 		int i, j, x, y, bakx1, baky1;
 		int s, w, ox, oy, startwall, cx1, cy1, cx2, cy2;
@@ -361,17 +322,17 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (i = headspritesect[s]; i >= 0; i = nextspritesect[i])
-						if ((sprite[i].cstat & 48) == 32) {
+					for(int i1 : spriteSectMap.getIndicesOf(s))
+						if ((sprite[i1].cstat & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
-							if ((sprite[i].cstat & (64 + 8)) == (64 + 8))
+							if ((sprite[i1].cstat & (64 + 8)) == (64 + 8))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i]);
-							tsprite[sortnum++].owner = (short) i;
+							tsprite[sortnum].set(sprite[i1]);
+							tsprite[sortnum++].owner = (short) i1;
 						}
 				}
 
@@ -496,7 +457,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				SPRITE spr = sprite[tsprite[s].owner];
+				Sprite spr = sprite[tsprite[s].owner];
 				if ((spr.cstat & 48) == 32) {
 					npoints = 0;
 

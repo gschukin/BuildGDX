@@ -38,6 +38,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -275,15 +276,15 @@ public abstract class Engine {
 	public static byte[] show2dwall;
 	public static byte[] show2dsprite;
 
-	public static SECTOR[] sector;
-	public static WALL[] wall;
-	public static SPRITE[] sprite;
+	public static Sector[] sector;
+	public static Wall[] wall;
+	public static Sprite[] sprite;
 	public static TSprite[] tsprite;
 	protected Tile[] tiles;
 
-	public static short[] headspritesect, headspritestat;
-	public static short[] prevspritesect, prevspritestat;
-	public static short[] nextspritesect, nextspritestat;
+	public static LinkedMap spriteSectMap;
+	public static LinkedMap spriteStatMap;
+
 	private final char[] fpsbuffer = new char[32];
 	private long fpstime = 0;
 	private int fpsx, fpsy;
@@ -661,50 +662,13 @@ public abstract class Engine {
 
 	////////// SPRITE LIST MANIPULATION FUNCTIONS //////////
 
-	public short insertspritesect(int sectnum) // jfBuild
-	{
-		if ((sectnum >= MAXSECTORS) || (headspritesect[MAXSECTORS] == -1))
-			return (-1); // list full
-
-		short blanktouse = headspritesect[MAXSECTORS];
-
-		headspritesect[MAXSECTORS] = nextspritesect[blanktouse];
-		if (headspritesect[MAXSECTORS] >= 0)
-			prevspritesect[headspritesect[MAXSECTORS]] = -1;
-
-		prevspritesect[blanktouse] = -1;
-		nextspritesect[blanktouse] = headspritesect[sectnum];
-		if (headspritesect[sectnum] >= 0)
-			prevspritesect[headspritesect[sectnum]] = blanktouse;
-		headspritesect[sectnum] = blanktouse;
-
-		sprite[blanktouse].setSectnum(sectnum);
-
-		return (blanktouse);
+	public short insertspritesect(int sectnum) {
+		return (short) spriteSectMap.insert(sectnum);
 	}
 
-	public short insertspritestat(int newstatnum) // jfBuild
-	{
-		if ((newstatnum >= MAXSTATUS) || (headspritestat[MAXSTATUS] == -1))
-			return (-1); // list full
-
-		short blanktouse = headspritestat[MAXSTATUS];
-
-		headspritestat[MAXSTATUS] = nextspritestat[blanktouse];
-		if (headspritestat[MAXSTATUS] >= 0)
-			prevspritestat[headspritestat[MAXSTATUS]] = -1;
-
-		prevspritestat[blanktouse] = -1;
-		nextspritestat[blanktouse] = headspritestat[newstatnum];
-		if (headspritestat[newstatnum] >= 0)
-			prevspritestat[headspritestat[newstatnum]] = blanktouse;
-		headspritestat[newstatnum] = blanktouse;
-
-		sprite[blanktouse].setStatnum(newstatnum);
-
-		return (blanktouse);
+	public short insertspritestat(int newstatnum) {
+		return (short) spriteStatMap.insert(newstatnum);
 	}
-
 	public short insertsprite(int sectnum, int statnum) // jfBuild
 	{
 		insertspritestat(statnum);
@@ -717,7 +681,8 @@ public abstract class Engine {
 		if (gl != null)
 			gl.removeSpriteCorr(spritenum);
 		deletespritestat(spritenum);
-		return (deletespritesect(spritenum));
+		deletespritesect(spritenum);
+		return 0;
 	}
 
 	public short changespritesect(int spritenum, int newsectnum) // jfBuild
@@ -728,7 +693,7 @@ public abstract class Engine {
 			return (0);
 		if (sprite[spritenum].getSectnum() == MAXSECTORS)
 			return (-1);
-		if (deletespritesect((short) spritenum) < 0)
+		if (!deletespritesect((short) spritenum))
 			return (-1);
 		insertspritesect(newsectnum);
 		return (0);
@@ -742,57 +707,20 @@ public abstract class Engine {
 			return (0);
 		if (sprite[spritenum].getStatnum() == MAXSTATUS)
 			return (-1);
-		if (deletespritestat((short) spritenum) < 0)
+		if (!deletespritestat((short) spritenum))
 			return (-1);
 		insertspritestat(newstatnum);
 		return (0);
 	}
 
-	public short deletespritesect(int spritenum) // jfBuild
-	{
-		if (sprite[spritenum].getSectnum() == MAXSECTORS)
-			return (-1);
-
-		if (headspritesect[sprite[spritenum].getSectnum()] == spritenum)
-			headspritesect[sprite[spritenum].getSectnum()] = nextspritesect[spritenum];
-
-		if (prevspritesect[spritenum] >= 0)
-			nextspritesect[prevspritesect[spritenum]] = nextspritesect[spritenum];
-		if (nextspritesect[spritenum] >= 0)
-			prevspritesect[nextspritesect[spritenum]] = prevspritesect[spritenum];
-
-		if (headspritesect[MAXSECTORS] >= 0)
-			prevspritesect[headspritesect[MAXSECTORS]] = (short) spritenum;
-		prevspritesect[spritenum] = -1;
-		nextspritesect[spritenum] = headspritesect[MAXSECTORS];
-		headspritesect[MAXSECTORS] = (short) spritenum;
-
-		sprite[spritenum].setSectnum(MAXSECTORS);
-		return (0);
+	public boolean deletespritesect(int spritenum) {
+		return spriteSectMap.remove(spritenum);
 	}
 
-	public short deletespritestat(int spritenum) // jfBuild
-	{
-		if (sprite[spritenum].getStatnum() == MAXSTATUS)
-			return (-1);
-
-		if (headspritestat[sprite[spritenum].getStatnum()] == spritenum)
-			headspritestat[sprite[spritenum].getStatnum()] = nextspritestat[spritenum];
-
-		if (prevspritestat[spritenum] >= 0)
-			nextspritestat[prevspritestat[spritenum]] = nextspritestat[spritenum];
-		if (nextspritestat[spritenum] >= 0)
-			prevspritestat[nextspritestat[spritenum]] = prevspritestat[spritenum];
-
-		if (headspritestat[MAXSTATUS] >= 0)
-			prevspritestat[headspritestat[MAXSTATUS]] = (short) spritenum;
-		prevspritestat[spritenum] = -1;
-		nextspritestat[spritenum] = headspritestat[MAXSTATUS];
-		headspritestat[MAXSTATUS] = (short) spritenum;
-
-		sprite[spritenum].setStatnum(MAXSTATUS);
-		return (0);
+	public boolean deletespritestat(int spritenum) {
+		return spriteStatMap.remove(spritenum);
 	}
+
 
 	public Point lintersect(int x1, int y1, int z1, int x2, int y2, int z2, int x3, // jfBuild
 			int y3, int x4, int y4) {
@@ -965,16 +893,11 @@ public abstract class Engine {
 		show2dsector = new byte[(MAXSECTORS + 7) >> 3];
 		show2dwall = new byte[(MAXWALLS + 7) >> 3];
 		show2dsprite = new byte[(MAXSPRITES + 7) >> 3];
-		sector = new SECTOR[MAXSECTORS];
-		wall = new WALL[MAXWALLS];
-		sprite = new SPRITE[MAXSPRITES];
+		sector = new Sector[MAXSECTORS];
+		wall = new Wall[MAXWALLS];
+		sprite = new Sprite[MAXSPRITES];
 		tsprite = new TSprite[MAXSPRITESONSCREEN + 1];
-		headspritesect = new short[MAXSECTORS + 1];
-		headspritestat = new short[MAXSTATUS + 1];
-		prevspritesect = new short[MAXSPRITES];
-		prevspritestat = new short[MAXSPRITES];
-		nextspritesect = new short[MAXSPRITES];
-		nextspritestat = new short[MAXSPRITES];
+
 		gotpic = new byte[(MAXTILES + 7) >> 3];
 		gotsector = new byte[(MAXSECTORS + 7) >> 3];
 
@@ -1069,39 +992,29 @@ public abstract class Engine {
 
 	public void initspritelists() // jfBuild
 	{
-		for (int i = 0; i < MAXSECTORS; i++) // Init doubly-linked sprite sector lists
-			headspritesect[i] = -1;
-		headspritesect[MAXSECTORS] = 0;
+		this.spriteSectMap = new SpriteLinkedMap(MAXSECTORS) {
+			@Override
+			protected void put(Sprite spr, int value) {
+				spr.setSectnum(value);
+			}
 
-		for (int i = 0; i < MAXSPRITES; i++) {
-			if (sprite[i] == null)
-				sprite[i] = new SPRITE();
-			else
-				sprite[i].reset();
-			prevspritesect[i] = (short) (i - 1);
-			nextspritesect[i] = (short) (i + 1);
-			sprite[i].setSectnum(MAXSECTORS);
-		}
-		prevspritesect[0] = -1;
-		nextspritesect[MAXSPRITES - 1] = -1;
+			@Override
+			protected int get(Sprite spr) {
+				return spr.getSectnum();
+			}
+		};
 
-		for (int i = 0; i < MAXSTATUS; i++) // Init doubly-linked sprite status lists
-			headspritestat[i] = -1;
-		headspritestat[MAXSTATUS] = 0;
-		for (int i = 0; i < MAXSPRITES; i++) {
-			prevspritestat[i] = (short) (i - 1);
-			nextspritestat[i] = (short) (i + 1);
-			sprite[i].setStatnum(MAXSTATUS);
-		}
-		prevspritestat[0] = -1;
-		nextspritestat[MAXSPRITES - 1] = -1;
+		this.spriteStatMap = new SpriteLinkedMap(MAXSTATUS) {
+			@Override
+			protected void put(Sprite spr, int value) {
+				spr.setStatnum(value);
+			}
 
-		for (int i = 0; i < MAXSPRITESONSCREEN; i++) {
-			if (tsprite[i] == null)
-				tsprite[i] = new TSprite();
-			else
-				tsprite[i].reset();
-		}
+			@Override
+			protected int get(Sprite spr) {
+				return spr.getStatnum();
+			}
+		};
 	}
 
 	public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, short dacursectnum) { // eDuke32
@@ -1180,11 +1093,11 @@ public abstract class Engine {
 
 		numsectors = fil.readShort();
 		for (int i = 0; i < numsectors; i++)
-			sector[i] = new SECTOR(fil);
+			sector[i] = new Sector(fil);
 
 		numwalls = fil.readShort();
 		for (int w = 0; w < numwalls; w++)
-			wall[w] = new WALL(fil);
+			wall[w] = new Wall(fil);
 
 		numsprites = fil.readShort();
 		for (int s = 0; s < numsprites; s++)
@@ -1221,7 +1134,7 @@ public abstract class Engine {
 
 		numsectors = fil.readShort();
 		for (int i = 0; i < numsectors; i++) {
-			SECTOR sec = new SECTOR();
+			Sector sec = new Sector();
 
 			sec.wallptr = fil.readShort();
 			sec.wallnum = fil.readShort();
@@ -1257,7 +1170,7 @@ public abstract class Engine {
 
 		numwalls = fil.readShort();
 		for (int w = 0; w < numwalls; w++) {
-			WALL wal = new WALL();
+			Wall wal = new Wall();
 
 			wal.x = fil.readInt();
 			wal.y = fil.readInt();
@@ -1282,7 +1195,7 @@ public abstract class Engine {
 
 		numsprites = fil.readShort();
 		for (int s = 0; s < numsprites; s++) {
-			SPRITE spr = sprite[s];
+			Sprite spr = sprite[s];
 
 			spr.x = fil.readInt();
 			spr.y = fil.readInt();
@@ -1612,7 +1525,7 @@ public abstract class Engine {
 		if (isCorruptWall(wallnum))
 			return 0;
 
-		WALL wal = wall[wallnum];
+		Wall wal = wall[wallnum];
 		int x1 = wal.x + walldist - x;
 		int y1 = wal.y + walldist - y;
 		wal = wall[wal.point2];
@@ -1697,7 +1610,7 @@ public abstract class Engine {
 			if (isCorruptWall(wallid))
 				return -1;
 
-			WALL wal = wall[wallid];
+			Wall wal = wall[wallid];
 			int y1 = wal.y - y;
 			int y2 = wall[wal.point2].y - y;
 
@@ -1780,7 +1693,7 @@ public abstract class Engine {
 		short wallid = sector[sectnum].wallptr;
 		int i = sector[sectnum].wallnum, testz;
 		do {
-			WALL wal = wall[wallid];
+			Wall wal = wall[wallid];
 			if (wal.nextsector >= 0) {
 				if (topbottom == 1) {
 					testz = sector[wal.nextsector].floorz;
@@ -1832,7 +1745,7 @@ public abstract class Engine {
 			if (!isValidSector(dasectnum))
 				continue;
 
-			SECTOR sec = sector[dasectnum];
+			Sector sec = sector[dasectnum];
 			short startwall = sec.wallptr;
 			int endwall = startwall + sec.wallnum - 1;
 			if (startwall < 0 || endwall < 0)
@@ -1842,8 +1755,8 @@ public abstract class Engine {
 				if (isCorruptWall(w))
 					continue;
 
-				WALL wal = wall[w];
-				WALL wal2 = wall[wal.point2];
+				Wall wal = wall[w];
+				Wall wal2 = wall[wal.point2];
 				int x31 = wal.x - x1;
 				int x34 = wal.x - wal2.x;
 				int y31 = wal.y - y1;
@@ -1898,7 +1811,7 @@ public abstract class Engine {
 		int ang, cosang, sinang, xspan, yspan, xrepeat, yrepeat;
 
 		short dasector, startwall;
-		short nextsector, z;
+		short nextsector;
 		int clipyou;
 
 		hit.hitsect = -1;
@@ -1922,15 +1835,15 @@ public abstract class Engine {
 				tempshortcnt++;
 				continue;
 			}
-			SECTOR sec = sector[dasector];
+			Sector sec = sector[dasector];
 			if (sec == null) {
 				tempshortcnt++;
 				continue;
 			}
 			x1 = 0x7fffffff;
 			if ((sec.ceilingstat & 2) != 0) {
-				WALL wal = wall[sec.wallptr];
-				WALL wal2 = wall[wal.point2];
+				Wall wal = wall[sec.wallptr];
+				Wall wal2 = wall[wal.point2];
 				dax = wal2.x - wal.x;
 				day = wal2.y - wal.y;
 				i = ksqrt(dax * dax + day * day);
@@ -1972,8 +1885,8 @@ public abstract class Engine {
 
 			x1 = 0x7fffffff;
 			if ((sec.floorstat & 2) != 0) {
-				WALL wal = wall[sec.wallptr];
-				WALL wal2 = wall[wal.point2];
+				Wall wal = wall[sec.wallptr];
+				Wall wal2 = wall[wal.point2];
 				dax = wal2.x - wal.x;
 				day = wal2.y - wal.y;
 				i = ksqrt(dax * dax + day * day);
@@ -2021,12 +1934,12 @@ public abstract class Engine {
 				continue;
 			}
 			Point out;
-			for (z = startwall; z < endwall; z++) {
+			for (int z = startwall; z < endwall; z++) {
 				if (isCorruptWall(z))
 					continue;
 
-				WALL wal = wall[z];
-				WALL wal2 = wall[wal.point2];
+				Wall wal = wall[z];
+				Wall wal2 = wall[wal.point2];
 				x1 = wal.x;
 				y1 = wal.y;
 				x2 = wal2.x;
@@ -2048,7 +1961,7 @@ public abstract class Engine {
 				nextsector = wal.nextsector;
 				if ((nextsector < 0) || ((wal.cstat & dawalclipmask) != 0)) {
 					hit.hitsect = dasector;
-					hit.hitwall = z;
+					hit.hitwall = (short) z;
 					hit.hitsprite = -1;
 					hit.hitx = intx;
 					hit.hity = inty;
@@ -2058,7 +1971,7 @@ public abstract class Engine {
 				getzsofslope(nextsector, intx, inty, zofslope);
 				if ((intz <= zofslope[CEIL]) || (intz >= zofslope[FLOOR])) {
 					hit.hitsect = dasector;
-					hit.hitwall = z;
+					hit.hitwall = (short) z;
 					hit.hitsprite = -1;
 					hit.hitx = intx;
 					hit.hity = inty;
@@ -2073,8 +1986,10 @@ public abstract class Engine {
 					clipsectorlist[tempshortnum++] = nextsector;
 			}
 
-			for (z = headspritesect[dasector]; z >= 0; z = nextspritesect[z]) {
-				SPRITE spr = sprite[z];
+
+
+			for (int z : spriteSectMap.getIndicesOf(dasector)) {
+				Sprite spr = sprite[z];
 				cstat = spr.cstat;
 
 				if (hitallsprites == 0)
@@ -2122,7 +2037,7 @@ public abstract class Engine {
 
 					hit.hitsect = dasector;
 					hit.hitwall = -1;
-					hit.hitsprite = z;
+					hit.hitsprite = (short) z;
 					hit.hitx = intx;
 					hit.hity = inty;
 					hit.hitz = intz;
@@ -2168,7 +2083,7 @@ public abstract class Engine {
 					if ((intz < zofslope[CEIL]) && (intz > zofslope[CEIL] - k)) {
 						hit.hitsect = dasector;
 						hit.hitwall = -1;
-						hit.hitsprite = z;
+						hit.hitsprite = (short) z;
 						hit.hitx = intx;
 						hit.hity = inty;
 						hit.hitz = intz;
@@ -2249,7 +2164,7 @@ public abstract class Engine {
 					if (clipyou != 0) {
 						hit.hitsect = dasector;
 						hit.hitwall = -1;
-						hit.hitsprite = z;
+						hit.hitsprite = (short) z;
 						hit.hitx = intx;
 						hit.hity = inty;
 						hit.hitz = intz;
@@ -2275,7 +2190,7 @@ public abstract class Engine {
 		int i, zz, x1, y1, z1, x2, y2, endwall;
 		int topt, topu, bot, dist, offx, offy;
 		short dasector, startwall;
-		short nextsector, good, z;
+		short nextsector, good;
 
 		near.tagsector = -1;
 		near.tagwall = -1;
@@ -2310,9 +2225,9 @@ public abstract class Engine {
 				tempshortcnt++;
 				continue;
 			}
-			for (z = startwall; z <= endwall; z++) {
-				WALL wal = wall[z];
-				WALL wal2 = wall[wal.point2];
+			for (int z = startwall; z <= endwall; z++) {
+				Wall wal = wall[z];
+				Wall wal2 = wall[wal.point2];
 				x1 = wal.x;
 				y1 = wal.y;
 				x2 = wal2.x;
@@ -2342,7 +2257,7 @@ public abstract class Engine {
 						if ((good & 1) != 0)
 							near.tagsector = nextsector;
 						if ((good & 2) != 0)
-							near.tagwall = z;
+							near.tagwall = (short) z;
 						near.taghitdist = dmulscale(out.getX() - xs, sintable[(ange + 2560) & 2047], out.getY() - ys,
 								sintable[(ange + 2048) & 2047], 14);
 						xe = out.getX();
@@ -2359,8 +2274,8 @@ public abstract class Engine {
 				}
 			}
 
-			for (z = headspritesect[dasector]; z >= 0; z = nextspritesect[z]) {
-				SPRITE spr = sprite[z];
+			for (int z : spriteSectMap.getIndicesOf(dasector)) {
+				Sprite spr = sprite[z];
 
 				good = 0;
 				if (((tagsearch & 1) != 0) && spr.lotag != 0)
@@ -2394,7 +2309,7 @@ public abstract class Engine {
 									int intx = xs + scale(vx, topt, bot);
 									int inty = ys + scale(vy, topt, bot);
 									if (klabs(intx - xs) + klabs(inty - ys) < klabs(xe - xs) + klabs(ye - ys)) {
-										near.tagsprite = z;
+										near.tagsprite = (short) z;
 										near.taghitdist = dmulscale(intx - xs, sintable[(ange + 2560) & 2047],
 												inty - ys, sintable[(ange + 2048) & 2047], 14);
 										xe = intx;
@@ -2492,11 +2407,11 @@ public abstract class Engine {
 		clipmove_y = y;
 		clipmove_z = z;
 		clipmove_sectnum = (short) sectnum;
-		WALL wal, wal2;
-		SPRITE spr;
-		SECTOR sec, sec2;
+		Wall wal, wal2;
+		Sprite spr;
+		Sector sec, sec2;
 		int i, templong1, templong2;
-		short j, startwall, hitwall;
+		short startwall, hitwall;
 		long oxvect, oyvect;
 		int lx, ly, retval;
 		int intx, inty, goalx, goaly;
@@ -2548,7 +2463,7 @@ public abstract class Engine {
 			endwall = startwall + sec.wallnum;
 			if (startwall < 0 || endwall < 0)
 				continue;
-			for (j = startwall; j < endwall; j++) {
+			for (short j = startwall; j < endwall; j++) {
 				if (isCorruptWall(j))
 					continue;
 
@@ -2646,7 +2561,7 @@ public abstract class Engine {
 				}
 			}
 
-			for (j = headspritesect[dasect]; j >= 0; j = nextspritesect[j]) {
+			for (int j : spriteSectMap.getIndicesOf(dasect)) {
 				spr = sprite[j];
 
 				cstat = spr.cstat;
@@ -2821,7 +2736,7 @@ public abstract class Engine {
 
 				templong1 = dmulscale(lx, oxvect, ly, oyvect, 6);
 				for (i = cnt + 1; i <= clipmoveboxtracenum; i++) {
-					j = hitwalls[i];
+					short j = hitwalls[i];
 					templong2 = dmulscale(clipit[j].x2 - clipit[j].x1, oxvect, clipit[j].y2 - clipit[j].y1, oyvect, 6);
 					if ((templong1 ^ templong2) < 0) {
 						clipmove_sectnum = updatesector(clipmove_x, clipmove_y, clipmove_sectnum);
@@ -2846,7 +2761,7 @@ public abstract class Engine {
 			clipmove_y = inty;
 		} while (((xvect | yvect) != 0) && (hitwall >= 0) && (cnt > 0));
 
-		for (j = 0; j < clipsectnum; j++)
+		for (short j = 0; j < clipsectnum; j++)
 			if (inside(clipmove_x, clipmove_y, clipsectorlist[j]) == 1) {
 				clipmove_sectnum = clipsectorlist[j];
 				return (retval);
@@ -2854,7 +2769,7 @@ public abstract class Engine {
 
 		clipmove_sectnum = -1;
 		templong1 = 0x7fffffff;
-		for (j = (short) (numsectors - 1); j >= 0; j--)
+		for (short j = (short) (numsectors - 1); j >= 0; j--)
 			if (inside(clipmove_x, clipmove_y, j) == 1) {
 				if ((sector[j].ceilingstat & 2) != 0)
 					templong2 = getceilzofslope(j, clipmove_x, clipmove_y) - (clipmove_z);
@@ -2891,8 +2806,8 @@ public abstract class Engine {
 		pushmove_z = z;
 		pushmove_sectnum = (short) sectnum;
 
-		SECTOR sec, sec2;
-		WALL wal;
+		Sector sec, sec2;
+		Wall wal;
 		int i, j, k, t, dx, dy, dax, day, daz, daz2, bad, dir;
 		int dawalclipmask;
 		short startwall, endwall, clipsectcnt;
@@ -3021,7 +2936,7 @@ public abstract class Engine {
 				if (!isValidWall(wallid))
 					break;
 
-				WALL wal = wall[wallid];
+				Wall wal = wall[wallid];
 				i = wal.nextsector;
 				if (i >= 0)
 					if (inside(x, y, i) == 1) {
@@ -3054,7 +2969,7 @@ public abstract class Engine {
 				if (!isValidWall(wallid))
 					break;
 
-				WALL wal = wall[wallid];
+				Wall wal = wall[wallid];
 				i = wal.nextsector;
 				if (i >= 0) {
 					getzsofslope(i, x, y, zofslope);
@@ -3116,11 +3031,11 @@ public abstract class Engine {
 
 	public void getzrange(int x, int y, int z, int sectnum, // jfBuild
 			int walldist, int cliptype) {
-		SECTOR sec;
-		WALL wal, wal2;
-		SPRITE spr;
+		Sector sec;
+		Wall wal, wal2;
+		Sprite spr;
 		int clipsectcnt, startwall, endwall, xoff, yoff, dax, day;
-		int xmin, ymin, xmax, ymax, i, j, k, l, dx, dy;
+		int xmin, ymin, xmax, ymax, i, k, l, dx, dy;
 		int x1, y1, x2, y2, x3, y3, x4, y4, ang, cosang, sinang;
 		int xspan, yspan, xrepeat, yrepeat, dasprclipmask, dawalclipmask;
 
@@ -3170,7 +3085,7 @@ public abstract class Engine {
 				clipsectcnt++;
 				continue;
 			}
-			for (j = startwall; j < endwall; j++) {
+			for (int j = startwall; j < endwall; j++) {
 				if (isCorruptWall(j))
 					continue;
 
@@ -3259,7 +3174,7 @@ public abstract class Engine {
 		} while (clipsectcnt < clipsectnum);
 
 		for (i = 0; i < clipsectnum; i++) {
-			for (j = headspritesect[clipsectorlist[i]]; j >= 0; j = nextspritesect[j]) {
+			for(int j : spriteSectMap.getIndicesOf(clipsectorlist[i])) {
 				spr = sprite[j];
 				cstat = spr.cstat;
 				if ((cstat & dasprclipmask) != 0) {
@@ -3727,7 +3642,7 @@ public abstract class Engine {
 		if ((sector[sectnum].ceilingstat & 2) == 0)
 			return (sector[sectnum].ceilingz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		int i = (ksqrt(dx * dx + dy * dy) << 5);
@@ -3744,7 +3659,7 @@ public abstract class Engine {
 		if ((sector[sectnum].floorstat & 2) == 0)
 			return (sector[sectnum].floorz);
 
-		WALL wal = wall[sector[sectnum].wallptr];
+		Wall wal = wall[sector[sectnum].wallptr];
 		int dx = wall[wal.point2].x - wal.x;
 		int dy = wall[wal.point2].y - wal.y;
 		int i = (ksqrt(dx * dx + dy * dy) << 5);
@@ -3758,14 +3673,14 @@ public abstract class Engine {
 		if (sectnum < 0 || sectnum >= MAXSECTORS || sector[sectnum] == null)
 			return;
 
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		if (sec == null)
 			return;
 		outz[CEIL] = sec.ceilingz;
 		outz[FLOOR] = sec.floorz;
 		if (((sec.ceilingstat | sec.floorstat) & 2) != 0) {
-			WALL wal = wall[sec.wallptr];
-			WALL wal2 = wall[wal.point2];
+			Wall wal = wall[sec.wallptr];
+			Wall wal2 = wall[wal.point2];
 			int dx = wal2.x - wal.x;
 			int dy = wal2.y - wal.y;
 			int i = (ksqrt(dx * dx + dy * dy) << 5);
@@ -3781,7 +3696,7 @@ public abstract class Engine {
 	}
 
 	public void alignceilslope(int dasect, int x, int y, int z) { // jfBuild
-		WALL wal = wall[sector[dasect].wallptr];
+		Wall wal = wall[sector[dasect].wallptr];
 		int dax = wall[wal.point2].x - wal.x;
 		int day = wall[wal.point2].y - wal.y;
 
@@ -3798,7 +3713,7 @@ public abstract class Engine {
 	}
 
 	public void alignflorslope(int dasect, int x, int y, int z) { // jfBuild
-		WALL wal = wall[sector[dasect].wallptr];
+		Wall wal = wall[sector[dasect].wallptr];
 		int dax = wall[wal.point2].x - wal.x;
 		int day = wall[wal.point2].y - wal.y;
 
@@ -4101,5 +4016,26 @@ public abstract class Engine {
 
 	public DefScript getDefs() {
 		return defs;
+	}
+
+	public abstract static class SpriteLinkedMap extends LinkedMap {
+
+		public SpriteLinkedMap(int listCount) {
+			super(listCount, MAXSPRITES);
+		}
+
+		protected abstract void put(Sprite spr, int value);
+
+		protected abstract int get(Sprite spr);
+
+		@Override
+		protected void put(int element, int value) {
+			put(sprite[element], value);
+		}
+
+		@Override
+		protected int get(int element) {
+			return get(sprite[element]);
+		}
 	}
 }

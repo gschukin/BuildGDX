@@ -22,9 +22,9 @@ import static ru.m210projects.Build.Pragmas.mulscale;
 import java.util.Arrays;
 
 import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SPRITE;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sprite;
+import ru.m210projects.Build.Types.Wall;
 
 public class Interpolation {
 
@@ -78,22 +78,22 @@ public class Interpolation {
 
 		switch (type) {
 		case WallX:
-			data.oldpos = ((WALL) obj).x;
+			data.oldpos = ((Wall) obj).x;
 			break;
 		case WallY:
-			data.oldpos = ((WALL) obj).y;
+			data.oldpos = ((Wall) obj).y;
 			break;
 		case FloorZ:
-			data.oldpos = ((SECTOR) obj).floorz;
+			data.oldpos = ((Sector) obj).floorz;
 			break;
 		case CeilZ:
-			data.oldpos = ((SECTOR) obj).ceilingz;
+			data.oldpos = ((Sector) obj).ceilingz;
 			break;
 		case FloorH:
-			data.oldpos = ((SECTOR) obj).floorheinum;
+			data.oldpos = ((Sector) obj).floorheinum;
 			break;
 		case CeilH:
-			data.oldpos = ((SECTOR) obj).ceilingheinum;
+			data.oldpos = ((Sector) obj).ceilingheinum;
 			break;
 		}
 	}
@@ -128,7 +128,7 @@ public class Interpolation {
 		requestUpdating = true;
 	}
 
-	public void dospriteinterp(SPRITE tsp, int smoothratio) {
+	public void dospriteinterp(Sprite tsp, int smoothratio) {
 		ILoc oldLoc = getsprinterpolate(tsp.owner);
 		if (oldLoc != null) {
 			int x = oldLoc.x;
@@ -152,17 +152,17 @@ public class Interpolation {
 	public int getValue(IData obj) {
 		switch (obj.type) {
 		case WallX:
-			return ((WALL) obj.ptr).x;
+			return ((Wall) obj.ptr).x;
 		case WallY:
-			return ((WALL) obj.ptr).y;
+			return ((Wall) obj.ptr).y;
 		case FloorZ:
-			return ((SECTOR) obj.ptr).floorz;
+			return ((Sector) obj.ptr).floorz;
 		case CeilZ:
-			return ((SECTOR) obj.ptr).ceilingz;
+			return ((Sector) obj.ptr).ceilingz;
 		case FloorH:
-			return ((SECTOR) obj.ptr).floorheinum;
+			return ((Sector) obj.ptr).floorheinum;
 		case CeilH:
-			return ((SECTOR) obj.ptr).ceilingheinum;
+			return ((Sector) obj.ptr).ceilingheinum;
 		}
 
 		return 0;
@@ -178,22 +178,22 @@ public class Interpolation {
 
 			switch (gInt.type) {
 			case WallX:
-				((WALL) obj).x = value;
+				((Wall) obj).x = value;
 				break;
 			case WallY:
-				((WALL) obj).y = value;
+				((Wall) obj).y = value;
 				break;
 			case FloorZ:
-				((SECTOR) obj).floorz = value;
+				((Sector) obj).floorz = value;
 				break;
 			case CeilZ:
-				((SECTOR) obj).ceilingz = value;
+				((Sector) obj).ceilingz = value;
 				break;
 			case FloorH:
-				((SECTOR) obj).floorheinum = (short) value;
+				((Sector) obj).floorheinum = (short) value;
 				break;
 			case CeilH:
-				((SECTOR) obj).ceilingheinum = (short) value;
+				((Sector) obj).ceilingheinum = (short) value;
 				break;
 			}
 		}
@@ -205,28 +205,28 @@ public class Interpolation {
 			Object obj = gInt.ptr;
 			switch (gInt.type) {
 			case WallX:
-				((WALL) obj).x = gInt.bakpos;
+				((Wall) obj).x = gInt.bakpos;
 				break;
 			case WallY:
-				((WALL) obj).y = gInt.bakpos;
+				((Wall) obj).y = gInt.bakpos;
 				break;
 			case FloorZ:
-				((SECTOR) obj).floorz = gInt.bakpos;
+				((Sector) obj).floorz = gInt.bakpos;
 				break;
 			case CeilZ:
-				((SECTOR) obj).ceilingz = gInt.bakpos;
+				((Sector) obj).ceilingz = gInt.bakpos;
 				break;
 			case FloorH:
-				((SECTOR) obj).floorheinum = (short) gInt.bakpos;
+				((Sector) obj).floorheinum = (short) gInt.bakpos;
 				break;
 			case CeilH:
-				((SECTOR) obj).ceilingheinum = (short) gInt.bakpos;
+				((Sector) obj).ceilingheinum = (short) gInt.bakpos;
 				break;
 			}
 		}
 	}
 
-	public boolean setsprinterpolate(int nSprite, SPRITE pSprite) {
+	public boolean setsprinterpolate(int nSprite, Sprite pSprite) {
 		if ((gSpriteLoc[nSprite >> 3] & pow2char[nSprite & 7]) == 0) {
 			ILoc pLocation = gOldSpriteLoc[nSprite];
 			pLocation.x = pSprite.x;
@@ -250,7 +250,7 @@ public class Interpolation {
 		return null;
 	}
 
-	public void setwallinterpolate(int nWall, WALL pWall) {
+	public void setwallinterpolate(int nWall, Wall pWall) {
 		if ((gWallLoc[nWall >> 3] & pow2char[nWall & 7]) == 0) {
 			setinterpolation(pWall, InterpolationType.WallX);
 			setinterpolation(pWall, InterpolationType.WallY);
@@ -258,7 +258,7 @@ public class Interpolation {
 		}
 	}
 
-	public void clearwallinterpolate(int nWall, WALL pWall) {
+	public void clearwallinterpolate(int nWall, Wall pWall) {
 		if ((gWallLoc[nWall >> 3] & pow2char[nWall & 7]) != 0) {
 			stopinterpolation(pWall, InterpolationType.WallX);
 			stopinterpolation(pWall, InterpolationType.WallY);
@@ -266,35 +266,35 @@ public class Interpolation {
 		}
 	}
 
-	public void setfheinuminterpolate(int nSector, SECTOR pSector) {
+	public void setfheinuminterpolate(int nSector, Sector pSector) {
 		if ((gFloorHeinumLoc[nSector >> 3] & pow2char[nSector & 7]) == 0) {
 			setinterpolation(pSector, InterpolationType.FloorH);
 			gFloorHeinumLoc[nSector >> 3] |= pow2char[nSector & 7];
 		}
 	}
 
-	public void clearfheinuminterpolate(int nSector, SECTOR pSector) {
+	public void clearfheinuminterpolate(int nSector, Sector pSector) {
 		if ((gFloorHeinumLoc[nSector >> 3] & pow2char[nSector & 7]) != 0) {
 			stopinterpolation(pSector, InterpolationType.FloorH);
 			gFloorHeinumLoc[nSector >> 3] &= ~pow2char[nSector & 7];
 		}
 	}
 
-	public void setcheinuminterpolate(int nSector, SECTOR pSector) {
+	public void setcheinuminterpolate(int nSector, Sector pSector) {
 		if ((gCeilHeinumLoc[nSector >> 3] & pow2char[nSector & 7]) == 0) {
 			setinterpolation(pSector, InterpolationType.CeilH);
 			gCeilHeinumLoc[nSector >> 3] |= pow2char[nSector & 7];
 		}
 	}
 
-	public void clearcheinuminterpolate(int nSector, SECTOR pSector) {
+	public void clearcheinuminterpolate(int nSector, Sector pSector) {
 		if ((gCeilHeinumLoc[nSector >> 3] & pow2char[nSector & 7]) != 0) {
 			stopinterpolation(pSector, InterpolationType.CeilH);
 			gCeilHeinumLoc[nSector >> 3] &= ~pow2char[nSector & 7];
 		}
 	}
 
-	public boolean setfloorinterpolate(int nSector, SECTOR pSector) {
+	public boolean setfloorinterpolate(int nSector, Sector pSector) {
 		if ((gFloorLoc[nSector >> 3] & pow2char[nSector & 7]) == 0) {
 			setinterpolation(pSector, InterpolationType.FloorZ);
 			gFloorLoc[nSector >> 3] |= pow2char[nSector & 7];
@@ -303,14 +303,14 @@ public class Interpolation {
 		return false;
 	}
 
-	public void clearfloorinterpolate(int nSector, SECTOR pSector) {
+	public void clearfloorinterpolate(int nSector, Sector pSector) {
 		if ((gFloorLoc[nSector >> 3] & pow2char[nSector & 7]) != 0) {
 			stopinterpolation(pSector, InterpolationType.FloorZ);
 			gFloorLoc[nSector >> 3] &= ~pow2char[nSector & 7];
 		}
 	}
 
-	public boolean setceilinterpolate(int nSector, SECTOR pSector) {
+	public boolean setceilinterpolate(int nSector, Sector pSector) {
 		if ((gCeilLoc[nSector >> 3] & pow2char[nSector & 7]) == 0) {
 			setinterpolation(pSector, InterpolationType.CeilZ);
 			gCeilLoc[nSector >> 3] |= pow2char[nSector & 7];
@@ -319,7 +319,7 @@ public class Interpolation {
 		return false;
 	}
 
-	public void clearceilinterpolate(int nSector, SECTOR pSector) {
+	public void clearceilinterpolate(int nSector, Sector pSector) {
 		if ((gCeilLoc[nSector >> 3] & pow2char[nSector & 7]) != 0) {
 			stopinterpolation(pSector, InterpolationType.CeilZ);
 			gCeilLoc[nSector >> 3] &= ~pow2char[nSector & 7];

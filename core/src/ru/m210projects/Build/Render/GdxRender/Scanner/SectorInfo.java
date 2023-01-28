@@ -8,9 +8,9 @@ import static ru.m210projects.Build.Engine.wall;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Engine.Clockdir;
-import ru.m210projects.Build.Types.SECTOR;
-import ru.m210projects.Build.Types.SECTOR.SectorIterator;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.Types.Sector.SectorIterator;
+import ru.m210projects.Build.Types.Wall;
 
 public class SectorInfo {
 
@@ -23,7 +23,7 @@ public class SectorInfo {
 
 	public void init(Engine engine) {
 		for (int i = 0; i < numsectors; i++) {
-			SECTOR sec = sector[i];
+			Sector sec = sector[i];
 			SectorIterator it = sec.iterator();
 
 			hasOccluders[i] = false;
@@ -33,7 +33,7 @@ public class SectorInfo {
 			while (it.hasNext()) {
 				short z = it.nexti();
 				loopinfo[z] = dir == null ? (dir = engine.clockdir(z)) : dir;
-				WALL wal = wall[z];
+				Wall wal = wall[z];
 				int nextsector = wal.nextsector;
 				if (dir == Clockdir.CCW && nextsector == -1) {
 					isOccluder[z] = true;

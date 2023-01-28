@@ -19,7 +19,7 @@ import java.util.Iterator;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
 
-public class SECTOR {
+public class Sector {
 	public static final int sizeof = 40;
 	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -36,14 +36,14 @@ public class SECTOR {
 	public short visibility, filler; // 2
 	public short lotag, hitag, extra; // 6
 
-	public SECTOR() {
+	public Sector() {
 	}
 
-	public SECTOR(byte[] data) {
+	public Sector(byte[] data) {
 		buildSector(new DataResource(data));
 	}
 
-	public SECTOR(Resource data) {
+	public Sector(Resource data) {
 		buildSector(data);
 	}
 
@@ -159,7 +159,7 @@ public class SECTOR {
 		extra = bb.readShort();
 	}
 
-	public void set(SECTOR src) {
+	public void set(Sector src) {
 		wallptr = src.wallptr;
 		wallnum = src.wallnum;
 		ceilingz = src.ceilingz;
@@ -246,7 +246,7 @@ public class SECTOR {
 
 	private static SectorIterator it;
 
-	public static final class SectorIterator implements Iterator<WALL> {
+	public static final class SectorIterator implements Iterator<Wall> {
 		private short i, startwall, endwall;
 
 		@Override
@@ -255,7 +255,7 @@ public class SECTOR {
 		}
 
 		@Override
-		public WALL next() {
+		public Wall next() {
 			return wall[nexti()];
 		}
 

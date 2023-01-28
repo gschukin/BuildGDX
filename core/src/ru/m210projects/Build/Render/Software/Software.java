@@ -11,78 +11,7 @@
 
 package ru.m210projects.Build.Render.Software;
 
-import static ru.m210projects.Build.Engine.CEIL;
-import static ru.m210projects.Build.Engine.FLOOR;
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXSPRITES;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.MAXXDIM;
-import static ru.m210projects.Build.Engine.MAXYDIM;
-import static ru.m210projects.Build.Engine.automapping;
-import static ru.m210projects.Build.Engine.bakwindowx1;
-import static ru.m210projects.Build.Engine.bakwindowx2;
-import static ru.m210projects.Build.Engine.bakwindowy1;
-import static ru.m210projects.Build.Engine.bakwindowy2;
-import static ru.m210projects.Build.Engine.cosglobalang;
-import static ru.m210projects.Build.Engine.cosviewingrangeglobalang;
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.globalang;
-import static ru.m210projects.Build.Engine.globalcursectnum;
-import static ru.m210projects.Build.Engine.globalhoriz;
-import static ru.m210projects.Build.Engine.globalpal;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.globalshade;
-import static ru.m210projects.Build.Engine.globalvisibility;
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.halfxdimen;
-import static ru.m210projects.Build.Engine.headspritesect;
-import static ru.m210projects.Build.Engine.inpreparemirror;
-import static ru.m210projects.Build.Engine.nextspritesect;
-import static ru.m210projects.Build.Engine.palookup;
-import static ru.m210projects.Build.Engine.parallaxtype;
-import static ru.m210projects.Build.Engine.parallaxvisibility;
-import static ru.m210projects.Build.Engine.parallaxyoffs;
-import static ru.m210projects.Build.Engine.parallaxyscale;
-import static ru.m210projects.Build.Engine.picsiz;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.pow2long;
-import static ru.m210projects.Build.Engine.pskybits;
-import static ru.m210projects.Build.Engine.pskyoff;
-import static ru.m210projects.Build.Engine.radarang;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.setviewcnt;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.show2dsprite;
-import static ru.m210projects.Build.Engine.show2dwall;
-import static ru.m210projects.Build.Engine.showinvisibility;
-import static ru.m210projects.Build.Engine.singlobalang;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sinviewingrangeglobalang;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.spritesortcnt;
-import static ru.m210projects.Build.Engine.totalclock;
-import static ru.m210projects.Build.Engine.transluc;
-import static ru.m210projects.Build.Engine.tsprite;
-import static ru.m210projects.Build.Engine.viewingrange;
-import static ru.m210projects.Build.Engine.viewingrangerecip;
-import static ru.m210projects.Build.Engine.visibility;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.xdimen;
-import static ru.m210projects.Build.Engine.xdimenscale;
-import static ru.m210projects.Build.Engine.xdimscale;
-import static ru.m210projects.Build.Engine.xyaspect;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.ydimen;
-import static ru.m210projects.Build.Engine.yxaspect;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
@@ -196,7 +125,7 @@ public class Software implements Renderer {
 	private final int[] spritesx = new int[MAXSPRITESONSCREEN];
 	private final int[] spritesy = new int[MAXSPRITESONSCREEN + 1];
 	private final int[] spritesz = new int[MAXSPRITESONSCREEN];
-	private final SPRITE[] tspriteptr = new SPRITE[MAXSPRITESONSCREEN + 1];
+	private final Sprite[] tspriteptr = new Sprite[MAXSPRITESONSCREEN + 1];
 
 	public short[] sectorborder = new short[256];
 	public short sectorbordercnt;
@@ -359,7 +288,7 @@ public class Software implements Renderer {
 	}
 
 	public void swapsprite(int k, int l, boolean z) {
-		SPRITE stmp = tspriteptr[k];
+		Sprite stmp = tspriteptr[k];
 		tspriteptr[k] = tspriteptr[l];
 		tspriteptr[l] = stmp;
 
@@ -676,7 +605,7 @@ public class Software implements Renderer {
 	private void drawalls(int bunch) {
 		int z = bunchfirst[bunch];
 		short sectnum = thesector[z];
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 
 		int andwstat1 = 0xff;
 		int andwstat2 = 0xff;
@@ -722,9 +651,9 @@ public class Software implements Renderer {
 			}
 
 			int wallnum = thewall[z];
-			WALL wal = wall[wallnum];
+			Wall wal = wall[wallnum];
 			short nextsectnum = wal.nextsector;
-			SECTOR nextsec = null;
+			Sector nextsec = null;
 
 			int gotswall = 0;
 
@@ -1033,7 +962,7 @@ public class Software implements Renderer {
 	}
 
 	private void drawsprite(int snum) {
-		SPRITE tspr = tspriteptr[snum];
+		Sprite tspr = tspriteptr[snum];
 
 		int xb = spritesx[snum];
 		int yp = spritesy[snum];
@@ -1068,7 +997,7 @@ public class Software implements Renderer {
 		}
 
 		short sectnum = tspr.getSectnum();
-		SECTOR sec = sector[sectnum];
+		Sector sec = sector[sectnum];
 		globalpal = tspr.pal;
 		if (palookup[globalpal] == null)
 			globalpal = 0; // JBF: fixes null-pointer crash
@@ -2005,8 +1934,8 @@ public class Software implements Renderer {
 
 	}
 
-	private void voxdraw(SPRITE daspr, int dasprang, int daxscale, int dayscale, VoxelInfo daindex, int[] daumost,
-			int[] dadmost) {
+	private void voxdraw(Sprite daspr, int dasprang, int daxscale, int dayscale, VoxelInfo daindex, int[] daumost,
+						 int[] dadmost) {
 		int i, j, k, x, y, syoff, ggxstart, ggystart, nxoff;
 		int cosang, sinang, sprcosang, sprsinang, backx, backy, gxinc, gyinc;
 		int daxsiz, daysiz, daxpivot, daypivot, dazpivot;
@@ -2021,7 +1950,7 @@ public class Software implements Renderer {
 		int dasprz = daspr.z;
 		int dashade = daspr.shade;
 		int dapal = daspr.pal;
-		SECTOR sec = sector[daspr.getSectnum()];
+		Sector sec = sector[daspr.getSectnum()];
 
 		cosang = sintable[(int) (globalang + 512) & 2047];
 		sinang = sintable[(int) globalang & 2047];
@@ -2390,8 +2319,8 @@ public class Software implements Renderer {
 	private void drawmaskwall(int damaskwallcnt) {
 		int i, j, k, x, z, z1, z2, lx, rx;
 		short sectnum;
-		SECTOR sec, nsec;
-		WALL wal;
+		Sector sec, nsec;
+		Wall wal;
 
 		z = maskwall[damaskwallcnt];
 		wal = wall[thewall[z]];
@@ -2544,7 +2473,7 @@ public class Software implements Renderer {
 				y2v - y1v, vplc, bufplc, bufoffs, p);
 	}
 
-	private void prepwall(int z, WALL wal) {
+	private void prepwall(int z, Wall wal) {
 		int l = 0, ol = 0;
 
 		int walxrepeat = (wal.xrepeat << 3);
@@ -2746,7 +2675,7 @@ public class Software implements Renderer {
 
 	private void florscan(int x1, int x2, int sectnum) {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
-		SECTOR sec;
+		Sector sec;
 
 		sec = sector[sectnum];
 		if (sec.floorpal != globalpalwritten) {
@@ -2956,7 +2885,7 @@ public class Software implements Renderer {
 	}
 
 	private void parascan(int dax1, int dax2, int dastat, int bunch) {
-		SECTOR sec;
+		Sector sec;
 		int j, k, l, m, n, x, z, wallnum, nextsectnum, globalhorizbak;
 		short[] topptr, botptr;
 
@@ -3166,8 +3095,8 @@ public class Software implements Renderer {
 		int daslope, dasqr;
 		int shoffs, shinc, m1, m2;
 		int mptr1, mptr2, nptr1, nptr2;
-		WALL wal;
-		SECTOR sec = sector[sectnum];
+		Wall wal;
+		Sector sec = sector[sectnum];
 
 		if (dastat == 0) {
 			if (globalposz <= engine.getceilzofslope(sectnum, globalposx, globalposy))
@@ -3359,7 +3288,7 @@ public class Software implements Renderer {
 
 	private void ceilscan(int x1, int x2, int sectnum) {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
-		SECTOR sec;
+		Sector sec;
 
 		sec = sector[sectnum];
 		if (sec.ceilingpal != globalpalwritten) {
@@ -3749,8 +3678,8 @@ public class Software implements Renderer {
 	}
 
 	private void scansector(short sectnum) {
-		WALL wal, wal2;
-		SPRITE spr;
+		Wall wal, wal2;
+		Sprite spr;
 		int xs, ys, x1, y1, x2, y2, xp1, yp1, xp2 = 0, yp2 = 0, templong;
 		int z, zz, startwall, endwall, numscansbefore, scanfirst, bunchfrst;
 		short nextsectnum;
@@ -3766,8 +3695,8 @@ public class Software implements Renderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (z = headspritesect[sectnum]; z >= 0; z = nextspritesect[z]) {
-				spr = sprite[z];
+			for(int z1 : spriteSectMap.getIndicesOf(sectnum)) {
+				spr = sprite[z1];
 				if ((((spr.cstat & 0x8000) == 0) || (showinvisibility)) && (spr.xrepeat > 0) && (spr.yrepeat > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
 					xs = spr.x - globalposx;
@@ -3775,9 +3704,9 @@ public class Software implements Renderer {
 					if (((spr.cstat & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
 						if (tsprite[spritesortcnt] == null)
 							tsprite[spritesortcnt] = new TSprite();
-						tsprite[spritesortcnt].set(sprite[z]);
+						tsprite[spritesortcnt].set(sprite[z1]);
 
-						tsprite[spritesortcnt++].owner = (short) z;
+						tsprite[spritesortcnt++].owner = (short) z1;
 					}
 				}
 			}
@@ -3924,11 +3853,11 @@ public class Software implements Renderer {
 		return (x) & 0xffffffffL;
 	}
 
-	private boolean spritewallfront(SPRITE s, int w) {
+	private boolean spritewallfront(Sprite s, int w) {
 		if (s == null)
 			return false;
 
-		WALL wal = wall[w];
+		Wall wal = wall[w];
 		int x1 = wal.x;
 		int y1 = wal.y;
 		wal = wall[wal.point2];
@@ -3961,7 +3890,7 @@ public class Software implements Renderer {
 	}
 
 	private int wallfront(int l1, int l2) {
-		WALL wal;
+		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
 		wal = wall[thewall[l1]];

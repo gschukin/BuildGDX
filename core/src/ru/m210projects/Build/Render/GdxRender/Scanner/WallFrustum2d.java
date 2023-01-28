@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 
 public class WallFrustum2d implements Poolable {
 
@@ -34,12 +34,12 @@ public class WallFrustum2d implements Poolable {
 		return this.setFullAngle();
 	}
 
-	public WallFrustum2d set(WALL wal) {
+	public WallFrustum2d set(Wall wal) {
 		this.sectnum = wal.nextsector;
 
 		float x1 = wal.x - globalposx;
 		float y1 = wal.y - globalposy;
-		WALL wal2 = wall[wal.point2];
+		Wall wal2 = wall[wal.point2];
 		float x2 = wal2.x - globalposx;
 		float y2 = wal2.y - globalposy;
 
@@ -87,13 +87,13 @@ public class WallFrustum2d implements Poolable {
 //		planes[num].d = -(globalposx * n.x + globalposy * n.y + globalposz * n.z);
 	}
 
-	public boolean wallInFrustum(WALL wal) {
+	public boolean wallInFrustum(Wall wal) {
 		if (isFullAngle)
 			return true;
 
 		int x1 = wal.x - globalposx;
 		int y1 = wal.y - globalposy;
-		WALL wal2 = wall[wal.point2];
+		Wall wal2 = wall[wal.point2];
 		int x2 = wal2.x - globalposx;
 		int y2 = wal2.y - globalposy;
 
@@ -129,7 +129,7 @@ public class WallFrustum2d implements Poolable {
 		return true;
 	}
 
-	private boolean NearPlaneCheck(WALL wal) {
+	private boolean NearPlaneCheck(Wall wal) {
 		tmp.set(planes[0].normal.x, planes[0].normal.y);
 		tmp.add(planes[1].normal.x, planes[1].normal.y);
 

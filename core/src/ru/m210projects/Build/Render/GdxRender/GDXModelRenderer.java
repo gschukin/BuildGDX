@@ -30,7 +30,7 @@ import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
-import ru.m210projects.Build.Types.SPRITE;
+import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 
 public class GDXModelRenderer {
@@ -45,7 +45,7 @@ public class GDXModelRenderer {
 		this.engine = parent.engine;
 	}
 
-	public boolean mddraw(GLModel m, SPRITE tspr) {
+	public boolean mddraw(GLModel m, Sprite tspr) {
 		if (m == null)
 			return false;
 
@@ -113,14 +113,14 @@ public class GDXModelRenderer {
 		return true;
 	}
 
-	private int getVisibility(SPRITE tspr) {
+	private int getVisibility(Sprite tspr) {
 		int vis = globalvisibility;
 		if (sector[tspr.getSectnum()].visibility != 0)
 			vis = mulscale(globalvisibility, (sector[tspr.getSectnum()].visibility + 16) & 0xFF, 4);
 		return vis;
 	}
 
-	private Matrix4 prepareTransform(GLModel m, SPRITE tspr) {
+	private Matrix4 prepareTransform(GLModel m, Sprite tspr) {
 		BuildCamera cam = parent.cam;
 
 		Tile pic = engine.getTile(tspr.picnum);

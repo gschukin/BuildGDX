@@ -24,9 +24,9 @@ import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.SurfaceInfo;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Type;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
-import ru.m210projects.Build.Types.SECTOR;
+import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Timer;
-import ru.m210projects.Build.Types.WALL;
+import ru.m210projects.Build.Types.Wall;
 
 public class WorldMesh {
 
@@ -86,7 +86,7 @@ public class WorldMesh {
 		quad = addQuad(vertices);
 
 		for (short s = 0; s < numsectors; s++) {
-			SECTOR sec = sector[s];
+			Sector sec = sector[s];
 			if (sec.floorz == sec.ceilingz)
 				continue;
 
@@ -132,9 +132,9 @@ public class WorldMesh {
 
 	public ArrayList<Vertex> getPoints(Heinum heinum, int sectnum, int z) {
 		int fz1, fz2, cz1, cz2;
-		SECTOR sec = sector[sectnum];
-		WALL wal = wall[z];
-		WALL wal2 = wall[wal.point2];
+		Sector sec = sector[sectnum];
+		Wall wal = wall[z];
+		Wall wal2 = wall[wal.point2];
 		int nextsector = wal.nextsector;
 
 		switch (heinum) {
@@ -285,8 +285,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxFloor(FloatArray vertices, int sectnum, int wallnum) {
-		final WALL wal = wall[wallnum];
-		final SECTOR sec = sector[sectnum];
+		final Wall wal = wall[wallnum];
+		final Sector sec = sector[sectnum];
 
 		boolean isParallaxFloor = sec.isParallaxFloor();
 		if (!isParallaxFloor)
@@ -318,8 +318,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxCeiling(FloatArray vertices, int sectnum, int wallnum) {
-		final WALL wal = wall[wallnum];
-		final SECTOR sec = sector[sectnum];
+		final Wall wal = wall[wallnum];
+		final Sector sec = sector[sectnum];
 
 		boolean isParallaxCeiling = sec.isParallaxCeiling();
 		if (!isParallaxCeiling)
@@ -428,7 +428,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addMaskedWall(FloatArray vertices, int sectnum, int wallnum) {
-		final WALL wal = wall[wallnum];
+		final Wall wal = wall[wallnum];
 		GLSurface surf = null;
 
 		if ((wal.isMasked() || wal.isOneWay()) && wal.nextsector != -1) {
@@ -639,12 +639,12 @@ public class WorldMesh {
 	private int getCeilingHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final SECTOR sec = sector[sectnum];
+		final Sector sec = sector[sectnum];
 
 		final int startwall = sec.wallptr;
 		final int endwall = sec.wallnum + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			WALL wal = wall[z];
+			Wall wal = wall[z];
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.x);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.y);
 		}
@@ -662,12 +662,12 @@ public class WorldMesh {
 	private int getFloorHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final SECTOR sec = sector[sectnum];
+		final Sector sec = sector[sectnum];
 
 		final int startwall = sec.wallptr;
 		final int endwall = sec.wallnum + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			WALL wal = wall[z];
+			Wall wal = wall[z];
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.x);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.y);
 		}
@@ -683,8 +683,8 @@ public class WorldMesh {
 	}
 
 	private int getWallHash(int sectnum, int z) {
-		final SECTOR sec = sector[sectnum];
-		final WALL wal = wall[z];
+		final Sector sec = sector[sectnum];
+		final Wall wal = wall[z];
 
 		int hash = 1;
 		final int prime = 31;
@@ -702,7 +702,7 @@ public class WorldMesh {
 		hash = prime * hash + wal.overpicnum; // middle texture
 
 		if (wal.isSwapped() && wal.nextwall != -1) {
-			final WALL swal = wall[wal.nextwall];
+			final Wall swal = wall[wal.nextwall];
 			hash = prime * hash + swal.cstat;
 			hash = prime * hash + swal.xpanning;
 			hash = prime * hash + swal.ypanning;
@@ -727,7 +727,7 @@ public class WorldMesh {
 		hash = prime * hash + (sec.isParallaxCeiling() ? 1 : 0);
 
 		if (wal.nextsector != -1) {
-			final SECTOR nsec = sector[wal.nextsector];
+			final Sector nsec = sector[wal.nextsector];
 
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.floorz);
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.floorheinum);
@@ -858,12 +858,12 @@ public class WorldMesh {
 		public int getMethod() {
 			switch (type) {
 			case Floor:
-				return (((SECTOR) ptr).floorstat >> 7) & 3;
+				return (((Sector) ptr).floorstat >> 7) & 3;
 			case Ceiling:
-				return (((SECTOR) ptr).ceilingstat >> 7) & 3;
+				return (((Sector) ptr).ceilingstat >> 7) & 3;
 			case Wall:
 				int method = 0;
-				WALL wal = (WALL) ptr;
+				Wall wal = (Wall) ptr;
 				if (wal.isMasked() && visflag == 4) {
 					method = 1;
 					if (!wal.isOneWay() && wal.isTransparent()) {
@@ -882,11 +882,11 @@ public class WorldMesh {
 		public short getPal() {
 			switch (type) {
 			case Floor:
-				return ((SECTOR) ptr).floorpal;
+				return ((Sector) ptr).floorpal;
 			case Ceiling:
-				return ((SECTOR) ptr).ceilingpal;
+				return ((Sector) ptr).ceilingpal;
 			case Wall:
-				return ((WALL) ptr).pal;
+				return ((Wall) ptr).pal;
 			default:
 				return 0;
 			}
@@ -895,11 +895,11 @@ public class WorldMesh {
 		public byte getShade() {
 			switch (type) {
 			case Floor:
-				return ((SECTOR) ptr).floorshade;
+				return ((Sector) ptr).floorshade;
 			case Ceiling:
-				return ((SECTOR) ptr).ceilingshade;
+				return ((Sector) ptr).ceilingshade;
 			case Wall:
-				return ((WALL) ptr).shade;
+				return ((Wall) ptr).shade;
 			default:
 				return 0;
 			}

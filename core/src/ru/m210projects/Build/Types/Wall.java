@@ -19,7 +19,7 @@ import java.nio.ByteOrder;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
 
-public class WALL {
+public class Wall {
 	public static final int sizeof = 32;
 	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order( ByteOrder.LITTLE_ENDIAN);
 
@@ -30,13 +30,13 @@ public class WALL {
 	public short pal, xrepeat, yrepeat, xpanning, ypanning; //5
 	public short lotag, hitag, extra; //6
 
-	public WALL() {}
+	public Wall() {}
 
-	public WALL(byte[] data) {
+	public Wall(byte[] data) {
     	buildWall(new DataResource(data));
 	}
 
-	public WALL(Resource data) {
+	public Wall(Resource data) {
     	buildWall(data);
 	}
 
@@ -66,7 +66,7 @@ public class WALL {
     	extra = bb.readShort();
 	}
 
-	public void set(WALL src) {
+	public void set(Wall src) {
 		x = src.x;
     	y = src.y;
     	point2 = src.point2;
