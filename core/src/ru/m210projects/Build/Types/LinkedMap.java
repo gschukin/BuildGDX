@@ -58,37 +58,32 @@ public abstract class LinkedMap {
             this.prev[next] = prev;
             this.next[element] = -1;
         }
-
         size[value]--;
     }
 
-//    public int insert(int element, int value) {
-//        if (value < 0 || value >= first.length) {
-//            return -1;
-//        }
-//
-//        if (element < 0 || element >= next.length) {
-//            return -1;
-//        }
-//
-//        int f = first[value];
-//        next[element] = -1;
-//		if (f >= 0)
-//		{
-//            prev[element] = prev[f];
-//            next[prev[f]] = element;
-//            prev[f] = element;
-//		}
-//		else {
-//			prev[element] = element;
-//			first[value] = element;
-//		}
-//
-//        return element;
-//
-//        // unable to detect old size[value]
-////        return linkFirst(element, value);
-//    }
+    public int insert(int element, int value) {
+        if (value < 0 || value >= first.length) {
+            return -1;
+        }
+
+        if (element < 0 || element >= next.length) {
+            return -1;
+        }
+
+        int f = first[value];
+        next[element] = -1;
+		if (f >= 0) {
+            prev[element] = prev[f];
+            next[prev[f]] = element;
+            prev[f] = element;
+		} else {
+			prev[element] = element;
+			first[value] = element;
+		}
+
+        size[value]++;
+        return element;
+    }
 
     public int insert(int value) {
         if (value < 0 || value >= first.length - 1) {
@@ -119,6 +114,14 @@ public abstract class LinkedMap {
         return true;
     }
 
+    public int getFree() {
+        int element = first[poolIndex];
+        if (element == -1) {
+            element = increase();
+        }
+        return element;
+    }
+
     protected void fill(int from) {
         int size = next.length;
         for (int i = from; i < size; i++) {
@@ -128,6 +131,7 @@ public abstract class LinkedMap {
         prev[from] = -1;
         next[size - 1] = -1;
         first[poolIndex] = from;
+        this.size[poolIndex] = size;
     }
 
     protected int increase() {
@@ -146,10 +150,7 @@ public abstract class LinkedMap {
     }
 
     protected int obtain() {
-        int element = first[poolIndex];
-        if (element == -1) {
-            element = increase();
-        }
+        int element = getFree();
 
         final int next = this.next[element];
         first[poolIndex] = next;
@@ -157,6 +158,7 @@ public abstract class LinkedMap {
             prev[next] = -1;
         }
         prev[element] = -1;
+        size[poolIndex]--;
         return element;
     }
 
@@ -248,12 +250,12 @@ public abstract class LinkedMap {
 
         @Override
         public void remove() {
-            LinkedMap.this.remove(current);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void set(Integer value) {
-            LinkedMap.this.set(current, value);
+            throw new UnsupportedOperationException();
         }
 
         @Override
