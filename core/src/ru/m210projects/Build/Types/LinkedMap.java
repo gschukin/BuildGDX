@@ -7,15 +7,17 @@ import java.util.StringJoiner;
 
 public abstract class LinkedMap {
 
-    private final int[] first;
-    private int[] prev;
-    private int[] next;
-    private final int poolIndex;
-    private final ListItr itr;
+    protected final int[] first;
+    protected final int[] size;
+    protected int[] prev;
+    protected int[] next;
+    protected final int poolIndex;
+    protected final ListItr itr;
 
     public LinkedMap(int listCount, int listCapacity) {
         poolIndex = listCount;
         first = new int[poolIndex + 1];
+        size = new int[poolIndex + 1];
         prev = new int[listCapacity];
         next = new int[listCapacity];
         Arrays.fill(first, -1);
@@ -28,7 +30,7 @@ public abstract class LinkedMap {
 
     protected abstract int get(int element);
 
-    protected int linkFirst(int element, int value) {
+    protected int link(int element, int value) {
         int f = first[value];
         next[element] = f;
         first[value] = element;
@@ -36,46 +38,17 @@ public abstract class LinkedMap {
             prev[f] = element;
         }
         put(element, value);
+        size[value]++;
         return element;
-    }
-
-    public int insert(int element, int value) {
-        if (value < 0 || value >= first.length - 1) {
-            return -1;
-        }
-
-        if(element < 0 || element >= next.length) {
-            return -1;
-        }
-
-        return linkFirst(element, value);
-    }
-
-    public int insert(int value) {
-        if (value < 0 || value >= first.length - 1) {
-            return -1;
-        }
-        return linkFirst(value);
-    }
-
-    public boolean remove(int element) {
-        if (element < 0 || element >= next.length || get(element) == poolIndex) {
-            return false;
-        }
-        unlink(element);
-        return true;
-    }
-
-    protected int linkFirst(int value) {
-        return linkFirst(obtain(), value);
     }
 
     protected void unlink(int element) {
         final int next = this.next[element];
         final int prev = this.prev[element];
+        final int value = get(element);
 
         if (prev == -1) {
-            this.first[get(element)] = next;
+            this.first[value] = next;
         } else {
             this.next[prev] = next;
             this.prev[element] = -1;
@@ -83,8 +56,54 @@ public abstract class LinkedMap {
 
         if (next >= 0) {
             this.prev[next] = prev;
+            this.next[element] = -1;
         }
-        linkFirst(element, poolIndex);
+
+        size[value]--;
+    }
+
+//    public int insert(int element, int value) {
+//        if (value < 0 || value >= first.length) {
+//            return -1;
+//        }
+//
+//        if (element < 0 || element >= next.length) {
+//            return -1;
+//        }
+//
+//        int f = first[value];
+//        next[element] = -1;
+//		if (f >= 0)
+//		{
+//            prev[element] = prev[f];
+//            next[prev[f]] = element;
+//            prev[f] = element;
+//		}
+//		else {
+//			prev[element] = element;
+//			first[value] = element;
+//		}
+//
+//        return element;
+//
+//        // unable to detect old size[value]
+////        return linkFirst(element, value);
+//    }
+
+    public int insert(int value) {
+        if (value < 0 || value >= first.length - 1) {
+            return -1;
+        }
+        return link(obtain(), value);
+    }
+
+    public boolean remove(int element) {
+        if (element < 0 || element >= next.length || get(element) == poolIndex) {
+            return false;
+        }
+        unlink(element);
+        link(element, poolIndex);
+        return true;
     }
 
     public boolean set(int element, int value) {
@@ -94,9 +113,7 @@ public abstract class LinkedMap {
 
         if (get(element) != value) {
             unlink(element);
-            if(value != poolIndex) {
-                linkFirst(value);
-            }
+            link(element, value);
         }
 
         return true;
@@ -146,23 +163,36 @@ public abstract class LinkedMap {
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ");
-        for (int i = 0; i < first.length - 1; i++) {
+        for (int i = 0; i < first.length; i++) {
             if (first[i] == -1) {
                 continue;
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.append("map(");
-            sb.append(i);
+            sb.append("map[");
+            if(i == first.length - 1) {
+                sb.append("free");
+            } else {
+                sb.append(i);
+            }
+            sb.append("].size(");
+            sb.append(size[i]);
             sb.append("): ");
 
             sb.append('[');
             int index = first[i];
             for (; ; ) {
                 sb.append(index);
-                if (next[index] == -1 || next[index] == index) {
+                if (next[index] == -1) {
                     break;
                 }
+
+                if (next[index] == index) {
+                    sb.append("List error at index ").append(index);
+                    System.err.println("List error at index " + index);
+                    break;
+                }
+
                 sb.append(',').append(' ');
                 index = next[index];
             }
