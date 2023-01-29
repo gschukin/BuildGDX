@@ -1,5 +1,8 @@
 package ru.m210projects.Build.Types;
 
+
+import com.badlogic.gdx.utils.Pool;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -12,7 +15,8 @@ public abstract class LinkedMap {
     protected int[] prev;
     protected int[] next;
     protected final int poolIndex;
-    protected final ListItr itr;
+    private final Pool<ListItr> iterators;
+
 
     public LinkedMap(int listCount, int listCapacity) {
         poolIndex = listCount;
@@ -21,9 +25,13 @@ public abstract class LinkedMap {
         prev = new int[listCapacity];
         next = new int[listCapacity];
         Arrays.fill(first, -1);
+        iterators = new Pool<>() {
+            @Override
+            protected ListItr newObject() {
+                return new ListItr();
+            }
+        };
         fill(0);
-
-        itr = new ListItr();
     }
 
     protected abstract void put(int element, int value);
@@ -205,7 +213,7 @@ public abstract class LinkedMap {
         return joiner.toString();
     }
 
-    private class ListItr implements ListIterator<Integer>, Iterable<Integer> {
+    private class ListItr implements ListIterator<Integer>, Iterable<Integer>, Pool.Poolable {
 
         private int index = -1, current = -1;
 
@@ -216,7 +224,11 @@ public abstract class LinkedMap {
 
         @Override
         public boolean hasNext() {
-            return index >= 0;
+            boolean hasNext = index >= 0;
+            if(!hasNext) {
+                iterators.free(this);
+            }
+            return hasNext;
         }
 
         @Override
@@ -262,11 +274,18 @@ public abstract class LinkedMap {
         public void add(Integer value) {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public void reset() {
+            index = -1;
+            current = -1;
+        }
     }
 
     public Iterable<Integer> getIndicesOf(int value) {
+
+        ListItr itr = iterators.obtain();
         itr.index = first[value];
-        itr.current = -1;
         return itr;
     }
 
