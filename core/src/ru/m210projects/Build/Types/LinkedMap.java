@@ -25,7 +25,7 @@ public abstract class LinkedMap {
         prev = new int[listCapacity];
         next = new int[listCapacity];
         Arrays.fill(first, -1);
-        iterators = new Pool<>() {
+        iterators = new Pool<ListItr>() {
             @Override
             protected ListItr newObject() {
                 return new ListItr();
@@ -67,30 +67,6 @@ public abstract class LinkedMap {
             this.next[element] = -1;
         }
         size[value]--;
-    }
-
-    public int insert(int element, int value) {
-        if (value < 0 || value >= first.length) {
-            return -1;
-        }
-
-        if (element < 0 || element >= next.length) {
-            return -1;
-        }
-
-        int f = first[value];
-        next[element] = -1;
-		if (f >= 0) {
-            prev[element] = prev[f];
-            next[prev[f]] = element;
-            prev[f] = element;
-		} else {
-			prev[element] = element;
-			first[value] = element;
-		}
-
-        size[value]++;
-        return element;
     }
 
     public int insert(int value) {
@@ -170,6 +146,18 @@ public abstract class LinkedMap {
         return element;
     }
 
+    public void toArrays(short[] head, short[] next, short[] prev) {
+        for (int i = 0; i < Math.min(first.length, head.length); i++) {
+            head[i] = (short) first[i];
+        }
+        for (int i = 0; i < Math.min(this.next.length, next.length); i++) {
+            next[i] = (short) this.next[i];
+        }
+        for (int i = 0; i < Math.min(this.prev.length, prev.length); i++) {
+            prev[i] = (short) this.prev[i];
+        }
+    }
+
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ");
@@ -180,7 +168,7 @@ public abstract class LinkedMap {
 
             StringBuilder sb = new StringBuilder();
             sb.append("map[");
-            if(i == first.length - 1) {
+            if (i == first.length - 1) {
                 sb.append("free");
             } else {
                 sb.append(i);
@@ -215,7 +203,15 @@ public abstract class LinkedMap {
 
     private class ListItr implements ListIterator<Integer>, Iterable<Integer>, Pool.Poolable {
 
-        private int index = -1, current = -1;
+        private int current = -1;
+        private Runnable func;
+        private int listIndex = 0, value;
+
+        private final Runnable nextFunc = () -> current = next[current];
+        private final Runnable firstFunc = () -> {
+            current = first[value];
+            func = nextFunc;
+        };
 
         @Override
         public Iterator<Integer> iterator() {
@@ -224,8 +220,8 @@ public abstract class LinkedMap {
 
         @Override
         public boolean hasNext() {
-            boolean hasNext = index >= 0;
-            if(!hasNext) {
+            boolean hasNext = listIndex < size[value];
+            if (!hasNext) {
                 iterators.free(this);
             }
             return hasNext;
@@ -233,8 +229,8 @@ public abstract class LinkedMap {
 
         @Override
         public Integer next() {
-            current = index;
-            index = next[current];
+            func.run();
+            listIndex++;
             return current;
         }
 
@@ -245,7 +241,6 @@ public abstract class LinkedMap {
 
         @Override
         public Integer previous() {
-            index = current;
             current = prev[current];
             return current;
         }
@@ -277,15 +272,18 @@ public abstract class LinkedMap {
 
         @Override
         public void reset() {
-            index = -1;
             current = -1;
+            func = null;
+            listIndex = 0;
+            value = -1;
         }
     }
 
     public Iterable<Integer> getIndicesOf(int value) {
-
         ListItr itr = iterators.obtain();
-        itr.index = first[value];
+        itr.value = value;
+        itr.listIndex = 0;
+        itr.func = itr.firstFunc;
         return itr;
     }
 

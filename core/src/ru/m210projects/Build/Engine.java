@@ -69,6 +69,7 @@ import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.Types.collections.SpriteMap;
 
 public abstract class Engine {
 
@@ -282,8 +283,8 @@ public abstract class Engine {
 	public static TSprite[] tsprite;
 	protected Tile[] tiles;
 
-	public static LinkedMap spriteSectMap;
-	public static LinkedMap spriteStatMap;
+	public static SpriteMap spriteSectMap;
+	public static SpriteMap spriteStatMap;
 
 	private final char[] fpsbuffer = new char[32];
 	private long fpstime = 0;
@@ -992,29 +993,29 @@ public abstract class Engine {
 
 	public void initspritelists() // jfBuild
 	{
-		this.spriteSectMap = new SpriteLinkedMap(MAXSECTORS) {
-			@Override
-			protected void put(Sprite spr, int value) {
-				spr.setSectnum(value);
-			}
-
-			@Override
-			protected int get(Sprite spr) {
-				return spr.getSectnum();
-			}
-		};
-
-		this.spriteStatMap = new SpriteLinkedMap(MAXSTATUS) {
-			@Override
-			protected void put(Sprite spr, int value) {
-				spr.setStatnum(value);
-			}
-
-			@Override
-			protected int get(Sprite spr) {
-				return spr.getStatnum();
-			}
-		};
+//		this.spriteSectMap = new SpriteLinkedMap(MAXSECTORS) {
+//			@Override
+//			protected void put(Sprite spr, int value) {
+//				spr.setSectnum(value);
+//			}
+//
+//			@Override
+//			protected int get(Sprite spr) {
+//				return spr.getSectnum();
+//			}
+//		};
+//
+//		this.spriteStatMap = new SpriteLinkedMap(MAXSTATUS) {
+//			@Override
+//			protected void put(Sprite spr, int value) {
+//				spr.setStatnum(value);
+//			}
+//
+//			@Override
+//			protected int get(Sprite spr) {
+//				return spr.getStatnum();
+//			}
+//		};
 	}
 
 	public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, short dacursectnum) { // eDuke32

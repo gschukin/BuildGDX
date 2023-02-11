@@ -14,6 +14,7 @@ import static ru.m210projects.Build.Gameutils.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 import ru.m210projects.Build.FileHandle.Resource;
 
@@ -51,8 +52,8 @@ public class Sprite {
     	xoffset = bb.readByte();
     	yoffset = bb.readByte();
     	sectnum = bb.readShort();
-    	if(sectnum < 0 || sectnum >= MAXSECTORS)
-			sectnum = 0;
+//    	if(sectnum < 0 || sectnum >= MAXSECTORS)
+//			sectnum = 0;
     	statnum = bb.readShort();
     	ang = bb.readShort();
     	owner = bb.readShort();
@@ -202,6 +203,77 @@ public class Sprite {
 
 	public void setStatnum(int statnum) {
 		this.statnum = (short) statnum;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Sprite)) return false;
+		Sprite sprite = (Sprite) o;
+
+		boolean[] b = new boolean[23];
+		b[0] = x == sprite.x;
+		b[1] = y == sprite.y;
+		b[2] = z == sprite.z;
+		b[3] = cstat == sprite.cstat;
+		b[4] = picnum == sprite.picnum;
+		b[5] = shade == sprite.shade;
+		b[6] = pal == sprite.pal;
+		b[7] = detail == sprite.detail;
+		b[8] = clipdist == sprite.clipdist;
+		b[9] = xrepeat == sprite.xrepeat;
+		b[10] = yrepeat == sprite.yrepeat;
+		b[11] = xoffset == sprite.xoffset;
+		b[12] = yoffset == sprite.yoffset;
+		b[13] = sectnum == sprite.sectnum;
+		b[14] = statnum == sprite.statnum;
+		b[15] = ang == sprite.ang;
+		b[16] = owner == sprite.owner;
+		b[17] = xvel == sprite.xvel;
+		b[18] = yvel == sprite.yvel;
+		b[19] = zvel == sprite.zvel;
+		b[20] = lotag == sprite.lotag;
+		b[21] = hitag == sprite.hitag;
+		b[22] = extra == sprite.extra;
+
+		boolean result = true;
+		for (int i = 0; i < 23; i++) {
+			if (!b[i]) {
+				System.err.print("Unsync in ");
+				switch (i) {
+					case 0: System.err.println("x: " + x + " != " + sprite.x); break;
+					case 1: System.err.println("y: " + y + " != " + sprite.y); break;
+					case 2: System.err.println("z: " + z + " != " + sprite.z); break;
+					case 3: System.err.println("cstat: " + cstat + " != " + sprite.cstat); break;
+					case 4: System.err.println("picnum: " + picnum + " != " + sprite.picnum); break;
+					case 5: System.err.println("shade: " + shade + " != " + sprite.shade); break;
+					case 6: System.err.println("pal: " + pal + " != " + sprite.pal); break;
+					case 7: System.err.println("detail: " + detail + " != " + sprite.detail); break;
+					case 8: System.err.println("clipdist: " + clipdist + " != " + sprite.clipdist); break;
+					case 9: System.err.println("xrepeat: " + xrepeat + " != " + sprite.xrepeat); break;
+					case 10: System.err.println("yrepeat: " + yrepeat + " != " + sprite.yrepeat); break;
+					case 11: System.err.println("xoffset: " + xoffset + " != " + sprite.xoffset); break;
+					case 12: System.err.println("yoffset: " + yoffset + " != " + sprite.yoffset); break;
+					case 13: System.err.println("sectnum: " + sectnum + " != " + sprite.sectnum); break;
+					case 14: System.err.println("statnum: " + statnum + " != " + sprite.statnum); break;
+					case 15: System.err.println("ang: " + ang + " != " + sprite.ang); break;
+					case 16: System.err.println("owner: " + owner + " != " + sprite.owner); break;
+					case 17: System.err.println("xvel: " + xvel + " != " + sprite.xvel); break;
+					case 18: System.err.println("yvel: " + yvel + " != " + sprite.yvel); break;
+					case 19: System.err.println("zvel: " + zvel + " != " + sprite.zvel); break;
+					case 20: System.err.println("lotag: " + lotag + " != " + sprite.lotag); break;
+					case 21: System.err.println("hitag: " + hitag + " != " + sprite.hitag); break;
+					case 22: System.err.println("extra: " + extra + " != " + sprite.extra); break;
+				}
+				result = false;
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z, cstat, picnum, shade, pal, detail, clipdist, xrepeat, yrepeat, xoffset, yoffset, sectnum, statnum, ang, owner, xvel, yvel, zvel, lotag, hitag, extra);
 	}
 }
 
