@@ -131,7 +131,7 @@ public abstract class Board {
 
 	protected ByteBuffer initmapbuffer() {
 		int size = 20 + // Point
-				(2 + (numwalls * Wall.sizeof)) + // walls
+				(2 + (numwalls * Wall.getSizeof())) + // walls
 				(2 + (numsectors * Sector.sizeof)) + // sectors
 				(2 + (getMaxSprites() * Sprite.sizeof)) + // sprites
 				 2 * (getMaxSectors() + 1) + 2 * (MAXSTATUS + 1) + 8 * getMaxSprites(); // sprite array
@@ -264,9 +264,9 @@ public abstract class Board {
 	}
 
 	public boolean setsprite(short spritenum, int newx, int newy, int newz) {
-		sprite[spritenum].x = newx;
-		sprite[spritenum].y = newy;
-		sprite[spritenum].z = newz;
+		sprite[spritenum].setX(newx);
+		sprite[spritenum].setY(newy);
+		sprite[spritenum].setZ(newz);
 
 		short tempsectnum = sprite[spritenum].getSectnum();
 		if (SETSPRITEZ == 1)
@@ -284,23 +284,23 @@ public abstract class Board {
 	////////// WALL MANIPULATION FUNCTIONS //////////
 
 	public void dragpoint(short pointhighlight, int dax, int day) {
-		wall[pointhighlight].x = dax;
-		wall[pointhighlight].y = day;
+		wall[pointhighlight].setX(dax);
+		wall[pointhighlight].setY(day);
 
 		int cnt = getMaxWalls();
 		short tempshort = pointhighlight; // search points CCW
 		do {
-			if (wall[tempshort].nextwall >= 0) {
-				tempshort = wall[wall[tempshort].nextwall].point2;
-				wall[tempshort].x = dax;
-				wall[tempshort].y = day;
+			if (wall[tempshort].getNextwall() >= 0) {
+				tempshort = wall[wall[tempshort].getNextwall()].getPoint2();
+				wall[tempshort].setX(dax);
+				wall[tempshort].setY(day);
 			} else {
 				tempshort = pointhighlight; // search points CW if not searched all the way around
 				do {
-					if (wall[lastwall(tempshort)].nextwall >= 0) {
-						tempshort = wall[lastwall(tempshort)].nextwall;
-						wall[tempshort].x = dax;
-						wall[tempshort].y = day;
+					if (wall[lastwall(tempshort)].getNextwall() >= 0) {
+						tempshort = wall[lastwall(tempshort)].getNextwall();
+						wall[tempshort].setX(dax);
+						wall[tempshort].setY(day);
 					} else {
 						break;
 					}
@@ -315,68 +315,68 @@ public abstract class Board {
 	////////// SECTOR MANIPULATION FUNCTIONS ////////
 
 	public void alignceilslope(short dasect, int x, int y, int z) {
-		Wall wal = wall[sector[dasect].wallptr];
-		int dax = wall[wal.point2].x - wal.x;
-		int day = wall[wal.point2].y - wal.y;
+		Wall wal = wall[sector[dasect].getWallptr()];
+		int dax = wall[wal.getPoint2()].getX() - wal.getX();
+		int day = wall[wal.getPoint2()].getY() - wal.getY();
 
-		int i = (y - wal.y) * dax - (x - wal.x) * day;
+		int i = (y - wal.getY()) * dax - (x - wal.getX()) * day;
 		if (i == 0)
 			return;
-		sector[dasect].ceilingheinum = (short) scale((z - sector[dasect].ceilingz) << 8, sqrt(dax * dax + day * day), i);
+		sector[dasect].setCeilingheinum((short) scale((z - sector[dasect].getCeilingz()) << 8, sqrt(dax * dax + day * day), i));
 
-		if (sector[dasect].ceilingheinum == 0)
-			sector[dasect].ceilingstat &= ~2;
+		if (sector[dasect].getCeilingheinum() == 0)
+			sector[dasect].setCeilingstat(sector[dasect].getCeilingstat() & ~2);
 		else
-			sector[dasect].ceilingstat |= 2;
+			sector[dasect].setCeilingstat(sector[dasect].getCeilingstat() | 2);
 	}
 
 	public void alignflorslope(short dasect, int x, int y, int z) {
-		Wall wal = wall[sector[dasect].wallptr];
-		int dax = wall[wal.point2].x - wal.x;
-		int day = wall[wal.point2].y - wal.y;
+		Wall wal = wall[sector[dasect].getWallptr()];
+		int dax = wall[wal.getPoint2()].getX() - wal.getX();
+		int day = wall[wal.getPoint2()].getY() - wal.getY();
 
-		int i = (y - wal.y) * dax - (x - wal.x) * day;
+		int i = (y - wal.getY()) * dax - (x - wal.getX()) * day;
 		if (i == 0)
 			return;
-		sector[dasect].floorheinum = (short) scale((z - sector[dasect].floorz) << 8, sqrt(dax * dax + day * day), i);
+		sector[dasect].setFloorheinum((short) scale((z - sector[dasect].getFloorz()) << 8, sqrt(dax * dax + day * day), i));
 
-		if (sector[dasect].floorheinum == 0)
-			sector[dasect].floorstat &= ~2;
+		if (sector[dasect].getFloorheinum() == 0)
+			sector[dasect].setFloorstat(sector[dasect].getFloorstat() & ~2);
 		else
-			sector[dasect].floorstat |= 2;
+			sector[dasect].setFloorstat(sector[dasect].getFloorstat() | 2);
 	}
 
 	public int getceilzofslope(short sectnum, int dax, int day) {
 		if (sectnum == -1 || sector[sectnum] == null)
 			return 0;
-		if ((sector[sectnum].ceilingstat & 2) == 0)
-			return (sector[sectnum].ceilingz);
+		if ((sector[sectnum].getCeilingstat() & 2) == 0)
+			return (sector[sectnum].getCeilingz());
 
-		Wall wal = wall[sector[sectnum].wallptr];
-		int dx = wall[wal.point2].x - wal.x;
-		int dy = wall[wal.point2].y - wal.y;
+		Wall wal = wall[sector[sectnum].getWallptr()];
+		int dx = wall[wal.getPoint2()].getX() - wal.getX();
+		int dy = wall[wal.getPoint2()].getY() - wal.getY();
 		int i = sqrt(dx * dx + dy * dy) << 5;
 		if (i == 0)
-			return (sector[sectnum].ceilingz);
-		long j = dmulscale(dx, day - wal.y, -dy, dax - wal.x, 3);
+			return (sector[sectnum].getCeilingz());
+		long j = dmulscale(dx, day - wal.getY(), -dy, dax - wal.getX(), 3);
 
-		return sector[sectnum].ceilingz + (scale(sector[sectnum].ceilingheinum, j, i));
+		return sector[sectnum].getCeilingz() + (scale(sector[sectnum].getCeilingheinum(), j, i));
 	}
 
 	public int getflorzofslope(short sectnum, int dax, int day) {
 		if (sectnum == -1 || sector[sectnum] == null)
 			return 0;
-		if ((sector[sectnum].floorstat & 2) == 0)
-			return (sector[sectnum].floorz);
+		if ((sector[sectnum].getFloorstat() & 2) == 0)
+			return (sector[sectnum].getFloorz());
 
-		Wall wal = wall[sector[sectnum].wallptr];
-		int dx = wall[wal.point2].x - wal.x;
-		int dy = wall[wal.point2].y - wal.y;
+		Wall wal = wall[sector[sectnum].getWallptr()];
+		int dx = wall[wal.getPoint2()].getX() - wal.getX();
+		int dy = wall[wal.getPoint2()].getY() - wal.getY();
 		int i = sqrt(dx * dx + dy * dy) << 5;
 		if (i == 0)
-			return (sector[sectnum].floorz);
-		long j = dmulscale(dx, day - wal.y, -dy, dax - wal.x, 3);
-		return sector[sectnum].floorz + (scale(sector[sectnum].floorheinum, j, i));
+			return (sector[sectnum].getFloorz());
+		long j = dmulscale(dx, day - wal.getY(), -dy, dax - wal.getX(), 3);
+		return sector[sectnum].getFloorz() + (scale(sector[sectnum].getFloorheinum(), j, i));
 	}
 	
 	////////// MAP MANIPULATION FUNCTIONS //////////
@@ -386,8 +386,8 @@ public abstract class Board {
 			return sectnum;
 
 		if ((sectnum >= 0) && (sectnum < numsectors)) {
-			short wallid = sector[sectnum].wallptr, i;
-			int j = sector[sectnum].wallnum;
+			short wallid = sector[sectnum].getWallptr(), i;
+			int j = sector[sectnum].getWallnum();
 			if (wallid < 0)
 				return -1;
 			do {
@@ -399,7 +399,7 @@ public abstract class Board {
 					j--;
 					continue;
 				}
-				i = wal.nextsector;
+				i = wal.getNextsector();
 				if (i >= 0)
 					if (inside(x, y, i) == 1) {
 						return i;
@@ -426,8 +426,8 @@ public abstract class Board {
 		if ((sectnum >= 0) && (sectnum < numsectors)) {
 			if (sector[sectnum] == null)
 				return -1;
-			short wallid = sector[sectnum].wallptr, i;
-			int j = sector[sectnum].wallnum;
+			short wallid = sector[sectnum].getWallptr(), i;
+			int j = sector[sectnum].getWallnum();
 			do {
 				if (wallid >= getMaxWalls())
 					break;
@@ -437,7 +437,7 @@ public abstract class Board {
 					j--;
 					continue;
 				}
-				i = wal.nextsector;
+				i = wal.getNextsector();
 				if (i >= 0) {
 					zs = getzsofslope(i, x, y);
 					if ((z >= zs.getCeiling()) && (z <= zs.getFloor()))
@@ -466,22 +466,22 @@ public abstract class Board {
 			return (-1);
 
 		int cnt = 0;
-		int wallid = sector[sectnum].wallptr;
+		int wallid = sector[sectnum].getWallptr();
 		if (wallid < 0)
 			return -1;
-		int i = sector[sectnum].wallnum;
+		int i = sector[sectnum].getWallnum();
 		int x1, y1, x2, y2;
 
 		do {
 			Wall wal = wall[wallid];
-			if (wal == null || wal.point2 < 0 || wall[wal.point2] == null)
+			if (wal == null || wal.getPoint2() < 0 || wall[wal.getPoint2()] == null)
 				return -1;
-			y1 = wal.y - y;
-			y2 = wall[wal.point2].y - y;
+			y1 = wal.getY() - y;
+			y2 = wall[wal.getPoint2()].getY() - y;
 
 			if ((y1 ^ y2) < 0) {
-				x1 = wal.x - x;
-				x2 = wall[wal.point2].x - x;
+				x1 = wal.getX() - x;
+				x2 = wall[wal.getPoint2()].getX() - x;
 				if ((x1 ^ x2) >= 0)
 					cnt ^= x1;
 				else
@@ -502,24 +502,24 @@ public abstract class Board {
 		if (sec == null)
 			return null;
 
-		int floorz = sec.floorz;
-		int ceilingz = sec.ceilingz;
+		int floorz = sec.getFloorz();
+		int ceilingz = sec.getCeilingz();
 		zofslope.setFloor(floorz);
 		zofslope.setCeiling(ceilingz);
-		if (((sec.ceilingstat | sec.floorstat) & 2) != 0) {
-			Wall wal = wall[sec.wallptr];
-			Wall wal2 = wall[wal.point2];
-			int dx = wal2.x - wal.x;
-			int dy = wal2.y - wal.y;
+		if (((sec.getCeilingstat() | sec.getFloorstat()) & 2) != 0) {
+			Wall wal = wall[sec.getWallptr()];
+			Wall wal2 = wall[wal.getPoint2()];
+			int dx = wal2.getX() - wal.getX();
+			int dy = wal2.getY() - wal.getY();
 			int i = sqrt(dx * dx + dy * dy) << 5;
 			if (i == 0)
 				return zofslope;
-			long j = dmulscale(dx, day - wal.y, -dy, dax - wal.x, 3);
+			long j = dmulscale(dx, day - wal.getY(), -dy, dax - wal.getX(), 3);
 
-			if ((sec.ceilingstat & 2) != 0)
-				ceilingz += scale(sec.ceilingheinum, j, i);
-			if ((sec.floorstat & 2) != 0)
-				floorz += scale(sec.floorheinum, j, i);
+			if ((sec.getCeilingstat() & 2) != 0)
+				ceilingz += scale(sec.getCeilingheinum(), j, i);
+			if ((sec.getFloorstat() & 2) != 0)
+				floorz += scale(sec.getFloorheinum(), j, i);
 		}
 
 		zofslope.setFloor(floorz);
@@ -528,13 +528,13 @@ public abstract class Board {
 	}
 
 	public int lastwall(int point) {
-		if ((point > 0) && (wall[point - 1].point2 == point))
+		if ((point > 0) && (wall[point - 1].getPoint2() == point))
 			return (point - 1);
 
 		int i = point, j;
 		int cnt = getMaxWalls();
 		do {
-			j = wall[i].point2;
+			j = wall[i].getPoint2();
 			if (j == point)
 				return (i);
 			i = j;
@@ -547,22 +547,22 @@ public abstract class Board {
 		if ((theline < 0) || (theline >= numwalls))
 			return (-1);
 
-		int i = wall[theline].nextwall;
+		int i = wall[theline].getNextwall();
 		if (i >= 0)
-			return (wall[i].nextsector);
+			return (wall[i].getNextsector());
 
 		int gap = (numsectors >> 1);
 		i = gap;
 		while (gap > 1) {
 			gap >>= 1;
-			if (sector[i].wallptr < theline)
+			if (sector[i].getWallptr() < theline)
 				i += gap;
 			else
 				i -= gap;
 		}
-		while (sector[i].wallptr > theline)
+		while (sector[i].getWallptr() > theline)
 			i--;
-		while (sector[i].wallptr + sector[i].wallnum <= theline)
+		while (sector[i].getWallptr() + sector[i].getWallnum() <= theline)
 			i++;
 		return (i);
 	}

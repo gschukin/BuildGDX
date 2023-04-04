@@ -9,162 +9,310 @@
 
 package ru.m210projects.Build.Types;
 
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Gameutils.*;
+import ru.m210projects.Build.FileHandle.DataResource;
+import ru.m210projects.Build.FileHandle.Resource;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import ru.m210projects.Build.FileHandle.DataResource;
-import ru.m210projects.Build.FileHandle.Resource;
+import static ru.m210projects.Build.Engine.MAXSECTORS;
+import static ru.m210projects.Build.Engine.MAXWALLS;
+import static ru.m210projects.Build.Gameutils.isValidTile;
 
 public class Wall {
-	public static final int sizeof = 32;
-	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order( ByteOrder.LITTLE_ENDIAN);
+    private static final int sizeof = 32;
+    private static final ByteBuffer buffer = ByteBuffer.allocate(getSizeof()).order(ByteOrder.LITTLE_ENDIAN);
 
-	public int x, y; //8
-	public short point2, nextwall, nextsector, cstat; //8
-	public short picnum, overpicnum; //4
-	public byte shade; //1
-	public short pal, xrepeat, yrepeat, xpanning, ypanning; //5
-	public short lotag, hitag, extra; //6
+    public int x;
+	public int y; //8
+    public short point2;
+	public short nextwall;
+	public short nextsector;
+	public short cstat; //8
+    public short picnum;
+	public short overpicnum; //4
+    public byte shade; //1
+    public short pal;
+	public short xrepeat;
+	public short yrepeat;
+	public short xpanning;
+	public short ypanning; //5
+    public short lotag;
+	public short hitag;
+	public short extra; //6
 
-	public Wall() {}
+    public Wall() {
+    }
 
-	public Wall(byte[] data) {
-    	buildWall(new DataResource(data));
+    public Wall(byte[] data) {
+        buildWall(new DataResource(data));
+    }
+
+    public Wall(Resource data) {
+        buildWall(data);
+    }
+
+	public static int getSizeof() {
+		return sizeof;
 	}
 
-	public Wall(Resource data) {
-    	buildWall(data);
+	public void buildWall(Resource bb) {
+        setX(bb.readInt());
+        setY(bb.readInt());
+        setPoint2(bb.readShort());
+        if (getPoint2() < 0 || getPoint2() >= MAXWALLS) setPoint2(0);
+        setNextwall(bb.readShort());
+        if (getNextwall() < 0 || getNextwall() >= MAXWALLS) setNextwall(-1);
+        setNextsector(bb.readShort());
+        if (getNextsector() < 0 || getNextsector() >= MAXSECTORS) setNextsector(-1);
+        setCstat(bb.readShort());
+        setPicnum(bb.readShort());
+        if (!isValidTile(getPicnum())) setPicnum(0);
+        setOverpicnum(bb.readShort());
+        if (!isValidTile(getOverpicnum())) setOverpicnum(0);
+        setShade(bb.readByte());
+        setPal((short) (bb.readByte() & 0xFF));
+        setXrepeat((short) (bb.readByte() & 0xFF));
+        setYrepeat((short) (bb.readByte() & 0xFF));
+        setXpanning((short) (bb.readByte() & 0xFF));
+        setYpanning((short) (bb.readByte() & 0xFF));
+        setLotag(bb.readShort());
+        setHitag(bb.readShort());
+        setExtra(bb.readShort());
+    }
+
+    public void set(Wall src) {
+        setX(src.getX());
+        setY(src.getY());
+        setPoint2(src.getPoint2());
+        setNextwall(src.getNextwall());
+        setNextsector(src.getNextsector());
+        setCstat(src.getCstat());
+        setPicnum(src.getPicnum());
+        setOverpicnum(src.getOverpicnum());
+        setShade(src.getShade());
+        setPal(src.getPal());
+        setXrepeat(src.getXrepeat());
+        setYrepeat(src.getYrepeat());
+        setXpanning(src.getXpanning());
+        setYpanning(src.getYpanning());
+        setLotag(src.getLotag());
+        setHitag(src.getHitag());
+        setExtra(src.getExtra());
+    }
+
+    public byte[] getBytes() {
+        buffer.clear();
+
+        buffer.putInt(this.getX());
+        buffer.putInt(this.getY());
+        buffer.putShort(this.getPoint2());
+        buffer.putShort(this.getNextwall());
+        buffer.putShort(this.getNextsector());
+        buffer.putShort(this.getCstat());
+        buffer.putShort(this.getPicnum());
+        buffer.putShort(this.getOverpicnum());
+        buffer.put(this.getShade());
+        buffer.put((byte) this.getPal());
+        buffer.put((byte) this.getXrepeat());
+        buffer.put((byte) this.getYrepeat());
+        buffer.put((byte) this.getXpanning());
+        buffer.put((byte) this.getYpanning());
+        buffer.putShort(this.getLotag());
+        buffer.putShort(this.getHitag());
+        buffer.putShort(this.getExtra());
+
+        return buffer.array();
+    }
+
+    public boolean isSwapped() {
+        return (getCstat() & 2) != 0;
+    }
+
+    public boolean isBottomAligned() {
+        return (getCstat() & 4) != 0;
+    }
+
+    public boolean isXFlip() {
+        return (getCstat() & 8) != 0;
+    }
+
+    public boolean isYFlip() {
+        return (getCstat() & 256) != 0;
+    }
+
+    public boolean isMasked() {
+        return (getCstat() & 16) != 0;
+    }
+
+    public boolean isOneWay() {
+        return (getCstat() & 32) != 0;
+    }
+
+    public boolean isTransparent() {
+        return (getCstat() & 128) != 0;
+    }
+
+    public boolean isTransparent2() {
+        return (getCstat() & 512) != 0;
+    }
+
+    @Override
+    public String toString() {
+        String out = "x " + getX() + " \r\n";
+        out += "y " + getY() + " \r\n";
+        out += "point2 " + getPoint2() + " \r\n";
+        out += "nextwall " + getNextwall() + " \r\n";
+        out += "nextsector " + getNextsector() + " \r\n";
+        out += "cstat " + getCstat() + " \r\n";
+        out += "picnum " + getPicnum() + " \r\n";
+        out += "overpicnum " + getOverpicnum() + " \r\n";
+        out += "shade " + getShade() + " \r\n";
+        out += "pal " + getPal() + " \r\n";
+        out += "xrepeat " + getXrepeat() + " \r\n";
+        out += "yrepeat " + getYrepeat() + " \r\n";
+        out += "xpanning " + getXpanning() + " \r\n";
+        out += "ypanning " + getYpanning() + " \r\n";
+        out += "lotag " + getLotag() + " \r\n";
+        out += "hitag " + getHitag() + " \r\n";
+        out += "extra " + getExtra() + " \r\n";
+
+        return out;
+    }
+
+	public int getX() {
+		return x;
 	}
 
-	public void buildWall(Resource bb)
-	{
-		x = bb.readInt();
-    	y = bb.readInt();
-    	point2 = bb.readShort();
-    	if(point2 < 0 || point2 >= MAXWALLS) point2 = 0;
-    	nextwall = bb.readShort();
-    	if(nextwall < 0 || nextwall >= MAXWALLS) nextwall = -1;
-    	nextsector = bb.readShort();
-    	if(nextsector < 0 || nextsector >= MAXSECTORS) nextsector = -1;
-    	cstat = bb.readShort();
-    	picnum = bb.readShort();
-    	if(!isValidTile(picnum)) picnum = 0;
-    	overpicnum = bb.readShort();
-    	if(!isValidTile(overpicnum)) overpicnum = 0;
-    	shade = bb.readByte();
-    	pal = (short) (bb.readByte()&0xFF);
-    	xrepeat = (short) (bb.readByte()&0xFF);
-    	yrepeat = (short) (bb.readByte()&0xFF);
-    	xpanning = (short) (bb.readByte()&0xFF);
-    	ypanning = (short) (bb.readByte()&0xFF);
-    	lotag = bb.readShort();
-    	hitag = bb.readShort();
-    	extra = bb.readShort();
+	public void setX(int x) {
+		this.x = x;
 	}
 
-	public void set(Wall src) {
-		x = src.x;
-    	y = src.y;
-    	point2 = src.point2;
-    	nextwall = src.nextwall;
-    	nextsector = src.nextsector;
-    	cstat = src.cstat;
-    	picnum = src.picnum;
-    	overpicnum = src.overpicnum;
-    	shade = src.shade;
-    	pal = src.pal;
-    	xrepeat = src.xrepeat;
-    	yrepeat = src.yrepeat;
-    	xpanning = src.xpanning;
-    	ypanning = src.ypanning;
-    	lotag = src.lotag;
-    	hitag = src.hitag;
-    	extra = src.extra;
+	public int getY() {
+		return y;
 	}
 
-	public byte[] getBytes()
-	{
-		buffer.clear();
-
-		buffer.putInt(this.x);
-    	buffer.putInt(this.y);
-    	buffer.putShort(this.point2);
-    	buffer.putShort(this.nextwall);
-    	buffer.putShort(this.nextsector);
-    	buffer.putShort(this.cstat);
-    	buffer.putShort(this.picnum);
-    	buffer.putShort(this.overpicnum);
-    	buffer.put(this.shade);
-    	buffer.put((byte)this.pal);
-    	buffer.put((byte)this.xrepeat);
-    	buffer.put((byte)this.yrepeat);
-    	buffer.put((byte)this.xpanning);
-    	buffer.put((byte)this.ypanning);
-    	buffer.putShort(this.lotag);
-    	buffer.putShort(this.hitag);
-    	buffer.putShort(this.extra);
-
-    	return buffer.array();
+	public void setY(int y) {
+		this.y = y;
 	}
 
-	public boolean isSwapped() {
-		return (cstat & 2) != 0;
+	public short getPoint2() {
+		return point2;
 	}
 
-
-	public boolean isBottomAligned() {
-		return (cstat & 4) != 0;
+	public void setPoint2(int point2) {
+		this.point2 = (short) point2;
 	}
 
-	public boolean isXFlip() {
-		return (cstat & 8) != 0;
+	public short getNextwall() {
+		return nextwall;
 	}
 
-	public boolean isYFlip() {
-		return (cstat & 256) != 0;
+	public void setNextwall(int nextwall) {
+		this.nextwall = (short) nextwall;
 	}
 
-	public boolean isMasked() {
-		return (cstat & 16) != 0;
+	public short getNextsector() {
+		return nextsector;
 	}
 
-	public boolean isOneWay() {
-		return (cstat & 32) != 0;
+	public void setNextsector(int nextsector) {
+		this.nextsector = (short) nextsector;
 	}
 
-	public boolean isTransparent() {
-		return (cstat & 128) != 0;
+	public short getCstat() {
+		return cstat;
 	}
 
-	public boolean isTransparent2() {
-		return (cstat & 512) != 0;
+	public void setCstat(int cstat) {
+		this.cstat = (short) cstat;
 	}
 
-	@Override
-	public String toString()
-	{
-		String out = "x " + x + " \r\n";
-		out += "y " + y + " \r\n";
-		out += "point2 " + point2 + " \r\n";
-		out += "nextwall " + nextwall + " \r\n";
-		out += "nextsector " + nextsector + " \r\n";
-		out += "cstat " + cstat + " \r\n";
-		out += "picnum " + picnum + " \r\n";
-		out += "overpicnum " + overpicnum + " \r\n";
-		out += "shade " + shade + " \r\n";
-		out += "pal " + pal + " \r\n";
-		out += "xrepeat " + xrepeat + " \r\n";
-		out += "yrepeat " + yrepeat + " \r\n";
-		out += "xpanning " + xpanning + " \r\n";
-		out += "ypanning " + ypanning + " \r\n";
-		out += "lotag " + lotag + " \r\n";
-		out += "hitag " + hitag + " \r\n";
-		out += "extra " + extra + " \r\n";
+	public short getPicnum() {
+		return picnum;
+	}
 
-		return out;
+	public void setPicnum(int picnum) {
+		this.picnum = (short) picnum;
+	}
+
+	public short getOverpicnum() {
+		return overpicnum;
+	}
+
+	public void setOverpicnum(int overpicnum) {
+		this.overpicnum = (short) overpicnum;
+	}
+
+	public byte getShade() {
+		return shade;
+	}
+
+	public void setShade(int shade) {
+		this.shade = (byte) shade;
+	}
+
+	public short getPal() {
+		return pal;
+	}
+
+	public void setPal(int pal) {
+		this.pal = (short) pal;
+	}
+
+	public short getXrepeat() {
+		return xrepeat;
+	}
+
+	public void setXrepeat(short xrepeat) {
+		this.xrepeat = xrepeat;
+	}
+
+	public short getYrepeat() {
+		return yrepeat;
+	}
+
+	public void setYrepeat(short yrepeat) {
+		this.yrepeat = yrepeat;
+	}
+
+	public short getXpanning() {
+		return xpanning;
+	}
+
+	public void setXpanning(short xpanning) {
+		this.xpanning = xpanning;
+	}
+
+	public short getYpanning() {
+		return ypanning;
+	}
+
+	public void setYpanning(short ypanning) {
+		this.ypanning = ypanning;
+	}
+
+	public short getLotag() {
+		return lotag;
+	}
+
+	public void setLotag(short lotag) {
+		this.lotag = lotag;
+	}
+
+	public short getHitag() {
+		return hitag;
+	}
+
+	public void setHitag(short hitag) {
+		this.hitag = hitag;
+	}
+
+	public short getExtra() {
+		return extra;
+	}
+
+	public void setExtra(int extra) {
+		this.extra = (short) extra;
 	}
 }

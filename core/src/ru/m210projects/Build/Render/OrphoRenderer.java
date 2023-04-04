@@ -22,8 +22,10 @@ import static ru.m210projects.Build.Net.Mmulti.connecthead;
 import static ru.m210projects.Build.Net.Mmulti.connectpoint2;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
+import static ru.m210projects.Build.RenderService.yxaspect;
 
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.Renderer.Transparent;
@@ -32,6 +34,8 @@ import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.Wall;
+import ru.m210projects.Build.Types.collections.SpriteNode;
+import static ru.m210projects.Build.RenderService.*;
 
 public abstract class OrphoRenderer {
 
@@ -86,8 +90,8 @@ public abstract class OrphoRenderer {
 
 		Wall wal;
 
-		xvect = sintable[(-cang) & 2047] * czoom;
-		yvect = sintable[(1536 - cang) & 2047] * czoom;
+		xvect = EngineUtils.sin(-cang) * czoom;
+		yvect = EngineUtils.sin(1536 - cang) * czoom;
 		xvect2 = mulscale(xvect, yxaspect, 16);
 		yvect2 = mulscale(yvect, yxaspect, 16);
 
@@ -97,31 +101,31 @@ public abstract class OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			Sector sec = sector[i];
-			if (!Gameutils.isValidWall(sec.wallptr) || sec.wallnum < 3)
+			Sector sec = getSector()[i];
+			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
 				continue;
 
-			startwall = sec.wallptr;
-			endwall = sec.wallptr + sec.wallnum;
+			startwall = sec.getWallptr();
+			endwall = sec.getWallptr() + sec.getWallnum();
 
 			if (startwall < 0 || endwall < 0)
 				continue;
 
 			for (int j = startwall; j < endwall; j++) {
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(wall[j].point2))
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(getWall()[j].getPoint2()))
 					continue;
 
-				wal = wall[j];
-				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.nextwall)) {
-					if (Gameutils.isValidSector(wal.nextsector)) {
+				wal = getWall()[j];
+				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
+					if (Gameutils.isValidSector(wal.getNextsector())) {
 						if (mapSettings.isWallVisible(j, i)) {
 							ox = mapSettings.getWallX(j) - cposx;
 							oy = mapSettings.getWallY(j) - cposy;
 							x1 = dmulscale(ox, xvect, -oy, yvect, 16) + (xdim << 11);
 							y1 = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 
-							ox = mapSettings.getWallX(wal.point2) - cposx;
-							oy = mapSettings.getWallY(wal.point2) - cposy;
+							ox = mapSettings.getWallX(wal.getPoint2()) - cposx;
+							oy = mapSettings.getWallY(wal.getPoint2()) - cposy;
 							x2 = dmulscale(ox, xvect, -oy, yvect, 16) + (xdim << 11);
 							y2 = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 
@@ -142,14 +146,15 @@ public abstract class OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for(int j : spriteSectMap.getIndicesOf(i)) {
-					Sprite spr = sprite[j];
+				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
+					int j = node.getIndex();
+					Sprite spr = getSprite()[j];
 
-					if ((spr.cstat & 0x8000) != 0 || spr.xrepeat == 0 || spr.yrepeat == 0
+					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
 						continue;
 
-					switch (spr.cstat & 48) {
+					switch (spr.getCstat() & 48) {
 					case 0:
 						if (mapSettings.isShowSprites(MapView.Lines) && ((gotsector[i >> 3] & (1 << (i & 7))) > 0)
 								&& (czoom > 96)) {
@@ -157,24 +162,24 @@ public abstract class OrphoRenderer {
 							oy = mapSettings.getSpriteY(j) - cposy;
 							x1 = dmulscale(ox, xvect, -oy, yvect, 16);
 							y1 = dmulscale(oy, xvect2, ox, yvect2, 16);
-							int daang = (spr.ang - cang) & 2047;
+							int daang = (spr.getAng() - cang) & 2047;
 							rotatesprite((x1 << 4) + (xdim << 15), (y1 << 4) + (ydim << 15),
-									mulscale(czoom * spr.yrepeat, yxaspect, 16), daang, spr.picnum, spr.shade, spr.pal,
-									(spr.cstat & 2) >> 1, windowx1, windowy1, windowx2, windowy2);
+									mulscale(czoom * spr.getYrepeat(), yxaspect, 16), daang, spr.getPicnum(), spr.getShade(), spr.getPal(),
+									(spr.getCstat() & 2) >> 1, windowx1, windowy1, windowx2, windowy2);
 						}
 						break;
 					case 16: {
-						Tile pic = engine.getTile(spr.picnum);
+						Tile pic = engine.getTile(spr.getPicnum());
 
 						x1 = mapSettings.getSpriteX(j);
 						y1 = mapSettings.getSpriteY(j);
-						byte xoff = (byte) (pic.getOffsetX() + spr.xoffset);
-						if ((spr.cstat & 4) > 0)
+						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
+						if ((spr.getCstat() & 4) > 0)
 							xoff = (byte) -xoff;
-						k = spr.ang;
-						int l = spr.xrepeat;
-						int dax = sintable[k & 2047] * l;
-						int day = sintable[(k + 1536) & 2047] * l;
+						k = spr.getAng();
+						int l = spr.getXrepeat();
+						int dax = EngineUtils.cos(k - 512) * l;
+						int day = EngineUtils.sin(k - 512) * l;
 						l = pic.getWidth();
 						k = (l >> 1) + xoff;
 						x1 -= mulscale(dax, k, 16);
@@ -200,22 +205,22 @@ public abstract class OrphoRenderer {
 					}
 						break;
 					case 32: {
-						Tile pic = engine.getTile(spr.picnum);
+						Tile pic = engine.getTile(spr.getPicnum());
 
-						byte xoff = (byte) (pic.getOffsetX() + spr.xoffset);
-						byte yoff = (byte) (pic.getOffsetY() + spr.yoffset);
-						if ((spr.cstat & 4) > 0)
+						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
+						byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
+						if ((spr.getCstat() & 4) > 0)
 							xoff = (byte) -xoff;
-						if ((spr.cstat & 8) > 0)
+						if ((spr.getCstat() & 8) > 0)
 							yoff = (byte) -yoff;
 
-						k = spr.ang;
-						int cosang = sintable[(k + 512) & 2047];
-						int sinang = sintable[k & 2047];
+						k = spr.getAng();
+						int cosang = EngineUtils.cos(k);
+						int sinang = EngineUtils.sin(k);
 						int xspan = pic.getWidth();
-						int xrepeat = spr.xrepeat;
+						int xrepeat = spr.getXrepeat();
 						int yspan = pic.getHeight();
-						int yrepeat = spr.yrepeat;
+						int yrepeat = spr.getYrepeat();
 
 						int dax = ((xspan >> 1) + xoff) * xrepeat;
 						int day = ((yspan >> 1) + yoff) * yrepeat;
@@ -277,21 +282,21 @@ public abstract class OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			startwall = sector[i].wallptr;
-			endwall = sector[i].wallptr + sector[i].wallnum;
+			startwall = getSector()[i].getWallptr();
+			endwall = getSector()[i].getWallptr() + getSector()[i].getWallnum();
 
 			if (startwall < 0 || endwall < 0)
 				continue;
 
 			k = -1;
 			for (int j = startwall; j < endwall; j++) {
-				wal = wall[j];
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(wall[j].point2))
+				wal = getWall()[j];
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(getWall()[j].getPoint2()))
 					continue;
 
-				if (wal.nextwall >= 0)
+				if (wal.getNextwall() >= 0)
 					continue;
-				Tile pic = engine.getTile(wal.picnum);
+				Tile pic = engine.getTile(wal.getPicnum());
 				if (!pic.hasSize())
 					continue;
 
@@ -305,8 +310,8 @@ public abstract class OrphoRenderer {
 					y1 = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 				}
 
-				k = wal.point2;
-				if (wall[k] == null)
+				k = wal.getPoint2();
+				if (getWall()[k] == null)
 					continue;
 
 				ox = mapSettings.getWallX(k) - cposx;
@@ -325,17 +330,17 @@ public abstract class OrphoRenderer {
 		// draw player
 		for (i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(sprite[spr].getSectnum()))
+			if (spr == -1 || !isValidSector(getSprite()[spr].getSectnum()))
 				continue;
 
-			Sprite pPlayer = sprite[spr];
+			Sprite pPlayer = getSprite()[spr];
 			ox = mapSettings.getSpriteX(spr) - cposx;
 			oy = mapSettings.getSpriteY(spr) - cposy;
 
 			int dx = mulscale(ox, xvect, 16) - mulscale(oy, yvect, 16);
 			int dy = mulscale(oy, xvect2, 16) + mulscale(ox, yvect2, 16);
 
-			int dang = (pPlayer.ang - cang) & 0x7FF;
+			int dang = (pPlayer.getAng() - cang) & 0x7FF;
 			int viewindex = mapSettings.getViewPlayer();
 			if (i == viewindex && !mapSettings.isScrollMode()) {
 				dx = 0;
@@ -369,8 +374,8 @@ public abstract class OrphoRenderer {
 					int sx = (dx << 4) + (xdim << 15);
 					int sy = (dy << 4) + (ydim << 15);
 
-					rotatesprite(sx, sy, nZoom, (short) dang, mapSettings.getPlayerPicnum(i), pPlayer.shade,
-							pPlayer.pal, (pPlayer.cstat & 2) >> 1, windowx1, windowy1, windowx2, windowy2);
+					rotatesprite(sx, sy, nZoom, (short) dang, mapSettings.getPlayerPicnum(i), pPlayer.getShade(),
+                            pPlayer.getPal(), (pPlayer.getCstat() & 2) >> 1, windowx1, windowy1, windowx2, windowy2);
 				}
 			}
 		}

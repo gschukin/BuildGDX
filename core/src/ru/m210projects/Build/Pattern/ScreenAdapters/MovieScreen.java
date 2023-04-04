@@ -10,6 +10,7 @@ import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.Tile;
+import static ru.m210projects.Build.RenderService.*;
 
 public abstract class MovieScreen extends SkippableAdapter {
 

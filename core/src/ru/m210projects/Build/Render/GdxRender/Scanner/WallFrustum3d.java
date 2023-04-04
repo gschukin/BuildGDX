@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
 import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
+import static ru.m210projects.Build.RenderService.*;
 
 public class WallFrustum3d implements Poolable {
 
@@ -102,7 +103,7 @@ public class WallFrustum3d implements Poolable {
 		if (coords == null)
 			return null;
 
-		if (!sector[sectnum].isParallaxCeiling() && !sector[sectnum].isParallaxFloor()) {
+		if (!getSector()[sectnum].isParallaxCeiling() && !getSector()[sectnum].isParallaxFloor()) {
 			if (!wallInFrustum(coords))
 				return null;
 		}

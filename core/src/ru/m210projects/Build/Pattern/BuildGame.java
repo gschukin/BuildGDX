@@ -48,7 +48,7 @@ import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.LittleEndian;
 import ru.m210projects.Build.Types.MemLog;
-
+import static ru.m210projects.Build.RenderService.*;
 public abstract class BuildGame extends Game {
 
 	public final String appname;

@@ -22,8 +22,7 @@ import static ru.m210projects.Build.Input.Keymap.MOUSE_LBUTTON;
 import static ru.m210projects.Build.Input.Keymap.MOUSE_RBUTTON;
 import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLDN;
 import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLUP;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 

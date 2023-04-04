@@ -36,6 +36,7 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_COORD_ARRAY;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
 import static ru.m210projects.Build.Render.Types.GL10.GL_VERTEX_ARRAY;
+import static ru.m210projects.Build.RenderService.*;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.BufferUtils;
 
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
@@ -58,6 +60,7 @@ import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
+import ru.m210projects.Build.Types.collections.SpriteNode;
 
 public class Polymost2D extends OrphoRenderer {
 
@@ -142,38 +145,38 @@ public class Polymost2D extends OrphoRenderer {
 		cx2 = ((windowx2 + 1) << 12) - 1;
 		cy2 = ((windowy2 + 1) << 12) - 1;
 		zoome <<= 8;
-		bakgxvect = divscale(sintable[(1536 - ang) & 2047], zoome, 28);
-		bakgyvect = divscale(sintable[(2048 - ang) & 2047], zoome, 28);
-		xvect = mulscale(sintable[(2048 - ang) & 2047], zoome, 8);
-		yvect = mulscale(sintable[(1536 - ang) & 2047], zoome, 8);
+		bakgxvect = divscale(EngineUtils.sin(1536 - ang), zoome, 28);
+		bakgyvect = divscale(EngineUtils.sin(2048 - ang), zoome, 28);
+		xvect = mulscale(EngineUtils.sin(2048 - ang), zoome, 8);
+		yvect = mulscale(EngineUtils.sin(1536 - ang), zoome, 8);
 		xvect2 = mulscale(xvect, yxaspect, 16);
 		yvect2 = mulscale(yvect, yxaspect, 16);
 
 		int sortnum = 0;
 
 		for (s = 0; s < numsectors; s++) {
-			sec = sector[s];
+			sec = getSector()[s];
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				npoints = 0;
 				i = 0;
-				startwall = sec.wallptr;
+				startwall = sec.getWallptr();
 
 				j = startwall;
 				if (startwall < 0)
 					continue;
-				for (w = sec.wallnum; w > 0; w--, j++) {
-					wal = wall[j];
+				for (w = sec.getWallnum(); w > 0; w--, j++) {
+					wal = getWall()[j];
 					if (wal == null)
 						continue;
-					ox = wal.x - dax;
-					oy = wal.y - day;
+					ox = wal.getX() - dax;
+					oy = wal.getY() - day;
 					x = dmulscale(ox, xvect, -oy, yvect, 16) + (xdim << 11);
 					y = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 					i |= getclipmask(x - cx1, cx2 - x, y - cy1, cy2 - y);
 					rx1[npoints] = x;
 					ry1[npoints] = y;
-					xb1[npoints] = wal.point2 - startwall;
+					xb1[npoints] = wal.getPoint2() - startwall;
 					if (xb1[npoints] < 0)
 						xb1[npoints] = 0;
 
@@ -188,24 +191,27 @@ public class Polymost2D extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for(int j1 : spriteSectMap.getIndicesOf(s))
-						if ((sprite[j1].cstat & 48) == 32) {
+					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+						int j1 = node.getIndex();
+						if ((getSprite()[j1].getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
 
-							if ((sprite[j1].cstat & (64 + 8)) == (64 + 8)
+							if ((getSprite()[j1].getCstat() & (64 + 8)) == (64 + 8)
 									|| !mapSettings.isSpriteVisible(MapView.Polygons, j1))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[j1]);
-							tsprite[sortnum++].owner = (short) j1;
+							tsprite[sortnum].set(getSprite()[j1]);
+							tsprite[sortnum++].setOwner((short) j1);
 						}
+					}
 				}
 
 				if (mapSettings.isShowSprites(MapView.Polygons))
-					for(int i1 : spriteSectMap.getIndicesOf(s)) {
+					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+						int i1 = node.getIndex();
 						if ((show2dsprite[i1 >> 3] & pow2char[i1 & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
@@ -215,19 +221,19 @@ public class Polymost2D extends OrphoRenderer {
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i1]);
-							tsprite[sortnum++].owner = (short) i1;
+							tsprite[sortnum].set(getSprite()[i1]);
+							tsprite[sortnum++].setOwner((short) i1);
 						}
 					}
 
 				gotsector[s >> 3] |= pow2char[s & 7];
 
-				globalorientation = sec.floorstat;
+				globalorientation = sec.getFloorstat();
 				if ((globalorientation & 1) != 0)
 					continue;
-				globalpal = sec.floorpal;
+				globalpal = sec.getFloorpal();
 
-				globalpicnum = sec.floorpicnum;
+				globalpicnum = sec.getFloorpicnum();
 				if (globalpicnum >= MAXTILES)
 					globalpicnum = 0;
 				engine.setgotpic(globalpicnum);
@@ -244,7 +250,7 @@ public class Polymost2D extends OrphoRenderer {
 				if (!pic.isLoaded())
 					engine.loadtile(globalpicnum);
 
-				globalshade = max(min(sec.floorshade, numshades - 1), 0);
+				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
 				if ((globalorientation & 64) == 0) {
 					globalposx = dax;
@@ -254,9 +260,9 @@ public class Polymost2D extends OrphoRenderer {
 					globalx2 = bakgxvect;
 					globaly2 = bakgyvect;
 				} else {
-					ox = wall[wall[startwall].point2].x - wall[startwall].x;
-					oy = wall[wall[startwall].point2].y - wall[startwall].y;
-					i = engine.ksqrt(ox * ox + oy * oy);
+					ox = getWall()[getWall()[startwall].getPoint2()].getX() - getWall()[startwall].getX();
+					oy = getWall()[getWall()[startwall].getPoint2()].getY() - getWall()[startwall].getY();
+					i = EngineUtils.sqrt(ox * ox + oy * oy);
 					if (i == 0)
 						continue;
 					i = 1048576 / i;
@@ -269,8 +275,8 @@ public class Polymost2D extends OrphoRenderer {
 					globalx2 = -globalx1;
 					globaly2 = -globaly1;
 
-					daslope = sector[s].floorheinum;
-					i = engine.ksqrt(daslope * daslope + 16777216);
+					daslope = getSector()[s].getFloorheinum();
+					i = EngineUtils.sqrt(daslope * daslope + 16777216);
 					globalposy = mulscale(globalposy, i, 12);
 					globalx2 = mulscale(globalx2, i, 12);
 					globaly2 = mulscale(globaly2, i, 12);
@@ -307,8 +313,8 @@ public class Polymost2D extends OrphoRenderer {
 				asm2 = globalx2 << globalyshift;
 				globalx1 <<= globalxshift;
 				globaly2 <<= globalyshift;
-				globalposx = (globalposx << (20 + globalxshift)) + ((sec.floorxpanning) << 24);
-				globalposy = (globalposy << (20 + globalyshift)) - ((sec.floorypanning) << 24);
+				globalposx = (globalposx << (20 + globalxshift)) + ((sec.getFloorxpanning()) << 24);
+				globalposy = (globalposy << (20 + globalyshift)) - ((sec.getFloorypanning()) << 24);
 
 				fillpolygon(npoints);
 			}
@@ -322,42 +328,41 @@ public class Polymost2D extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1)
 				for (i = 0; i < sortnum - gap; i++)
 					for (j = i; j >= 0; j -= gap) {
-						if (sprite[tsprite[j].owner].z <= sprite[tsprite[j + gap].owner].z)
+						if (getSprite()[tsprite[j].getOwner()].getZ() <= getSprite()[tsprite[j + gap].getOwner()].getZ())
 							break;
 
-						short tmp = tsprite[j].owner;
-						tsprite[j].owner = tsprite[j + gap].owner;
-						tsprite[j + gap].owner = tmp;
+						short tmp = tsprite[j].getOwner();
+						tsprite[j].setOwner(tsprite[j + gap].getOwner());
+						tsprite[j + gap].setOwner(tmp);
 					}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				Sprite spr = sprite[tsprite[s].owner];
-				if ((spr.cstat & 32768) == 0) {
+				Sprite spr = getSprite()[tsprite[s].getOwner()];
+				if ((spr.getCstat() & 32768) == 0) {
 					npoints = 0;
 
-					if (spr.picnum >= MAXTILES)
-						spr.picnum = 0;
+					if (spr.getPicnum() >= MAXTILES)
+						spr.setPicnum(0);
 
-					Tile pic = engine.getTile(spr.picnum);
+					Tile pic = engine.getTile(spr.getPicnum());
 
-					xoff = (byte) (pic.getOffsetX() + spr.xoffset);
-					yoff = (byte) (pic.getOffsetY() + spr.yoffset);
-					if ((spr.cstat & 4) > 0)
+					xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
+					yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
+					if ((spr.getCstat() & 4) > 0)
 						xoff = -xoff;
-					if ((spr.cstat & 8) > 0)
+					if ((spr.getCstat() & 8) > 0)
 						yoff = -yoff;
 
-					k = spr.ang & 2047;
-					cosang = sintable[(k + 512) & 2047];
-					sinang = sintable[k];
+					cosang = EngineUtils.cos(spr.getAng());
+					sinang = EngineUtils.sin(spr.getAng());
 					xspan = pic.getWidth();
-					xrepeat = spr.xrepeat;
+					xrepeat = spr.getXrepeat();
 					yspan = pic.getHeight();
-					yrepeat = spr.yrepeat;
+					yrepeat = spr.getYrepeat();
 					ox = ((xspan >> 1) + xoff) * xrepeat;
 					oy = ((yspan >> 1) + yoff) * yrepeat;
-					x1 = spr.x + mulscale(sinang, ox, 16) + mulscale(cosang, oy, 16);
-					y1 = spr.y + mulscale(sinang, oy, 16) - mulscale(cosang, ox, 16);
+					x1 = spr.getX() + mulscale(sinang, ox, 16) + mulscale(cosang, oy, 16);
+					y1 = spr.getY() + mulscale(sinang, oy, 16) - mulscale(cosang, ox, 16);
 					l = xspan * xrepeat;
 					x2 = x1 - mulscale(sinang, l, 16);
 					y2 = y1 + mulscale(cosang, l, 16);
@@ -412,8 +417,8 @@ public class Polymost2D extends OrphoRenderer {
 					bakx1 = (int) rx1[0];
 					baky1 = mulscale((int) ry1[0] - (ydim << 11), xyaspect, 16) + (ydim << 11);
 
-					globalpicnum = spr.picnum;
-					globalpal = spr.pal; // GL needs this, software doesn't
+					globalpicnum = spr.getPicnum();
+					globalpal = spr.getPal(); // GL needs this, software doesn't
 					engine.setgotpic(globalpicnum);
 					Tile sprpic = engine.getTile(globalpicnum);
 
@@ -431,11 +436,11 @@ public class Polymost2D extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((sector[spr.getSectnum()].ceilingstat & 1) > 0)
-						globalshade = (sector[spr.getSectnum()].ceilingshade);
+					if ((getSector()[spr.getSectnum()].getCeilingstat() & 1) > 0)
+						globalshade = (getSector()[spr.getSectnum()].getCeilingshade());
 					else
-						globalshade = (sector[spr.getSectnum()].floorshade);
-					globalshade = max(min(globalshade + spr.shade + 6, numshades - 1), 0);
+						globalshade = (getSector()[spr.getSectnum()].getFloorshade());
+					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
 					// relative alignment stuff
 					ox = x2 - x1;
@@ -469,7 +474,7 @@ public class Polymost2D extends OrphoRenderer {
 					globalposx = dmulscale(-baky1, globalx1, -bakx1, globaly1, 28);
 					globalposy = dmulscale(bakx1, globalx2, -baky1, globaly2, 28);
 
-					if ((spr.cstat & 0x4) > 0) {
+					if ((spr.getCstat() & 0x4) > 0) {
 						globalx1 = -globalx1;
 						globaly1 = -globaly1;
 						globalposx = -globalposx;
@@ -482,7 +487,7 @@ public class Polymost2D extends OrphoRenderer {
 					globalposy <<= (20 + 2);
 
 					// so polymost can get the translucency. ignored in software mode:
-					globalorientation = ((spr.cstat & 2) << 7) | ((spr.cstat & 512) >> 2);
+					globalorientation = ((spr.getCstat() & 2) << 7) | ((spr.getCstat() & 512) >> 2);
 
 					fillpolygon(npoints);
 				}
@@ -1234,9 +1239,9 @@ public class Polymost2D extends OrphoRenderer {
 		parent.gshang = 0.0f;
 		float d = z / (65536.0f * 16384.0f);
 		float ogctang = parent.gctang;
-		parent.gctang = sintable[(a + 512) & 2047] * d;
+		parent.gctang = EngineUtils.cos(a) * d;
 		float ogstang = parent.gstang;
-		parent.gstang = sintable[a & 2047] * d;
+		parent.gstang = EngineUtils.sin(a) * d;
 		ogshade = globalshade;
 		globalshade = dashade;
 		ogpal = globalpal;
@@ -1265,8 +1270,8 @@ public class Polymost2D extends OrphoRenderer {
 
 				d = z / (65536.0f * 16384.0f);
 				float cosang, sinang;
-				float cosang2 = cosang = sintable[(a + 512) & 2047] * d;
-				float sinang2 = sinang = sintable[a & 2047] * d;
+				float cosang2 = cosang = EngineUtils.cos(a) * d;
+				float sinang2 = sinang = EngineUtils.sin(a) * d;
 				if ((dastat & 2) != 0 || ((dastat & 8) == 0)) // Don't aspect unscaled perms
 				{
 					d = xyaspect / 65536.0f;
@@ -1291,21 +1296,22 @@ public class Polymost2D extends OrphoRenderer {
 			y1 = -y1;
 		}
 
-		hudsprite.ang = (short) (hudInfo.angadd + globalang);
-		hudsprite.xrepeat = hudsprite.yrepeat = 32;
+		hudsprite.setAng((short) (hudInfo.angadd + globalang));
+		hudsprite.setXrepeat(32);
+		hudsprite.setYrepeat(32);
 
 		float cos = parent.gcosang * 16.0f;
 		float sin = parent.gsinang * 16.0f;
 
-		hudsprite.x = (int) ((cos * z1 - sin * x1) * 1024.0f + globalposx);
-		hudsprite.y = (int) ((sin * z1 + cos * x1) * 1024.0f + globalposy);
-		hudsprite.z = (int) (globalposz + y1 * 16384.0f * 0.8f);
+		hudsprite.setX((int) ((cos * z1 - sin * x1) * 1024.0f + globalposx));
+		hudsprite.setY((int) ((sin * z1 + cos * x1) * 1024.0f + globalposy));
+		hudsprite.setZ((int) (globalposz + y1 * 16384.0f * 0.8f));
 
-		hudsprite.picnum = (short) picnum;
-		hudsprite.shade = (byte) dashade;
-		hudsprite.pal = (short) dapalnum;
-		hudsprite.owner = (short) (uniqid + MAXSPRITES);
-		hudsprite.cstat = (short) ((dastat & 1) + ((dastat & 32) << 4) + ((dastat & 4) << 1));
+		hudsprite.setPicnum((short) picnum);
+		hudsprite.setShade((byte) dashade);
+		hudsprite.setPal((short) dapalnum);
+		hudsprite.setOwner((short) (uniqid + MAXSPRITES));
+		hudsprite.setCstat((short) ((dastat & 1) + ((dastat & 32) << 4) + ((dastat & 4) << 1)));
 
 		if ((dastat & 10) == 2)
 			gl.glViewport(windowx1, ydim - (windowy2 + 1), windowx2 - windowx1 + 1, windowy2 - windowy1 + 1);
@@ -1349,7 +1355,7 @@ public class Polymost2D extends OrphoRenderer {
 			gl.glClear(GL_DEPTH_BUFFER_BIT);
 		}
 
-		parent.globalorientation = hudsprite.cstat;
+		parent.globalorientation = hudsprite.getCstat();
 		parent.mdrenderer.mddraw(parent.modelManager.getModel(picnum, dapalnum), hudsprite, 0, 0);
 
 		viewingrange = oldviewingrange;

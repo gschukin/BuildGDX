@@ -16,8 +16,8 @@
 
 package ru.m210projects.Build.Render;
 
-import static ru.m210projects.Build.Engine.MAXXDIM;
-import static ru.m210projects.Build.Engine.MAXYDIM;
+import static ru.m210projects.Build.RenderService.MAXXDIM;
+import static ru.m210projects.Build.RenderService.MAXYDIM;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -24,8 +24,7 @@ import static ru.m210projects.Build.Engine.MAXWALLS;
 import static ru.m210projects.Build.Engine.sector;
 import static ru.m210projects.Build.Engine.sprite;
 import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Pragmas.scale;
 
 import java.io.DataInputStream;
@@ -165,7 +164,7 @@ public class Gameutils {
 	}
 
 	public static boolean isCorruptWall(int i) {
-		return !isValidWall(i) || !isValidWall(wall[i].point2);
+		return !isValidWall(i) || !isValidWall(wall[i].getPoint2());
 	}
 
 	public static boolean isValidTile(int tile) {

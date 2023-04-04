@@ -87,7 +87,7 @@ public class WorldMesh {
 
 		for (short s = 0; s < numsectors; s++) {
 			Sector sec = sector[s];
-			if (sec.floorz == sec.ceilingz)
+			if (sec.getFloorz() == sec.getCeilingz())
 				continue;
 
 			tess.setSector(s, true);
@@ -100,7 +100,7 @@ public class WorldMesh {
 			addCeiling(vertices, s);
 			ceilinghash[s] = getCeilingHash(s);
 
-			for (int w = sec.wallptr; w < sec.wallptr + sec.wallnum; w++) {
+			for (int w = sec.getWallptr(); w < sec.getWallptr() + sec.getWallnum(); w++) {
 				wallhash[w] = getWallHash(s, w);
 
 				addMiddle(vertices, s, w);
@@ -110,7 +110,7 @@ public class WorldMesh {
 			}
 
 			if (sec.isParallaxCeiling() || sec.isParallaxFloor()) {
-				for (int w = sec.wallptr; w < sec.wallptr + sec.wallnum; w++) {
+				for (int w = sec.getWallptr(); w < sec.getWallptr() + sec.getWallnum(); w++) {
 					addParallaxCeiling(vertices, s, w);
 					addParallaxFloor(vertices, s, w);
 				}
@@ -134,17 +134,17 @@ public class WorldMesh {
 		int fz1, fz2, cz1, cz2;
 		Sector sec = sector[sectnum];
 		Wall wal = wall[z];
-		Wall wal2 = wall[wal.point2];
-		int nextsector = wal.nextsector;
+		Wall wal2 = wall[wal.getPoint2()];
+		int nextsector = wal.getNextsector();
 
 		switch (heinum) {
 		case Max:
 		case MaxWall:
-			engine.getzsofslope((short) sectnum, wal.x, wal.y, zofslope);
+			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), zofslope);
 			pol[CEILING1].set(wal, zofslope[CEIL], 0, 0);
 			pol[FLOOR1].set(wal, zofslope[FLOOR], 0, 1);
 
-			engine.getzsofslope((short) sectnum, wal2.x, wal2.y, zofslope);
+			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), zofslope);
 			pol[FLOOR2].set(wal2, zofslope[FLOOR], 1, 1);
 			pol[CEILING2].set(wal2, zofslope[CEIL], 1, 0);
 
@@ -156,10 +156,10 @@ public class WorldMesh {
 			}
 			break;
 		case Lower:
-			fz1 = engine.getflorzofslope((short) sectnum, wal.x, wal.y);
-			cz1 = engine.getflorzofslope((short) nextsector, wal.x, wal.y);
-			fz2 = engine.getflorzofslope((short) sectnum, wal2.x, wal2.y);
-			cz2 = engine.getflorzofslope((short) nextsector, wal2.x, wal2.y);
+			fz1 = engine.getflorzofslope((short) sectnum, wal.getX(), wal.getY());
+			cz1 = engine.getflorzofslope((short) nextsector, wal.getX(), wal.getY());
+			fz2 = engine.getflorzofslope((short) sectnum, wal2.getX(), wal2.getY());
+			cz2 = engine.getflorzofslope((short) nextsector, wal2.getX(), wal2.getY());
 
 			if (fz1 < cz1 && fz2 < cz2)
 				return null;
@@ -170,28 +170,28 @@ public class WorldMesh {
 			pol[CEILING2].set(wal2, cz2, 1, 0);
 			break;
 		case SkyLower:
-			fz1 = engine.getflorzofslope((short) sectnum, wal.x, wal.y);
+			fz1 = engine.getflorzofslope((short) sectnum, wal.getX(), wal.getY());
 			pol[CEILING1].set(wal, fz1, 0, 1);
 			pol[FLOOR1].set(wal, fz1 + 0x8000000, 0, 0);
 
-			fz1 = engine.getflorzofslope((short) sectnum, wal2.x, wal2.y);
+			fz1 = engine.getflorzofslope((short) sectnum, wal2.getX(), wal2.getY());
 			pol[FLOOR2].set(wal2, fz1 + 0x8000000, 1, 1);
 			pol[CEILING2].set(wal2, fz1, 1, 0);
 			break;
 		case SkyUpper:
-			cz1 = engine.getceilzofslope((short) sectnum, wal.x, wal.y);
+			cz1 = engine.getceilzofslope((short) sectnum, wal.getX(), wal.getY());
 			pol[FLOOR1].set(wal, cz1, 0, 0);
 			pol[CEILING1].set(wal, cz1 - 0x8000000, 0, 1);
 
-			cz1 = engine.getceilzofslope((short) sectnum, wal2.x, wal2.y);
+			cz1 = engine.getceilzofslope((short) sectnum, wal2.getX(), wal2.getY());
 			pol[FLOOR2].set(wal2, cz1, 1, 1);
 			pol[CEILING2].set(wal2, cz1 - 0x8000000, 1, 0);
 			break;
 		case Upper:
-			fz1 = engine.getceilzofslope((short) sectnum, wal.x, wal.y);
-			cz1 = engine.getceilzofslope((short) nextsector, wal.x, wal.y);
-			fz2 = engine.getceilzofslope((short) sectnum, wal2.x, wal2.y);
-			cz2 = engine.getceilzofslope((short) nextsector, wal2.x, wal2.y);
+			fz1 = engine.getceilzofslope((short) sectnum, wal.getX(), wal.getY());
+			cz1 = engine.getceilzofslope((short) nextsector, wal.getX(), wal.getY());
+			fz2 = engine.getceilzofslope((short) sectnum, wal2.getX(), wal2.getY());
+			cz2 = engine.getceilzofslope((short) nextsector, wal2.getX(), wal2.getY());
 
 			if (fz1 >= cz1 && fz2 >= cz2)
 				return null;
@@ -202,17 +202,17 @@ public class WorldMesh {
 			pol[CEILING2].set(wal2, fz2, 1, 0);
 			break;
 		case Portal:
-			engine.getzsofslope((short) nextsector, wal.x, wal.y, zofslope);
+			engine.getzsofslope((short) nextsector, wal.getX(), wal.getY(), zofslope);
 			fz1 = zofslope[FLOOR];
 			cz1 = zofslope[CEIL];
-			engine.getzsofslope((short) nextsector, wal2.x, wal2.y, zofslope);
+			engine.getzsofslope((short) nextsector, wal2.getX(), wal2.getY(), zofslope);
 			fz2 = zofslope[FLOOR];
 			cz2 = zofslope[CEIL];
 
-			engine.getzsofslope((short) sectnum, wal.x, wal.y, zofslope);
+			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), zofslope);
 			int fz3 = zofslope[FLOOR];
 			int cz3 = zofslope[CEIL];
-			engine.getzsofslope((short) sectnum, wal2.x, wal2.y, zofslope);
+			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), zofslope);
 			int fz4 = zofslope[FLOOR];
 			int cz4 = zofslope[CEIL];
 
@@ -292,7 +292,7 @@ public class WorldMesh {
 		if (!isParallaxFloor)
 			return setNull(lower_skies, wallnum);
 
-		int nextsector = wal.nextsector;
+		int nextsector = wal.getNextsector();
 		boolean isParallaxNext = nextsector != -1 && (sector[nextsector].isParallaxFloor());
 
 		GLSurface surf = null;
@@ -325,7 +325,7 @@ public class WorldMesh {
 		if (!isParallaxCeiling)
 			return setNull(upper_skies, wallnum);
 
-		int nextsector = wal.nextsector;
+		int nextsector = wal.getNextsector();
 		boolean isParallaxNext = nextsector != -1 && (sector[nextsector].isParallaxCeiling());
 
 		GLSurface surf = null;
@@ -353,7 +353,7 @@ public class WorldMesh {
 
 	private GLSurface addMiddle(FloatArray vertices, int sectnum, int wallnum) {
 		GLSurface surf = null;
-		final int nextsector = wall[wallnum].nextsector;
+		final int nextsector = wall[wallnum].getNextsector();
 		if (nextsector != -1)
 			return setNull(walls, wallnum);
 
@@ -378,7 +378,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addUpper(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = wall[wallnum].nextsector;
+		final int nextsector = wall[wallnum].getNextsector();
 		if (nextsector == -1 || (sector[nextsector].isParallaxCeiling() && sector[sectnum].isParallaxCeiling()))
 			return setNull(upper_walls, wallnum);
 
@@ -403,7 +403,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addLower(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = wall[wallnum].nextsector;
+		final int nextsector = wall[wallnum].getNextsector();
 		if (nextsector == -1 || (sector[nextsector].isParallaxFloor() && sector[sectnum].isParallaxFloor()))
 			return setNull(lower_walls, wallnum);
 
@@ -431,7 +431,7 @@ public class WorldMesh {
 		final Wall wal = wall[wallnum];
 		GLSurface surf = null;
 
-		if ((wal.isMasked() || wal.isOneWay()) && wal.nextsector != -1) {
+		if ((wal.isMasked() || wal.isOneWay()) && wal.getNextsector() != -1) {
 			SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Portal), wallnum, vertices);
 			if (info == null)
 				return setNull(maskwalls, wallnum);
@@ -641,20 +641,20 @@ public class WorldMesh {
 		final int prime = 31;
 		final Sector sec = sector[sectnum];
 
-		final int startwall = sec.wallptr;
-		final int endwall = sec.wallnum + startwall;
+		final int startwall = sec.getWallptr();
+		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
 			Wall wal = wall[z];
-			hash = prime * hash + NumberUtils.floatToIntBits(wal.x);
-			hash = prime * hash + NumberUtils.floatToIntBits(wal.y);
+			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
+			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
 
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.ceilingz);
-		hash = prime * hash + sec.ceilingstat;
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.ceilingheinum);
-		hash = prime * hash + sec.ceilingpicnum;
-		hash = prime * hash + sec.ceilingxpanning;
-		hash = prime * hash + sec.ceilingypanning;
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getCeilingz());
+		hash = prime * hash + sec.getCeilingstat();
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getCeilingheinum());
+		hash = prime * hash + sec.getCeilingpicnum();
+		hash = prime * hash + sec.getCeilingxpanning();
+		hash = prime * hash + sec.getCeilingypanning();
 
 		return hash;
 	}
@@ -664,20 +664,20 @@ public class WorldMesh {
 		final int prime = 31;
 		final Sector sec = sector[sectnum];
 
-		final int startwall = sec.wallptr;
-		final int endwall = sec.wallnum + startwall;
+		final int startwall = sec.getWallptr();
+		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
 			Wall wal = wall[z];
-			hash = prime * hash + NumberUtils.floatToIntBits(wal.x);
-			hash = prime * hash + NumberUtils.floatToIntBits(wal.y);
+			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
+			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
 
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.floorz);
-		hash = prime * hash + sec.floorstat;
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.floorheinum);
-		hash = prime * hash + sec.floorpicnum;
-		hash = prime * hash + sec.floorxpanning;
-		hash = prime * hash + sec.floorypanning;
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorz());
+		hash = prime * hash + sec.getFloorstat();
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorheinum());
+		hash = prime * hash + sec.getFloorpicnum();
+		hash = prime * hash + sec.getFloorxpanning();
+		hash = prime * hash + sec.getFloorypanning();
 
 		return hash;
 	}
@@ -689,59 +689,59 @@ public class WorldMesh {
 		int hash = 1;
 		final int prime = 31;
 
-		hash = prime * hash + NumberUtils.floatToIntBits(wal.x);
-		hash = prime * hash + NumberUtils.floatToIntBits(wal.y);
-		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.point2].x);
-		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.point2].y);
-		hash = prime * hash + wal.cstat;
-		hash = prime * hash + wal.xpanning;
-		hash = prime * hash + wal.ypanning;
-		hash = prime * hash + wal.xrepeat;
-		hash = prime * hash + wal.yrepeat;
-		hash = prime * hash + wal.picnum; // upper texture
-		hash = prime * hash + wal.overpicnum; // middle texture
+		hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
+		hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
+		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.getPoint2()].getX());
+		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.getPoint2()].getY());
+		hash = prime * hash + wal.getCstat();
+		hash = prime * hash + wal.getXpanning();
+		hash = prime * hash + wal.getYpanning();
+		hash = prime * hash + wal.getXrepeat();
+		hash = prime * hash + wal.getYrepeat();
+		hash = prime * hash + wal.getPicnum(); // upper texture
+		hash = prime * hash + wal.getOverpicnum(); // middle texture
 
-		if (wal.isSwapped() && wal.nextwall != -1) {
-			final Wall swal = wall[wal.nextwall];
-			hash = prime * hash + swal.cstat;
-			hash = prime * hash + swal.xpanning;
-			hash = prime * hash + swal.ypanning;
-			hash = prime * hash + swal.xrepeat;
-			hash = prime * hash + swal.yrepeat;
-			hash = prime * hash + swal.picnum;
+		if (wal.isSwapped() && wal.getNextwall() != -1) {
+			final Wall swal = wall[wal.getNextwall()];
+			hash = prime * hash + swal.getCstat();
+			hash = prime * hash + swal.getXpanning();
+			hash = prime * hash + swal.getYpanning();
+			hash = prime * hash + swal.getXrepeat();
+			hash = prime * hash + swal.getYrepeat();
+			hash = prime * hash + swal.getPicnum();
 		}
 
-		if (((sec.ceilingstat | sec.floorstat) & 2) != 0) {
-			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.wallptr].x);
-			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.wallptr].y);
+		if (((sec.getCeilingstat() | sec.getFloorstat()) & 2) != 0) {
+			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.getWallptr()].getX());
+			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.getWallptr()].getY());
 		}
 
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.floorz);
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.floorheinum);
-		hash = prime * hash + (sec.isSlopedFloor() ? 1 : 0);
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorz());
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorheinum());
+		hash = prime * hash + (sec.isFloorSlope() ? 1 : 0);
 		hash = prime * hash + (sec.isParallaxFloor() ? 1 : 0);
 
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.ceilingz);
-		hash = prime * hash + NumberUtils.floatToIntBits(sec.ceilingheinum);
-		hash = prime * hash + (sec.isSlopedCeiling() ? 1 : 0);
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getCeilingz());
+		hash = prime * hash + NumberUtils.floatToIntBits(sec.getCeilingheinum());
+		hash = prime * hash + (sec.isCeilingSlope() ? 1 : 0);
 		hash = prime * hash + (sec.isParallaxCeiling() ? 1 : 0);
 
-		if (wal.nextsector != -1) {
-			final Sector nsec = sector[wal.nextsector];
+		if (wal.getNextsector() != -1) {
+			final Sector nsec = sector[wal.getNextsector()];
 
-			hash = prime * hash + NumberUtils.floatToIntBits(nsec.floorz);
-			hash = prime * hash + NumberUtils.floatToIntBits(nsec.floorheinum);
-			hash = prime * hash + (nsec.isSlopedFloor() ? 1 : 0);
+			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorz());
+			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorheinum());
+			hash = prime * hash + (nsec.isFloorSlope() ? 1 : 0);
 			hash = prime * hash + (nsec.isParallaxFloor() ? 1 : 0);
 
-			hash = prime * hash + NumberUtils.floatToIntBits(nsec.ceilingz);
-			hash = prime * hash + NumberUtils.floatToIntBits(nsec.ceilingheinum);
-			hash = prime * hash + (nsec.isSlopedCeiling() ? 1 : 0);
+			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getCeilingz());
+			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getCeilingheinum());
+			hash = prime * hash + (nsec.isCeilingSlope() ? 1 : 0);
 			hash = prime * hash + (nsec.isParallaxCeiling() ? 1 : 0);
 
-			if (((nsec.ceilingstat | nsec.floorstat) & 2) != 0) {
-				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.wallptr].x);
-				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.wallptr].y);
+			if (((nsec.getCeilingstat() | nsec.getFloorstat()) & 2) != 0) {
+				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.getWallptr()].getX());
+				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.getWallptr()].getY());
 			}
 		}
 
@@ -848,7 +848,7 @@ public class WorldMesh {
 		}
 
 		public int getVisibility() {
-			return sector[vis_ptr].visibility;
+			return sector[vis_ptr].getVisibility();
 		}
 
 		public void render(ShaderProgram shader) {
@@ -858,9 +858,9 @@ public class WorldMesh {
 		public int getMethod() {
 			switch (type) {
 			case Floor:
-				return (((Sector) ptr).floorstat >> 7) & 3;
+				return (((Sector) ptr).getFloorstat() >> 7) & 3;
 			case Ceiling:
-				return (((Sector) ptr).ceilingstat >> 7) & 3;
+				return (((Sector) ptr).getCeilingstat() >> 7) & 3;
 			case Wall:
 				int method = 0;
 				Wall wal = (Wall) ptr;
@@ -882,11 +882,11 @@ public class WorldMesh {
 		public short getPal() {
 			switch (type) {
 			case Floor:
-				return ((Sector) ptr).floorpal;
+				return ((Sector) ptr).getFloorpal();
 			case Ceiling:
-				return ((Sector) ptr).ceilingpal;
+				return ((Sector) ptr).getCeilingpal();
 			case Wall:
-				return ((Wall) ptr).pal;
+				return ((Wall) ptr).getPal();
 			default:
 				return 0;
 			}
@@ -895,11 +895,11 @@ public class WorldMesh {
 		public byte getShade() {
 			switch (type) {
 			case Floor:
-				return ((Sector) ptr).floorshade;
+				return ((Sector) ptr).getFloorshade();
 			case Ceiling:
-				return ((Sector) ptr).ceilingshade;
+				return ((Sector) ptr).getCeilingshade();
 			case Wall:
-				return ((Wall) ptr).shade;
+				return ((Wall) ptr).getShade();
 			default:
 				return 0;
 			}

@@ -16,8 +16,7 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Strhandler.*;
 import static ru.m210projects.Build.Render.VideoMode.strvmodes;
 import static ru.m210projects.Build.Render.VideoMode.validmodes;

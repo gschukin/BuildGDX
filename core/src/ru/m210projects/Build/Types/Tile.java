@@ -2,7 +2,11 @@ package ru.m210projects.Build.Types;
 
 public class Tile {
 
-	public enum AnimType {
+    public boolean hasYOffset() {
+		return (anm & 0x00FF0000) != 0;
+    }
+
+    public enum AnimType {
 		Oscil, Forward, Backward, None
 	}
 

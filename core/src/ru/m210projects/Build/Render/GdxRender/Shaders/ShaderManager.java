@@ -1,12 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Shaders;
 
-import static ru.m210projects.Build.Engine.windowx1;
-import static ru.m210projects.Build.Engine.windowx2;
-import static ru.m210projects.Build.Engine.windowy1;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.ydim;
-
-import com.badlogic.gdx.graphics.Color;
+import static ru.m210projects.Build.RenderService.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;

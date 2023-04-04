@@ -1,6 +1,7 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
 import static ru.m210projects.Build.Engine.*;
+import static ru.m210projects.Build.RenderService.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,7 +59,7 @@ public class RayCaster {
 		}
 
 		public boolean isPortal() {
-			return wall[wallid].nextsector != -1;
+			return getWall()[wallid].getNextsector() != -1;
 		}
 
 		@Override
@@ -227,16 +228,16 @@ public class RayCaster {
 	}
 
 	public void add(int z, WallFrustum2d frust) {
-		Wall wal = wall[z];
-		Wall wal2 = wall[wal.point2];
+		Wall wal = getWall()[z];
+		Wall wal2 = getWall()[wal.getPoint2()];
 
 		if (frust == null || frust.sectnum == globalcursectnum) {
-			addSegment(z, wal.x, wal.y, wal2.x, wal2.y);
+			addSegment(z, wal.getX(), wal.getY(), wal2.getX(), wal2.getY());
 		} else {
 			WallFrustum2d f = frust;
 			do {
 				if (f.isGreater180())
-					addSegment(z, wal.x, wal.y, wal2.x, wal2.y);
+					addSegment(z, wal.getX(), wal.getY(), wal2.getX(), wal2.getY());
 				else
 					addClippedSegment(f, z);
 				f = f.next;
@@ -248,13 +249,13 @@ public class RayCaster {
 
 	public void addClippedSegment(WallFrustum2d frustum, int z) {
 		Plane[] planes = frustum.planes;
-		Wall p1 = wall[z];
-		Wall p2 = wall[p1.point2];
+		Wall p1 = getWall()[z];
+		Wall p2 = getWall()[p1.getPoint2()];
 
-		float p1x = p1.x;
-		float p1y = p1.y;
-		float p2x = p2.x;
-		float p2y = p2.y;
+		float p1x = p1.getX();
+		float p1y = p1.getY();
+		float p2x = p2.getX();
+		float p2y = p2.getY();
 
 		for (int i = 0; i < 2; i++) {
 			Vector3 p = planes[i].normal;

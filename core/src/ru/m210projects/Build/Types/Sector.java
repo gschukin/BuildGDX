@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 
+import org.jetbrains.annotations.NotNull;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
 
@@ -23,18 +24,39 @@ public class Sector {
 	public static final int sizeof = 40;
 	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order(ByteOrder.LITTLE_ENDIAN);
 
-	public short wallptr, wallnum; // 4
-	public int ceilingz, floorz; // 8
-	public short ceilingstat, floorstat; // 4
-	public short ceilingpicnum, ceilingheinum; // 4
+	private Wall[] walls = new Wall[0];
+
+	public Wall[] getWalls() {
+		return walls;
+	}
+	public void setWalls(@NotNull Wall[] walls) {
+		this.walls = walls;
+	}
+
+	public short wallptr;
+	public short wallnum; // 4
+	public int ceilingz;
+	public int floorz; // 8
+	public short ceilingstat;
+	public short floorstat; // 4
+	public short ceilingpicnum;
+	public short ceilingheinum; // 4
 	public byte ceilingshade; // 1
 
-	public short ceilingpal, ceilingxpanning, ceilingypanning; // 3
-	public short floorpicnum, floorheinum; // 4
+	public short ceilingpal;
+	public short ceilingxpanning;
+	public short ceilingypanning; // 3
+	public short floorpicnum;
+	public short floorheinum; // 4
 	public byte floorshade; // 1
-	public short floorpal, floorxpanning, floorypanning; // 3
-	public short visibility, filler; // 2
-	public short lotag, hitag, extra; // 6
+	public short floorpal;
+	public short floorxpanning;
+	public short floorypanning; // 3
+	public short visibility;
+	public short filler; // 2
+	public short lotag;
+	public short hitag;
+	public short extra; // 6
 
 	public Sector() {
 	}
@@ -47,204 +69,392 @@ public class Sector {
 		buildSector(data);
 	}
 
-	public boolean isParallaxCeiling() {
-		return (ceilingstat & 1) != 0;
+	public int getEndWall() {
+		return wallptr + wallnum - 1;
 	}
 
-	public boolean isSlopedCeiling() {
-		return (ceilingstat & 2) != 0;
+	public boolean isParallaxCeiling() {
+		return (getCeilingstat() & 1) != 0;
+	}
+
+	public boolean isCeilingSlope() {
+		return (getCeilingstat() & 2) != 0;
 	}
 
 	public boolean isTexSwapedCeiling() {
-		return (ceilingstat & 4) != 0;
+		return (getCeilingstat() & 4) != 0;
 	}
 
 	public boolean isTexSmooshedCeiling() {
-		return (ceilingstat & 8) != 0;
+		return (getCeilingstat() & 8) != 0;
 	}
 
 	public boolean isTexXFlippedCeiling() {
-		return (ceilingstat & 16) != 0;
+		return (getCeilingstat() & 16) != 0;
 	}
 
 	public boolean isTexYFlippedCeiling() {
-		return (ceilingstat & 32) != 0;
+		return (getCeilingstat() & 32) != 0;
 	}
 
 	public boolean isRelativeTexCeiling() {
-		return (ceilingstat & 64) != 0;
+		return (getCeilingstat() & 64) != 0;
 	}
 
 	public boolean isMaskedTexCeiling() {
-		return (ceilingstat & 128) != 0;
+		return (getCeilingstat() & 128) != 0;
 	}
 
 	public boolean isTransparentCeiling() {
-		return (ceilingstat & 256) != 0;
+		return (getCeilingstat() & 256) != 0;
 	}
 
 	public boolean isTransparent2Ceiling() {
-		return (ceilingstat & (128 | 256)) != 0;
+		return (getCeilingstat() & (128 | 256)) != 0;
 	}
 
 	public boolean isParallaxFloor() {
-		return (floorstat & 1) != 0;
+		return (getFloorstat() & 1) != 0;
 	}
 
-	public boolean isSlopedFloor() {
-		return (floorstat & 2) != 0;
+	public boolean isFloorSlope() {
+		return (getFloorstat() & 2) != 0;
 	}
 
 	public boolean isTexSwapedFloor() {
-		return (floorstat & 4) != 0;
+		return (getFloorstat() & 4) != 0;
 	}
 
 	public boolean isTexSmooshedFloor() {
-		return (floorstat & 8) != 0;
+		return (getFloorstat() & 8) != 0;
 	}
 
 	public boolean isTexXFlippedFloor() {
-		return (floorstat & 16) != 0;
+		return (getFloorstat() & 16) != 0;
 	}
 
 	public boolean isTexYFlippedFloor() {
-		return (floorstat & 32) != 0;
+		return (getFloorstat() & 32) != 0;
 	}
 
 	public boolean isRelativeTexFloor() {
-		return (floorstat & 64) != 0;
+		return (getFloorstat() & 64) != 0;
 	}
 
 	public boolean isMaskedTexFloor() {
-		return (floorstat & 128) != 0;
+		return (getFloorstat() & 128) != 0;
 	}
 
 	public boolean isTransparentFloor() {
-		return (floorstat & 256) != 0;
+		return (getFloorstat() & 256) != 0;
 	}
 
 	public boolean isTransparent2Floor() {
-		return (floorstat & (128 | 256)) != 0;
+		return (getFloorstat() & (128 | 256)) != 0;
 	}
 
 	public void buildSector(Resource bb) {
-		wallptr = bb.readShort();
-		if (wallptr < 0 || wallptr >= MAXWALLS)
-			wallptr = 0;
-		wallnum = bb.readShort();
-		ceilingz = bb.readInt();
-		floorz = bb.readInt();
-		ceilingstat = bb.readShort();
-		floorstat = bb.readShort();
-		ceilingpicnum = bb.readShort();
-		if (!isValidTile(ceilingpicnum))
-			ceilingpicnum = 0;
-		ceilingheinum = bb.readShort();
-		ceilingshade = bb.readByte();
-		ceilingpal = (short) (bb.readByte() & 0xFF);
-		ceilingxpanning = (short) (bb.readByte() & 0xFF);
-		ceilingypanning = (short) (bb.readByte() & 0xFF);
-		floorpicnum = bb.readShort();
-		if (!isValidTile(floorpicnum))
-			floorpicnum = 0;
-		floorheinum = bb.readShort();
-		floorshade = bb.readByte();
-		floorpal = (short) (bb.readByte() & 0xFF);
-		floorxpanning = (short) (bb.readByte() & 0xFF);
-		floorypanning = (short) (bb.readByte() & 0xFF);
-		visibility = (short) (bb.readByte() & 0xFF);
-		filler = bb.readByte();
-		lotag = bb.readShort();
-		hitag = bb.readShort();
-		extra = bb.readShort();
+		setWallptr(bb.readShort());
+		if (getWallptr() < 0 || getWallptr() >= MAXWALLS)
+			setWallptr(0);
+		setWallnum(bb.readShort());
+		setCeilingz(bb.readInt());
+		setFloorz(bb.readInt());
+		setCeilingstat(bb.readShort());
+		setFloorstat(bb.readShort());
+		setCeilingpicnum(bb.readShort());
+		if (!isValidTile(getCeilingpicnum()))
+			setCeilingpicnum(0);
+		setCeilingheinum(bb.readShort());
+		setCeilingshade(bb.readByte());
+		setCeilingpal((short) (bb.readByte() & 0xFF));
+		setCeilingxpanning((short) (bb.readByte() & 0xFF));
+		setCeilingypanning((short) (bb.readByte() & 0xFF));
+		setFloorpicnum(bb.readShort());
+		if (!isValidTile(getFloorpicnum()))
+			setFloorpicnum(0);
+		setFloorheinum(bb.readShort());
+		setFloorshade(bb.readByte());
+		setFloorpal((short) (bb.readByte() & 0xFF));
+		setFloorxpanning((short) (bb.readByte() & 0xFF));
+		setFloorypanning((short) (bb.readByte() & 0xFF));
+		setVisibility((short) (bb.readByte() & 0xFF));
+		setFiller(bb.readByte());
+		setLotag(bb.readShort());
+		setHitag(bb.readShort());
+		setExtra(bb.readShort());
 	}
 
 	public void set(Sector src) {
-		wallptr = src.wallptr;
-		wallnum = src.wallnum;
-		ceilingz = src.ceilingz;
-		floorz = src.floorz;
-		ceilingstat = src.ceilingstat;
-		floorstat = src.floorstat;
-		ceilingpicnum = src.ceilingpicnum;
-		ceilingheinum = src.ceilingheinum;
-		ceilingshade = src.ceilingshade;
-		ceilingpal = src.ceilingpal;
-		ceilingxpanning = src.ceilingxpanning;
-		ceilingypanning = src.ceilingypanning;
-		floorpicnum = src.floorpicnum;
-		floorheinum = src.floorheinum;
-		floorshade = src.floorshade;
-		floorpal = src.floorpal;
-		floorxpanning = src.floorxpanning;
-		floorypanning = src.floorypanning;
-		visibility = src.visibility;
-		filler = src.filler;
-		lotag = src.lotag;
-		hitag = src.hitag;
-		extra = src.extra;
+		setWallptr(src.getWallptr());
+		setWallnum(src.getWallnum());
+		setCeilingz(src.getCeilingz());
+		setFloorz(src.getFloorz());
+		setCeilingstat(src.getCeilingstat());
+		setFloorstat(src.getFloorstat());
+		setCeilingpicnum(src.getCeilingpicnum());
+		setCeilingheinum(src.getCeilingheinum());
+		setCeilingshade(src.getCeilingshade());
+		setCeilingpal(src.getCeilingpal());
+		setCeilingxpanning(src.getCeilingxpanning());
+		setCeilingypanning(src.getCeilingypanning());
+		setFloorpicnum(src.getFloorpicnum());
+		setFloorheinum(src.getFloorheinum());
+		setFloorshade(src.getFloorshade());
+		setFloorpal(src.getFloorpal());
+		setFloorxpanning(src.getFloorxpanning());
+		setFloorypanning(src.getFloorypanning());
+		setVisibility(src.getVisibility());
+		setFiller(src.getFiller());
+		setLotag(src.getLotag());
+		setHitag(src.getHitag());
+		setExtra(src.getExtra());
 	}
 
 	public byte[] getBytes() {
 		buffer.clear();
 
-		buffer.putShort(this.wallptr);
-		buffer.putShort(this.wallnum);
-		buffer.putInt(this.ceilingz);
-		buffer.putInt(this.floorz);
-		buffer.putShort(this.ceilingstat);
-		buffer.putShort(this.floorstat);
-		buffer.putShort(this.ceilingpicnum);
-		buffer.putShort(this.ceilingheinum);
-		buffer.put(this.ceilingshade);
-		buffer.put((byte) this.ceilingpal);
-		buffer.put((byte) this.ceilingxpanning);
-		buffer.put((byte) this.ceilingypanning);
-		buffer.putShort(this.floorpicnum);
-		buffer.putShort(this.floorheinum);
-		buffer.put(this.floorshade);
-		buffer.put((byte) this.floorpal);
-		buffer.put((byte) this.floorxpanning);
-		buffer.put((byte) this.floorypanning);
-		buffer.put((byte) this.visibility);
-		buffer.put((byte) this.filler);
-		buffer.putShort(this.lotag);
-		buffer.putShort(this.hitag);
-		buffer.putShort(this.extra);
+		buffer.putShort(this.getWallptr());
+		buffer.putShort(this.getWallnum());
+		buffer.putInt(this.getCeilingz());
+		buffer.putInt(this.getFloorz());
+		buffer.putShort(this.getCeilingstat());
+		buffer.putShort(this.getFloorstat());
+		buffer.putShort(this.getCeilingpicnum());
+		buffer.putShort(this.getCeilingheinum());
+		buffer.put(this.getCeilingshade());
+		buffer.put((byte) this.getCeilingpal());
+		buffer.put((byte) this.getCeilingxpanning());
+		buffer.put((byte) this.getCeilingypanning());
+		buffer.putShort(this.getFloorpicnum());
+		buffer.putShort(this.getFloorheinum());
+		buffer.put(this.getFloorshade());
+		buffer.put((byte) this.getFloorpal());
+		buffer.put((byte) this.getFloorxpanning());
+		buffer.put((byte) this.getFloorypanning());
+		buffer.put((byte) this.getVisibility());
+		buffer.put((byte) this.getFiller());
+		buffer.putShort(this.getLotag());
+		buffer.putShort(this.getHitag());
+		buffer.putShort(this.getExtra());
 
 		return buffer.array();
 	}
 
 	@Override
 	public String toString() {
-		String out = "wallptr " + wallptr + " \r\n";
-		out += "wallnum " + wallnum + " \r\n";
-		out += "ceilingz " + ceilingz + " \r\n";
-		out += "floorz " + floorz + " \r\n";
-		out += "ceilingstat " + ceilingstat + " \r\n";
-		out += "floorstat " + floorstat + " \r\n";
-		out += "ceilingpicnum " + ceilingpicnum + " \r\n";
-		out += "ceilingheinum " + ceilingheinum + " \r\n";
-		out += "ceilingshade " + ceilingshade + " \r\n";
-		out += "ceilingpal " + ceilingpal + " \r\n";
-		out += "ceilingxpanning " + ceilingxpanning + " \r\n";
-		out += "ceilingypanning " + ceilingypanning + " \r\n";
-		out += "floorpicnum " + floorpicnum + " \r\n";
-		out += "floorheinum " + floorheinum + " \r\n";
-		out += "floorshade " + floorshade + " \r\n";
-		out += "floorpal " + floorpal + " \r\n";
-		out += "floorxpanning " + floorxpanning + " \r\n";
-		out += "floorypanning " + floorypanning + " \r\n";
-		out += "visibility " + visibility + " \r\n";
-		out += "filler " + filler + " \r\n";
-		out += "lotag " + lotag + " \r\n";
-		out += "hitag " + hitag + " \r\n";
-		out += "extra " + extra + " \r\n";
+		String out = "wallptr " + getWallptr() + " \r\n";
+		out += "wallnum " + getWallnum() + " \r\n";
+		out += "ceilingz " + getCeilingz() + " \r\n";
+		out += "floorz " + getFloorz() + " \r\n";
+		out += "ceilingstat " + getCeilingstat() + " \r\n";
+		out += "floorstat " + getFloorstat() + " \r\n";
+		out += "ceilingpicnum " + getCeilingpicnum() + " \r\n";
+		out += "ceilingheinum " + getCeilingheinum() + " \r\n";
+		out += "ceilingshade " + getCeilingshade() + " \r\n";
+		out += "ceilingpal " + getCeilingpal() + " \r\n";
+		out += "ceilingxpanning " + getCeilingxpanning() + " \r\n";
+		out += "ceilingypanning " + getCeilingypanning() + " \r\n";
+		out += "floorpicnum " + getFloorpicnum() + " \r\n";
+		out += "floorheinum " + getFloorheinum() + " \r\n";
+		out += "floorshade " + getFloorshade() + " \r\n";
+		out += "floorpal " + getFloorpal() + " \r\n";
+		out += "floorxpanning " + getFloorxpanning() + " \r\n";
+		out += "floorypanning " + getFloorypanning() + " \r\n";
+		out += "visibility " + getVisibility() + " \r\n";
+		out += "filler " + getFiller() + " \r\n";
+		out += "lotag " + getLotag() + " \r\n";
+		out += "hitag " + getHitag() + " \r\n";
+		out += "extra " + getExtra() + " \r\n";
 
 		return out;
 	}
 
 	private static SectorIterator it;
+
+	public short getWallptr() {
+		return wallptr;
+	}
+
+	public void setWallptr(int wallptr) {
+		this.wallptr = (short) wallptr;
+	}
+
+	public short getWallnum() {
+		return wallnum;
+	}
+
+	public void setWallnum(int wallnum) {
+		this.wallnum = (short) wallnum;
+	}
+
+	public int getCeilingz() {
+		return ceilingz;
+	}
+
+	public void setCeilingz(int ceilingz) {
+		this.ceilingz = ceilingz;
+	}
+
+	public int getFloorz() {
+		return floorz;
+	}
+
+	public void setFloorz(int floorz) {
+		this.floorz = floorz;
+	}
+
+	public short getCeilingstat() {
+		return ceilingstat;
+	}
+
+	public void setCeilingstat(int ceilingstat) {
+		this.ceilingstat = (short) ceilingstat;
+	}
+
+	public short getFloorstat() {
+		return floorstat;
+	}
+
+	public void setFloorstat(int floorstat) {
+		this.floorstat = (short) floorstat;
+	}
+
+	public short getCeilingpicnum() {
+		return ceilingpicnum;
+	}
+
+	public void setCeilingpicnum(int ceilingpicnum) {
+		this.ceilingpicnum = (short) ceilingpicnum;
+	}
+
+	public short getCeilingheinum() {
+		return ceilingheinum;
+	}
+
+	public void setCeilingheinum(int ceilingheinum) {
+		this.ceilingheinum = (short) ceilingheinum;
+	}
+
+	public byte getCeilingshade() {
+		return ceilingshade;
+	}
+
+	public void setCeilingshade(int ceilingshade) {
+		this.ceilingshade = (byte) ceilingshade;
+	}
+
+	public short getCeilingpal() {
+		return ceilingpal;
+	}
+
+	public void setCeilingpal(short ceilingpal) {
+		this.ceilingpal = ceilingpal;
+	}
+
+	public short getCeilingxpanning() {
+		return ceilingxpanning;
+	}
+
+	public void setCeilingxpanning(short ceilingxpanning) {
+		this.ceilingxpanning = ceilingxpanning;
+	}
+
+	public short getCeilingypanning() {
+		return ceilingypanning;
+	}
+
+	public void setCeilingypanning(short ceilingypanning) {
+		this.ceilingypanning = ceilingypanning;
+	}
+
+	public short getFloorpicnum() {
+		return floorpicnum;
+	}
+
+	public void setFloorpicnum(int floorpicnum) {
+		this.floorpicnum = (short) floorpicnum;
+	}
+
+	public short getFloorheinum() {
+		return floorheinum;
+	}
+
+	public void setFloorheinum(int floorheinum) {
+		this.floorheinum = (short) floorheinum;
+	}
+
+	public byte getFloorshade() {
+		return floorshade;
+	}
+
+	public void setFloorshade(int floorshade) {
+		this.floorshade = (byte) floorshade;
+	}
+
+	public short getFloorpal() {
+		return floorpal;
+	}
+
+	public void setFloorpal(short floorpal) {
+		this.floorpal = floorpal;
+	}
+
+	public short getFloorxpanning() {
+		return floorxpanning;
+	}
+
+	public void setFloorxpanning(short floorxpanning) {
+		this.floorxpanning = floorxpanning;
+	}
+
+	public short getFloorypanning() {
+		return floorypanning;
+	}
+
+	public void setFloorypanning(short floorypanning) {
+		this.floorypanning = floorypanning;
+	}
+
+	public short getVisibility() {
+		return visibility;
+	}
+
+	public void setVisibility(int visibility) {
+		this.visibility = (short) visibility;
+	}
+
+	public short getFiller() {
+		return filler;
+	}
+
+	public void setFiller(short filler) {
+		this.filler = filler;
+	}
+
+	public short getLotag() {
+		return lotag;
+	}
+
+	public void setLotag(int lotag) {
+		this.lotag = (short) lotag;
+	}
+
+	public short getHitag() {
+		return hitag;
+	}
+
+	public void setHitag(int hitag) {
+		this.hitag = (short) hitag;
+	}
+
+	public short getExtra() {
+		return extra;
+	}
+
+	public void setExtra(int extra) {
+		this.extra = (short) extra;
+	}
 
 	public static final class SectorIterator implements Iterator<Wall> {
 		private short i, startwall, endwall;
@@ -256,7 +466,7 @@ public class Sector {
 
 		@Override
 		public Wall next() {
-			return wall[nexti()];
+			return getWall()[nexti()];
 		}
 
 		public short nexti() {
@@ -282,6 +492,6 @@ public class Sector {
 	public SectorIterator iterator() {
 		if (it == null)
 			it = new SectorIterator();
-		return it.init(wallptr, wallnum);
+		return it.init(getWallptr(), getWallnum());
 	}
 }

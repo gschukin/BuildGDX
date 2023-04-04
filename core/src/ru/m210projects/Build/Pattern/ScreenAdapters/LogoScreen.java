@@ -16,8 +16,7 @@
 
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;

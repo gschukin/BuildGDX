@@ -158,13 +158,13 @@ public abstract class MDModel implements GLModel {
 			return;
 		}
 
-		int tile = tspr.picnum;
+		int tile = tspr.getPicnum();
 
-		cframe = nframe = mdInfo.getParams(tspr.picnum).framenum;
+		cframe = nframe = mdInfo.getParams(tspr.getPicnum()).framenum;
 		boolean smoothdurationp = (GLSettings.animSmoothing.get() && (mdInfo.getParams(tile).smoothduration != 0));
 
-		Spritesmooth smooth = (tspr.owner < MAXSPRITES + MAXUNIQHUDID) ? mdInfo.getSmoothParams(tspr.owner) : null;
-		SpriteAnim sprext = (tspr.owner < MAXSPRITES + MAXUNIQHUDID) ? mdInfo.getAnimParams(tspr.owner) : null;
+		Spritesmooth smooth = (tspr.getOwner() < MAXSPRITES + MAXUNIQHUDID) ? mdInfo.getSmoothParams(tspr.getOwner()) : null;
+		SpriteAnim sprext = (tspr.getOwner() < MAXSPRITES + MAXUNIQHUDID) ? mdInfo.getAnimParams(tspr.getOwner()) : null;
 
 		MDAnimation anim;
 		for (anim = animations; anim != null && anim.startframe != cframe; anim = anim.next) {

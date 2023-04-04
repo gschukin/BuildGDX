@@ -17,6 +17,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
 import ru.m210projects.Build.Pattern.Tools.SaveManager.SaveInfo;
 import ru.m210projects.Build.Types.Tile;
+import static ru.m210projects.Build.RenderService.*;
 
 public abstract class MenuSlotList extends MenuList
 {

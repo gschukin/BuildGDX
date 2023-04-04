@@ -2,12 +2,7 @@ package ru.m210projects.Build.Render.GdxRender;
 
 import static com.badlogic.gdx.graphics.GL20.*;
 import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Engine.globalang;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.globalvisibility;
-import static ru.m210projects.Build.Engine.sector;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Pragmas.klabs;
 import static ru.m210projects.Build.Pragmas.mulscale;
 
@@ -18,6 +13,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager;
@@ -45,7 +41,7 @@ public class SpriteRenderer {
 			if (o1 == null || o2 == null)
 				return 0;
 
-			if(o1.owner == o2.owner || o1.owner == -1 || o2.owner == -1)
+			if(o1.getOwner() == o2.getOwner() || o1.getOwner() == -1 || o2.getOwner() == -1)
 				return 0;
 
 			int len1 = getDist(o1);
@@ -53,19 +49,19 @@ public class SpriteRenderer {
 			if(len1 != len2)
 				return len1 < len2 ? -1 : 1;
 
-			if ((o1.cstat & 2) != 0)
+			if ((o1.getCstat() & 2) != 0)
 				return -1;
 
-			if ((o2.cstat & 2) != 0)
+			if ((o2.getCstat() & 2) != 0)
 				return 1;
 
 			return (o1.getStatnum() <= o2.getStatnum()) ? -1 : 0;
 		}
 
 		public int getDist(Sprite spr) {
-			int dx1 = spr.x - globalposx;
-			int dy1 = spr.y - globalposy;
-			int dz1 = (spritesz[spr.owner] - globalposz) >> 4;
+			int dx1 = spr.getX() - globalposx;
+			int dy1 = spr.getY() - globalposy;
+			int dz1 = (spritesz[spr.getOwner()] - globalposz) >> 4;
 
 			return dx1 * dx1 + dy1 * dy1 + dz1 * dz1;
 		}
@@ -81,20 +77,20 @@ public class SpriteRenderer {
 	public void sort(Sprite[] array, int len) {
 		for(int i = 0; i < len; i++) {
 			Sprite spr = array[i];
-			int s = spr.owner;
+			int s = spr.getOwner();
 			if(s == -1)
 				continue;
 
-			spritesz[s] = spr.z;
-			if(!Gameutils.isValidTile(spr.picnum))
+			spritesz[s] = spr.getZ();
+			if(!Gameutils.isValidTile(spr.getPicnum()))
 				continue;
 
-			if ((spr.cstat & 48) != 32) {
-				Tile pic = engine.getTile(spr.picnum);
-				byte yoff = (byte) (pic.getOffsetY() + spr.yoffset);
-				spritesz[s] -= ((yoff * spr.yrepeat) << 2);
-				int yspan = (pic.getHeight() * spr.yrepeat << 2);
-				if ((spr.cstat & 128) == 0)
+			if ((spr.getCstat() & 48) != 32) {
+				Tile pic = engine.getTile(spr.getPicnum());
+				byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
+				spritesz[s] -= ((yoff * spr.getYrepeat()) << 2);
+				int yspan = (pic.getHeight() * spr.getYrepeat() << 2);
+				if ((spr.getCstat() & 128) == 0)
 					spritesz[s] -= (yspan >> 1);
 				if (klabs(spritesz[s] - globalposz) < (yspan >> 1))
 					spritesz[s] = globalposz;
@@ -109,9 +105,9 @@ public class SpriteRenderer {
 	}
 
 	public Matrix4 getMatrix(Sprite tspr, int texx, int texy) {
-		int picnum = tspr.picnum;
-		int orientation = tspr.cstat;
-		int spritenum = tspr.owner;
+		int picnum = tspr.getPicnum();
+		int orientation = tspr.getCstat();
+		int spritenum = tspr.getOwner();
 		Tile pic = engine.getTile(picnum);
 
 		int xoff = 0, yoff = 0;
@@ -121,8 +117,8 @@ public class SpriteRenderer {
 				pic = engine.getTile(picnum);
 			}
 
-			xoff = tspr.xoffset;
-			yoff = tspr.yoffset;
+			xoff = tspr.getXoffset();
+			yoff = tspr.getYoffset();
 			xoff += pic.getOffsetX();
 			yoff += pic.getOffsetY();
 		}
@@ -219,9 +215,9 @@ public class SpriteRenderer {
 //		}
 
 		float xspans;
-		float posx = tspr.x;
-		float posy = tspr.y;
-		float posz = tspr.z;
+		float posx = tspr.getX();
+		float posy = tspr.getY();
+		float posz = tspr.getZ();
 		transform.setToTranslation(posx, posy, posz);
 
 		switch ((orientation >> 4) & 3) {
@@ -239,34 +235,34 @@ public class SpriteRenderer {
 				xspans = -xspans;
 			}
 
-			transform.translate(0, 0, (tspr.yrepeat * texy * (yflip ? 2.0f : -2.0f)));
+			transform.translate(0, 0, (tspr.getYrepeat() * texy * (yflip ? 2.0f : -2.0f)));
 			transform.rotate(0, 0, 1, (int) Gameutils.AngleToDegrees(ang));
-			transform.translate((tspr.xrepeat * xoff) / (5.0f), 0, -((yoff * tspr.yrepeat) << 2));
+			transform.translate((tspr.getXrepeat() * xoff) / (5.0f), 0, -((yoff * tspr.getYrepeat()) << 2));
 
 			if ((tsizx & 1) == 0)
-				transform.translate((tspr.xrepeat >> 1) / xspans, 0, 0);
+				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
 
 			if ((orientation & 128) != 0) {
-				float zoffs = ((tsizy * tspr.yrepeat) << 1);
+				float zoffs = ((tsizy * tspr.getYrepeat()) << 1);
 				if ((tsizy & 1) != 0)
-					zoffs += (tspr.yrepeat << 1); // Odd yspans
+					zoffs += (tspr.getYrepeat() << 1); // Odd yspans
 				transform.translate(0, 0, zoffs);
 			}
 
 			if (yflip) {
 				transform.rotate(0, 1, 0, 180);
-				transform.translate(0, 0, (tspr.yrepeat * texy) * 4.0f);
+				transform.translate(0, 0, (tspr.getYrepeat() * texy) * 4.0f);
 			} else
-				transform.translate(0, 0, (tspr.yrepeat * (texy - tsizy)) * 4.0f);
+				transform.translate(0, 0, (tspr.getYrepeat() * (texy - tsizy)) * 4.0f);
 
-			transform.scale((tspr.xrepeat * texx) / 5.0f, 0, 4 * tspr.yrepeat * texy);
+			transform.scale((tspr.getXrepeat() * texx) / 5.0f, 0, 4 * tspr.getYrepeat() * texy);
 			break;
 		case 1: // Wall sprite
 			if (yflip)
 				yoff = -yoff;
-			int wang = (int) Gameutils.AngleToDegrees((tspr.ang + ((xflip ^ yflip) ? 1536 : 512)) & 0x7FF);
+			int wang = (int) Gameutils.AngleToDegrees((tspr.getAng() + ((xflip ^ yflip) ? 1536 : 512)) & 0x7FF);
 			if ((orientation & 64) == 0) {
-				int dang = (((tspr.ang - engine.getangle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
+				int dang = (((tspr.getAng() - EngineUtils.getAngle(tspr.getX() - globalposx, tspr.getY() - globalposy)) & 0x7FF) - 1024);
 				if (dang > 512 || dang < -512) {
 					xflip = !xflip;
 				}
@@ -283,29 +279,29 @@ public class SpriteRenderer {
 				xspans = -xspans;
 			}
 
-			transform.translate(0, 0, (tspr.yrepeat * texy * (yflip ? 2.0f : -2.0f)));
+			transform.translate(0, 0, (tspr.getYrepeat() * texy * (yflip ? 2.0f : -2.0f)));
 			transform.rotate(0, 0, 1, wang);
-			transform.translate((tspr.xrepeat * xoff) / 4.0f, 0, -(tspr.yrepeat * yoff) * 4.0f);
+			transform.translate((tspr.getXrepeat() * xoff) / 4.0f, 0, -(tspr.getYrepeat() * yoff) * 4.0f);
 			if ((orientation & 128) != 0)
-				transform.translate(0, 0, (tspr.yrepeat * tsizy) * 2.0f);
+				transform.translate(0, 0, (tspr.getYrepeat() * tsizy) * 2.0f);
 
 			if ((tsizx & 1) == 0)
-				transform.translate((tspr.xrepeat >> 1) / xspans, 0, 0);
+				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
 
 			if (yflip) {
 				transform.rotate(0, 1, 0, 180);
-				transform.translate(0, 0, (tspr.yrepeat * texy) * 4.0f);
+				transform.translate(0, 0, (tspr.getYrepeat() * texy) * 4.0f);
 			} else
-				transform.translate(0, 0, (tspr.yrepeat * (texy - tsizy)) * 4.0f);
+				transform.translate(0, 0, (tspr.getYrepeat() * (texy - tsizy)) * 4.0f);
 
-			transform.scale((tspr.xrepeat * texx) / 4.0f, 0, (tspr.yrepeat * texy) * 4.0f);
+			transform.scale((tspr.getXrepeat() * texx) / 4.0f, 0, (tspr.getYrepeat() * texy) * 4.0f);
 			break;
 		case 2: // Floor sprite
 			if (yflip)
 				yoff = -yoff;
 
 			if ((orientation & 64) == 0) {
-				if (tspr.z < globalposz) {
+				if (tspr.getZ() < globalposz) {
 					yflip = true;
 				} else if (yflip)
 					yflip = !yflip;
@@ -318,14 +314,14 @@ public class SpriteRenderer {
 			} else if (xflip)
 				xspans = -xspans;
 
-			transform.rotate(0, 0, 1, (int) Gameutils.AngleToDegrees((tspr.ang + (xflip ? 512 : 1536)) & 0x7FF));
+			transform.rotate(0, 0, 1, (int) Gameutils.AngleToDegrees((tspr.getAng() + (xflip ? 512 : 1536)) & 0x7FF));
 			transform.rotate(1, 0, 0, xflip ? -90 : 90);
 
 			if ((tsizx & 1) == 0)
-				transform.translate((tspr.xrepeat >> 1) / xspans, 0, 0);
+				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
 
-			transform.translate((tspr.xrepeat * xoff) / 4.0f, 0, -(tspr.yrepeat * yoff) / 4.0f);
-			transform.scale((tspr.xrepeat * texx) / 4.0f, 0, (tspr.yrepeat * texy) / 4.0f);
+			transform.translate((tspr.getXrepeat() * xoff) / 4.0f, 0, -(tspr.getYrepeat() * yoff) / 4.0f);
+			transform.scale((tspr.getXrepeat() * texx) / 4.0f, 0, (tspr.getYrepeat() * texy) / 4.0f);
 			break;
 		}
 
@@ -333,7 +329,7 @@ public class SpriteRenderer {
 	}
 
 	public boolean draw(Sprite tspr) {
-		if (tspr.owner < 0 || !Gameutils.isValidTile(tspr.picnum) || !Gameutils.isValidSector(tspr.getSectnum()))
+		if (tspr.getOwner() < 0 || !Gameutils.isValidTile(tspr.getPicnum()) || !Gameutils.isValidSector(tspr.getSectnum()))
 			return false;
 
 //		ShaderManager manager = parent.manager;
@@ -544,11 +540,11 @@ public class SpriteRenderer {
 
 		ShaderManager manager = parent.manager;
 
-		int picnum = tspr.picnum;
-		int shade = tspr.shade;
-		int pal = tspr.pal & 0xFF;
-		int orientation = tspr.cstat;
-		int spritenum = tspr.owner;
+		int picnum = tspr.getPicnum();
+		int shade = tspr.getShade();
+		int pal = tspr.getPal() & 0xFF;
+		int orientation = tspr.getCstat();
+		int spritenum = tspr.getOwner();
 		Tile pic = engine.getTile(picnum);
 		if ((orientation & 48) != 48) {
 			if (pic.getType() != AnimType.None) {
@@ -587,8 +583,8 @@ public class SpriteRenderer {
 		}
 
 		int vis = globalvisibility;
-		if (sector[tspr.getSectnum()].visibility != 0)
-			vis = mulscale(globalvisibility, (sector[tspr.getSectnum()].visibility + 16) & 0xFF, 4);
+		if (getSector()[tspr.getSectnum()].getVisibility() != 0)
+			vis = mulscale(globalvisibility, (getSector()[tspr.getSectnum()].getVisibility() + 16) & 0xFF, 4);
 
 		if (tex.getPixelFormat() == PixelFormat.Pal8)
 			((IndexedShader) manager.getProgram()).setVisibility((int) (-vis / 64.0f));
@@ -600,7 +596,7 @@ public class SpriteRenderer {
 		switch ((orientation >> 4) & 3) {
 		case 1: // Wall sprite
 			if ((orientation & 64) == 0) {
-				int dang = (((tspr.ang - engine.getangle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
+				int dang = (((tspr.getAng() - EngineUtils.getAngle(tspr.getX() - globalposx, tspr.getY() - globalposy)) & 0x7FF) - 1024);
 				if (dang > 512 || dang < -512) {
 					xflip = !xflip;
 				}
@@ -608,7 +604,7 @@ public class SpriteRenderer {
 			break;
 		case 2: // Floor sprite
 			if ((orientation & 64) == 0) {
-				if (tspr.z < globalposz) {
+				if (tspr.getZ() < globalposz) {
 					yflip = true;
 				} else if (yflip)
 					yflip = !yflip;

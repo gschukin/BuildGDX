@@ -6,13 +6,12 @@ import static com.badlogic.gdx.graphics.GL20.GL_CULL_FACE;
 import static com.badlogic.gdx.graphics.GL20.GL_CW;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT1;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT2;
-import static ru.m210projects.Build.Engine.globalvisibility;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.sector;
 import static ru.m210projects.Build.Engine.totalclock;
 import static ru.m210projects.Build.Pragmas.mulscale;
+import static ru.m210projects.Build.RenderService.TRANSLUSCENT1;
+import static ru.m210projects.Build.RenderService.TRANSLUSCENT2;
 
 import com.badlogic.gdx.math.Matrix4;
 
@@ -49,7 +48,7 @@ public class GDXModelRenderer {
 		if (m == null)
 			return false;
 
-		boolean isFloorAligned = (tspr.cstat & 48) == 32;
+		boolean isFloorAligned = (tspr.getCstat() & 48) == 32;
 		if (m.getType() == Type.Voxel && isFloorAligned)
 			return false;
 
@@ -78,8 +77,8 @@ public class GDXModelRenderer {
 		manager.transform(transport);
 		manager.frustum(null);
 
-		int shade = tspr.shade;
-		int pal = tspr.pal & 0xFF;
+		int shade = tspr.getShade();
+		int pal = tspr.getPal() & 0xFF;
 
 		float r, g, b, alpha = 1.0f;
 		r = g = b = (numshades - min(max((shade), 0), numshades)) / (float) numshades;
@@ -91,8 +90,8 @@ public class GDXModelRenderer {
 			b *= p.b / 255.0f;
 		}
 
-		if ((tspr.cstat & 2) != 0) {
-			if ((tspr.cstat & 512) == 0)
+		if ((tspr.getCstat() & 2) != 0) {
+			if ((tspr.getCstat() & 512) == 0)
 				alpha = TRANSLUSCENT1;
 			else
 				alpha = TRANSLUSCENT2;
@@ -105,7 +104,7 @@ public class GDXModelRenderer {
 			parent.calcFog(pal, shade, vis);
 
 		BuildGdx.gl.glEnable(GL_BLEND);
-		Tile2model t2m = defs.mdInfo.getParams(tspr.picnum);
+		Tile2model t2m = defs.mdInfo.getParams(tspr.getPicnum());
 		m.render(pal, shade, t2m != null ? t2m.skinnum : 0, vis, alpha);
 
 		BuildGdx.gl.glFrontFace(GL_CW);
@@ -115,43 +114,43 @@ public class GDXModelRenderer {
 
 	private int getVisibility(Sprite tspr) {
 		int vis = globalvisibility;
-		if (sector[tspr.getSectnum()].visibility != 0)
-			vis = mulscale(globalvisibility, (sector[tspr.getSectnum()].visibility + 16) & 0xFF, 4);
+		if (Engine.getSector()[tspr.getSectnum()].getVisibility() != 0)
+			vis = mulscale(globalvisibility, (Engine.getSector()[tspr.getSectnum()].getVisibility() + 16) & 0xFF, 4);
 		return vis;
 	}
 
 	private Matrix4 prepareTransform(GLModel m, Sprite tspr) {
 		BuildCamera cam = parent.cam;
 
-		Tile pic = engine.getTile(tspr.picnum);
-		int orientation = tspr.cstat;
+		Tile pic = engine.getTile(tspr.getPicnum());
+		int orientation = tspr.getCstat();
 
 		boolean xflip = (orientation & 4) != 0;
 		boolean yflip = (orientation & 8) != 0;
 		boolean isWallAligned = (orientation & 48) == 16;
 		boolean isFloorAligned = (orientation & 48) == 32;
 
-		float xoff = tspr.xoffset;
-		float yoff = yflip ? -tspr.yoffset : tspr.yoffset;
-		float posx = tspr.x;
-		float posy = tspr.y;
-		float posz = tspr.z;
+		float xoff = tspr.getXoffset();
+		float yoff = yflip ? -tspr.getYoffset() : tspr.getYoffset();
+		float posx = tspr.getX();
+		float posy = tspr.getY();
+		float posz = tspr.getZ();
 
 		if (m.getType() == Type.Voxel) {
 			GLVoxel vox = (GLVoxel) m;
 			if ((orientation & 128) == 0)
-				posz -= ((vox.zsiz * tspr.yrepeat) << 1);
+				posz -= ((vox.zsiz * tspr.getYrepeat()) << 1);
 			if (yflip && (orientation & 16) == 0)
-				posz += ((pic.getHeight() * 0.5f) - vox.zpiv) * tspr.yrepeat * 8.0f;
+				posz += ((pic.getHeight() * 0.5f) - vox.zpiv) * tspr.getYrepeat() * 8.0f;
 		} else {
 			if ((orientation & 128) != 0 && !isFloorAligned)
-				posz += (pic.getHeight() * tspr.yrepeat) << 1;
+				posz += (pic.getHeight() * tspr.getYrepeat()) << 1;
 			if (yflip)
-				posz -= (pic.getHeight() * tspr.yrepeat) << 2;
+				posz -= (pic.getHeight() * tspr.getYrepeat()) << 2;
 		}
 
-		float f = (tspr.xrepeat / 32.0f) * m.getScale();
-		float g = (tspr.yrepeat / 32.0f) * m.getScale();
+		float f = (tspr.getXrepeat() / 32.0f) * m.getScale();
+		float g = (tspr.getYrepeat() / 32.0f) * m.getScale();
 		if (!isWallAligned && !isFloorAligned)
 			f *= 0.8f;
 
@@ -164,8 +163,8 @@ public class GDXModelRenderer {
 		}
 		transform.scale(f, f, yflip ? -g : g);
 
-		Spriteext sprext = parent.defs.mapInfo.getSpriteInfo(tspr.owner);
-		float ang = tspr.ang + (sprext != null ? sprext.angoff : 0);
+		Spriteext sprext = parent.defs.mapInfo.getSpriteInfo(tspr.getOwner());
+		float ang = tspr.getAng() + (sprext != null ? sprext.angoff : 0);
 		transform.rotate(0, 0, 1, (float) Gameutils.AngleToDegrees(ang));
 		transform.scale(isFloorAligned ? -1.0f : 1.0f, xflip ^ isFloorAligned ? -1.0f : 1.0f, 1.0f);
 		if (m.getType() == Type.Voxel)
@@ -364,8 +363,8 @@ public class GDXModelRenderer {
 //			BuildGdx.gl.glFrontFace(GL_CW);
 //
 //		int vis = globalvisibility;
-//		if (sector[tspr.sectnum].visibility != 0)
-//			vis = mulscale(globalvisibility, (sector[tspr.sectnum].visibility + 16) & 0xFF, 4);
+//		if (Engine.getSector()[tspr.sectnum].visibility != 0)
+//			vis = mulscale(globalvisibility, (Engine.getSector()[tspr.sectnum].visibility + 16) & 0xFF, 4);
 //
 //		parent.switchShader(
 //				parent.getTexFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader);

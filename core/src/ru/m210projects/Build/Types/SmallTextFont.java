@@ -18,7 +18,6 @@ package ru.m210projects.Build.Types;
 
 import static com.badlogic.gdx.graphics.GL20.GL_ALPHA;
 import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.smalltextfont;
 import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
 import java.nio.ByteBuffer;
@@ -29,9 +28,12 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 
 public class SmallTextFont extends TileFont {
 
-	public SmallTextFont() {
+	byte[] smalltextfont;
+
+	public SmallTextFont(byte[] smalltextfont) {
 		super(FontType.Bitmap, smalltextfont, 4, 6, 16, 16);
 
+		this.smalltextfont = smalltextfont;
 		sizx = 128;
 		sizy = 128;
 	}

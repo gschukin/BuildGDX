@@ -1,61 +1,5 @@
 package ru.m210projects.Build.Render.GdxRender;
 
-import static com.badlogic.gdx.graphics.GL20.*;
-import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_BUFFER_BIT;
-import static com.badlogic.gdx.graphics.GL20.GL_DEPTH_TEST;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Engine.MAXSPRITESONSCREEN;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT1;
-import static ru.m210projects.Build.Engine.TRANSLUSCENT2;
-import static ru.m210projects.Build.Engine.beforedrawrooms;
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.globalang;
-import static ru.m210projects.Build.Engine.globalpal;
-import static ru.m210projects.Build.Engine.globalposx;
-import static ru.m210projects.Build.Engine.globalposy;
-import static ru.m210projects.Build.Engine.globalposz;
-import static ru.m210projects.Build.Engine.globalshade;
-import static ru.m210projects.Build.Engine.gotsector;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.pSmallTextfont;
-import static ru.m210projects.Build.Engine.pTextfont;
-import static ru.m210projects.Build.Engine.palookup;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.show2dsector;
-import static ru.m210projects.Build.Engine.show2dsprite;
-import static ru.m210projects.Build.Engine.sintable;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.tsprite;
-import static ru.m210projects.Build.Engine.wall;
-import static ru.m210projects.Build.Engine.windowy2;
-import static ru.m210projects.Build.Engine.wx1;
-import static ru.m210projects.Build.Engine.wx2;
-import static ru.m210projects.Build.Engine.wy1;
-import static ru.m210projects.Build.Engine.wy2;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.xdimen;
-import static ru.m210projects.Build.Engine.xdimenscale;
-import static ru.m210projects.Build.Engine.xyaspect;
-import static ru.m210projects.Build.Engine.ydim;
-import static ru.m210projects.Build.Engine.yxaspect;
-import static ru.m210projects.Build.Gameutils.AngleToRadians;
-import static ru.m210projects.Build.Gameutils.buildAngleToDegrees;
-import static ru.m210projects.Build.Gameutils.buildAngleToRadians;
-import static ru.m210projects.Build.Gameutils.isValidSector;
-import static ru.m210projects.Build.Net.Mmulti.connecthead;
-import static ru.m210projects.Build.Net.Mmulti.connectpoint2;
-import static ru.m210projects.Build.Pragmas.dmulscale;
-import static ru.m210projects.Build.Pragmas.mulscale;
-import static ru.m210projects.Build.Pragmas.scale;
-
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -66,16 +10,16 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
-
-import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
-import ru.m210projects.Build.Render.IOverheadMapSettings;
-import ru.m210projects.Build.Render.OrphoRenderer;
-import ru.m210projects.Build.Render.Renderer.Transparent;
-import ru.m210projects.Build.Render.GdxRender.WorldMesh.GLSurface;
+import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager;
 import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager.Shader;
+import ru.m210projects.Build.Render.GdxRender.WorldMesh.GLSurface;
+import ru.m210projects.Build.Render.IOverheadMapSettings;
+import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
+import ru.m210projects.Build.Render.OrphoRenderer;
+import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Render.TextureHandle.DummyTileData;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
@@ -87,6 +31,20 @@ import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
+import ru.m210projects.Build.Types.collections.SpriteNode;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import static com.badlogic.gdx.graphics.GL20.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static ru.m210projects.Build.Engine.*;
+import static ru.m210projects.Build.Gameutils.*;
+import static ru.m210projects.Build.Net.Mmulti.connecthead;
+import static ru.m210projects.Build.Net.Mmulti.connectpoint2;
+import static ru.m210projects.Build.Pragmas.*;
+import static ru.m210projects.Build.RenderService.*;
 
 public class GDXOrtho extends OrphoRenderer {
 
@@ -439,8 +397,8 @@ public class GDXOrtho extends OrphoRenderer {
 
 				float d = z / (65536.0f * 16384.0f);
 				float cosang, sinang;
-				float cosang2 = cosang = sintable[(a + 512) & 2047] * d;
-				float sinang2 = sinang = sintable[a & 2047] * d;
+				float cosang2 = cosang = EngineUtils.cos(a) * d;
+				float sinang2 = sinang = EngineUtils.sin(a) * d;
 				if ((dastat & 2) != 0 || ((dastat & 8) == 0)) { // Don't aspect unscaled perms
 					d = xyaspect / 65536.0f;
 					cosang2 *= d;
@@ -469,18 +427,19 @@ public class GDXOrtho extends OrphoRenderer {
 			hudsprite = new Sprite();
 		hudsprite.reset((byte) 0);
 
-		hudsprite.ang = (short) (hudInfo.angadd + globalang);
-		hudsprite.xrepeat = hudsprite.yrepeat = 32;
+		hudsprite.setAng((short) (hudInfo.angadd + globalang));
+		hudsprite.setXrepeat(32);
+		hudsprite.setYrepeat(32);
 
-		hudsprite.x = (int) ((gcosang * z1 - gsinang * x1) * 800.0f + globalposx);
-		hudsprite.y = (int) ((gsinang * z1 + gcosang * x1) * 800.0f + globalposy);
-		hudsprite.z = (int) (globalposz + y1 * 16384.0f * 0.8f);
+		hudsprite.setX((int) ((gcosang * z1 - gsinang * x1) * 800.0f + globalposx));
+		hudsprite.setY((int) ((gsinang * z1 + gcosang * x1) * 800.0f + globalposy));
+		hudsprite.setZ((int) (globalposz + y1 * 16384.0f * 0.8f));
 
-		hudsprite.picnum = (short) picnum;
-		hudsprite.shade = (byte) dashade;
-		hudsprite.pal = (short) dapalnum;
-		hudsprite.owner = (short) MAXSPRITES;
-		hudsprite.cstat = (short) ((dastat & 1) + ((dastat & 32) << 4) + (dastat & 4) << 1);
+		hudsprite.setPicnum((short) picnum);
+		hudsprite.setShade((byte) dashade);
+		hudsprite.setPal((short) dapalnum);
+		hudsprite.setOwner((short) MAXSPRITES);
+		hudsprite.setCstat((short) ((dastat & 1) + ((dastat & 32) << 4) + (dastat & 4) << 1));
 
 		if ((dastat & 10) == 2)
 			parent.resizeglcheck();
@@ -524,15 +483,15 @@ public class GDXOrtho extends OrphoRenderer {
 		if (col < 0)
 			return;
 
-		Wall wal = wall[w];
+		Wall wal = getWall()[w];
 
 		int ox = cposx - mapSettings.getWallX(w);
 		int oy = cposy - mapSettings.getWallY(w);
 		float x1 = ox * cos - oy * sin + xdim * 2048;
 		float y1 = ox * sin + oy * cos + ydim * 2048;
 
-		ox = cposx - mapSettings.getWallX(wal.point2);
-		oy = cposy - mapSettings.getWallY(wal.point2);
+		ox = cposx - mapSettings.getWallX(wal.getPoint2());
+		oy = cposy - mapSettings.getWallY(wal.getPoint2());
 
 		float x2 = ox * cos - oy * sin + xdim * 2048;
 		float y2 = ox * sin + oy * cos + ydim * 2048;
@@ -550,27 +509,27 @@ public class GDXOrtho extends OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			Sector sec = sector[i];
-			if (!Gameutils.isValidWall(sec.wallptr) || sec.wallnum < 3)
+			Sector sec = getSector()[i];
+			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
 				continue;
 
-			int walnum = sec.wallptr;
-			for (int j = 0; j < sec.wallnum; j++, walnum++) {
-				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(wall[walnum].point2))
+			int walnum = sec.getWallptr();
+			for (int j = 0; j < sec.getWallnum(); j++, walnum++) {
+				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(getWall()[walnum].getPoint2()))
 					continue;
 
-				Wall wal = wall[walnum];
-				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.nextwall)) {
-					if (Gameutils.isValidSector(wal.nextsector)) {
+				Wall wal = getWall()[walnum];
+				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
+					if (Gameutils.isValidSector(wal.getNextsector())) {
 						if (mapSettings.isWallVisible(walnum, i))
 							drawoverheadline(walnum, cposx, cposy, cos, sin, mapSettings.getWallColor(walnum, i));
 					}
 				}
 
-				if (wal.nextwall >= 0)
+				if (wal.getNextwall() >= 0)
 					continue;
 
-				Tile pic = engine.getTile(wal.picnum);
+				Tile pic = engine.getTile(wal.getPicnum());
 				if (!pic.hasSize())
 					continue;
 
@@ -584,39 +543,40 @@ public class GDXOrtho extends OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for(int j : spriteSectMap.getIndicesOf(i)) {
-					Sprite spr = sprite[j];
+				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
+					int j = node.getIndex();
+					Sprite spr = getSprite()[j];
 
-					if ((spr.cstat & 0x8000) != 0 || spr.xrepeat == 0 || spr.yrepeat == 0
+					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
 						continue;
 
-					switch (spr.cstat & 48) {
+					switch (spr.getCstat() & 48) {
 					case 0:
 						if (((gotsector[i >> 3] & (1 << (i & 7))) > 0) && (czoom > 96)) {
 							int ox = cposx - mapSettings.getSpriteX(j);
 							int oy = cposy - mapSettings.getSpriteY(j);
 							float dx = ox * cos - oy * sin;
 							float dy = ox * sin + oy * cos;
-							int daang = (spr.ang - cang) & 0x7FF;
-							int nZoom = czoom * spr.yrepeat;
+							int daang = (spr.getAng() - cang) & 0x7FF;
+							int nZoom = czoom * spr.getYrepeat();
 							int sx = (int) (dx + xdim * 2048);
 							int sy = (int) (dy + ydim * 2048);
 
-							rotatesprite(sx * 16, sy * 16, nZoom, (short) daang, spr.picnum, spr.shade, spr.pal,
-									(spr.cstat & 2) >> 1, wx1, wy1, wx2, wy2);
+							rotatesprite(sx * 16, sy * 16, nZoom, (short) daang, spr.getPicnum(), spr.getShade(), spr.getPal(),
+									(spr.getCstat() & 2) >> 1, wx1, wy1, wx2, wy2);
 						}
 						break;
 					case 16: {
-						Tile pic = engine.getTile(spr.picnum);
+						Tile pic = engine.getTile(spr.getPicnum());
 						int x1 = mapSettings.getSpriteX(j);
 						int y1 = mapSettings.getSpriteY(j);
-						byte xoff = (byte) (pic.getOffsetX() + spr.xoffset);
-						if ((spr.cstat & 4) > 0)
+						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
+						if ((spr.getCstat() & 4) > 0)
 							xoff = (byte) -xoff;
 
-						int dax = sintable[spr.ang & 2047] * spr.xrepeat;
-						int day = sintable[(spr.ang + 1536) & 2047] * spr.xrepeat;
+						int dax = EngineUtils.cos(spr.getAng() - 512) * spr.getXrepeat();
+						int day = EngineUtils.sin(spr.getAng() - 512) * spr.getXrepeat();
 						int k = (pic.getWidth() >> 1) + xoff;
 						x1 -= mulscale(dax, k, 16);
 						int x2 = x1 + mulscale(dax, pic.getWidth(), 16);
@@ -641,25 +601,25 @@ public class GDXOrtho extends OrphoRenderer {
 					}
 						break;
 					case 32: {
-						Tile pic = engine.getTile(spr.picnum);
-						byte xoff = (byte) (pic.getOffsetX() + spr.xoffset);
-						byte yoff = (byte) (pic.getOffsetY() + spr.yoffset);
-						if ((spr.cstat & 4) > 0)
+						Tile pic = engine.getTile(spr.getPicnum());
+						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
+						byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
+						if ((spr.getCstat() & 4) > 0)
 							xoff = (byte) -xoff;
-						if ((spr.cstat & 8) > 0)
+						if ((spr.getCstat() & 8) > 0)
 							yoff = (byte) -yoff;
 
-						int cosang = sintable[(spr.ang + 512) & 2047];
-						int sinang = sintable[spr.ang & 2047];
+						int cosang = EngineUtils.cos(spr.getAng());
+						int sinang = EngineUtils.sin(spr.getAng());
 
-						int dax = ((pic.getWidth() >> 1) + xoff) * spr.xrepeat;
-						int day = ((pic.getHeight() >> 1) + yoff) * spr.yrepeat;
+						int dax = ((pic.getWidth() >> 1) + xoff) * spr.getXrepeat();
+						int day = ((pic.getHeight() >> 1) + yoff) * spr.getYrepeat();
 						int x1 = mapSettings.getSpriteX(j) + dmulscale(sinang, dax, cosang, day, 16);
 						int y1 = mapSettings.getSpriteY(j) + dmulscale(sinang, day, -cosang, dax, 16);
-						int l = pic.getWidth() * spr.xrepeat;
+						int l = pic.getWidth() * spr.getXrepeat();
 						int x2 = x1 - mulscale(sinang, l, 16);
 						int y2 = y1 + mulscale(cosang, l, 16);
-						l = pic.getHeight() * spr.yrepeat;
+						l = pic.getHeight() * spr.getYrepeat();
 						int k = -mulscale(cosang, l, 16);
 						int x3 = x2 + k;
 						int x4 = x1 + k;
@@ -705,17 +665,17 @@ public class GDXOrtho extends OrphoRenderer {
 		// draw player
 		for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(sprite[spr].getSectnum()))
+			if (spr == -1 || !isValidSector(getSprite()[spr].getSectnum()))
 				continue;
 
-			Sprite pPlayer = sprite[spr];
+			Sprite pPlayer = getSprite()[spr];
 			int ox = cposx - mapSettings.getSpriteX(spr);
 			int oy = cposy - mapSettings.getSpriteY(spr);
 
 			float dx = ox * cos - oy * sin;
 			float dy = ox * sin + oy * cos;
 
-			int dang = (pPlayer.ang - cang) & 0x7FF;
+			int dang = (pPlayer.getAng() - cang) & 0x7FF;
 			int viewindex = mapSettings.getViewPlayer();
 			if (i == viewindex && !mapSettings.isScrollMode()) {
 				dx = 0;
@@ -750,8 +710,8 @@ public class GDXOrtho extends OrphoRenderer {
 					int sx = (int) (dx + xdim * 2048);
 					int sy = (int) (dy + ydim * 2048);
 
-					rotatesprite(sx * 16, sy * 16, nZoom, (short) dang, picnum, pPlayer.shade, pPlayer.pal,
-							(pPlayer.cstat & 2) >> 1, wx1, wy1, wx2, wy2);
+					rotatesprite(sx * 16, sy * 16, nZoom, (short) dang, picnum, pPlayer.getShade(), pPlayer.getPal(),
+							(pPlayer.getCstat() & 2) >> 1, wx1, wy1, wx2, wy2);
 				}
 			}
 		}
@@ -786,30 +746,33 @@ public class GDXOrtho extends OrphoRenderer {
 
 		int sortnum = 0;
 		for (int s = 0; s < numsectors; s++) {
-			Sector sec = sector[s];
+			Sector sec = getSector()[s];
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				if ((showSprites & 1) != 0) {
 					// Collect floor sprites to draw
-					for(int i : spriteSectMap.getIndicesOf(s))
-						if ((sprite[i].cstat & 48) == 32) {
+					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+						int i = node.getIndex();
+						if ((getSprite()[i].getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								break;
 
-							if ((sprite[i].cstat & (64 + 8)) == (64 + 8)
+							if ((getSprite()[i].getCstat() & (64 + 8)) == (64 + 8)
 									|| !mapSettings.isSpriteVisible(MapView.Polygons, i))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i]);
-							tsprite[sortnum++].owner = (short) i;
+							tsprite[sortnum].set(getSprite()[i]);
+							tsprite[sortnum++].setOwner((short) i);
 						}
+					}
 				}
 
 				if ((showSprites & 2) != 0) {
-					for(int i : spriteSectMap.getIndicesOf(s)) {
-						if ((sprite[i].cstat & 48) == 32)
+					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+						int i = node.getIndex();
+						if ((getSprite()[i].getCstat() & 48) == 32)
 							continue;
 
 						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {
@@ -824,8 +787,8 @@ public class GDXOrtho extends OrphoRenderer {
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(sprite[i]);
-							tsprite[sortnum++].owner = (short) i;
+							tsprite[sortnum].set(getSprite()[i]);
+							tsprite[sortnum++].setOwner((short) i);
 						}
 					}
 				}
@@ -833,9 +796,9 @@ public class GDXOrtho extends OrphoRenderer {
 				gotsector[s >> 3] |= pow2char[s & 7];
 				if (sec.isParallaxFloor())
 					continue;
-				globalpal = sec.floorpal;
+				globalpal = sec.getFloorpal();
 
-				int globalpicnum = sec.floorpicnum;
+				int globalpicnum = sec.getFloorpicnum();
 				if (globalpicnum >= MAXTILES)
 					globalpicnum = 0;
 				engine.setgotpic(globalpicnum);
@@ -852,13 +815,13 @@ public class GDXOrtho extends OrphoRenderer {
 				if (!pic.isLoaded())
 					engine.loadtile(globalpicnum);
 
-				globalshade = max(min(sec.floorshade, numshades - 1), 0);
+				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
 				GLSurface flor = parent.world.getFloor(s);
 				if (flor != null) {
 					tmpMat.setToRotation(0, 0, 1, (512 - ang) * buildAngleToDegrees);
 					tmpMat.translate(-dax / parent.cam.xscale, -day / parent.cam.xscale,
-							-sector[s].floorz / parent.cam.yscale);
+							-getSector()[s].getFloorz() / parent.cam.yscale);
 					parent.drawSurf(flor, 0, tmpMat, null);
 				}
 			}
@@ -875,32 +838,32 @@ public class GDXOrtho extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1)
 				for (int i = 0; i < sortnum - gap; i++)
 					for (int j = i; j >= 0; j -= gap) {
-						if (sprite[tsprite[j].owner].z <= sprite[tsprite[j + gap].owner].z)
+						if (getSprite()[tsprite[j].getOwner()].getZ() <= getSprite()[tsprite[j + gap].getOwner()].getZ())
 							break;
 
-						short tmp = tsprite[j].owner;
-						tsprite[j].owner = tsprite[j + gap].owner;
-						tsprite[j + gap].owner = tmp;
+						short tmp = tsprite[j].getOwner();
+						tsprite[j].setOwner(tsprite[j + gap].getOwner());
+						tsprite[j + gap].setOwner(tmp);
 					}
 
 			for (int s = sortnum - 1; s >= 0; s--) {
-				int j = tsprite[s].owner;
-				Sprite spr = sprite[j];
-				if ((spr.cstat & 32768) == 0) {
-					if (spr.picnum >= MAXTILES)
-						spr.picnum = 0;
+				int j = tsprite[s].getOwner();
+				Sprite spr = getSprite()[j];
+				if ((spr.getCstat() & 32768) == 0) {
+					if (spr.getPicnum() >= MAXTILES)
+						spr.setPicnum(0);
 
 					int ox = dax - mapSettings.getSpriteX(j);
 					int oy = day - mapSettings.getSpriteY(j);
 					float dx = ox * cos - oy * sin;
 					float dy = ox * sin + oy * cos;
-					int daang = (spr.ang - ang) & 0x7FF;
-					int nZoom = zoome * spr.yrepeat;
+					int daang = (spr.getAng() - ang) & 0x7FF;
+					int nZoom = zoome * spr.getYrepeat();
 					int sx = (int) (dx + xdim * 2048);
 					int sy = (int) (dy + ydim * 2048);
 
-					rotatesprite(sx * 16, sy * 16, nZoom, (short) daang, mapSettings.getSpritePicnum(j), spr.shade, spr.pal,
-							((spr.cstat & 2) >> 1) | 8, wx1, wy1, wx2, wy2);
+					rotatesprite(sx * 16, sy * 16, nZoom, (short) daang, mapSettings.getSpritePicnum(j), spr.getShade(), spr.getPal(),
+							((spr.getCstat() & 2) >> 1) | 8, wx1, wy1, wx2, wy2);
 				}
 			}
 		}

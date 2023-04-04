@@ -27,14 +27,14 @@ public class SectorInfo {
 			SectorIterator it = sec.iterator();
 
 			hasOccluders[i] = false;
-			Clockdir dir = engine.clockdir(sec.wallptr);
+			Clockdir dir = engine.clockdir(sec.getWallptr());
 			boolean hasContour = false;
 			int numloops = 0;
 			while (it.hasNext()) {
 				short z = it.nexti();
 				loopinfo[z] = dir == null ? (dir = engine.clockdir(z)) : dir;
 				Wall wal = wall[z];
-				int nextsector = wal.nextsector;
+				int nextsector = wal.getNextsector();
 				if (dir == Clockdir.CCW && nextsector == -1) {
 					isOccluder[z] = true;
 					hasOccluders[i] = true;
@@ -43,7 +43,7 @@ public class SectorInfo {
 
                 isContour[z] = dir == Clockdir.CW && nextsector == -1;
 
-				if (wal.point2 < z) {
+				if (wal.getPoint2() < z) {
 					numloops++;
 					if (dir == Clockdir.CW)
 						hasContour = true;

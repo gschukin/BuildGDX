@@ -3,14 +3,14 @@ package ru.m210projects.Build.Types;
 public class TSprite extends Sprite {
 
     public int getSpriteNum() {
-        return this.owner;
+        return this.getOwner();
     }
 
     public TSprite update(int x, int y, int z, int sectnum) {
-        this.x = x;
-        this.y = y;
-        this.y = y;
-        this.sectnum = (short) sectnum;
+        this.setX(x);
+        this.setY(y);
+        this.setY(y);
+        this.setSectnum((short) sectnum);
         return this;
     }
 }

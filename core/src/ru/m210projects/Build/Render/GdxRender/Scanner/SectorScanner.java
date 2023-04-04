@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Pragmas;
 import ru.m210projects.Build.Types.*;
@@ -21,6 +22,8 @@ import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
+import ru.m210projects.Build.Types.collections.SpriteNode;
+import static ru.m210projects.Build.RenderService.*;
 
 public abstract class SectorScanner {
 
@@ -117,46 +120,46 @@ public abstract class SectorScanner {
 			if (!pFrustum.handled) {
 				pFrustum.handled = true;
 
-				int startwall = sector[sectnum].wallptr;
-				int endwall = sector[sectnum].wallnum + startwall;
+				int startwall = getSector()[sectnum].getWallptr();
+				int endwall = getSector()[sectnum].getWallnum() + startwall;
 				for (int z = startwall; z < endwall; z++) {
-					Wall wal = wall[z];
+					Wall wal = getWall()[z];
 					if (!pvs.checkWall(z))
 						continue;
 
-					int nextsectnum = wal.nextsector;
+					int nextsectnum = wal.getNextsector();
 					if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Max, sectnum, z))) {
 						gotwall[z >> 3] |= pow2char[z & 7];
 
-						if ((sector[sectnum].isParallaxFloor()
-								&& (nextsectnum == -1 || !sector[nextsectnum].isParallaxFloor()))
+						if ((getSector()[sectnum].isParallaxFloor()
+								&& (nextsectnum == -1 || !getSector()[nextsectnum].isParallaxFloor()))
 								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyLower, sectnum, z)))
 							wallflags[z] |= 8;
-						if ((sector[sectnum].isParallaxCeiling()
-								&& (nextsectnum == -1 || !sector[nextsectnum].isParallaxCeiling()))
+						if ((getSector()[sectnum].isParallaxCeiling()
+								&& (nextsectnum == -1 || !getSector()[nextsectnum].isParallaxCeiling()))
 								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyUpper, sectnum, z)))
 							wallflags[z] |= 16;
 
 						if (nextsectnum != -1) {
-							if (!checkWallRange(nextsectnum, wal.nextwall)) {
-								int theline = wal.nextwall;
+							if (!checkWallRange(nextsectnum, wal.getNextwall())) {
+								int theline = wal.getNextwall();
 								int gap = (numsectors >> 1);
 								short i = (short) gap;
 								while (gap > 1) {
 									gap >>= 1;
-									if (sector[i].wallptr < theline)
+									if (getSector()[i].getWallptr() < theline)
 										i += gap;
 									else
 										i -= gap;
 								}
-								while (sector[i].wallptr > theline)
+								while (getSector()[i].getWallptr() > theline)
 									i--;
-								while (sector[i].wallptr + sector[i].wallnum <= theline)
+								while (getSector()[i].getWallptr() + getSector()[i].getWallnum() <= theline)
 									i++;
 								nextsectnum = i;
 
 								System.err.println("Error on " + i);
-								wal.nextsector = i; // XXX
+								wal.setNextsector(i); // XXX
 							}
 
 							if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Lower, sectnum, z)))
@@ -168,8 +171,8 @@ public abstract class SectorScanner {
 								continue;
 
 							WallFrustum3d portal = null;
-							if ((((sector[sectnum].ceilingstat & sector[nextsectnum].ceilingstat) & 1) != 0)
-									|| (((sector[sectnum].floorstat & sector[nextsectnum].floorstat) & 1) != 0)) {
+							if ((((getSector()[sectnum].getCeilingstat() & getSector()[nextsectnum].getCeilingstat()) & 1) != 0)
+									|| (((getSector()[sectnum].getFloorstat() & getSector()[nextsectnum].getFloorstat()) & 1) != 0)) {
 								portal = pFrustum.clone(pFrustumPool);
 								portal.sectnum = nextsectnum;
 							} else {
@@ -184,7 +187,7 @@ public abstract class SectorScanner {
 									float posx = globalposx;
 									float posy = globalposy;
 
-									if ((sector[sectnum].isParallaxCeiling()) || (sector[sectnum].isParallaxFloor())
+									if ((getSector()[sectnum].isParallaxCeiling()) || (getSector()[sectnum].isParallaxFloor())
 											|| (projectionToWall(posx, posy, wal, projPoint)
 													&& Math.abs(posx - projPoint.x) + Math
 															.abs(posy - projPoint.y) <= cam.near * cam.xscale * 2)) {
@@ -246,13 +249,13 @@ public abstract class SectorScanner {
 			if (automapping == 1)
 				show2dsector[sectnum >> 3] |= pow2char[sectnum & 7];
 
-			boolean isParallaxCeiling = sector[sectnum].isParallaxCeiling();
-			boolean isParallaxFloor = sector[sectnum].isParallaxFloor();
-			int startwall = sector[sectnum].wallptr;
-			int endwall = sector[sectnum].wallnum + startwall;
+			boolean isParallaxCeiling = getSector()[sectnum].isParallaxCeiling();
+			boolean isParallaxFloor = getSector()[sectnum].isParallaxFloor();
+			int startwall = getSector()[sectnum].getWallptr();
+			int endwall = getSector()[sectnum].getWallnum() + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				Wall wal = wall[z];
-				int nextsectnum = wal.nextsector;
+				Wall wal = getWall()[z];
+				int nextsectnum = wal.getNextsector();
 
 				if ((gotwall[z >> 3] & pow2char[z & 7]) == 0)
 					continue;
@@ -271,14 +274,14 @@ public abstract class SectorScanner {
 					wallflags[z] &= ~(8 | 16);
 
 					if (isParallaxCeiling) {
-						if (engine.getTile(sector[sectnum].ceilingpicnum).hasSize()) {
-							skyCeiling = sector[sectnum];
+						if (engine.getTile(getSector()[sectnum].getCeilingpicnum()).hasSize()) {
+							skyCeiling = getSector()[sectnum];
 						}
 					}
 
 					if (isParallaxFloor) {
-						if (engine.getTile(sector[sectnum].floorpicnum).hasSize()) {
-							skyFloor = sector[sectnum];
+						if (engine.getTile(getSector()[sectnum].getFloorpicnum()).hasSize()) {
+							skyFloor = getSector()[sectnum];
 						}
 					}
 
@@ -308,24 +311,24 @@ public abstract class SectorScanner {
 	protected IntComparator wallcomp = new IntComparator() {
 		@Override
 		public int compare(int o1, int o2) {
-			if (!wallfront(wall[o1], wall[o2]))
+			if (!wallfront(getWall()[o1], getWall()[o2]))
 				return -1;
 			return 0;
 		}
 	};
 
 	protected boolean wallfront(Wall w1, Wall w2) {
-		Wall wp1 = wall[w1.point2];
-		float x11 = w1.x;
-		float y11 = w1.y;
-		float x21 = wp1.x;
-		float y21 = wp1.y;
+		Wall wp1 = getWall()[w1.getPoint2()];
+		float x11 = w1.getX();
+		float y11 = w1.getY();
+		float x21 = wp1.getX();
+		float y21 = wp1.getY();
 
-		Wall wp2 = wall[w2.point2];
-		float x12 = w2.x;
-		float y12 = w2.y;
-		float x22 = wp2.x;
-		float y22 = wp2.y;
+		Wall wp2 = getWall()[w2.getPoint2()];
+		float x12 = w2.getX();
+		float y12 = w2.getY();
+		float x22 = wp2.getX();
+		float y22 = wp2.getY();
 
 		float dx = x21 - x11;
 		float dy = y21 - y11;
@@ -379,23 +382,24 @@ public abstract class SectorScanner {
 	}
 
 	private boolean checkWallRange(int sectnum, int z) {
-		return z >= sector[sectnum].wallptr && z < (sector[sectnum].wallptr + sector[sectnum].wallnum);
+		return z >= getSector()[sectnum].getWallptr() && z < (getSector()[sectnum].getWallptr() + getSector()[sectnum].getWallnum());
 	}
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
-		for(int z : spriteSectMap.getIndicesOf(sectnum)) {
-			Sprite spr = sprite[z];
+		for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
+			int z = node.getIndex();
+			Sprite spr = getSprite()[z];
 
-			if ((((spr.cstat & 0x8000) == 0) || showinvisibility) && (spr.xrepeat > 0) && (spr.yrepeat > 0)
+			if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 					&& (spritesortcnt < MAXSPRITESONSCREEN)) {
-				int xs = spr.x - globalposx;
-				int ys = spr.y - globalposy;
-				if ((spr.cstat & (64 + 48)) != (64 + 16) || Pragmas.dmulscale(sintable[(spr.ang + 512) & 2047], -xs,
-						sintable[spr.ang & 2047], -ys, 6) > 0) {
+				int xs = spr.getX() - globalposx;
+				int ys = spr.getY() - globalposy;
+				if ((spr.getCstat() & (64 + 48)) != (64 + 16) || Pragmas.dmulscale(EngineUtils.cos(spr.getAng()), -xs,
+						EngineUtils.sin(spr.getAng()), -ys, 6) > 0) {
 					if (spriteInFrustum(pFrustum, spr)) {
 						Sprite tspr = addTSprite();
 						tspr.set(spr);
-						tspr.owner = (short) z;
+						tspr.setOwner((short) z);
 					}
 				}
 			}
@@ -441,18 +445,18 @@ public abstract class SectorScanner {
 		Plane: for (int i = near == null ? 0 : -1; i < frustum.planes.length; i++) {
 			Plane plane = (i == -1) ? near : frustum.planes[i];
 
-			int startwall = sector[sectnum].wallptr;
-			int endwall = sector[sectnum].wallnum + startwall;
+			int startwall = getSector()[sectnum].getWallptr();
+			int endwall = getSector()[sectnum].getWallnum() + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				Wall wal = wall[z];
-				int wz = isFloor ? engine.getflorzofslope((short) sectnum, wal.x, wal.y)
-						: engine.getceilzofslope((short) sectnum, wal.x, wal.y);
+				Wall wal = getWall()[z];
+				int wz = isFloor ? engine.getflorzofslope((short) sectnum, wal.getX(), wal.getY())
+						: engine.getceilzofslope((short) sectnum, wal.getX(), wal.getY());
 
-				if ((isFloor && !sector[sectnum].isSlopedFloor() && globalposz > wz)
-						|| (!isFloor && !sector[sectnum].isSlopedCeiling() && globalposz < wz))
+				if ((isFloor && !getSector()[sectnum].isFloorSlope() && globalposz > wz)
+						|| (!isFloor && !getSector()[sectnum].isCeilingSlope() && globalposz < wz))
 					continue;
 
-				if (plane.testPoint(wal.x, wal.y, wz) != PlaneSide.Back)
+				if (plane.testPoint(wal.getX(), wal.getY(), wz) != PlaneSide.Back)
 					continue Plane;
 			}
 
@@ -474,26 +478,26 @@ public abstract class SectorScanner {
 	}
 
 	public boolean projectionToWall(float posx, float posy, Wall w, Vector2 n) {
-		Wall p2 = wall[w.point2];
-		int dx = p2.x - w.x;
-		int dy = p2.y - w.y;
+		Wall p2 = getWall()[w.getPoint2()];
+		int dx = p2.getX() - w.getX();
+		int dy = p2.getY() - w.getY();
 
-		float i = dx * (posx - w.x) + dy * (posy - w.y);
+		float i = dx * (posx - w.getX()) + dy * (posy - w.getY());
 
 		if (i < 0) {
-			n.set(w.x, w.y);
+			n.set(w.getX(), w.getY());
 			return false;
 		}
 
 		float j = dx * dx + dy * dy;
 		if (i > j) {
-			n.set(p2.x, p2.y);
+			n.set(p2.getX(), p2.getY());
 			return false;
 		}
 
 		i /= j;
 
-		n.set(dx * i + w.x, dy * i + w.y);
+		n.set(dx * i + w.getX(), dy * i + w.getY());
 		return true;
 	}
 

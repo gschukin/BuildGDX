@@ -17,8 +17,7 @@
 package ru.m210projects.Build.Pattern;
 
 import static ru.m210projects.Build.Engine.getInput;
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 
 import java.util.Arrays;

@@ -7,7 +7,7 @@
 package ru.m210projects.Build.OnSceenDisplay;
 
 import static ru.m210projects.Build.Engine.palette;
-import static ru.m210projects.Build.Engine.xdim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.OnSceenDisplay.Console.BGCTILE;
 import static ru.m210projects.Build.OnSceenDisplay.Console.BGTILE;
 import static ru.m210projects.Build.OnSceenDisplay.Console.BGTILE_SIZEX;

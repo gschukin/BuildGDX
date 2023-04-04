@@ -78,22 +78,22 @@ public class Interpolation {
 
 		switch (type) {
 		case WallX:
-			data.oldpos = ((Wall) obj).x;
+			data.oldpos = ((Wall) obj).getX();
 			break;
 		case WallY:
-			data.oldpos = ((Wall) obj).y;
+			data.oldpos = ((Wall) obj).getY();
 			break;
 		case FloorZ:
-			data.oldpos = ((Sector) obj).floorz;
+			data.oldpos = ((Sector) obj).getFloorz();
 			break;
 		case CeilZ:
-			data.oldpos = ((Sector) obj).ceilingz;
+			data.oldpos = ((Sector) obj).getCeilingz();
 			break;
 		case FloorH:
-			data.oldpos = ((Sector) obj).floorheinum;
+			data.oldpos = ((Sector) obj).getFloorheinum();
 			break;
 		case CeilH:
-			data.oldpos = ((Sector) obj).ceilingheinum;
+			data.oldpos = ((Sector) obj).getCeilingheinum();
 			break;
 		}
 	}
@@ -129,7 +129,7 @@ public class Interpolation {
 	}
 
 	public void dospriteinterp(Sprite tsp, int smoothratio) {
-		ILoc oldLoc = getsprinterpolate(tsp.owner);
+		ILoc oldLoc = getsprinterpolate(tsp.getOwner());
 		if (oldLoc != null) {
 			int x = oldLoc.x;
 			int y = oldLoc.y;
@@ -137,32 +137,32 @@ public class Interpolation {
 			short nAngle = oldLoc.ang;
 
 			// interpolate sprite position
-			x += mulscale(tsp.x - oldLoc.x, smoothratio, 16);
-			y += mulscale(tsp.y - oldLoc.y, smoothratio, 16);
-			z += mulscale(tsp.z - oldLoc.z, smoothratio, 16);
-			nAngle += mulscale(((tsp.ang - oldLoc.ang + 1024) & 0x7FF) - 1024, smoothratio, 16);
+			x += mulscale(tsp.getX() - oldLoc.x, smoothratio, 16);
+			y += mulscale(tsp.getY() - oldLoc.y, smoothratio, 16);
+			z += mulscale(tsp.getZ() - oldLoc.z, smoothratio, 16);
+			nAngle += mulscale(((tsp.getAng() - oldLoc.ang + 1024) & 0x7FF) - 1024, smoothratio, 16);
 
-			tsp.x = x;
-			tsp.y = y;
-			tsp.z = z;
-			tsp.ang = nAngle;
+			tsp.setX(x);
+			tsp.setY(y);
+			tsp.setZ(z);
+			tsp.setAng(nAngle);
 		}
 	}
 
 	public int getValue(IData obj) {
 		switch (obj.type) {
 		case WallX:
-			return ((Wall) obj.ptr).x;
+			return ((Wall) obj.ptr).getX();
 		case WallY:
-			return ((Wall) obj.ptr).y;
+			return ((Wall) obj.ptr).getY();
 		case FloorZ:
-			return ((Sector) obj.ptr).floorz;
+			return ((Sector) obj.ptr).getFloorz();
 		case CeilZ:
-			return ((Sector) obj.ptr).ceilingz;
+			return ((Sector) obj.ptr).getCeilingz();
 		case FloorH:
-			return ((Sector) obj.ptr).floorheinum;
+			return ((Sector) obj.ptr).getFloorheinum();
 		case CeilH:
-			return ((Sector) obj.ptr).ceilingheinum;
+			return ((Sector) obj.ptr).getCeilingheinum();
 		}
 
 		return 0;
@@ -178,22 +178,22 @@ public class Interpolation {
 
 			switch (gInt.type) {
 			case WallX:
-				((Wall) obj).x = value;
+				((Wall) obj).setX(value);
 				break;
 			case WallY:
-				((Wall) obj).y = value;
+				((Wall) obj).setY(value);
 				break;
 			case FloorZ:
-				((Sector) obj).floorz = value;
+				((Sector) obj).setFloorz(value);
 				break;
 			case CeilZ:
-				((Sector) obj).ceilingz = value;
+				((Sector) obj).setCeilingz(value);
 				break;
 			case FloorH:
-				((Sector) obj).floorheinum = (short) value;
+				((Sector) obj).setFloorheinum((short) value);
 				break;
 			case CeilH:
-				((Sector) obj).ceilingheinum = (short) value;
+				((Sector) obj).setCeilingheinum((short) value);
 				break;
 			}
 		}
@@ -205,22 +205,22 @@ public class Interpolation {
 			Object obj = gInt.ptr;
 			switch (gInt.type) {
 			case WallX:
-				((Wall) obj).x = gInt.bakpos;
+				((Wall) obj).setX(gInt.bakpos);
 				break;
 			case WallY:
-				((Wall) obj).y = gInt.bakpos;
+				((Wall) obj).setY(gInt.bakpos);
 				break;
 			case FloorZ:
-				((Sector) obj).floorz = gInt.bakpos;
+				((Sector) obj).setFloorz(gInt.bakpos);
 				break;
 			case CeilZ:
-				((Sector) obj).ceilingz = gInt.bakpos;
+				((Sector) obj).setCeilingz(gInt.bakpos);
 				break;
 			case FloorH:
-				((Sector) obj).floorheinum = (short) gInt.bakpos;
+				((Sector) obj).setFloorheinum((short) gInt.bakpos);
 				break;
 			case CeilH:
-				((Sector) obj).ceilingheinum = (short) gInt.bakpos;
+				((Sector) obj).setCeilingheinum((short) gInt.bakpos);
 				break;
 			}
 		}
@@ -229,10 +229,10 @@ public class Interpolation {
 	public boolean setsprinterpolate(int nSprite, Sprite pSprite) {
 		if ((gSpriteLoc[nSprite >> 3] & pow2char[nSprite & 7]) == 0) {
 			ILoc pLocation = gOldSpriteLoc[nSprite];
-			pLocation.x = pSprite.x;
-			pLocation.y = pSprite.y;
-			pLocation.z = pSprite.z;
-			pLocation.ang = pSprite.ang;
+			pLocation.x = pSprite.getX();
+			pLocation.y = pSprite.getY();
+			pLocation.z = pSprite.getZ();
+			pLocation.ang = pSprite.getAng();
 			gSpriteLoc[nSprite >> 3] |= pow2char[nSprite & 7];
 			return true;
 		}

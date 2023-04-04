@@ -18,7 +18,6 @@ package ru.m210projects.Build.Types;
 
 import static com.badlogic.gdx.graphics.GL20.GL_ALPHA;
 import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.textfont;
 import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
 import java.nio.ByteBuffer;
@@ -29,9 +28,11 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 
 public class TextFont extends TileFont {
 
-	public TextFont() {
+	byte[] textfont;
+	public TextFont(byte[] textfont) {
 		super(FontType.Bitmap, textfont, 8, 8, 16, 16);
 
+		this.textfont = textfont;
 		sizx = 128;
 		sizy = 128;
 	}

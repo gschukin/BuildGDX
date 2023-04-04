@@ -22,12 +22,12 @@ import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_2D;
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
 import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.Engine.RESERVEDPALS;
-import static ru.m210projects.Build.Engine.pSmallTextfont;
-import static ru.m210projects.Build.Engine.pTextfont;
 import static ru.m210projects.Build.Render.Types.GL10.GL_MODELVIEW;
 import static ru.m210projects.Build.Render.Types.GL10.GL_RGB_SCALE;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
+import static ru.m210projects.Build.RenderService.pSmallTextfont;
+import static ru.m210projects.Build.RenderService.pTextfont;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;

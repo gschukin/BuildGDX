@@ -16,8 +16,7 @@
 
 package ru.m210projects.Build.Pattern;
 
-import static ru.m210projects.Build.Engine.xdim;
-import static ru.m210projects.Build.Engine.ydim;
+import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.toCharArray;

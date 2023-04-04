@@ -508,6 +508,7 @@ public class LwjglInput implements BuildInput {
 				touchEvents.add(event);
 				mouseX = event.x;
 				mouseY = event.y;
+
 				deltaX += (int)(Mouse.getEventDX() * Display.getPixelScaleFactor());
 				deltaY += (int)(Mouse.getEventDY() * Display.getPixelScaleFactor());
 			}

@@ -19,6 +19,7 @@ import static ru.m210projects.Build.Pragmas.klabs;
 import static ru.m210projects.Build.Pragmas.ksgn;
 import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.Pragmas.scale;
+import static ru.m210projects.Build.RenderService.*;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.Renderer;
@@ -37,8 +39,10 @@ import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Settings.BuildSettings;
+import ru.m210projects.Build.Tables;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
+import ru.m210projects.Build.Types.collections.SpriteNode;
 
 public class Software implements Renderer {
 
@@ -312,17 +316,17 @@ public class Software implements Renderer {
 
 		for (i = spritesortcnt - 1; i >= 0; i--) {
 			tspriteptr[i] = tsprite[i];
-			if (tspriteptr[i].picnum < 0 || tspriteptr[i].picnum > MAXTILES)
+			if (tspriteptr[i].getPicnum() < 0 || tspriteptr[i].getPicnum() > MAXTILES)
 				continue;
 
-			xs = tspriteptr[i].x - globalposx;
-			ys = tspriteptr[i].y - globalposy;
+			xs = tspriteptr[i].getX() - globalposx;
+			ys = tspriteptr[i].getY() - globalposy;
 			yp = dmulscale(xs, cosviewingrangeglobalang, ys, sinviewingrangeglobalang, 6);
 
 			if (yp > (4 << 8)) {
 				xp = dmulscale(ys, cosglobalang, -xs, singlobalang, 6);
 				spritesx[i] = scale(xp + yp, xdimen << 7, yp);
-			} else if ((tspriteptr[i].cstat & 48) == 0) {
+			} else if ((tspriteptr[i].getCstat() & 48) == 0) {
 				spritesortcnt--; // Delete face sprite if on wrong side!
 				if (i != spritesortcnt) {
 					tspriteptr[i] = tspriteptr[spritesortcnt];
@@ -356,16 +360,16 @@ public class Software implements Renderer {
 			ys = spritesy[j];
 			if (j > i + 1) {
 				for (k = i; k < j; k++) {
-					spritesz[k] = tspriteptr[k].z;
-					if (tspriteptr[k].picnum < 0 || tspriteptr[k].picnum > MAXTILES)
+					spritesz[k] = tspriteptr[k].getZ();
+					if (tspriteptr[k].getPicnum() < 0 || tspriteptr[k].getPicnum() > MAXTILES)
 						continue;
 
-					if ((tspriteptr[k].cstat & 48) != 32) {
-						Tile pic = engine.getTile(tspriteptr[k].picnum);
-						yoff = (byte) (pic.getOffsetY() + (tspriteptr[k].yoffset));
-						spritesz[k] -= ((yoff * tspriteptr[k].yrepeat) << 2);
-						yspan = (pic.getHeight() * tspriteptr[k].yrepeat << 2);
-						if ((tspriteptr[k].cstat & 128) == 0)
+					if ((tspriteptr[k].getCstat() & 48) != 32) {
+						Tile pic = engine.getTile(tspriteptr[k].getPicnum());
+						yoff = (byte) (pic.getOffsetY() + (tspriteptr[k].getYoffset()));
+						spritesz[k] -= ((yoff * tspriteptr[k].getYrepeat()) << 2);
+						yspan = (pic.getHeight() * tspriteptr[k].getYrepeat() << 2);
+						if ((tspriteptr[k].getCstat() & 128) == 0)
 							spritesz[k] -= (yspan >> 1);
 						if (klabs(spritesz[k] - globalposz) < (yspan >> 1))
 							spritesz[k] = globalposz;
@@ -403,7 +407,7 @@ public class Software implements Renderer {
 				if (k >= 0) // remove holes in sprite list
 				{
 					for (i = k; i < spritesortcnt; i++)
-						if (tspriteptr[i] != null && tspriteptr[i].owner >= 0) {
+						if (tspriteptr[i] != null && tspriteptr[i].getOwner() >= 0) {
 							if (i > k) {
 								tspriteptr[k] = tspriteptr[i];
 								spritesx[k] = spritesx[i];
@@ -492,7 +496,7 @@ public class Software implements Renderer {
 			mirrorsx1 = xdimen - 1;
 			mirrorsx2 = 0;
 			for (i = numscans - 1; i >= 0; i--) {
-				if (wall[thewall[i]].nextsector < 0)
+				if (getWall()[thewall[i]].getNextsector() < 0)
 					continue;
 				if (xb1[i] < mirrorsx1)
 					mirrorsx1 = xb1[i];
@@ -605,7 +609,7 @@ public class Software implements Renderer {
 	private void drawalls(int bunch) {
 		int z = bunchfirst[bunch];
 		short sectnum = thesector[z];
-		Sector sec = sector[sectnum];
+		Sector sec = getSector()[sectnum];
 
 		int andwstat1 = 0xff;
 		int andwstat2 = 0xff;
@@ -617,18 +621,18 @@ public class Software implements Renderer {
 
 		if ((andwstat1 & 3) != 3) // draw ceilings
 		{
-			if ((sec.ceilingstat & 3) == 2)
+			if ((sec.getCeilingstat() & 3) == 2)
 				grouscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 0);
-			else if ((sec.ceilingstat & 1) == 0)
+			else if ((sec.getCeilingstat() & 1) == 0)
 				ceilscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else
 				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 0, bunch);
 		}
 		if ((andwstat2 & 12) != 12) // draw floors
 		{
-			if ((sec.floorstat & 3) == 2) // slopes
+			if ((sec.getFloorstat() & 3) == 2) // slopes
 				grouscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum, 1);
-			else if ((sec.floorstat & 1) == 0) // solid
+			else if ((sec.getFloorstat() & 1) == 0) // solid
 				florscan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], sectnum);
 			else // background
 				parascan(xb1[bunchfirst[bunch]], xb2[bunchlast[bunch]], 1, bunch);
@@ -651,8 +655,8 @@ public class Software implements Renderer {
 			}
 
 			int wallnum = thewall[z];
-			Wall wal = wall[wallnum];
-			short nextsectnum = wal.nextsector;
+			Wall wal = getWall()[wallnum];
+			short nextsectnum = wal.getNextsector();
 			Sector nextsec = null;
 
 			int gotswall = 0;
@@ -661,27 +665,27 @@ public class Software implements Renderer {
 			int startsmostcnt = smostcnt;
 
 			if (nextsectnum >= 0) {
-				nextsec = sector[nextsectnum];
-				engine.getzsofslope(sectnum, wal.x, wal.y, zofslope);
+				nextsec = getSector()[nextsectnum];
+				engine.getzsofslope(sectnum, wal.getX(), wal.getY(), zofslope);
 				cz[0] = zofslope[CEIL];
 				fz[0] = zofslope[FLOOR];
-				engine.getzsofslope(sectnum, wall[wal.point2].x, wall[wal.point2].y, zofslope);
+				engine.getzsofslope(sectnum, getWall()[wal.getPoint2()].getX(), getWall()[wal.getPoint2()].getY(), zofslope);
 				cz[1] = zofslope[CEIL];
 				fz[1] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, wal.x, wal.y, zofslope);
+				engine.getzsofslope(nextsectnum, wal.getX(), wal.getY(), zofslope);
 				cz[2] = zofslope[CEIL];
 				fz[2] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, wall[wal.point2].x, wall[wal.point2].y, zofslope);
+				engine.getzsofslope(nextsectnum, getWall()[wal.getPoint2()].getX(), getWall()[wal.getPoint2()].getY(), zofslope);
 				cz[3] = zofslope[CEIL];
 				fz[3] = zofslope[FLOOR];
 				engine.getzsofslope(nextsectnum, globalposx, globalposy, zofslope);
 				cz[4] = zofslope[CEIL];
 				fz[4] = zofslope[FLOOR];
 
-				if ((wal.cstat & 48) == 16)
+				if ((wal.getCstat() & 48) == 16)
 					maskwall[maskwallcnt++] = z;
 
-				if (((sec.ceilingstat & 1) == 0) || ((nextsec.ceilingstat & 1) == 0)) {
+				if (((sec.getCeilingstat() & 1) == 0) || ((nextsec.getCeilingstat() & 1) == 0)) {
 					if ((cz[2] <= cz[0]) && (cz[3] <= cz[1])) {
 						if (globparaceilclip != 0)
 							for (x = x1; x <= x2; x++)
@@ -698,12 +702,12 @@ public class Software implements Renderer {
 								if (dwall[i] > dplc[i])
 									dwall[i] = dplc[i];
 
-						globalorientation = wal.cstat;
-						globalpicnum = wal.picnum;
+						globalorientation = wal.getCstat();
+						globalpicnum = wal.getPicnum();
 						if (globalpicnum >= MAXTILES)
 							globalpicnum = 0;
-						globalxpanning = wal.xpanning & 0xFF;
-						globalypanning = wal.ypanning & 0xFF;
+						globalxpanning = wal.getXpanning() & 0xFF;
+						globalypanning = wal.getYpanning() & 0xFF;
 						globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 						Tile pic = engine.getTile(globalpicnum);
 
@@ -712,18 +716,18 @@ public class Software implements Renderer {
 						globalshiftval = (short) (32 - globalshiftval);
 						if (pic.getType() != AnimType.None)
 							globalpicnum += engine.animateoffs(globalpicnum, (short) wallnum + 16384);
-						globalshade = wal.shade;
+						globalshade = wal.getShade();
 						globvis = globalvisibility;
-						if (sec.visibility != 0)
-							globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
-						globalpal = wal.pal;
+						if (sec.getVisibility() != 0)
+							globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+						globalpal = wal.getPal();
 						if (palookup[globalpal] == null)
 							globalpal = 0; // JBF: fixes crash
-						globalyscale = (wal.yrepeat << (globalshiftval - 19));
+						globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
 						if ((globalorientation & 4) == 0)
-							globalzd = (((globalposz - nextsec.ceilingz) * globalyscale) << 8);
+							globalzd = (((globalposz - nextsec.getCeilingz()) * globalyscale) << 8);
 						else
-							globalzd = (((globalposz - sec.ceilingz) * globalyscale) << 8);
+							globalzd = (((globalposz - sec.getCeilingz()) * globalyscale) << 8);
 						globalzd += (globalypanning << 24);
 						if ((globalorientation & 256) != 0) {
 							globalyscale = -globalyscale;
@@ -768,7 +772,7 @@ public class Software implements Renderer {
 						}
 					}
 				}
-				if (((sec.floorstat & 1) == 0) || ((nextsec.floorstat & 1) == 0)) {
+				if (((sec.getFloorstat() & 1) == 0) || ((nextsec.getFloorstat() & 1) == 0)) {
 					if ((fz[2] >= fz[0]) && (fz[3] >= fz[1])) {
 						if (globparaflorclip != 0)
 							for (x = x1; x <= x2; x++)
@@ -785,47 +789,47 @@ public class Software implements Renderer {
 								if (uwall[i] < uplc[i])
 									uwall[i] = uplc[i];
 
-						if ((wal.cstat & 2) > 0) {
-							wallnum = wal.nextwall;
-							wal = wall[wallnum];
-							globalorientation = wal.cstat;
-							globalpicnum = wal.picnum;
+						if ((wal.getCstat() & 2) > 0) {
+							wallnum = wal.getNextwall();
+							wal = getWall()[wallnum];
+							globalorientation = wal.getCstat();
+							globalpicnum = wal.getPicnum();
 							if (globalpicnum >= MAXTILES)
 								globalpicnum = 0;
-							globalxpanning = wal.xpanning & 0xFF;
-							globalypanning = wal.ypanning & 0xFF;
+							globalxpanning = wal.getXpanning() & 0xFF;
+							globalypanning = wal.getYpanning() & 0xFF;
 							if (engine.getTile(globalpicnum).getType() != AnimType.None)
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
-							globalshade = wal.shade;
-							globalpal = wal.pal;
+							globalshade = wal.getShade();
+							globalpal = wal.getPal();
 							wallnum = thewall[z];
-							wal = wall[wallnum];
+							wal = getWall()[wallnum];
 						} else {
-							globalorientation = wal.cstat;
-							globalpicnum = wal.picnum;
+							globalorientation = wal.getCstat();
+							globalpicnum = wal.getPicnum();
 							if (globalpicnum >= MAXTILES)
 								globalpicnum = 0;
-							globalxpanning = wal.xpanning & 0xFF;
-							globalypanning = wal.ypanning & 0xFF;
+							globalxpanning = wal.getXpanning() & 0xFF;
+							globalypanning = wal.getYpanning() & 0xFF;
 							if (engine.getTile(globalpicnum).getType() != AnimType.None)
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
-							globalshade = wal.shade;
-							globalpal = wal.pal;
+							globalshade = wal.getShade();
+							globalpal = wal.getPal();
 						}
 						if (palookup[globalpal] == null)
 							globalpal = 0; // JBF: fixes crash
 						globvis = globalvisibility;
-						if (sec.visibility != 0)
-							globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+						if (sec.getVisibility() != 0)
+							globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 						globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 						if (pow2long[globalshiftval] != engine.getTile(globalpicnum).getHeight())
 							globalshiftval++;
 						globalshiftval = (short) (32 - globalshiftval);
-						globalyscale = (wal.yrepeat << (globalshiftval - 19));
+						globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
 						if ((globalorientation & 4) == 0)
-							globalzd = (((globalposz - nextsec.floorz) * globalyscale) << 8);
+							globalzd = (((globalposz - nextsec.getFloorz()) * globalyscale) << 8);
 						else
-							globalzd = (((globalposz - sec.ceilingz) * globalyscale) << 8);
+							globalzd = (((globalposz - sec.getCeilingz()) * globalyscale) << 8);
 						globalzd += (globalypanning << 24);
 						if ((globalorientation & 256) != 0) {
 							globalyscale = -globalyscale;
@@ -873,7 +877,7 @@ public class Software implements Renderer {
 				}
 				if (numhits < 0)
 					return;
-				if (((wal.cstat & 32) == 0) && ((gotsector[nextsectnum >> 3] & pow2char[nextsectnum & 7]) == 0)) {
+				if (((wal.getCstat() & 32) == 0) && ((gotsector[nextsectnum >> 3] & pow2char[nextsectnum & 7]) == 0)) {
 					if (umost[x2] < dmost[x2])
 						scansector(nextsectnum);
 					else {
@@ -895,45 +899,45 @@ public class Software implements Renderer {
 					}
 				}
 			}
-			if ((nextsectnum < 0) || (wal.cstat & 32) != 0) // White/1-way wall
+			if ((nextsectnum < 0) || (wal.getCstat() & 32) != 0) // White/1-way wall
 			{
-				globalorientation = wal.cstat;
+				globalorientation = wal.getCstat();
 				if (nextsectnum < 0)
-					globalpicnum = wal.picnum;
+					globalpicnum = wal.getPicnum();
 				else
-					globalpicnum = wal.overpicnum;
+					globalpicnum = wal.getOverpicnum();
 				if (globalpicnum >= MAXTILES)
 					globalpicnum = 0;
-				globalxpanning = wal.xpanning & 0xFF;
-				globalypanning = wal.ypanning & 0xFF;
+				globalxpanning = wal.getXpanning() & 0xFF;
+				globalypanning = wal.getYpanning() & 0xFF;
 				Tile pic = engine.getTile(globalpicnum);
 
 				if (pic.getType() != AnimType.None) {
 					globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 					pic = engine.getTile(globalpicnum);
 				}
-				globalshade = wal.shade;
+				globalshade = wal.getShade();
 				globvis = globalvisibility;
-				if (sec.visibility != 0)
-					globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
-				globalpal = wal.pal;
+				if (sec.getVisibility() != 0)
+					globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+				globalpal = wal.getPal();
 				if (palookup[globalpal] == null)
 					globalpal = 0; // JBF: fixes crash
 				globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 				if (pow2long[globalshiftval] != pic.getHeight())
 					globalshiftval++;
 				globalshiftval = (short) (32 - globalshiftval);
-				globalyscale = (wal.yrepeat << (globalshiftval - 19));
+				globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
 				if (nextsectnum >= 0) {
 					if ((globalorientation & 4) == 0)
-						globalzd = globalposz - nextsec.ceilingz;
+						globalzd = globalposz - nextsec.getCeilingz();
 					else
-						globalzd = globalposz - sec.ceilingz;
+						globalzd = globalposz - sec.getCeilingz();
 				} else {
 					if ((globalorientation & 4) == 0)
-						globalzd = globalposz - sec.ceilingz;
+						globalzd = globalposz - sec.getCeilingz();
 					else
-						globalzd = globalposz - sec.floorz;
+						globalzd = globalposz - sec.getFloorz();
 				}
 				globalzd = ((globalzd * globalyscale) << 8) + (globalypanning << 24);
 				if ((globalorientation & 256) != 0) {
@@ -967,13 +971,13 @@ public class Software implements Renderer {
 		int xb = spritesx[snum];
 		int yp = spritesy[snum];
 
-		if (tspr == null || tspr.owner < 0 || tspr.picnum < 0 || tspr.picnum >= MAXTILES || tspr.getSectnum() < 0)
+		if (tspr == null || tspr.getOwner() < 0 || tspr.getPicnum() < 0 || tspr.getPicnum() >= MAXTILES || tspr.getSectnum() < 0)
 			return;
 
-		int tilenum = tspr.picnum;
+		int tilenum = tspr.getPicnum();
 		VoxelInfo vtilenum = null;
-		short spritenum = tspr.owner;
-		short cstat = tspr.cstat;
+		short spritenum = tspr.getOwner();
+		short cstat = tspr.getCstat();
 
 		Tile pic = engine.getTile(tilenum);
 		if (pic.getType() != AnimType.None) {
@@ -983,13 +987,13 @@ public class Software implements Renderer {
 		if (!pic.hasSize() || (spritenum < 0))
 			return;
 
-		if ((tspr.xrepeat <= 0) || (tspr.yrepeat <= 0))
+		if ((tspr.getXrepeat() <= 0) || (tspr.getYrepeat() <= 0))
 			return;
 
 		if (BuildSettings.useVoxels.get()) {
 			Tile2model entry = defs != null ? defs.mdInfo.getParams(tilenum) : null;
 			if (entry != null && entry.voxel != null) {
-				if ((sprite[tspr.owner].cstat & 48) != 32) {
+				if ((getSprite()[tspr.getOwner()].getCstat() & 48) != 32) {
 					vtilenum = entry.voxel;
 					cstat |= 48;
 				}
@@ -997,11 +1001,11 @@ public class Software implements Renderer {
 		}
 
 		short sectnum = tspr.getSectnum();
-		Sector sec = sector[sectnum];
-		globalpal = tspr.pal;
+		Sector sec = getSector()[sectnum];
+		globalpal = tspr.getPal();
 		if (palookup[globalpal] == null)
 			globalpal = 0; // JBF: fixes null-pointer crash
-		globalshade = tspr.shade;
+		globalshade = tspr.getShade();
 		if ((cstat & 2) != 0) {
 			if ((cstat & 512) != 0)
 				a.settransreverse();
@@ -1009,12 +1013,12 @@ public class Software implements Renderer {
 				a.settransnormal();
 		}
 
-		int xoff = (byte) (pic.getOffsetX() + (tspr.xoffset));
-		int yoff = (byte) (pic.getOffsetY() + (tspr.yoffset));
+		int xoff = (byte) (pic.getOffsetX() + (tspr.getXoffset()));
+		int yoff = (byte) (pic.getOffsetY() + (tspr.getYoffset()));
 
 		int xv, yv, x1, y1, x2, y2, dax, day, dax1, dax2, dalx2, darx2;
 		int i, j, k, x, y, z, zz, z1, z2, xp1, yp1, xp2, yp2, xspan, yspan, xsiz, ysiz;
-		long siz;
+		int siz;
 
 		switch ((cstat >> 4) & 3) {
 		case 0: // Face sprite
@@ -1023,12 +1027,12 @@ public class Software implements Renderer {
 
 			siz = divscale(xdimenscale, yp, 19);
 
-			xv = mulscale((tspr.xrepeat) << 16, xyaspect, 16);
+			xv = mulscale((tspr.getXrepeat()) << 16, xyaspect, 16);
 
 			xspan = pic.getWidth();
 			yspan = pic.getHeight();
 			xsiz = mulscale(siz, xv * xspan, 30);
-			ysiz = mulscale(siz, tspr.yrepeat * yspan, 14);
+			ysiz = mulscale(siz, tspr.getYrepeat() * yspan, 14);
 
 			if (((xspan >> 11) >= xsiz) || (yspan >= (ysiz >> 1)))
 				return; // Watch out for divscale overflow
@@ -1042,13 +1046,13 @@ public class Software implements Renderer {
 			else
 				x1 += i;
 
-			y1 = mulscale(tspr.z - globalposz, siz, 16);
-			y1 -= mulscale(siz, tspr.yrepeat * yoff, 14);
+			y1 = mulscale(tspr.getZ() - globalposz, siz, 16);
+			y1 -= mulscale(siz, tspr.getYrepeat() * yoff, 14);
 			y1 += ((int) globalhoriz << 8) - ysiz;
 			if ((cstat & 128) != 0) {
 				y1 += (ysiz >> 1);
 				if ((yspan & 1) != 0)
-					y1 += mulscale(siz, tspr.yrepeat, 15); // Odd yspans
+					y1 += mulscale(siz, tspr.getYrepeat(), 15); // Odd yspans
 			}
 
 			x2 = x1 + xsiz - 1;
@@ -1065,15 +1069,15 @@ public class Software implements Renderer {
 			if (lx > rx)
 				return;
 
-			long yinc = divscale(yspan, ysiz, 32);
+			int yinc = divscale(yspan, ysiz, 32);
 
 			long startum = 0;
-			if ((sec.ceilingstat & 3) == 0)
-				startum = (long) globalhoriz + mulscale(siz, sec.ceilingz - globalposz, 24) - 1;
+			if ((sec.getCeilingstat() & 3) == 0)
+				startum = (long) globalhoriz + mulscale(siz, sec.getCeilingz() - globalposz, 24) - 1;
 
 			long startdm = 0x7fffffff;
-			if ((sec.floorstat & 3) == 0)
-				startdm = (long) globalhoriz + mulscale(siz, sec.floorz - globalposz, 24) + 1;
+			if ((sec.getFloorstat() & 3) == 0)
+				startdm = (long) globalhoriz + mulscale(siz, sec.getFloorz() - globalposz, 24) + 1;
 
 			if ((y1 >> 8) > startum)
 				startum = (y1 >> 8);
@@ -1088,7 +1092,7 @@ public class Software implements Renderer {
 				return;
 
 			int linum;
-			long linuminc;
+			int linuminc;
 			if ((cstat & 4) == 0) {
 				linuminc = divscale(xspan, xsiz, 24);
 				linum = mulscale((lx << 8) - x1, linuminc, 8);
@@ -1160,13 +1164,13 @@ public class Software implements Renderer {
 					return;
 			}
 
-			z2 = tspr.z - ((yoff * tspr.yrepeat) << 2);
+			z2 = tspr.getZ() - ((yoff * tspr.getYrepeat()) << 2);
 			if ((cstat & 128) != 0) {
-				z2 += ((yspan * tspr.yrepeat) << 1);
+				z2 += ((yspan * tspr.getYrepeat()) << 1);
 				if ((yspan & 1) != 0)
-					z2 += (tspr.yrepeat << 1); // Odd yspans
+					z2 += (tspr.getYrepeat() << 1); // Odd yspans
 			}
-			z1 = z2 - ((yspan * tspr.yrepeat) << 2);
+			z1 = z2 - ((yspan * tspr.getYrepeat()) << 2);
 
 			globalorientation = 0;
 			globalpicnum = (short) tilenum;
@@ -1175,13 +1179,13 @@ public class Software implements Renderer {
 			globalxpanning = 0;
 			globalypanning = 0;
 			globvis = globalvisibility;
-			if (sec.visibility != 0)
-				globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+			if (sec.getVisibility() != 0)
+				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 			globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 			if (pow2long[globalshiftval] != pic.getHeight())
 				globalshiftval++;
 			globalshiftval = (short) (32 - globalshiftval);
-			globalyscale = divscale(512, tspr.yrepeat, globalshiftval - 19);
+			globalyscale = divscale(512, tspr.getYrepeat(), globalshiftval - 19);
 			globalzd = (((globalposz - z1) * globalyscale) << 8);
 			if ((cstat & 8) > 0) {
 				globalyscale = -globalyscale;
@@ -1205,12 +1209,12 @@ public class Software implements Renderer {
 
 			xspan = pic.getWidth();
 			yspan = pic.getHeight();
-			xv = tspr.xrepeat * sintable[(tspr.ang + 2560 + 1536) & 2047];
-			yv = tspr.xrepeat * sintable[(tspr.ang + 2048 + 1536) & 2047];
+			xv = tspr.getXrepeat() * EngineUtils.cos(tspr.getAng() + 2048 + 1536);
+			yv = tspr.getXrepeat() * EngineUtils.sin(tspr.getAng() + 2048 + 1536);
 			i = (xspan >> 1) + xoff;
-			x1 = tspr.x - globalposx - mulscale(xv, i, 16);
+			x1 = tspr.getX() - globalposx - mulscale(xv, i, 16);
 			x2 = x1 + mulscale(xv, xspan, 16);
-			y1 = tspr.y - globalposy - mulscale(yv, i, 16);
+			y1 = tspr.getY() - globalposy - mulscale(yv, i, 16);
 			y2 = y1 + mulscale(yv, xspan, 16);
 
 			yp1 = dmulscale(x1, cosviewingrangeglobalang, y1, sinviewingrangeglobalang, 6);
@@ -1332,13 +1336,13 @@ public class Software implements Renderer {
 			long hinc = divscale(xdimenscale, yb2[MAXWALLSB - 1], 19);
 			hinc = (hinc - hplc) / (xb2[MAXWALLSB - 1] - xb1[MAXWALLSB - 1] + 1);
 
-			z2 = tspr.z - ((yoff * tspr.yrepeat) << 2);
+			z2 = tspr.getZ() - ((yoff * tspr.getYrepeat()) << 2);
 			if ((cstat & 128) != 0) {
-				z2 += ((yspan * tspr.yrepeat) << 1);
+				z2 += ((yspan * tspr.getYrepeat()) << 1);
 				if ((yspan & 1) != 0)
-					z2 += (tspr.yrepeat << 1); // Odd yspans
+					z2 += (tspr.getYrepeat() << 1); // Odd yspans
 			}
-			z1 = z2 - ((yspan * tspr.yrepeat) << 2);
+			z1 = z2 - ((yspan * tspr.getYrepeat()) << 2);
 
 			globalorientation = 0;
 			globalpicnum = (short) tilenum;
@@ -1348,23 +1352,23 @@ public class Software implements Renderer {
 			globalypanning = 0;
 			globvis = globalvisibility;
 
-			if (sec.visibility != 0)
-				globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+			if (sec.getVisibility() != 0)
+				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 			globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 			if (pow2long[globalshiftval] != pic.getHeight())
 				globalshiftval++;
 			globalshiftval = (short) (32 - globalshiftval);
-			globalyscale = divscale(512, tspr.yrepeat, globalshiftval - 19);
+			globalyscale = divscale(512, tspr.getYrepeat(), globalshiftval - 19);
 			globalzd = (((globalposz - z1) * globalyscale) << 8);
 			if ((cstat & 8) > 0) {
 				globalyscale = -globalyscale;
 				globalzd = (((globalposz - z2) * globalyscale) << 8);
 			}
 
-			if (((sec.ceilingstat & 1) == 0) && (z1 < sec.ceilingz))
-				z1 = sec.ceilingz;
-			if (((sec.floorstat & 1) == 0) && (z2 > sec.floorz))
-				z2 = sec.floorz;
+			if (((sec.getCeilingstat() & 1) == 0) && (z1 < sec.getCeilingz()))
+				z1 = sec.getCeilingz();
+			if (((sec.getFloorstat() & 1) == 0) && (z2 > sec.getFloorz()))
+				z2 = sec.getFloorz();
 
 			owallmost(uwall, (MAXWALLSB - 1), z1 - globalposz);
 			owallmost(dwall, (MAXWALLSB - 1), z2 - globalposz);
@@ -1386,11 +1390,11 @@ public class Software implements Renderer {
 						x = 0x80000000;
 					} else {
 						x = thewall[j];
-						xp1 = wall[x].x;
-						yp1 = wall[x].y;
-						x = wall[x].point2;
-						xp2 = wall[x].x;
-						yp2 = wall[x].y;
+						xp1 = getWall()[x].getX();
+						yp1 = getWall()[x].getY();
+						x = getWall()[x].getPoint2();
+						xp2 = getWall()[x].getX();
+						yp2 = getWall()[x].getY();
 
 						z1 = (xp2 - xp1) * (y1 - yp1) - (yp2 - yp1) * (x1 - xp1);
 						z2 = (xp2 - xp1) * (y2 - yp1) - (yp2 - yp1) * (x2 - xp1);
@@ -1403,8 +1407,8 @@ public class Software implements Renderer {
 							if ((z1 ^ z2) >= 0)
 								x = -(z1 + z2);
 							else {
-								if ((xp2 - xp1) * (tspr.y - yp1) == (tspr.x - xp1) * (yp2 - yp1)) {
-									if (wall[thewall[j]].nextsector == tspr.getSectnum())
+								if ((xp2 - xp1) * (tspr.getY() - yp1) == (tspr.getX() - xp1) * (yp2 - yp1)) {
+									if (getWall()[thewall[j]].getNextsector() == tspr.getSectnum())
 										x = 0x80000000;
 									else
 										x = 0x7fffffff;
@@ -1473,7 +1477,7 @@ public class Software implements Renderer {
 			break;
 		case 2: // Floor sprite
 			if ((cstat & 64) != 0)
-				if ((globalposz > tspr.z) == ((cstat & 8) == 0))
+				if ((globalposz > tspr.getZ()) == ((cstat & 8) == 0))
 					return;
 
 			if ((cstat & 4) > 0)
@@ -1484,23 +1488,23 @@ public class Software implements Renderer {
 			yspan = pic.getHeight();
 
 			// Rotate center point
-			dax = tspr.x - globalposx;
-			day = tspr.y - globalposy;
+			dax = tspr.getX() - globalposx;
+			day = tspr.getY() - globalposy;
 			rzi[0] = dmulscale(cosglobalang, dax, singlobalang, day, 10);
 			rxi[0] = dmulscale(cosglobalang, day, -singlobalang, dax, 10);
 
 			// Get top-left corner
-			i = ((tspr.ang + 2048 - (int) globalang) & 2047);
-			int cosang = sintable[(i + 512) & 2047];
-			int sinang = sintable[i];
-			dax = ((xspan >> 1) + xoff) * tspr.xrepeat;
-			day = ((yspan >> 1) + yoff) * tspr.yrepeat;
+			i = ((tspr.getAng() + 2048 - (int) globalang) & 2047);
+			int cosang = EngineUtils.cos(i);
+			int sinang = EngineUtils.sin(i);
+			dax = ((xspan >> 1) + xoff) * tspr.getXrepeat();
+			day = ((yspan >> 1) + yoff) * tspr.getYrepeat();
 			rzi[0] += dmulscale(sinang, dax, cosang, day, 12);
 			rxi[0] += dmulscale(sinang, day, -cosang, dax, 12);
 
 			// Get other 3 corners
-			dax = xspan * tspr.xrepeat;
-			day = yspan * tspr.yrepeat;
+			dax = xspan * tspr.getXrepeat();
+			day = yspan * tspr.getYrepeat();
 			rzi[1] = rzi[0] - mulscale(sinang, dax, 12);
 			rxi[1] = rxi[0] + mulscale(cosang, dax, 12);
 			dax = -mulscale(cosang, day, 12);
@@ -1511,7 +1515,7 @@ public class Software implements Renderer {
 			rxi[3] = rxi[0] + day;
 
 			// Put all points on same z
-			ryi[0] = scale((tspr.z - globalposz), yxaspect, 320 << 8);
+			ryi[0] = scale((tspr.getZ() - globalposz), yxaspect, 320 << 8);
 			if (ryi[0] == 0)
 				return;
 			ryi[1] = ryi[2] = ryi[3] = ryi[0];
@@ -1581,7 +1585,7 @@ public class Software implements Renderer {
 					npoints2++;
 				}
 				if ((zsgn ^ zzsgn) < 0) {
-					long t = divscale(zsgn, zsgn - zzsgn, 30);
+					int t = divscale(zsgn, zsgn - zzsgn, 30);
 					rxi2[npoints2] = rxi[z] + mulscale(t, rxi[zz] - rxi[z], 30);
 					ryi2[npoints2] = ryi[z] + mulscale(t, ryi[zz] - ryi[z], 30);
 					rzi2[npoints2] = rzi[z] + mulscale(t, rzi[zz] - rzi[z], 30);
@@ -1607,7 +1611,7 @@ public class Software implements Renderer {
 					npoints++;
 				}
 				if ((zsgn ^ zzsgn) < 0) {
-					long t = divscale(zsgn, zsgn - zzsgn, 30);
+					int t = divscale(zsgn, zsgn - zzsgn, 30);
 					rxi[npoints] = rxi2[z] + mulscale(t, rxi2[zz] - rxi2[z], 30);
 					ryi[npoints] = ryi2[z] + mulscale(t, ryi2[zz] - ryi2[z], 30);
 					rzi[npoints] = rzi2[z] + mulscale(t, rzi2[zz] - rzi2[z], 30);
@@ -1633,7 +1637,7 @@ public class Software implements Renderer {
 					npoints2++;
 				}
 				if ((zsgn ^ zzsgn) < 0) {
-					long t = divscale(zsgn, zsgn - zzsgn, 30);
+					int t = divscale(zsgn, zsgn - zzsgn, 30);
 					rxi2[npoints2] = rxi[z] + mulscale(t, rxi[zz] - rxi[z], 30);
 					ryi2[npoints2] = ryi[z] + mulscale(t, ryi[zz] - ryi[z], 30);
 					rzi2[npoints2] = rzi[z] + mulscale(t, rzi[zz] - rzi[z], 30);
@@ -1659,7 +1663,7 @@ public class Software implements Renderer {
 					npoints++;
 				}
 				if ((zsgn ^ zzsgn) < 0) {
-					long t = divscale(zsgn, zsgn - zzsgn, 30);
+					int t = divscale(zsgn, zsgn - zzsgn, 30);
 					rxi[npoints] = rxi2[z] + mulscale(t, rxi2[zz] - rxi2[z], 30);
 					ryi[npoints] = ryi2[z] + mulscale(t, ryi2[zz] - ryi2[z], 30);
 					rzi[npoints] = rzi2[z] + mulscale(t, rzi2[zz] - rzi2[z], 30);
@@ -1744,15 +1748,15 @@ public class Software implements Renderer {
 
 				// if (spritewallfront(tspr,thewall[j]) == 0)
 				x = thewall[j];
-				xp1 = wall[x].x;
-				yp1 = wall[x].y;
-				x = wall[x].point2;
-				xp2 = wall[x].x;
-				yp2 = wall[x].y;
-				x = (xp2 - xp1) * (tspr.y - yp1) - (tspr.x - xp1) * (yp2 - yp1);
+				xp1 = getWall()[x].getX();
+				yp1 = getWall()[x].getY();
+				x = getWall()[x].getPoint2();
+				xp2 = getWall()[x].getX();
+				yp2 = getWall()[x].getY();
+				x = (xp2 - xp1) * (tspr.getY() - yp1) - (tspr.getX() - xp1) * (yp2 - yp1);
 				if ((yp > yb1[j]) && (yp > yb2[j]))
 					x = -1;
-				if ((x >= 0) && ((x != 0) || (wall[thewall[j]].nextsector != tspr.getSectnum())))
+				if ((x >= 0) && ((x != 0) || (getWall()[thewall[j]].getNextsector() != tspr.getSectnum())))
 					continue;
 
 				dalx2 = Math.max(xb1[j], lx);
@@ -1793,8 +1797,8 @@ public class Software implements Renderer {
 			globalbufplc = pic.data;
 
 			globvis = mulscale(globalhisibility, viewingrange, 16);
-			if (sec.visibility != 0)
-				globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+			if (sec.getVisibility() != 0)
+				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 
 			x = picsiz[globalpicnum];
 			y = ((x >> 4) & 15);
@@ -1827,10 +1831,10 @@ public class Software implements Renderer {
 			break;
 
 		case 3: // Voxel sprite
-			long nyrepeat;
+			int nyrepeat;
 
-			xoff = tspr.xoffset;
-			yoff = tspr.yoffset;
+			xoff = tspr.getXoffset();
+			yoff = tspr.getYoffset();
 			if ((cstat & 8) > 0)
 				yoff = -yoff;
 
@@ -1888,42 +1892,42 @@ public class Software implements Renderer {
 				break;
 
 			if (vtilenum.getScale() == 65536)
-				nyrepeat = ((tspr.yrepeat) << 16);
+				nyrepeat = ((tspr.getYrepeat()) << 16);
 			else
-				nyrepeat = (long) (tspr.yrepeat * vtilenum.getScale());
-			xv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2560 + 1536) & 2047]) * (vtilenum.getScale() / 65536.0f));
-			yv = (int) ((tspr.xrepeat * sintable[(tspr.ang + 2048 + 1536) & 2047]) * (vtilenum.getScale() / 65536.0f));
+				nyrepeat = (int) (tspr.getYrepeat() * vtilenum.getScale());
+			xv = (int) ((tspr.getXrepeat() * EngineUtils.cos(tspr.getAng() + 2048 + 1536)) * (vtilenum.getScale() / 65536.0f));
+			yv = (int) ((tspr.getXrepeat() * EngineUtils.sin(tspr.getAng() + 2048 + 1536)) * (vtilenum.getScale() / 65536.0f));
 
-			tspr.x -= mulscale(xoff, xv, 16) / 1.25f;
-			tspr.y -= mulscale(xoff, yv, 16) / 1.25f;
-			tspr.z -= mulscale(yoff, nyrepeat, 14);
+			tspr.setX((int) (tspr.getX() - mulscale(xoff, xv, 16) / 1.25f));
+			tspr.setY((int) (tspr.getY() - mulscale(xoff, yv, 16) / 1.25f));
+			tspr.setZ(tspr.getZ() - mulscale(yoff, nyrepeat, 14));
 
 			if ((cstat & 128) == 0)
 				// tspr.z -= mulscale(tilesizy[tspr.picnum], nyrepeat, 15); // GDX this more
 				// correct, but disabled for compatible with eduke
-				tspr.z -= mulscale(vtilenum.getData().zpiv[0], nyrepeat, 22);
+				tspr.setZ(tspr.getZ() - mulscale(vtilenum.getData().zpiv[0], nyrepeat, 22));
 
 			if ((cstat & 8) != 0 && (cstat & 16) != 0)
-				tspr.z += mulscale((pic.getHeight() / 2) - vtilenum.getData().zpiv[0], nyrepeat, 36);
+				tspr.setZ(tspr.getZ() + mulscale((pic.getHeight() / 2) - vtilenum.getData().zpiv[0], nyrepeat, 36));
 
 			globvis = globalvisibility;
 			globalorientation = cstat;
-			if (sec.visibility != 0)
-				globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+			if (sec.getVisibility() != 0)
+				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 
-			i = tspr.ang + 1536;
+			i = tspr.getAng() + 1536;
 			if (vtilenum.isRotating())
 				i -= (5 * totalclock) & 2047;
 
-			Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.owner);
+			Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.getOwner());
 			if (sprext != null)
 				i += sprext.angoff;
 
 			float f = 1.0f;
-			if ((sprite[tspr.owner].cstat & 48) == 16 || (sprite[tspr.owner].cstat & 48) == 32)
+			if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 16 || (getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
 				f *= 1.25f;
 
-			voxdraw(tspr, i, (int) (tspr.xrepeat * f), tspr.yrepeat, vtilenum, lwall, swall);
+			voxdraw(tspr, i, (int) (tspr.getXrepeat() * f), tspr.getYrepeat(), vtilenum, lwall, swall);
 			break;
 		}
 		if (automapping == 1)
@@ -1945,17 +1949,17 @@ public class Software implements Renderer {
 		int yoff, xs = 0, ys = 0, xe, ye, xi = 0, yi = 0, cbackx, cbacky, dagxinc, dagyinc;
 		int voxptr, voxend, zleng, mip;
 
-		int dasprx = daspr.x;
-		int daspry = daspr.y;
-		int dasprz = daspr.z;
-		int dashade = daspr.shade;
-		int dapal = daspr.pal;
-		Sector sec = sector[daspr.getSectnum()];
+		int dasprx = daspr.getX();
+		int daspry = daspr.getY();
+		int dasprz = daspr.getZ();
+		int dashade = daspr.getShade();
+		int dapal = daspr.getPal();
+		Sector sec = getSector()[daspr.getSectnum()];
 
-		cosang = sintable[(int) (globalang + 512) & 2047];
-		sinang = sintable[(int) globalang & 2047];
-		sprcosang = sintable[(dasprang + 512) & 2047];
-		sprsinang = sintable[dasprang & 2047];
+		cosang = EngineUtils.cos((int) (globalang + 512));
+		sinang = EngineUtils.sin((int) globalang);
+		sprcosang = EngineUtils.cos(dasprang + 512);
+		sprsinang = EngineUtils.sin(dasprang);
 
 		mip = klabs(dmulscale(dasprx - globalposx, cosang, daspry - globalposy, sinang, 6));
 		j = engine.getpalookup(mulscale(globvis, mip, 21), dashade) << 8;
@@ -2061,8 +2065,8 @@ public class Software implements Renderer {
 		int xptr, dazsiz = davox.zsiz[mip];
 		short[] shortptr;
 
-		int dm = divscale(sec.floorz - globalposz, odayscale, 21);
-		int um = divscale(sec.ceilingz - globalposz, odayscale, 21);
+		int dm = divscale(sec.getFloorz() - globalposz, odayscale, 21);
+		int um = divscale(sec.getCeilingz() - globalposz, odayscale, 21);
 		for (cnt = 0; cnt < 8; cnt++) {
 			switch (cnt) {
 			case 0:
@@ -2244,11 +2248,11 @@ public class Software implements Renderer {
 					l2 = distrecip[(ny + yoff) >> 14];
 
 					int umz = 0;
-					if ((sec.ceilingstat & 3) == 0)
+					if ((sec.getCeilingstat() & 3) == 0)
 						umz = mulscale((um < 0) ? l1 : l2, um, 32) + (int) globalhoriz;
 
 					int dmz = 0x7fffffff;
-					if ((sec.floorstat & 3) == 0)
+					if ((sec.getFloorstat() & 3) == 0)
 						dmz = mulscale((dm < 0) ? l2 : l1, dm, 32) + (int) globalhoriz;
 
 					for (; voxptr < voxend; voxptr += zleng + 3) {
@@ -2323,47 +2327,47 @@ public class Software implements Renderer {
 		Wall wal;
 
 		z = maskwall[damaskwallcnt];
-		wal = wall[thewall[z]];
+		wal = getWall()[thewall[z]];
 		sectnum = thesector[z];
-		sec = sector[sectnum];
-		nsec = sector[wal.nextsector];
-		z1 = Math.max(nsec.ceilingz, sec.ceilingz);
-		z2 = Math.min(nsec.floorz, sec.floorz);
+		sec = getSector()[sectnum];
+		nsec = getSector()[wal.getNextsector()];
+		z1 = Math.max(nsec.getCeilingz(), sec.getCeilingz());
+		z2 = Math.min(nsec.getFloorz(), sec.getFloorz());
 
 		wallmost(uwall, z, sectnum, 0);
-		wallmost(uplc, z, wal.nextsector, 0);
+		wallmost(uplc, z, wal.getNextsector(), 0);
 		for (x = xb1[z]; x <= xb2[z]; x++)
 			if (uplc[x] > uwall[x])
 				uwall[x] = uplc[x];
 		wallmost(dwall, z, sectnum, 1);
-		wallmost(dplc, z, wal.nextsector, 1);
+		wallmost(dplc, z, wal.getNextsector(), 1);
 		for (x = xb1[z]; x <= xb2[z]; x++)
 			if (dplc[x] < dwall[x])
 				dwall[x] = dplc[x];
 		prepwall(z, wal);
 
-		globalorientation = wal.cstat;
-		globalpicnum = wal.overpicnum;
+		globalorientation = wal.getCstat();
+		globalpicnum = wal.getOverpicnum();
 		if (globalpicnum >= MAXTILES)
 			globalpicnum = 0;
-		globalxpanning = wal.xpanning & 0xFF;
-		globalypanning = wal.ypanning & 0xFF;
+		globalxpanning = wal.getXpanning() & 0xFF;
+		globalypanning = wal.getYpanning() & 0xFF;
 
 		Tile pic = engine.getTile(globalpicnum);
 		if (pic.getType() != AnimType.None) {
 			globalpicnum += engine.animateoffs(globalpicnum, thewall[z] + 16384);
 			pic = engine.getTile(globalpicnum);
 		}
-		globalshade = wal.shade;
+		globalshade = wal.getShade();
 		globvis = globalvisibility;
-		if (sec.visibility != 0)
-			globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
-		globalpal = wal.pal;
+		if (sec.getVisibility() != 0)
+			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+		globalpal = wal.getPal();
 		globalshiftval = (short) (picsiz[globalpicnum] >> 4);
 		if (pow2long[globalshiftval] != pic.getHeight())
 			globalshiftval++;
 		globalshiftval = (short) (32 - globalshiftval);
-		globalyscale = (wal.yrepeat << (globalshiftval - 19));
+		globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
 		if ((globalorientation & 4) == 0)
 			globalzd = (((globalposz - z1) * globalyscale) << 8);
 		else
@@ -2476,7 +2480,7 @@ public class Software implements Renderer {
 	private void prepwall(int z, Wall wal) {
 		int l = 0, ol = 0;
 
-		int walxrepeat = (wal.xrepeat << 3);
+		int walxrepeat = (wal.getXrepeat() << 3);
 
 		// lwall calculation
 		int i = (xb1[z] - halfxdimen);
@@ -2541,7 +2545,7 @@ public class Software implements Renderer {
 			lwall[xb1[z]] = 0;
 		if ((lwall[xb2[z]] >= walxrepeat) && (walxrepeat != 0))
 			lwall[xb2[z]] = walxrepeat - 1;
-		if ((wal.cstat & 8) != 0) {
+		if ((wal.getCstat() & 8) != 0) {
 			walxrepeat--;
 			for (x = xb1[z]; x <= xb2[z]; x++)
 				lwall[x] = walxrepeat - lwall[x];
@@ -2677,16 +2681,16 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = sector[sectnum];
-		if (sec.floorpal != globalpalwritten) {
-			globalpalwritten = sec.floorpal;
+		sec = getSector()[sectnum];
+		if (sec.getFloorpal() != globalpalwritten) {
+			globalpalwritten = sec.getFloorpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
 		}
 
-		globalzd = globalposz - sec.floorz;
+		globalzd = globalposz - sec.getFloorz();
 		if (globalzd > 0)
 			return;
-		globalpicnum = sec.floorpicnum;
+		globalpicnum = sec.getFloorpicnum();
 		if (globalpicnum >= MAXTILES)
 			globalpicnum = 0;
 		engine.setgotpic(globalpicnum);
@@ -2703,11 +2707,11 @@ public class Software implements Renderer {
 			engine.loadtile(globalpicnum);
 		globalbufplc = pic.data;
 
-		globalshade = sec.floorshade;
+		globalshade = sec.getFloorshade();
 		globvis = globalcisibility;
-		if (sec.visibility != 0)
-			globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
-		globalorientation = sec.floorstat;
+		if (sec.getVisibility() != 0)
+			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+		globalorientation = sec.getFloorstat();
 
 		if ((globalorientation & 64) == 0) {
 			globalx1 = singlobalang;
@@ -2717,10 +2721,10 @@ public class Software implements Renderer {
 			globalxpanning = (globalposx << 20);
 			globalypanning = -(globalposy << 20);
 		} else {
-			j = sec.wallptr;
-			ox = wall[wall[j].point2].x - wall[j].x;
-			oy = wall[wall[j].point2].y - wall[j].y;
-			i = engine.ksqrt(ox * ox + oy * oy);
+			j = sec.getWallptr();
+			ox = getWall()[getWall()[j].getPoint2()].getX() - getWall()[j].getX();
+			oy = getWall()[getWall()[j].getPoint2()].getY() - getWall()[j].getY();
+			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0)
 				i = 1024;
 			else
@@ -2730,8 +2734,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((wall[j].x - globalposx) << 6);
-			oy = ((wall[j].y - globalposy) << 6);
+			ox = ((getWall()[j].getX() - globalposx) << 6);
+			oy = ((getWall()[j].getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -2775,8 +2779,8 @@ public class Software implements Renderer {
 		globaly2 <<= globalyshift;
 		globalxpanning <<= globalxshift;
 		globalypanning <<= globalyshift;
-		globalxpanning += ((sec.floorxpanning) << 24);
-		globalypanning += ((sec.floorypanning) << 24);
+		globalxpanning += ((sec.getFloorxpanning()) << 24);
+		globalypanning += ((sec.getFloorypanning()) << 24);
 		globaly1 = (-globalx1 - globaly1) * halfxdimen;
 		globalx2 = (globalx2 - globaly2) * halfxdimen;
 
@@ -2890,29 +2894,29 @@ public class Software implements Renderer {
 		short[] topptr, botptr;
 
 		short sectnum = thesector[bunchfirst[bunch]];
-		sec = sector[sectnum];
+		sec = getSector()[sectnum];
 		globalhorizbak = (int) globalhoriz;
 		if (parallaxyscale != 65536)
 			globalhoriz = mulscale((int) globalhoriz - (ydimen >> 1), parallaxyscale, 16) + (ydimen >> 1);
 		globvis = globalpisibility;
 
-		if (sec.visibility != 0)
-			globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+		if (sec.getVisibility() != 0)
+			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 
 		if (dastat == 0) {
-			globalpal = sec.ceilingpal;
-			globalpicnum = sec.ceilingpicnum;
-			globalshade = sec.ceilingshade;
-			globalxpanning = sec.ceilingxpanning;
-			globalypanning = sec.ceilingypanning;
+			globalpal = sec.getCeilingpal();
+			globalpicnum = sec.getCeilingpicnum();
+			globalshade = sec.getCeilingshade();
+			globalxpanning = sec.getCeilingxpanning();
+			globalypanning = sec.getCeilingypanning();
 			topptr = umost;
 			botptr = uplc;
 		} else {
-			globalpal = sec.floorpal;
-			globalpicnum = sec.floorpicnum;
-			globalshade = sec.floorshade;
-			globalxpanning = sec.floorxpanning;
-			globalypanning = sec.floorypanning;
+			globalpal = sec.getFloorpal();
+			globalpicnum = sec.getFloorpicnum();
+			globalshade = sec.getFloorshade();
+			globalxpanning = sec.getFloorxpanning();
+			globalypanning = sec.getFloorypanning();
 			topptr = dplc;
 			botptr = dmost;
 		}
@@ -2938,17 +2942,17 @@ public class Software implements Renderer {
 
 		for (z = bunchfirst[bunch]; z >= 0; z = p2[z]) {
 			wallnum = thewall[z];
-			nextsectnum = wall[wallnum].nextsector;
+			nextsectnum = getWall()[wallnum].getNextsector();
 
 			j = 0;
 			if (nextsectnum != -1) {
 				if (dastat == 0)
-					j = sector[nextsectnum].ceilingstat;
+					j = getSector()[nextsectnum].getCeilingstat();
 				else
-					j = sector[nextsectnum].floorstat;
+					j = getSector()[nextsectnum].getFloorstat();
 			}
 
-			if ((nextsectnum < 0) || ((wall[wallnum].cstat & 32) != 0) || ((j & 1) == 0)) {
+			if ((nextsectnum < 0) || ((getWall()[wallnum].getCstat() & 32) != 0) || ((j & 1) == 0)) {
 				if (x == -1)
 					x = xb1[z];
 				if (parallaxtype == 0) {
@@ -2964,7 +2968,7 @@ public class Software implements Renderer {
 				if (parallaxtype == 2) {
 					n = mulscale(xdimscale, viewingrange, 16);
 					for (j = xb1[z]; j <= xb2[z]; j++)
-						swplc[j] = mulscale(sintable[(radarang2[j] + 512) & 2047], n, 14);
+						swplc[j] = mulscale(EngineUtils.cos(radarang2[j]), n, 14);
 				} else {
 					Arrays.fill(swplc, xb1[z], xb2[z] + 1, mulscale(xdimscale, viewingrange, 16));
 				}
@@ -3096,26 +3100,26 @@ public class Software implements Renderer {
 		int shoffs, shinc, m1, m2;
 		int mptr1, mptr2, nptr1, nptr2;
 		Wall wal;
-		Sector sec = sector[sectnum];
+		Sector sec = getSector()[sectnum];
 
 		if (dastat == 0) {
 			if (globalposz <= engine.getceilzofslope(sectnum, globalposx, globalposy))
 				return; // Back-face culling
-			globalorientation = sec.ceilingstat;
-			globalpicnum = sec.ceilingpicnum;
-			globalshade = sec.ceilingshade;
-			globalpal = sec.ceilingpal;
-			daslope = sec.ceilingheinum;
-			daz = sec.ceilingz;
+			globalorientation = sec.getCeilingstat();
+			globalpicnum = sec.getCeilingpicnum();
+			globalshade = sec.getCeilingshade();
+			globalpal = sec.getCeilingpal();
+			daslope = sec.getCeilingheinum();
+			daz = sec.getCeilingz();
 		} else {
 			if (globalposz >= engine.getflorzofslope(sectnum, globalposx, globalposy))
 				return; // Back-face culling
-			globalorientation = sec.floorstat;
-			globalpicnum = sec.floorpicnum;
-			globalshade = sec.floorshade;
-			globalpal = sec.floorpal;
-			daslope = sec.floorheinum;
-			daz = sec.floorz;
+			globalorientation = sec.getFloorstat();
+			globalpicnum = sec.getFloorpicnum();
+			globalshade = sec.getFloorshade();
+			globalpal = sec.getFloorpal();
+			daslope = sec.getFloorheinum();
+			daz = sec.getFloorz();
 		}
 
 		Tile pic = engine.getTile(globalpicnum);
@@ -3130,10 +3134,10 @@ public class Software implements Renderer {
 		if (pic.data == null)
 			engine.loadtile(globalpicnum);
 
-		wal = wall[sec.wallptr];
-		wx = wall[wal.point2].x - wal.x;
-		wy = wall[wal.point2].y - wal.y;
-		dasqr = krecipasm(engine.ksqrt(wx * wx + wy * wy));
+		wal = getWall()[sec.getWallptr()];
+		wx = getWall()[wal.getPoint2()].getX() - wal.getX();
+		wy = getWall()[wal.getPoint2()].getY() - wal.getY();
+		dasqr = krecipasm(EngineUtils.sqrt(wx * wx + wy * wy));
 		i = mulscale(daslope, dasqr, 21);
 		wx *= i;
 		wy *= i;
@@ -3152,17 +3156,17 @@ public class Software implements Renderer {
 
 		if ((globalorientation & 64) != 0) // Relative alignment
 		{
-			dx = mulscale(wall[wal.point2].x - wal.x, dasqr, 14);
-			dy = mulscale(wall[wal.point2].y - wal.y, dasqr, 14);
+			dx = mulscale(getWall()[wal.getPoint2()].getX() - wal.getX(), dasqr, 14);
+			dy = mulscale(getWall()[wal.getPoint2()].getY() - wal.getY(), dasqr, 14);
 
-			i = engine.ksqrt(daslope * daslope + 16777216);
+			i = EngineUtils.sqrt(daslope * daslope + 16777216);
 
 			x = globalx;
 			y = globaly;
 			globalx = dmulscale(x, dx, y, dy, 16);
 			globaly = mulscale(dmulscale(-y, dx, x, dy, 16), i, 12);
-			x = ((wal.x - globalposx) << 8);
-			y = ((wal.y - globalposy) << 8);
+			x = ((wal.getX() - globalposx) << 8);
+			y = ((wal.getY() - globalposy) << 8);
 			globalx1 = dmulscale(-x, dx, -y, dy, 16);
 			globaly1 = mulscale(dmulscale(-y, dx, x, dy, 16), i, 12);
 			x = globalx2;
@@ -3192,7 +3196,7 @@ public class Software implements Renderer {
 			globaly = -globaly;
 		}
 
-		daz = dmulscale(wx, globalposy - wal.y, -wy, globalposx - wal.x, 9) + ((daz - globalposz) << 8);
+		daz = dmulscale(wx, globalposy - wal.getY(), -wy, globalposx - wal.getX(), 9) + ((daz - globalposz) << 8);
 		globalx2 = mulscale(globalx2, daz, 20);
 		globalx = mulscale(globalx, daz, 28);
 		globaly2 = mulscale(globaly2, -daz, 20);
@@ -3212,16 +3216,16 @@ public class Software implements Renderer {
 		globaly <<= j;
 
 		if (dastat == 0) {
-			globalx1 += ((sec.ceilingxpanning) << 24);
-			globaly1 += ((sec.ceilingypanning) << 24);
+			globalx1 += ((sec.getCeilingxpanning()) << 24);
+			globaly1 += ((sec.getCeilingypanning()) << 24);
 		} else {
-			globalx1 += ((sec.floorxpanning) << 24);
-			globaly1 += ((sec.floorypanning) << 24);
+			globalx1 += ((sec.getFloorxpanning()) << 24);
+			globaly1 += ((sec.getFloorypanning()) << 24);
 		}
 
 		globvis = globalvisibility;
-		if (sec.visibility != 0)
-			globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
+		if (sec.getVisibility() != 0)
+			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 		globvis = mulscale(globvis, daz, 13);
 		globvis = mulscale(globvis, xdimscale, 16);
 
@@ -3290,16 +3294,16 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = sector[sectnum];
-		if (sec.ceilingpal != globalpalwritten) {
-			globalpalwritten = sec.ceilingpal;
+		sec = getSector()[sectnum];
+		if (sec.getCeilingpal() != globalpalwritten) {
+			globalpalwritten = sec.getCeilingpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
 		}
 
-		globalzd = sec.ceilingz - globalposz;
+		globalzd = sec.getCeilingz() - globalposz;
 		if (globalzd > 0)
 			return;
-		globalpicnum = sec.ceilingpicnum;
+		globalpicnum = sec.getCeilingpicnum();
 		if (globalpicnum >= MAXTILES)
 			globalpicnum = 0;
 
@@ -3316,11 +3320,11 @@ public class Software implements Renderer {
 			engine.loadtile(globalpicnum);
 		globalbufplc = pic.data;
 
-		globalshade = sec.ceilingshade;
+		globalshade = sec.getCeilingshade();
 		globvis = globalcisibility;
-		if (sec.visibility != 0)
-			globvis = mulscale(globvis, (sec.visibility + 16) & 0xFF, 4);
-		globalorientation = sec.ceilingstat;
+		if (sec.getVisibility() != 0)
+			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+		globalorientation = sec.getCeilingstat();
 
 		if ((globalorientation & 64) == 0) {
 			globalx1 = singlobalang;
@@ -3330,10 +3334,10 @@ public class Software implements Renderer {
 			globalxpanning = (globalposx << 20);
 			globalypanning = -(globalposy << 20);
 		} else {
-			j = sec.wallptr;
-			ox = wall[wall[j].point2].x - wall[j].x;
-			oy = wall[wall[j].point2].y - wall[j].y;
-			i = engine.ksqrt(ox * ox + oy * oy);
+			j = sec.getWallptr();
+			ox = getWall()[getWall()[j].getPoint2()].getX() - getWall()[j].getX();
+			oy = getWall()[getWall()[j].getPoint2()].getY() - getWall()[j].getY();
+			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0)
 				i = 1024;
 			else
@@ -3343,8 +3347,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((wall[j].x - globalposx) << 6);
-			oy = ((wall[j].y - globalposy) << 6);
+			ox = ((getWall()[j].getX() - globalposx) << 6);
+			oy = ((getWall()[j].getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -3388,8 +3392,8 @@ public class Software implements Renderer {
 		globaly2 <<= globalyshift;
 		globalxpanning <<= globalxshift;
 		globalypanning <<= globalyshift;
-		globalxpanning += ((sec.ceilingxpanning) << 24);
-		globalypanning += ((sec.ceilingypanning) << 24);
+		globalxpanning += ((sec.getCeilingxpanning()) << 24);
+		globalypanning += ((sec.getCeilingypanning()) << 24);
 		globaly1 = (-globalx1 - globaly1) * halfxdimen;
 		globalx2 = (globalx2 - globaly2) * halfxdimen;
 
@@ -3649,16 +3653,16 @@ public class Software implements Renderer {
 			int xinc = mulscale(viewingrange * 320, xdimenrecip, 32);
 			int x = (640 << 16) - mulscale(xinc, xdimen, 1);
 
+
+			Tables tables = engine.getTables();
 			for (i = 0; i < xdimen; i++) {
 				j = x & 65535;
 				k = x >> 16;
 				x += xinc;
-				if (k < 0 || k >= radarang.length - 1)
-					break;
 
 				if (j != 0)
-					j = mulscale(radarang[k + 1] - radarang[k], j, 16);
-				radarang2[i] = (short) ((radarang[k] + j) >> 6);
+					j = mulscale(tables.getRadarAng(k + 1) - tables.getRadarAng(k), j, 16);
+				radarang2[i] = (short) ((tables.getRadarAng(k) + j) >> 6);
 			}
 
 			for (i = 1; i < 65536; i++)
@@ -3695,18 +3699,19 @@ public class Software implements Renderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for(int z1 : spriteSectMap.getIndicesOf(sectnum)) {
-				spr = sprite[z1];
-				if ((((spr.cstat & 0x8000) == 0) || (showinvisibility)) && (spr.xrepeat > 0) && (spr.yrepeat > 0)
+			for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
+				int z1 = node.getIndex();
+				spr = getSprite()[z1];
+				if ((((spr.getCstat() & 0x8000) == 0) || (showinvisibility)) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
-					xs = spr.x - globalposx;
-					ys = spr.y - globalposy;
-					if (((spr.cstat & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
+					xs = spr.getX() - globalposx;
+					ys = spr.getY() - globalposy;
+					if (((spr.getCstat() & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
 						if (tsprite[spritesortcnt] == null)
 							tsprite[spritesortcnt] = new TSprite();
-						tsprite[spritesortcnt].set(sprite[z1]);
+						tsprite[spritesortcnt].set(getSprite()[z1]);
 
-						tsprite[spritesortcnt++].owner = (short) z1;
+						tsprite[spritesortcnt++].setOwner((short) z1);
 					}
 				}
 			}
@@ -3716,30 +3721,30 @@ public class Software implements Renderer {
 			bunchfrst = numbunches;
 			numscansbefore = numscans;
 
-			if (sector[sectnum] == null)
+			if (getSector()[sectnum] == null)
 				continue;
 
-			startwall = sector[sectnum].wallptr;
-			endwall = startwall + sector[sectnum].wallnum;
+			startwall = getSector()[sectnum].getWallptr();
+			endwall = startwall + getSector()[sectnum].getWallnum();
 			scanfirst = numscans;
 
 			if (startwall < 0 || endwall < 0)
 				continue;
 			for (z = startwall; z < endwall; z++) {
-				wal = wall[z];
-				if (wal == null || wal.point2 < 0 || wal.point2 >= MAXWALLS)
+				wal = getWall()[z];
+				if (wal == null || wal.getPoint2() < 0 || wal.getPoint2() >= MAXWALLS)
 					continue;
-				nextsectnum = wal.nextsector;
+				nextsectnum = wal.getNextsector();
 
-				wal2 = wall[wal.point2];
+				wal2 = getWall()[wal.getPoint2()];
 				if (wal2 == null)
 					continue;
-				x1 = wal.x - globalposx;
-				y1 = wal.y - globalposy;
-				x2 = wal2.x - globalposx;
-				y2 = wal2.y - globalposy;
+				x1 = wal.getX() - globalposx;
+				y1 = wal.getY() - globalposy;
+				x2 = wal2.getX() - globalposx;
+				y2 = wal2.getY() - globalposy;
 
-				if ((nextsectnum >= 0) && ((wal.cstat & 32) == 0) && sectorbordercnt < sectorborder.length
+				if ((nextsectnum >= 0) && ((wal.getCstat() & 32) == 0) && sectorbordercnt < sectorborder.length
 						&& ((gotsector[nextsectnum >> 3] & pow2char[nextsectnum & 7]) == 0)) {
 					templong = x1 * y2 - x2 * y1;
 
@@ -3748,7 +3753,7 @@ public class Software implements Renderer {
 							sectorborder[sectorbordercnt++] = nextsectnum;
 				}
 
-				if ((z == startwall) || (wall[z - 1].point2 != z)) {
+				if ((z == startwall) || (getWall()[z - 1].getPoint2() != z)) {
 					xp1 = dmulscale(y1, cosglobalang, -x1, singlobalang, 6);
 					yp1 = dmulscale(x1, cosviewingrangeglobalang, y1, sinviewingrangeglobalang, 6);
 				} else {
@@ -3824,7 +3829,7 @@ public class Software implements Renderer {
 						}
 				} while (false);
 
-				if ((wall[z].point2 < z) && (scanfirst < numscans)) {
+				if ((getWall()[z].getPoint2() < z) && (scanfirst < numscans)) {
 					p2[numscans - 1] = (short) scanfirst;
 					scanfirst = numscans;
 				}
@@ -3833,7 +3838,7 @@ public class Software implements Renderer {
 			for (z = numscansbefore; z < numscans; z++) {
 				if (z >= MAXWALLSB || p2[z] >= MAXWALLSB)
 					continue;
-				if ((wall[thewall[z]].point2 != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
+				if ((getWall()[thewall[z]].getPoint2() != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
 					bunchfirst[numbunches++] = p2[z];
 					p2[z] = -1;
 				}
@@ -3857,11 +3862,11 @@ public class Software implements Renderer {
 		if (s == null)
 			return false;
 
-		Wall wal = wall[w];
-		int x1 = wal.x;
-		int y1 = wal.y;
-		wal = wall[wal.point2];
-		return (dmulscale(wal.x - x1, s.y - y1, -(s.x - x1), wal.y - y1, 32) >= 0);
+		Wall wal = getWall()[w];
+		int x1 = wal.getX();
+		int y1 = wal.getY();
+		wal = getWall()[wal.getPoint2()];
+		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
 	private int bunchfront(int b1, int b2) {
@@ -3893,18 +3898,18 @@ public class Software implements Renderer {
 		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
-		wal = wall[thewall[l1]];
-		x11 = wal.x;
-		y11 = wal.y;
-		wal = wall[wal.point2];
-		x21 = wal.x;
-		y21 = wal.y;
-		wal = wall[thewall[l2]];
-		x12 = wal.x;
-		y12 = wal.y;
-		wal = wall[wal.point2];
-		x22 = wal.x;
-		y22 = wal.y;
+		wal = getWall()[thewall[l1]];
+		x11 = wal.getX();
+		y11 = wal.getY();
+		wal = getWall()[wal.getPoint2()];
+		x21 = wal.getX();
+		y21 = wal.getY();
+		wal = getWall()[thewall[l2]];
+		x12 = wal.getX();
+		y12 = wal.getY();
+		wal = getWall()[wal.getPoint2()];
+		x22 = wal.getX();
+		y22 = wal.getY();
 
 		dx = x21 - x11;
 		dy = y21 - y11;
@@ -3973,7 +3978,7 @@ public class Software implements Renderer {
 		}
 
 		if ((bad & 3) != 0) {
-			long t = divscale((z - s1), (s2 - s1), 30);
+			int t = divscale((z - s1), (s2 - s1), 30);
 			inty = yb1[w] + mulscale(yb2[w] - yb1[w], t, 30);
 			xcross = xb1[w] + scale(mulscale(yb2[w], t, 30), (xb2[w] - xb1[w]), inty);
 
@@ -4001,7 +4006,7 @@ public class Software implements Renderer {
 		}
 
 		if ((bad & 12) != 0) {
-			long t = divscale((z - s3), (s4 - s3), 30);
+			int t = divscale((z - s3), (s4 - s3), 30);
 			inty = yb1[w] + mulscale(yb2[w] - yb1[w], t, 30);
 			xcross = xb1[w] + scale(mulscale(yb2[w], t, 30), xb2[w] - xb1[w], inty);
 
@@ -4062,32 +4067,32 @@ public class Software implements Renderer {
 		int bad, i, j, y, z, inty, intz, xcross, yinc, fw;
 		int x1, y1, z1, x2, y2, z2, xv, yv, dx, dy, dasqr, oz1, oz2;
 		int s1, s2, s3, s4, ix1, ix2, iy1, iy2;
-		long t;
+		int t;
 
 		if (dastat == 0) {
-			z = (sector[sectnum].ceilingz - globalposz);
-			if ((sector[sectnum].ceilingstat & 2) == 0)
+			z = (getSector()[sectnum].getCeilingz() - globalposz);
+			if ((getSector()[sectnum].getCeilingstat() & 2) == 0)
 				return (owallmost(mostbuf, w, z));
 		} else {
-			z = (sector[sectnum].floorz - globalposz);
-			if ((sector[sectnum].floorstat & 2) == 0)
+			z = (getSector()[sectnum].getFloorz() - globalposz);
+			if ((getSector()[sectnum].getFloorstat() & 2) == 0)
 				return (owallmost(mostbuf, w, z));
 		}
 
 		i = thewall[w];
-		if (i == sector[sectnum].wallptr)
+		if (i == getSector()[sectnum].getWallptr())
 			return (owallmost(mostbuf, w, z));
 
-		x1 = wall[i].x;
-		x2 = wall[wall[i].point2].x - x1;
-		y1 = wall[i].y;
-		y2 = wall[wall[i].point2].y - y1;
+		x1 = getWall()[i].getX();
+		x2 = getWall()[getWall()[i].getPoint2()].getX() - x1;
+		y1 = getWall()[i].getY();
+		y2 = getWall()[getWall()[i].getPoint2()].getY() - y1;
 
-		fw = sector[sectnum].wallptr;
-		i = wall[fw].point2;
-		dx = wall[i].x - wall[fw].x;
-		dy = wall[i].y - wall[fw].y;
-		dasqr = krecipasm(engine.ksqrt(dx * dx + dy * dy));
+		fw = getSector()[sectnum].getWallptr();
+		i = getWall()[fw].getPoint2();
+		dx = getWall()[i].getX() - getWall()[fw].getX();
+		dy = getWall()[i].getY() - getWall()[fw].getY();
+		dasqr = krecipasm(EngineUtils.sqrt(dx * dx + dy * dy));
 
 		if (xb1[w] == 0) {
 			xv = cosglobalang + sinviewingrangeglobalang;
@@ -4101,14 +4106,14 @@ public class Software implements Renderer {
 		if (klabs(j) > klabs(i >> 3))
 			i = divscale(i, j, 28);
 		if (dastat == 0) {
-			t = mulscale(sector[sectnum].ceilingheinum, dasqr, 15);
-			z1 = sector[sectnum].ceilingz;
+			t = mulscale(getSector()[sectnum].getCeilingheinum(), dasqr, 15);
+			z1 = getSector()[sectnum].getCeilingz();
 		} else {
-			t = mulscale(sector[sectnum].floorheinum, dasqr, 15);
-			z1 = sector[sectnum].floorz;
+			t = mulscale(getSector()[sectnum].getFloorheinum(), dasqr, 15);
+			z1 = getSector()[sectnum].getFloorz();
 		}
-		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - wall[fw].y) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - wall[fw].x) << 8), 24) + ((z1 - globalposz) << 7);
+		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - getWall()[fw].getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - getWall()[fw].getX()) << 8), 24) + ((z1 - globalposz) << 7);
 
 		if (xb2[w] == xdimen - 1) {
 			xv = cosglobalang - sinviewingrangeglobalang;
@@ -4122,14 +4127,14 @@ public class Software implements Renderer {
 		if (klabs(j) > klabs(i >> 3))
 			i = divscale(i, j, 28);
 		if (dastat == 0) {
-			t = mulscale(sector[sectnum].ceilingheinum, dasqr, 15);
-			z2 = sector[sectnum].ceilingz;
+			t = mulscale(getSector()[sectnum].getCeilingheinum(), dasqr, 15);
+			z2 = getSector()[sectnum].getCeilingz();
 		} else {
-			t = mulscale(sector[sectnum].floorheinum, dasqr, 15);
-			z2 = sector[sectnum].floorz;
+			t = mulscale(getSector()[sectnum].getFloorheinum(), dasqr, 15);
+			z2 = getSector()[sectnum].getFloorz();
 		}
-		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - wall[fw].y) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - wall[fw].x) << 8), 24) + ((z2 - globalposz) << 7);
+		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - getWall()[fw].getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - getWall()[fw].getX()) << 8), 24) + ((z2 - globalposz) << 7);
 
 		s1 = mulscale(globaluclip, yb1[w], 20);
 		s2 = mulscale(globaluclip, yb2[w], 20);

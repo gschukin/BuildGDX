@@ -1,6 +1,7 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
 import static ru.m210projects.Build.Engine.*;
+import static ru.m210projects.Build.RenderService.*;
 
 import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector2;
@@ -35,13 +36,13 @@ public class WallFrustum2d implements Poolable {
 	}
 
 	public WallFrustum2d set(Wall wal) {
-		this.sectnum = wal.nextsector;
+		this.sectnum = wal.getNextsector();
 
-		float x1 = wal.x - globalposx;
-		float y1 = wal.y - globalposy;
-		Wall wal2 = wall[wal.point2];
-		float x2 = wal2.x - globalposx;
-		float y2 = wal2.y - globalposy;
+		float x1 = wal.getX() - globalposx;
+		float y1 = wal.getY() - globalposy;
+		Wall wal2 = getWall()[wal.getPoint2()];
+		float x2 = wal2.getX() - globalposx;
+		float y2 = wal2.getY() - globalposy;
 
 		setPlane(0, x1, y1, 0); // left
 		setPlane(1, -x2, -y2, 0); // right
@@ -91,11 +92,11 @@ public class WallFrustum2d implements Poolable {
 		if (isFullAngle)
 			return true;
 
-		int x1 = wal.x - globalposx;
-		int y1 = wal.y - globalposy;
-		Wall wal2 = wall[wal.point2];
-		int x2 = wal2.x - globalposx;
-		int y2 = wal2.y - globalposy;
+		int x1 = wal.getX() - globalposx;
+		int y1 = wal.getY() - globalposy;
+		Wall wal2 = getWall()[wal.getPoint2()];
+		int x2 = wal2.getX() - globalposx;
+		int y2 = wal2.getY() - globalposy;
 
 		// left / right planes check
 
@@ -133,13 +134,13 @@ public class WallFrustum2d implements Poolable {
 		tmp.set(planes[0].normal.x, planes[0].normal.y);
 		tmp.add(planes[1].normal.x, planes[1].normal.y);
 
-		int x1 = wal.x - globalposx;
-		int y1 = wal.y - globalposy;
+		int x1 = wal.getX() - globalposx;
+		int y1 = wal.getY() - globalposy;
 		if (tmp.dot(x1, y1) >= 0)
 			return true;
 
-		int x2 = wall[wal.point2].x - globalposx;
-		int y2 = wall[wal.point2].y - globalposy;
+		int x2 = getWall()[wal.getPoint2()].getX() - globalposx;
+		int y2 = getWall()[wal.getPoint2()].getY() - globalposy;
         return tmp.dot(x2, y2) >= 0;
     }
 

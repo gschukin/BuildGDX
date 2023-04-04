@@ -43,6 +43,7 @@ import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation.mdpause;
 import static ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation.mdtims;
 import static ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation.omdtims;
+import static ru.m210projects.Build.RenderService.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class GDXRenderer implements GLRenderer {
 		this.scanner = new SectorScanner(engine) {
 			@Override
 			protected Matrix4 getSpriteMatrix(Sprite tspr) {
-				Tile pic = engine.getTile(tspr.picnum);
+				Tile pic = engine.getTile(tspr.getPicnum());
 				return sprR.getMatrix(tspr, pic.getWidth(), pic.getHeight());
 			}
 		};
@@ -449,17 +450,17 @@ public class GDXRenderer implements GLRenderer {
 
 	public void drawsprite(int i) {
 		Sprite tspr = tsprite[i];
-		if (tspr == null || tspr.owner == -1)
+		if (tspr == null || tspr.getOwner() == -1)
 			return;
 
-		Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.owner);
+		Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.getOwner());
 		while (sprext == null || !sprext.isNotModel()) {
 			rendering = Rendering.Model.setIndex(i);
 
 			if (GLSettings.useModels.get()) {
-				GLModel md = modelManager.getModel(tspr.picnum, tspr.pal);
+				GLModel md = modelManager.getModel(tspr.getPicnum(), tspr.getPal());
 				if (md != null) {
-					if (tspr.owner < 0 || tspr.owner >= MAXSPRITES) {
+					if (tspr.getOwner() < 0 || tspr.getOwner() >= MAXSPRITES) {
 						if (mdR.mddraw(md, tspr))
 							return;
 						break; // else, render as flat sprite
@@ -472,23 +473,23 @@ public class GDXRenderer implements GLRenderer {
 			}
 
 			if (BuildSettings.useVoxels.get()) {
-				int picnum = tspr.picnum;
+				int picnum = tspr.getPicnum();
 				if (engine.getTile(picnum).getType() != AnimType.None) {
-					picnum += engine.animateoffs(picnum, tspr.owner + 32768);
+					picnum += engine.animateoffs(picnum, tspr.getOwner() + 32768);
 				}
 
-				int dist = (tspr.x - globalposx) * (tspr.x - globalposx)
-						+ (tspr.y - globalposy) * (tspr.y - globalposy);
+				int dist = (tspr.getX() - globalposx) * (tspr.getX() - globalposx)
+						+ (tspr.getY() - globalposy) * (tspr.getY() - globalposy);
 				if (dist < 48000L * 48000L) {
 					GLVoxel vox = (GLVoxel) modelManager.getVoxel(picnum);
 					if (vox != null) {
-						if ((tspr.cstat & 48) != 48) {
+						if ((tspr.getCstat() & 48) != 48) {
 							if (mdR.mddraw(vox, tspr))
 								return;
 							break; // else, render as flat sprite
 						}
 
-						if ((tspr.cstat & 48) == 48) {
+						if ((tspr.getCstat() & 48) == 48) {
 							mdR.mddraw(vox, tspr);
 							return;
 						}
@@ -572,9 +573,9 @@ public class GDXRenderer implements GLRenderer {
 
 		Sector skysector;
 		if ((skysector = scanner.getLastSkySector(Heinum.SkyUpper)) != null) {
-			int pal = skysector.ceilingpal;
-			int shade = skysector.ceilingshade;
-			int picnum = skysector.ceilingpicnum;
+			int pal = skysector.getCeilingpal();
+			int shade = skysector.getCeilingshade();
+			int picnum = skysector.getCeilingpicnum();
 
 			drawSky(world.getQuad(), picnum, shade, pal, 0,
 					transform.setToTranslation(cam.position.x, cam.position.y, cam.position.z - 100).scale(cam.far,
@@ -582,9 +583,9 @@ public class GDXRenderer implements GLRenderer {
 		}
 
 		if ((skysector = scanner.getLastSkySector(Heinum.SkyLower)) != null) {
-			int pal = skysector.floorpal;
-			int shade = skysector.floorshade;
-			int picnum = skysector.floorpicnum;
+			int pal = skysector.getFloorpal();
+			int shade = skysector.getFloorshade();
+			int picnum = skysector.getFloorpicnum();
 
 			drawSky(world.getQuad(), picnum, shade, pal, 0,
 					transform.setToTranslation(cam.position.x, cam.position.y, cam.position.z + 100).scale(cam.far,
@@ -1055,8 +1056,8 @@ public class GDXRenderer implements GLRenderer {
 
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					Sprite spr = sprite[i];
-					if (spr == null || ((spr.cstat >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
+					Sprite spr = getSprite()[i];
+					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
 					addSpriteCorr(i);
@@ -1328,11 +1329,11 @@ public class GDXRenderer implements GLRenderer {
 		if (s == null)
 			return false;
 
-		Wall wal = wall[w];
-		int x1 = wal.x;
-		int y1 = wal.y;
-		wal = wall[wal.point2];
-		return (dmulscale(wal.x - x1, s.y - y1, -(s.x - x1), wal.y - y1, 32) >= 0);
+		Wall wal = getWall()[w];
+		int x1 = wal.getX();
+		int y1 = wal.getY();
+		wal = getWall()[wal.getPoint2()];
+		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
 	protected void set2dview() {

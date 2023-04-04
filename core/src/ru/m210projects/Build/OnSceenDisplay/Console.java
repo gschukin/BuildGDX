@@ -9,6 +9,8 @@ package ru.m210projects.Build.OnSceenDisplay;
 
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Engine.*;
+import static ru.m210projects.Build.RenderService.xdim;
+import static ru.m210projects.Build.RenderService.ydim;
 import static ru.m210projects.Build.Strhandler.*;
 import static ru.m210projects.Build.FileHandle.Compat.*;
 
@@ -22,6 +24,7 @@ import java.util.List;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.FileHandle.FileResource;
 import ru.m210projects.Build.FileHandle.FileResource.Mode;
 import ru.m210projects.Build.Input.InputCallback;
@@ -1043,7 +1046,7 @@ public class Console {
 	    osdeditwinend = editlinewidth;
 	}
 
-	public static void draw()
+	public static void draw(Engine engine)
 	{
 	    if ((osdflags & OSD_INITIALIZED) == 0 || func == null)
 	        return;
@@ -1095,7 +1098,7 @@ public class Console {
 
 	    {
 	        int offset = ((osdflags & (OSD_CAPS|OSD_SHIFT)) == (OSD_CAPS|OSD_SHIFT) && osdhead > 0)?1:0;
-	        int shade = ((int)osdpromptshade.value!=0)?(int)osdpromptshade.value:(sintable[(totalclock<<4)&2047]>>11);
+	        int shade = ((int)osdpromptshade.value!=0)?(int)osdpromptshade.value:(EngineUtils.sin(totalclock<<4)>>11);
 
 	        if (osdhead == osdlines-1) func.drawchar(0,osdrowscur,'~',shade,(int)osdpromptpal.value, osdtextscale);
 	        else if (osdhead > 0) func.drawchar(0,osdrowscur,'^',shade,(int)osdpromptpal.value, osdtextscale);
@@ -1114,7 +1117,7 @@ public class Console {
 
 	        if (osdver != null)
 	        	func.drawstr(osdcols-osdverlen + 2, osdrowscur - ((offset >= osdcols-osdverlen+2)?1:0),
-	                      osdver ,osdverlen,(sintable[(totalclock<<4)&2047]>>11),osdverpal, osdtextscale);
+	                      osdver ,osdverlen,(EngineUtils.sin(totalclock<<4)>>11),osdverpal, osdtextscale);
 	     }
 	}
 }
