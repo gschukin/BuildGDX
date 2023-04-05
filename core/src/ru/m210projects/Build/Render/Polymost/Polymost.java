@@ -1068,7 +1068,7 @@ public class Polymost implements GLRenderer {
 		double fx, fy, ox, oy, oz, ox2, oy2, r;
 		int i;
 
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 
 		if ((globalorientation & 64) == 0) {
 			nonparallaxed_ft[0] = globalposx;
@@ -1077,16 +1077,16 @@ public class Polymost implements GLRenderer {
 			nonparallaxed_ft[3] = singlobalang;
 		} else {
 			// relative alignment
-			fx = getWall()[getWall()[sec.getWallptr()].getPoint2()].getX() - getWall()[sec.getWallptr()].getX();
-			fy = getWall()[getWall()[sec.getWallptr()].getPoint2()].getY() - getWall()[sec.getWallptr()].getY();
+			fx = Engine.getWall(Engine.getWall(sec.getWallptr()).getPoint2()).getX() - Engine.getWall(sec.getWallptr()).getX();
+			fy = Engine.getWall(Engine.getWall(sec.getWallptr()).getPoint2()).getY() - Engine.getWall(sec.getWallptr()).getY();
 			r = 1.0 / sqrt(fx * fx + fy * fy);
 			fx *= r;
 			fy *= r;
 
 			nonparallaxed_ft[2] = cosglobalang * fx + singlobalang * fy;
 			nonparallaxed_ft[3] = singlobalang * fx - cosglobalang * fy;
-			nonparallaxed_ft[0] = (globalposx - getWall()[sec.getWallptr()].getX()) * fx + (globalposy - getWall()[sec.getWallptr()].getY()) * fy;
-			nonparallaxed_ft[1] = (globalposy - getWall()[sec.getWallptr()].getY()) * fx - (globalposx - getWall()[sec.getWallptr()].getX()) * fy;
+			nonparallaxed_ft[0] = (globalposx - Engine.getWall(sec.getWallptr()).getX()) * fx + (globalposy - Engine.getWall(sec.getWallptr()).getY()) * fy;
+			nonparallaxed_ft[1] = (globalposy - Engine.getWall(sec.getWallptr()).getY()) * fx - (globalposx - Engine.getWall(sec.getWallptr()).getX()) * fy;
 			if ((globalorientation & 4) == 0)
 				globalorientation ^= 32;
 			else
@@ -1291,7 +1291,7 @@ public class Polymost implements GLRenderer {
 		int i, x, y, z, wallnum, sectnum, nextsectnum;
 
 		sectnum = thesector[bunchfirst[bunch]];
-		sec = getSector()[sectnum];
+		sec = Engine.getSector(sectnum);
 
 		calc_and_apply_fog(sec.getFloorshade(), sec.getVisibility(), sec.getFloorpal());
 
@@ -1300,10 +1300,10 @@ public class Polymost implements GLRenderer {
 
 			wallnum = thewall[z];
 
-			wal = getWall()[wallnum];
-			wal2 = getWall()[wal.getPoint2()];
+			wal = Engine.getWall(wallnum);
+			wal2 = Engine.getWall(wal.getPoint2());
 			nextsectnum = wal.getNextsector();
-			nextsec = nextsectnum >= 0 ? getSector()[nextsectnum] : null;
+			nextsec = nextsectnum >= 0 ? Engine.getSector(nextsectnum) : null;
 
 			fwalxrepeat = wal.getXrepeat() & 0xFF;
 
@@ -1383,7 +1383,7 @@ public class Polymost implements GLRenderer {
 
 				if ((globalorientation & 1) == 0) {
 					nonparallaxed(nx0, ny0, nx1, ny1, ryp0, ryp1, x0, x1, fy0, fy1, 1, sectnum, true);
-				} else if ((nextsectnum < 0) || ((getSector()[nextsectnum].getFloorstat() & 1) == 0))
+				} else if ((nextsectnum < 0) || ((Engine.getSector(nextsectnum).getFloorstat() & 1) == 0))
 					drawbackground(sectnum, x0, x1, fy0, fy1, true);
 
 			} // END DRAW FLOOR
@@ -1406,7 +1406,7 @@ public class Polymost implements GLRenderer {
 
 				if ((globalorientation & 1) == 0) {
 					nonparallaxed(nx0, ny0, nx1, ny1, ryp0, ryp1, x0, x1, cy0, cy1, 0, sectnum, false);
-				} else if ((nextsectnum < 0) || ((getSector()[nextsectnum].getCeilingstat() & 1) == 0))
+				} else if ((nextsectnum < 0) || ((Engine.getSector(nextsectnum).getCeilingstat() & 1) == 0))
 					drawbackground(sectnum, x0, x1, cy0, cy1, false);
 
 			} // END DRAW CEILING
@@ -1436,7 +1436,7 @@ public class Polymost implements GLRenderer {
 					maskwall[maskwallcnt++] = (short) z;
 
 				if (((cy0 < ocy0) || (cy1 < ocy1))
-						&& (((sec.getCeilingstat() & getSector()[nextsectnum].getCeilingstat()) & 1)) == 0) {
+						&& (((sec.getCeilingstat() & Engine.getSector(nextsectnum).getCeilingstat()) & 1)) == 0) {
 					globalpicnum = wal.getPicnum();
 					globalshade = wal.getShade();
 					globalpal = wal.getPal() & 0xFF;
@@ -1444,7 +1444,7 @@ public class Polymost implements GLRenderer {
 						globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 
 					if (!wal.isBottomAligned())
-						i = getSector()[nextsectnum].getCeilingz();
+						i = Engine.getSector(nextsectnum).getCeilingz();
 					else
 						i = sec.getCeilingz();
 
@@ -1475,11 +1475,11 @@ public class Polymost implements GLRenderer {
 						guo = oguo;
 					}
 				}
-				if (((ofy0 < fy0) || (ofy1 < fy1)) && (((sec.getFloorstat() & getSector()[nextsectnum].getFloorstat()) & 1)) == 0) {
+				if (((ofy0 < fy0) || (ofy1 < fy1)) && (((sec.getFloorstat() & Engine.getSector(nextsectnum).getFloorstat()) & 1)) == 0) {
 					if (!wal.isSwapped()) {
 						drawalls_nwal.set(wal);
 					} else {
-						drawalls_nwal.set(getWall()[wal.getNextwall()]);
+						drawalls_nwal.set(Engine.getWall(wal.getNextwall()));
 						guo += (drawalls_nwal.getXpanning() - wal.getXpanning()) * gdo;
 						gux += (drawalls_nwal.getXpanning() - wal.getXpanning()) * gdx;
 						guy += (drawalls_nwal.getXpanning() - wal.getXpanning()) * gdy;
@@ -1491,7 +1491,7 @@ public class Polymost implements GLRenderer {
 						globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 
 					if (!drawalls_nwal.isBottomAligned())
-						i = getSector()[nextsectnum].getFloorz();
+						i = Engine.getSector(nextsectnum).getFloorz();
 					else
 						i = sec.getCeilingz();
 
@@ -1609,16 +1609,16 @@ public class Polymost implements GLRenderer {
 		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
-		wal = getWall()[thewall[l1]];
+		wal = Engine.getWall(thewall[l1]);
 		x11 = wal.getX();
 		y11 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		x21 = wal.getX();
 		y21 = wal.getY();
-		wal = getWall()[thewall[l2]];
+		wal = Engine.getWall(thewall[l2]);
 		x12 = wal.getX();
 		y12 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		x22 = wal.getX();
 		y22 = wal.getY();
 
@@ -1676,7 +1676,7 @@ public class Polymost implements GLRenderer {
 
 			for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
 				int z = node.getIndex();
-				spr = getSprite()[z];
+				spr = Engine.getSprite(z);
 				if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
 					xs = spr.getX() - globalposx;
@@ -1687,7 +1687,7 @@ public class Polymost implements GLRenderer {
 								EngineUtils.sin(spr.getAng()), -ys, 6) > 0) {
 							if (tsprite[spritesortcnt] == null)
 								tsprite[spritesortcnt] = new TSprite();
-							tsprite[spritesortcnt].set(getSprite()[z]);
+							tsprite[spritesortcnt].set(Engine.getSprite(z));
 
 							tsprite[spritesortcnt++].setOwner((short) z);
 						}
@@ -1700,10 +1700,10 @@ public class Polymost implements GLRenderer {
 			bunchfrst = numbunches;
 			numscansbefore = numscans;
 
-			if (getSector()[sectnum] == null)
+			if (Engine.getSector(sectnum) == null)
 				continue;
-			startwall = getSector()[sectnum].getWallptr();
-			endwall = getSector()[sectnum].getWallnum() + startwall;
+			startwall = Engine.getSector(sectnum).getWallptr();
+			endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 			scanfirst = numscans;
 			xp2 = 0;
 			yp2 = 0;
@@ -1713,8 +1713,8 @@ public class Polymost implements GLRenderer {
 				if (isCorruptWall(z))
 					continue;
 
-				wal = getWall()[z];
-				wal2 = getWall()[wal.getPoint2()];
+				wal = Engine.getWall(z);
+				wal2 = Engine.getWall(wal.getPoint2());
 				x1 = wal.getX() - globalposx;
 				y1 = wal.getY() - globalposy;
 				x2 = wal2.getX() - globalposx;
@@ -1733,7 +1733,7 @@ public class Polymost implements GLRenderer {
 					}
 				}
 
-				if ((z == startwall) || (getWall()[z - 1].getPoint2() != z)) {
+				if ((z == startwall) || (Engine.getWall(z - 1).getPoint2() != z)) {
 					xp1 = ((double) y1 * cosglobalang - (double) x1 * singlobalang) / 64.0;
 					yp1 = ((double) x1 * cosviewingrangeglobalang + (double) y1 * sinviewingrangeglobalang) / 64.0;
 				} else {
@@ -1757,14 +1757,14 @@ public class Polymost implements GLRenderer {
 						}
 					}
 
-				if ((getWall()[z].getPoint2() < z) && (scanfirst < numscans)) {
+				if ((Engine.getWall(z).getPoint2() < z) && (scanfirst < numscans)) {
 					p2[numscans - 1] = (short) scanfirst;
 					scanfirst = numscans;
 				}
 			}
 
 			for (int z = numscansbefore; z < numscans; z++) {
-				if ((getWall()[thewall[z]].getPoint2() != thewall[p2[z]]) || (dxb2[z] > dxb1[p2[z]])) {
+				if ((getWall(thewall[z]).getPoint2() != thewall[p2[z]]) || (dxb2[z] > dxb1[p2[z]])) {
 					bunchfirst[numbunches++] = p2[z];
 					p2[z] = -1;
 				}
@@ -1814,7 +1814,7 @@ public class Polymost implements GLRenderer {
 
 		Tile pic = engine.getTile(globalpicnum);
 
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 		drawalls_dd[0] = xdimen * .0000001; // Adjust sky depth based on screen size!
 		t = pic.getWidth() << dapskybits; // (1 << (picsiz[globalpicnum] & 15)) << dapskybits;
 
@@ -2179,7 +2179,7 @@ public class Polymost implements GLRenderer {
 	private void drawbackground(int sectnum, double x0, double x1, double y0, double y1, boolean floor) {
 		// Parallaxing sky... hacked for Ken's mountain texture;
 
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 		int shade = sec.getFloorshade();
 		int pal = sec.getFloorpal();
 		if (!floor) {
@@ -2411,8 +2411,8 @@ public class Polymost implements GLRenderer {
 		// cullcheckcnt = 0;
 
 		z = maskwall[damaskwallcnt];
-		wal = getWall()[thewall[z]];
-		wal2 = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(thewall[z]);
+		wal2 = Engine.getWall(wal.getPoint2());
 		sectnum = thesector[z];
 
 		if (sectnum == -1 || wal.getNextsector() == -1)
@@ -2420,8 +2420,8 @@ public class Polymost implements GLRenderer {
 
 		rendering = Rendering.MaskWall.setIndex(thewall[z]);
 
-		sec = getSector()[sectnum];
-		nsec = getSector()[wal.getNextsector()];
+		sec = Engine.getSector(sectnum);
+		nsec = getSector(wal.getNextsector());
 
 		globalpicnum = wal.getOverpicnum();
 		if (globalpicnum >= MAXTILES)
@@ -2627,8 +2627,8 @@ public class Polymost implements GLRenderer {
 	private static final Vector2 projPoint = new Vector2();
 
 	private int getclosestpointonwall(int posx, int posy, int dawall, Vector2 n) {
-		Wall w = getWall()[dawall];
-		Wall p2 = getWall()[getWall()[dawall].getPoint2()];
+		Wall w = Engine.getWall(dawall);
+		Wall p2 = Engine.getWall(Engine.getWall(dawall).getPoint2());
 		int dx = p2.getX() - w.getX();
 		int dy = p2.getY() - w.getY();
 
@@ -2725,7 +2725,7 @@ public class Polymost implements GLRenderer {
 			if (GLSettings.useModels.get()) {
 				GLModel md = modelManager.getModel(globalpicnum, globalpal);
 				if (md != null) {
-					calc_and_apply_fog(shade, getSector()[tspr.getSectnum()].getVisibility(), getSector()[tspr.getSectnum()].getFloorpal());
+					calc_and_apply_fog(shade, getSector(tspr.getSectnum()).getVisibility(), getSector(tspr.getSectnum()).getFloorpal());
 
 					if (tspr.getOwner() < 0 || tspr.getOwner() >= MAXSPRITES /* || tspr.statnum == TSPR_MIRROR */ ) {
 						if (mdrenderer.mddraw(md, tspr, xoff, yoff) != 0)
@@ -2744,7 +2744,7 @@ public class Polymost implements GLRenderer {
 				if (dist < 48000L * 48000L) {
 					GLVoxel vox = (GLVoxel) modelManager.getVoxel(globalpicnum);
 					if (vox != null) {
-						calc_and_apply_fog(shade, getSector()[tspr.getSectnum()].getVisibility(), getSector()[tspr.getSectnum()].getFloorpal());
+						calc_and_apply_fog(shade, getSector(tspr.getSectnum()).getVisibility(), getSector(tspr.getSectnum()).getFloorpal());
 
 						if ((tspr.getCstat() & 48) != 48) {
 							if (mdrenderer.voxdraw(vox, tspr) != 0)
@@ -2763,7 +2763,7 @@ public class Polymost implements GLRenderer {
 		}
 
 		rendering = Rendering.Sprite.setIndex(snum);
-		calc_and_apply_fog(shade, getSector()[tspr.getSectnum()].getVisibility(), getSector()[tspr.getSectnum()].getFloorpal());
+		calc_and_apply_fog(shade, getSector(tspr.getSectnum()).getVisibility(), getSector(tspr.getSectnum()).getFloorpal());
 
 //		if (sprext != null) {
 //			if ((sprext.flags & SPREXT_AWAY1) != 0) {
@@ -2875,13 +2875,13 @@ public class Polymost implements GLRenderer {
 
 			// Clip sprites to ceilings/floors when no parallaxing and not
 			// sloped
-			if ((getSector()[tspr.getSectnum()].getCeilingstat() & 3) == 0) {
-				sy0 = ((getSector()[tspr.getSectnum()].getCeilingz() - globalposz)) * gyxscale * ryp0 + ghoriz;
+			if ((getSector(tspr.getSectnum()).getCeilingstat() & 3) == 0) {
+				sy0 = ((getSector(tspr.getSectnum()).getCeilingz() - globalposz)) * gyxscale * ryp0 + ghoriz;
 				if (dsprite[0].py < sy0)
 					dsprite[0].py = dsprite[1].py = sy0;
 			}
-			if ((getSector()[tspr.getSectnum()].getFloorstat() & 3) == 0) {
-				sy0 = ((getSector()[tspr.getSectnum()].getFloorz() - globalposz)) * gyxscale * ryp0 + ghoriz;
+			if ((getSector(tspr.getSectnum()).getFloorstat() & 3) == 0) {
+				sy0 = ((getSector(tspr.getSectnum()).getFloorz() - globalposz)) * gyxscale * ryp0 + ghoriz;
 				if (dsprite[2].py > sy0)
 					dsprite[2].py = dsprite[3].py = sy0;
 			}
@@ -3005,17 +3005,17 @@ public class Polymost implements GLRenderer {
 			}
 
 			// Clip sprites to ceilings/floors when no parallaxing
-			if (tspr.getSectnum() != -1 && (getSector()[tspr.getSectnum()].getCeilingstat() & 1) == 0) {
+			if (tspr.getSectnum() != -1 && (getSector(tspr.getSectnum()).getCeilingstat() & 1) == 0) {
 				f = ((float) tspr.getYrepeat()) * (float) tsizy * 4;
-				if (getSector()[tspr.getSectnum()].getCeilingz() > tspr.getZ() - f) {
-					sc0 = ((getSector()[tspr.getSectnum()].getCeilingz() - globalposz)) * ryp0 + ghoriz;
-					sc1 = ((getSector()[tspr.getSectnum()].getCeilingz() - globalposz)) * ryp1 + ghoriz;
+				if (getSector(tspr.getSectnum()).getCeilingz() > tspr.getZ() - f) {
+					sc0 = ((getSector(tspr.getSectnum()).getCeilingz() - globalposz)) * ryp0 + ghoriz;
+					sc1 = ((getSector(tspr.getSectnum()).getCeilingz() - globalposz)) * ryp1 + ghoriz;
 				}
 			}
-			if (tspr.getSectnum() != -1 && (getSector()[tspr.getSectnum()].getFloorstat() & 1) == 0) {
-				if (getSector()[tspr.getSectnum()].getFloorz() < tspr.getZ()) {
-					sf0 = ((getSector()[tspr.getSectnum()].getFloorz() - globalposz)) * ryp0 + ghoriz;
-					sf1 = ((getSector()[tspr.getSectnum()].getFloorz() - globalposz)) * ryp1 + ghoriz;
+			if (tspr.getSectnum() != -1 && (getSector(tspr.getSectnum()).getFloorstat() & 1) == 0) {
+				if (getSector(tspr.getSectnum()).getFloorz() < tspr.getZ()) {
+					sf0 = ((getSector(tspr.getSectnum()).getFloorz() - globalposz)) * ryp0 + ghoriz;
+					sf1 = ((getSector(tspr.getSectnum()).getFloorz() - globalposz)) * ryp1 + ghoriz;
 				}
 			}
 
@@ -3082,9 +3082,9 @@ public class Polymost implements GLRenderer {
 			if ((globalorientation & 8) > 0)
 				yoff = -yoff;
 
-//			if (tspr.z < sector[tspr.sectnum].ceilingz)
+//			if (tspr.z < getSector()[tspr.sectnum].ceilingz)
 //				tspr.z += ((tspr.owner) & 31);
-//			if (tspr.z > sector[tspr.sectnum].floorz)
+//			if (tspr.z > getSector()[tspr.sectnum].floorz)
 //				tspr.z -= ((tspr.owner) & 31);
 
 			i = (tspr.getAng() & 2047);
@@ -3482,10 +3482,10 @@ public class Polymost implements GLRenderer {
 
 			maskwallcnt--;
 
-			drawmasks_dot.x = getWall()[thewall[maskwall[maskwallcnt]]].getX();
-			drawmasks_dot.y = getWall()[thewall[maskwall[maskwallcnt]]].getY();
-			drawmasks_dot2.x = getWall()[getWall()[thewall[maskwall[maskwallcnt]]].getPoint2()].getX();
-			drawmasks_dot2.y = getWall()[getWall()[thewall[maskwall[maskwallcnt]]].getPoint2()].getY();
+			drawmasks_dot.x = Engine.getWall(thewall[maskwall[maskwallcnt]]).getX();
+			drawmasks_dot.y = Engine.getWall(thewall[maskwall[maskwallcnt]]).getY();
+			drawmasks_dot2.x = Engine.getWall(Engine.getWall(thewall[maskwall[maskwallcnt]]).getPoint2()).getX();
+			drawmasks_dot2.y = Engine.getWall(Engine.getWall(thewall[maskwall[maskwallcnt]]).getPoint2()).getY();
 
 			equation(drawmasks_maskeq, drawmasks_dot.x, drawmasks_dot.y, drawmasks_dot2.x, drawmasks_dot2.y);
 			equation(drawmasks_p1eq, drawmasks_pos.x, drawmasks_pos.y, drawmasks_dot.x, drawmasks_dot.y);
@@ -3771,7 +3771,7 @@ public class Polymost implements GLRenderer {
 	}
 
 	public int nearwall(int i, int range) {
-		Sprite spr = getSprite()[i];
+		Sprite spr = Engine.getSprite(i);
 		short sectnum = spr.getSectnum();
 		int xs = spr.getX();
 		int ys = spr.getY();
@@ -3784,11 +3784,11 @@ public class Polymost implements GLRenderer {
 		if ((sectnum < 0) || (sectnum >= numsectors))
 			return (-1);
 
-		short startwall = getSector()[sectnum].getWallptr();
-		int endwall = (startwall + getSector()[sectnum].getWallnum() - 1);
+		short startwall = Engine.getSector(sectnum).getWallptr();
+		int endwall = (startwall + Engine.getSector(sectnum).getWallnum() - 1);
 		for (int z = startwall; z <= endwall; z++) {
-			Wall wal = getWall()[z];
-			Wall wal2 = getWall()[wal.getPoint2()];
+			Wall wal = Engine.getWall(z);
+			Wall wal2 = Engine.getWall(wal.getPoint2());
 			int x1 = wal.getX();
 			int y1 = wal.getY();
 			int x2 = wal2.getX();
@@ -3834,7 +3834,7 @@ public class Polymost implements GLRenderer {
 				int dist = dmulscale(vvx.get() - xs, EngineUtils.cos(spr.getAng()), vvy.get() - ys,
 						EngineUtils.sin(spr.getAng()), 14);
 				if (klabs(dist) <= 8) {
-					int wallang = EngineUtils.getAngle(getWall()[wal.getPoint2()].getX() - wal.getX(), getWall()[wal.getPoint2()].getY() - wal.getY()) - 512;
+					int wallang = EngineUtils.getAngle(Engine.getWall(wal.getPoint2()).getX() - wal.getX(), Engine.getWall(wal.getPoint2()).getY() - wal.getY()) - 512;
 					int nx = vvx.get() - mulscale(EngineUtils.cos(wallang), 4, 14);
 					int ny = vvy.get() - mulscale(EngineUtils.sin(wallang), 4, 14);
 					dcoord[i].x = nx - spr.getX();
@@ -3862,7 +3862,7 @@ public class Polymost implements GLRenderer {
 			case Other:
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					Sprite spr = getSprite()[i];
+					Sprite spr = Engine.getSprite(i);
 					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
@@ -3876,15 +3876,15 @@ public class Polymost implements GLRenderer {
 	@Override
 	public void addSpriteCorr(int snum) {
 		int spr_wall;
-		Sprite spr = getSprite()[snum];
+		Sprite spr = Engine.getSprite(snum);
 		if ((spr_wall = nearwall(snum, -64)) == -1)
 			if ((spr.getCstat() & 64) != 0 || (spr_wall = nearwall(snum, 64)) == -1)
 				return;
 
 		spritewall[snum] = spr_wall;
 		float sang = spr.getAng() * 360 / 2048;
-		int wdx = getWall()[spr_wall].getX() - getWall()[getWall()[spr_wall].getPoint2()].getX();
-		int wdy = getWall()[spr_wall].getY() - getWall()[getWall()[spr_wall].getPoint2()].getY();
+		int wdx = Engine.getWall(spr_wall).getX() - Engine.getWall(Engine.getWall(spr_wall).getPoint2()).getX();
+		int wdy = Engine.getWall(spr_wall).getY() - Engine.getWall(Engine.getWall(spr_wall).getPoint2()).getY();
 		float wang = new Vector2(wdx, wdy).angle() - 90;
 		if (wang < 0)
 			wang += 360;
@@ -3937,48 +3937,48 @@ public class Polymost implements GLRenderer {
 	}
 
 	public double polymost_getflorzofslope(int sectnum, double dax, double day) {
-		if (getSector()[sectnum] == null)
+		if (Engine.getSector(sectnum) == null)
 			return 0;
-		if ((getSector()[sectnum].getFloorstat() & 2) == 0)
-			return (getSector()[sectnum].getFloorz());
+		if ((Engine.getSector(sectnum).getFloorstat() & 2) == 0)
+			return (Engine.getSector(sectnum).getFloorz());
 
-		Wall wal = getWall()[getSector()[sectnum].getWallptr()];
-		int dx = getWall()[wal.getPoint2()].getX() - wal.getX();
-		int dy = getWall()[wal.getPoint2()].getY() - wal.getY();
+		Wall wal = Engine.getWall(Engine.getSector(sectnum).getWallptr());
+		int dx = Engine.getWall(wal.getPoint2()).getX() - wal.getX();
+		int dy = Engine.getWall(wal.getPoint2()).getY() - wal.getY();
 		long i = (EngineUtils.sqrt(dx * dx + dy * dy) << 5);
 		if (i == 0)
-			return (getSector()[sectnum].getFloorz());
+			return (Engine.getSector(sectnum).getFloorz());
 
 		double j = (dx * (day - wal.getY()) - dy * (dax - wal.getX())) / 8;
-		return getSector()[sectnum].getFloorz() + getSector()[sectnum].getFloorheinum() * j / i;
+		return Engine.getSector(sectnum).getFloorz() + Engine.getSector(sectnum).getFloorheinum() * j / i;
 	}
 
 	public double polymost_getceilzofslope(int sectnum, double dax, double day) {
-		if ((getSector()[sectnum].getCeilingstat() & 2) == 0)
-			return (getSector()[sectnum].getCeilingz());
+		if ((Engine.getSector(sectnum).getCeilingstat() & 2) == 0)
+			return (Engine.getSector(sectnum).getCeilingz());
 
-		Wall wal = getWall()[getSector()[sectnum].getWallptr()];
-		int dx = getWall()[wal.getPoint2()].getX() - wal.getX();
-		int dy = getWall()[wal.getPoint2()].getY() - wal.getY();
+		Wall wal = Engine.getWall(Engine.getSector(sectnum).getWallptr());
+		int dx = Engine.getWall(wal.getPoint2()).getX() - wal.getX();
+		int dy = Engine.getWall(wal.getPoint2()).getY() - wal.getY();
 		long i = (EngineUtils.sqrt(dx * dx + dy * dy) << 5);
 		if (i == 0)
-			return (getSector()[sectnum].getCeilingz());
+			return (Engine.getSector(sectnum).getCeilingz());
 
 		double j = (dx * (day - wal.getY()) - dy * (dax - wal.getX())) / 8;
-		return getSector()[sectnum].getCeilingz() + getSector()[sectnum].getCeilingheinum() * j / i;
+		return Engine.getSector(sectnum).getCeilingz() + Engine.getSector(sectnum).getCeilingheinum() * j / i;
 	}
 
 	private static float dceilzsofslope, dfloorzsofslope;
 
 	public void polymost_getzsofslope(int sectnum, double dax, double day) {
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 		if (sec == null)
 			return;
 		dceilzsofslope = sec.getCeilingz();
 		dfloorzsofslope = sec.getFloorz();
 		if (((sec.getCeilingstat() | sec.getFloorstat()) & 2) != 0) {
-			Wall wal = getWall()[sec.getWallptr()];
-			Wall wal2 = getWall()[wal.getPoint2()];
+			Wall wal = Engine.getWall(sec.getWallptr());
+			Wall wal2 = Engine.getWall(wal.getPoint2());
 			int dx = wal2.getX() - wal.getX();
 			int dy = wal2.getY() - wal.getY();
 			long i = (EngineUtils.sqrt(dx * dx + dy * dy) << 5);
@@ -3987,9 +3987,9 @@ public class Polymost implements GLRenderer {
 			double j = (dx * (day - wal.getY()) - dy * (dax - wal.getX())) / 8;
 
 			if ((sec.getCeilingstat() & 2) != 0)
-				dceilzsofslope += getSector()[sectnum].getCeilingheinum() * j / i;
+				dceilzsofslope += Engine.getSector(sectnum).getCeilingheinum() * j / i;
 			if ((sec.getFloorstat() & 2) != 0)
-				dfloorzsofslope += getSector()[sectnum].getFloorheinum() * j / i;
+				dfloorzsofslope += Engine.getSector(sectnum).getFloorheinum() * j / i;
 		}
 	}
 

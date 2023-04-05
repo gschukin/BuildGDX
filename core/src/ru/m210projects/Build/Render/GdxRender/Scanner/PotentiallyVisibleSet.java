@@ -1,10 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.pow2char;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.wall;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.RenderService.*;
 
 import java.util.Arrays;
@@ -74,20 +70,20 @@ public class PotentiallyVisibleSet {
 				if (info.hasOccluders(sectnum)) {
 					ray.init(false);
 
-					int startwall = Engine.getSector()[sectnum].getWallptr();
-					int endwall = Engine.getSector()[sectnum].getWallnum() + startwall;
+					int startwall = Engine.getSector(sectnum).getWallptr();
+					int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 					for (int z = startwall; z < endwall; z++) {
-						if (!WallFacingCheck(wall[z]))
+						if (!WallFacingCheck(Engine.getWall(z)))
 							continue;
 						ray.add(z, null);
 					}
 					ray.update();
 				}
 
-				int startwall = sector[sectnum].getWallptr();
-				int endwall = sector[sectnum].getWallnum() + startwall;
+				int startwall = Engine.getSector(sectnum).getWallptr();
+				int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 				for (int z = startwall; z < endwall; z++) {
-					Wall wal = wall[z];
+					Wall wal = Engine.getWall(z);
 					int nextsectnum = wal.getNextsector();
 
 					if (!WallFacingCheck(wal))
@@ -137,8 +133,8 @@ public class PotentiallyVisibleSet {
 //			sectnum = sectorqueue[i];
 //			if ((pFrustum = gotviewport[sectnum]) != null) {
 //				if(!World.info.isCorruptSector(sectnum)) {
-//					int startwall = sector[sectnum].wallptr;
-//					int endwall = sector[sectnum].wallnum + startwall;
+//					int startwall = Engine.getSector(sectnum).wallptr;
+//					int endwall = Engine.getSector(sectnum).wallnum + startwall;
 //					for (int z = startwall; z < endwall; z++) {
 //						if ((gotwall[z >> 3] & pow2char[z & 7]) != 0) {
 //							ray.add(z, pFrustum);
@@ -151,13 +147,13 @@ public class PotentiallyVisibleSet {
 		for (sectnum = 0; sectnum < MAXSECTORS; sectnum++) {
 			if ((pFrustum = gotviewport[sectnum]) != null) {
 				if (!info.isCorruptSector(sectnum)) {
-					int startwall = sector[sectnum].getWallptr();
-					int endwall = sector[sectnum].getWallnum() + startwall;
+					int startwall = Engine.getSector(sectnum).getWallptr();
+					int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 					for (int z = startwall; z < endwall; z++) {
 						if ((gotwall[z >> 3] & pow2char[z & 7]) != 0) {
-							Wall w = wall[z];
+							Wall w = Engine.getWall(z);
 //							if(w.nextsector != -1) { //XXX E2L8 near wall bug fix
-							Wall p2 = wall[w.getPoint2()];
+							Wall p2 = Engine.getWall(w.getPoint2());
 							int dx = p2.getX() - w.getX();
 							int dy = p2.getY() - w.getY();
 							float i = dx * (globalposx - w.getX()) + dy * (globalposy - w.getY());
@@ -203,8 +199,8 @@ public class PotentiallyVisibleSet {
 	private boolean WallFacingCheck(Wall wal) {
 		float x1 = wal.getX() - globalposx;
 		float y1 = wal.getY() - globalposy;
-		float x2 = wall[wal.getPoint2()].getX() - globalposx;
-		float y2 = wall[wal.getPoint2()].getY() - globalposy;
+		float x2 = Engine.getWall(wal.getPoint2()).getX() - globalposx;
+		float y2 = Engine.getWall(wal.getPoint2()).getY() - globalposy;
 
 		return (x1 * y2 - y1 * x2) >= 0;
 	}

@@ -611,10 +611,10 @@ public class RenderService {
     }
 
     public void preparemirror(int dax, int day, int daz, float daang, float dahoriz, int dawall, int dasector) { // jfBuild
-        int x = getWall()[dawall].getX();
-        int dx = getWall()[getWall()[dawall].getPoint2()].getX() - x;
-        int y = getWall()[dawall].getY();
-        int dy = getWall()[getWall()[dawall].getPoint2()].getY() - y;
+        int x = Engine.getWall(dawall).getX();
+        int dx = getWall(Engine.getWall(dawall).getPoint2()).getX() - x;
+        int y = Engine.getWall(dawall).getY();
+        int dy = getWall(Engine.getWall(dawall).getPoint2()).getY() - y;
         int j = dx * dx + dy * dy;
         if (j == 0)
             return;

@@ -114,8 +114,8 @@ public class GDXModelRenderer {
 
 	private int getVisibility(Sprite tspr) {
 		int vis = globalvisibility;
-		if (Engine.getSector()[tspr.getSectnum()].getVisibility() != 0)
-			vis = mulscale(globalvisibility, (Engine.getSector()[tspr.getSectnum()].getVisibility() + 16) & 0xFF, 4);
+		if (Engine.getSector(tspr.getSectnum()).getVisibility() != 0)
+			vis = mulscale(globalvisibility, (Engine.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
 		return vis;
 	}
 
@@ -311,7 +311,7 @@ public class GDXModelRenderer {
 //		if (m == null)
 //			return 0;
 //
-//		if ((sprite[tspr.owner].cstat & 48) == 32)
+//		if ((Engine.getSprite()[tspr.owner].cstat & 48) == 32)
 //			return 0;
 //
 //		ShaderManager manager = parent.manager;

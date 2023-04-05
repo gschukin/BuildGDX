@@ -1056,7 +1056,7 @@ public class GDXRenderer implements GLRenderer {
 
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					Sprite spr = getSprite()[i];
+					Sprite spr = Engine.getSprite(i);
 					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
 						continue;
 
@@ -1329,10 +1329,10 @@ public class GDXRenderer implements GLRenderer {
 		if (s == null)
 			return false;
 
-		Wall wal = getWall()[w];
+		Wall wal = Engine.getWall(w);
 		int x1 = wal.getX();
 		int y1 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
@@ -1452,8 +1452,8 @@ public class GDXRenderer implements GLRenderer {
 //	private boolean WallFacingCheck(WALL wal) {
 //		float x1 = wal.x - globalposx;
 //		float y1 = wal.y - globalposy;
-//		float x2 = wall[wal.point2].x - globalposx;
-//		float y2 = wall[wal.point2].y - globalposy;
+//		float x2 = Engine.getWall(wal.point2).x - globalposx;
+//		float y2 = Engine.getWall(wal.point2).y - globalposy;
 //
 //		return (x1 * y2 - y1 * x2) >= 0;
 //	}
@@ -1473,7 +1473,7 @@ public class GDXRenderer implements GLRenderer {
 //	}
 //
 //	private ArrayList<Vertex> project(BuildCamera cam, int z, int sectnum, Heinum h) {
-//		WALL wal = wall[z];
+//		WALL wal = Engine.getWall(z);
 //		if (!WallFacingCheck(wal))
 //			return null;
 //

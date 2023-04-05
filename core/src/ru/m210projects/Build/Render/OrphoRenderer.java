@@ -101,7 +101,7 @@ public abstract class OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			Sector sec = getSector()[i];
+			Sector sec = Engine.getSector(i);
 			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
 				continue;
 
@@ -112,10 +112,10 @@ public abstract class OrphoRenderer {
 				continue;
 
 			for (int j = startwall; j < endwall; j++) {
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(getWall()[j].getPoint2()))
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2()))
 					continue;
 
-				wal = getWall()[j];
+				wal = Engine.getWall(j);
 				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
 					if (Gameutils.isValidSector(wal.getNextsector())) {
 						if (mapSettings.isWallVisible(j, i)) {
@@ -148,7 +148,7 @@ public abstract class OrphoRenderer {
 
 				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
-					Sprite spr = getSprite()[j];
+					Sprite spr = Engine.getSprite(j);
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
@@ -282,16 +282,16 @@ public abstract class OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			startwall = getSector()[i].getWallptr();
-			endwall = getSector()[i].getWallptr() + getSector()[i].getWallnum();
+			startwall = Engine.getSector(i).getWallptr();
+			endwall = Engine.getSector(i).getWallptr() + Engine.getSector(i).getWallnum();
 
 			if (startwall < 0 || endwall < 0)
 				continue;
 
 			k = -1;
 			for (int j = startwall; j < endwall; j++) {
-				wal = getWall()[j];
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(getWall()[j].getPoint2()))
+				wal = Engine.getWall(j);
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2()))
 					continue;
 
 				if (wal.getNextwall() >= 0)
@@ -311,7 +311,7 @@ public abstract class OrphoRenderer {
 				}
 
 				k = wal.getPoint2();
-				if (getWall()[k] == null)
+				if (Engine.getWall(k) == null)
 					continue;
 
 				ox = mapSettings.getWallX(k) - cposx;
@@ -330,10 +330,10 @@ public abstract class OrphoRenderer {
 		// draw player
 		for (i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(getSprite()[spr].getSectnum()))
+			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum()))
 				continue;
 
-			Sprite pPlayer = getSprite()[spr];
+			Sprite pPlayer = Engine.getSprite(spr);
 			ox = mapSettings.getSpriteX(spr) - cposx;
 			oy = mapSettings.getSpriteY(spr) - cposy;
 

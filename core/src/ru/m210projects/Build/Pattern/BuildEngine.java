@@ -72,26 +72,26 @@ public class BuildEngine extends Engine {
 
 	@Override
 	public void dragpoint(int pointhighlight, int dax, int day) {
-		game.pInt.setwallinterpolate(pointhighlight, getWall()[pointhighlight]);
-		getWall()[pointhighlight].setX(dax);
-		getWall()[pointhighlight].setY(day);
+		game.pInt.setwallinterpolate(pointhighlight, Engine.getWall(pointhighlight));
+		Engine.getWall(pointhighlight).setX(dax);
+		Engine.getWall(pointhighlight).setY(day);
 
 		int cnt = MAXWALLS;
 		int tempshort = pointhighlight; // search points CCW
 		do {
-			if (getWall()[tempshort].getNextwall() >= 0) {
-				tempshort = getWall()[getWall()[tempshort].getNextwall()].getPoint2();
-				game.pInt.setwallinterpolate(tempshort, getWall()[tempshort]);
-				getWall()[tempshort].setX(dax);
-				getWall()[tempshort].setY(day);
+			if (Engine.getWall(tempshort).getNextwall() >= 0) {
+				tempshort = Engine.getWall(Engine.getWall(tempshort).getNextwall()).getPoint2();
+				game.pInt.setwallinterpolate(tempshort, Engine.getWall(tempshort));
+				Engine.getWall(tempshort).setX(dax);
+				Engine.getWall(tempshort).setY(day);
 			} else {
 				tempshort = pointhighlight; // search points CW if not searched all the way around
 				do {
-					if (getWall()[lastwall(tempshort)].getNextwall() >= 0) {
-						tempshort = getWall()[lastwall(tempshort)].getNextwall();
-						game.pInt.setwallinterpolate(tempshort, getWall()[tempshort]);
-						getWall()[tempshort].setX(dax);
-						getWall()[tempshort].setY(day);
+					if (Engine.getWall(lastwall(tempshort)).getNextwall() >= 0) {
+						tempshort = Engine.getWall(lastwall(tempshort)).getNextwall();
+						game.pInt.setwallinterpolate(tempshort, Engine.getWall(tempshort));
+						Engine.getWall(tempshort).setX(dax);
+						Engine.getWall(tempshort).setY(day);
 					} else
 						break;
 

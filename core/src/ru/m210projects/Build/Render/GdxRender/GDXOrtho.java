@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager;
@@ -483,7 +484,7 @@ public class GDXOrtho extends OrphoRenderer {
 		if (col < 0)
 			return;
 
-		Wall wal = getWall()[w];
+		Wall wal = Engine.getWall(w);
 
 		int ox = cposx - mapSettings.getWallX(w);
 		int oy = cposy - mapSettings.getWallY(w);
@@ -509,16 +510,16 @@ public class GDXOrtho extends OrphoRenderer {
 					|| !Gameutils.isValidSector(i))
 				continue;
 
-			Sector sec = getSector()[i];
+			Sector sec = Engine.getSector(i);
 			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
 				continue;
 
 			int walnum = sec.getWallptr();
 			for (int j = 0; j < sec.getWallnum(); j++, walnum++) {
-				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(getWall()[walnum].getPoint2()))
+				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(Engine.getWall(walnum).getPoint2()))
 					continue;
 
-				Wall wal = getWall()[walnum];
+				Wall wal = Engine.getWall(walnum);
 				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
 					if (Gameutils.isValidSector(wal.getNextsector())) {
 						if (mapSettings.isWallVisible(walnum, i))
@@ -545,7 +546,7 @@ public class GDXOrtho extends OrphoRenderer {
 
 				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
-					Sprite spr = getSprite()[j];
+					Sprite spr = Engine.getSprite(j);
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
@@ -665,10 +666,10 @@ public class GDXOrtho extends OrphoRenderer {
 		// draw player
 		for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(getSprite()[spr].getSectnum()))
+			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum()))
 				continue;
 
-			Sprite pPlayer = getSprite()[spr];
+			Sprite pPlayer = Engine.getSprite(spr);
 			int ox = cposx - mapSettings.getSpriteX(spr);
 			int oy = cposy - mapSettings.getSpriteY(spr);
 
@@ -746,24 +747,24 @@ public class GDXOrtho extends OrphoRenderer {
 
 		int sortnum = 0;
 		for (int s = 0; s < numsectors; s++) {
-			Sector sec = getSector()[s];
+			Sector sec = Engine.getSector(s);
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				if ((showSprites & 1) != 0) {
 					// Collect floor sprites to draw
 					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
-						if ((getSprite()[i].getCstat() & 48) == 32) {
+						if ((Engine.getSprite(i).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								break;
 
-							if ((getSprite()[i].getCstat() & (64 + 8)) == (64 + 8)
+							if ((Engine.getSprite(i).getCstat() & (64 + 8)) == (64 + 8)
 									|| !mapSettings.isSpriteVisible(MapView.Polygons, i))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(getSprite()[i]);
+							tsprite[sortnum].set(Engine.getSprite(i));
 							tsprite[sortnum++].setOwner((short) i);
 						}
 					}
@@ -772,7 +773,7 @@ public class GDXOrtho extends OrphoRenderer {
 				if ((showSprites & 2) != 0) {
 					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
-						if ((getSprite()[i].getCstat() & 48) == 32)
+						if ((Engine.getSprite(i).getCstat() & 48) == 32)
 							continue;
 
 						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {
@@ -787,7 +788,7 @@ public class GDXOrtho extends OrphoRenderer {
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(getSprite()[i]);
+							tsprite[sortnum].set(Engine.getSprite(i));
 							tsprite[sortnum++].setOwner((short) i);
 						}
 					}
@@ -821,7 +822,7 @@ public class GDXOrtho extends OrphoRenderer {
 				if (flor != null) {
 					tmpMat.setToRotation(0, 0, 1, (512 - ang) * buildAngleToDegrees);
 					tmpMat.translate(-dax / parent.cam.xscale, -day / parent.cam.xscale,
-							-getSector()[s].getFloorz() / parent.cam.yscale);
+							-Engine.getSector(s).getFloorz() / parent.cam.yscale);
 					parent.drawSurf(flor, 0, tmpMat, null);
 				}
 			}
@@ -838,7 +839,7 @@ public class GDXOrtho extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1)
 				for (int i = 0; i < sortnum - gap; i++)
 					for (int j = i; j >= 0; j -= gap) {
-						if (getSprite()[tsprite[j].getOwner()].getZ() <= getSprite()[tsprite[j + gap].getOwner()].getZ())
+						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ())
 							break;
 
 						short tmp = tsprite[j].getOwner();
@@ -848,7 +849,7 @@ public class GDXOrtho extends OrphoRenderer {
 
 			for (int s = sortnum - 1; s >= 0; s--) {
 				int j = tsprite[s].getOwner();
-				Sprite spr = getSprite()[j];
+				Sprite spr = Engine.getSprite(j);
 				if ((spr.getCstat() & 32768) == 0) {
 					if (spr.getPicnum() >= MAXTILES)
 						spr.setPicnum(0);

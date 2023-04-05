@@ -383,8 +383,8 @@ public class SpriteRenderer {
 //		}
 //
 //		int vis = globalvisibility;
-//		if (sector[tspr.sectnum].visibility != 0)
-//			vis = mulscale(globalvisibility, (sector[tspr.sectnum].visibility + 16) & 0xFF, 4);
+//		if (getSector()[tspr.sectnum].visibility != 0)
+//			vis = mulscale(globalvisibility, (getSector()[tspr.sectnum].visibility + 16) & 0xFF, 4);
 //
 //		if (tex.getPixelFormat() == PixelFormat.Pal8)
 //			((IndexedShader) manager.getProgram()).setVisibility((int) (-vis / 64.0f));
@@ -583,8 +583,8 @@ public class SpriteRenderer {
 		}
 
 		int vis = globalvisibility;
-		if (getSector()[tspr.getSectnum()].getVisibility() != 0)
-			vis = mulscale(globalvisibility, (getSector()[tspr.getSectnum()].getVisibility() + 16) & 0xFF, 4);
+		if (getSector(tspr.getSectnum()).getVisibility() != 0)
+			vis = mulscale(globalvisibility, (getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
 
 		if (tex.getPixelFormat() == PixelFormat.Pal8)
 			((IndexedShader) manager.getProgram()).setVisibility((int) (-vis / 64.0f));

@@ -120,10 +120,10 @@ public abstract class SectorScanner {
 			if (!pFrustum.handled) {
 				pFrustum.handled = true;
 
-				int startwall = getSector()[sectnum].getWallptr();
-				int endwall = getSector()[sectnum].getWallnum() + startwall;
+				int startwall = Engine.getSector(sectnum).getWallptr();
+				int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 				for (int z = startwall; z < endwall; z++) {
-					Wall wal = getWall()[z];
+					Wall wal = Engine.getWall(z);
 					if (!pvs.checkWall(z))
 						continue;
 
@@ -131,12 +131,12 @@ public abstract class SectorScanner {
 					if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Max, sectnum, z))) {
 						gotwall[z >> 3] |= pow2char[z & 7];
 
-						if ((getSector()[sectnum].isParallaxFloor()
-								&& (nextsectnum == -1 || !getSector()[nextsectnum].isParallaxFloor()))
+						if ((Engine.getSector(sectnum).isParallaxFloor()
+								&& (nextsectnum == -1 || !Engine.getSector(nextsectnum).isParallaxFloor()))
 								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyLower, sectnum, z)))
 							wallflags[z] |= 8;
-						if ((getSector()[sectnum].isParallaxCeiling()
-								&& (nextsectnum == -1 || !getSector()[nextsectnum].isParallaxCeiling()))
+						if ((Engine.getSector(sectnum).isParallaxCeiling()
+								&& (nextsectnum == -1 || !Engine.getSector(nextsectnum).isParallaxCeiling()))
 								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyUpper, sectnum, z)))
 							wallflags[z] |= 16;
 
@@ -147,14 +147,14 @@ public abstract class SectorScanner {
 								short i = (short) gap;
 								while (gap > 1) {
 									gap >>= 1;
-									if (getSector()[i].getWallptr() < theline)
+									if (Engine.getSector(i).getWallptr() < theline)
 										i += gap;
 									else
 										i -= gap;
 								}
-								while (getSector()[i].getWallptr() > theline)
+								while (Engine.getSector(i).getWallptr() > theline)
 									i--;
-								while (getSector()[i].getWallptr() + getSector()[i].getWallnum() <= theline)
+								while (Engine.getSector(i).getWallptr() + Engine.getSector(i).getWallnum() <= theline)
 									i++;
 								nextsectnum = i;
 
@@ -171,8 +171,8 @@ public abstract class SectorScanner {
 								continue;
 
 							WallFrustum3d portal = null;
-							if ((((getSector()[sectnum].getCeilingstat() & getSector()[nextsectnum].getCeilingstat()) & 1) != 0)
-									|| (((getSector()[sectnum].getFloorstat() & getSector()[nextsectnum].getFloorstat()) & 1) != 0)) {
+							if ((((Engine.getSector(sectnum).getCeilingstat() & Engine.getSector(nextsectnum).getCeilingstat()) & 1) != 0)
+									|| (((Engine.getSector(sectnum).getFloorstat() & Engine.getSector(nextsectnum).getFloorstat()) & 1) != 0)) {
 								portal = pFrustum.clone(pFrustumPool);
 								portal.sectnum = nextsectnum;
 							} else {
@@ -187,7 +187,7 @@ public abstract class SectorScanner {
 									float posx = globalposx;
 									float posy = globalposy;
 
-									if ((getSector()[sectnum].isParallaxCeiling()) || (getSector()[sectnum].isParallaxFloor())
+									if ((Engine.getSector(sectnum).isParallaxCeiling()) || (Engine.getSector(sectnum).isParallaxFloor())
 											|| (projectionToWall(posx, posy, wal, projPoint)
 													&& Math.abs(posx - projPoint.x) + Math
 															.abs(posy - projPoint.y) <= cam.near * cam.xscale * 2)) {
@@ -249,12 +249,12 @@ public abstract class SectorScanner {
 			if (automapping == 1)
 				show2dsector[sectnum >> 3] |= pow2char[sectnum & 7];
 
-			boolean isParallaxCeiling = getSector()[sectnum].isParallaxCeiling();
-			boolean isParallaxFloor = getSector()[sectnum].isParallaxFloor();
-			int startwall = getSector()[sectnum].getWallptr();
-			int endwall = getSector()[sectnum].getWallnum() + startwall;
+			boolean isParallaxCeiling = Engine.getSector(sectnum).isParallaxCeiling();
+			boolean isParallaxFloor = Engine.getSector(sectnum).isParallaxFloor();
+			int startwall = Engine.getSector(sectnum).getWallptr();
+			int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				Wall wal = getWall()[z];
+				Wall wal = Engine.getWall(z);
 				int nextsectnum = wal.getNextsector();
 
 				if ((gotwall[z >> 3] & pow2char[z & 7]) == 0)
@@ -274,14 +274,14 @@ public abstract class SectorScanner {
 					wallflags[z] &= ~(8 | 16);
 
 					if (isParallaxCeiling) {
-						if (engine.getTile(getSector()[sectnum].getCeilingpicnum()).hasSize()) {
-							skyCeiling = getSector()[sectnum];
+						if (engine.getTile(Engine.getSector(sectnum).getCeilingpicnum()).hasSize()) {
+							skyCeiling = Engine.getSector(sectnum);
 						}
 					}
 
 					if (isParallaxFloor) {
-						if (engine.getTile(getSector()[sectnum].getFloorpicnum()).hasSize()) {
-							skyFloor = getSector()[sectnum];
+						if (engine.getTile(Engine.getSector(sectnum).getFloorpicnum()).hasSize()) {
+							skyFloor = Engine.getSector(sectnum);
 						}
 					}
 
@@ -311,20 +311,20 @@ public abstract class SectorScanner {
 	protected IntComparator wallcomp = new IntComparator() {
 		@Override
 		public int compare(int o1, int o2) {
-			if (!wallfront(getWall()[o1], getWall()[o2]))
+			if (!wallfront(Engine.getWall(o1), Engine.getWall(o2)))
 				return -1;
 			return 0;
 		}
 	};
 
 	protected boolean wallfront(Wall w1, Wall w2) {
-		Wall wp1 = getWall()[w1.getPoint2()];
+		Wall wp1 = Engine.getWall(w1.getPoint2());
 		float x11 = w1.getX();
 		float y11 = w1.getY();
 		float x21 = wp1.getX();
 		float y21 = wp1.getY();
 
-		Wall wp2 = getWall()[w2.getPoint2()];
+		Wall wp2 = Engine.getWall(w2.getPoint2());
 		float x12 = w2.getX();
 		float y12 = w2.getY();
 		float x22 = wp2.getX();
@@ -382,13 +382,13 @@ public abstract class SectorScanner {
 	}
 
 	private boolean checkWallRange(int sectnum, int z) {
-		return z >= getSector()[sectnum].getWallptr() && z < (getSector()[sectnum].getWallptr() + getSector()[sectnum].getWallnum());
+		return z >= Engine.getSector(sectnum).getWallptr() && z < (Engine.getSector(sectnum).getWallptr() + Engine.getSector(sectnum).getWallnum());
 	}
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
 		for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
 			int z = node.getIndex();
-			Sprite spr = getSprite()[z];
+			Sprite spr = Engine.getSprite(z);
 
 			if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 					&& (spritesortcnt < MAXSPRITESONSCREEN)) {
@@ -445,15 +445,15 @@ public abstract class SectorScanner {
 		Plane: for (int i = near == null ? 0 : -1; i < frustum.planes.length; i++) {
 			Plane plane = (i == -1) ? near : frustum.planes[i];
 
-			int startwall = getSector()[sectnum].getWallptr();
-			int endwall = getSector()[sectnum].getWallnum() + startwall;
+			int startwall = Engine.getSector(sectnum).getWallptr();
+			int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 			for (int z = startwall; z < endwall; z++) {
-				Wall wal = getWall()[z];
+				Wall wal = Engine.getWall(z);
 				int wz = isFloor ? engine.getflorzofslope((short) sectnum, wal.getX(), wal.getY())
 						: engine.getceilzofslope((short) sectnum, wal.getX(), wal.getY());
 
-				if ((isFloor && !getSector()[sectnum].isFloorSlope() && globalposz > wz)
-						|| (!isFloor && !getSector()[sectnum].isCeilingSlope() && globalposz < wz))
+				if ((isFloor && !Engine.getSector(sectnum).isFloorSlope() && globalposz > wz)
+						|| (!isFloor && !Engine.getSector(sectnum).isCeilingSlope() && globalposz < wz))
 					continue;
 
 				if (plane.testPoint(wal.getX(), wal.getY(), wz) != PlaneSide.Back)
@@ -478,7 +478,7 @@ public abstract class SectorScanner {
 	}
 
 	public boolean projectionToWall(float posx, float posy, Wall w, Vector2 n) {
-		Wall p2 = getWall()[w.getPoint2()];
+		Wall p2 = Engine.getWall(w.getPoint2());
 		int dx = p2.getX() - w.getX();
 		int dy = p2.getY() - w.getY();
 

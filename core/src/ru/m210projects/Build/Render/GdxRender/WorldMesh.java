@@ -1,13 +1,5 @@
 package ru.m210projects.Build.Render.GdxRender;
 
-import static ru.m210projects.Build.Engine.CEIL;
-import static ru.m210projects.Build.Engine.FLOOR;
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.wall;
-
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
@@ -27,6 +19,8 @@ import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Timer;
 import ru.m210projects.Build.Types.Wall;
+
+import static ru.m210projects.Build.Engine.*;
 
 public class WorldMesh {
 
@@ -86,7 +80,7 @@ public class WorldMesh {
 		quad = addQuad(vertices);
 
 		for (short s = 0; s < numsectors; s++) {
-			Sector sec = sector[s];
+			Sector sec = Engine.getSector(s);
 			if (sec.getFloorz() == sec.getCeilingz())
 				continue;
 
@@ -132,9 +126,9 @@ public class WorldMesh {
 
 	public ArrayList<Vertex> getPoints(Heinum heinum, int sectnum, int z) {
 		int fz1, fz2, cz1, cz2;
-		Sector sec = sector[sectnum];
-		Wall wal = wall[z];
-		Wall wal2 = wall[wal.getPoint2()];
+		Sector sec = Engine.getSector(sectnum);
+		Wall wal = Engine.getWall(z);
+		Wall wal2 = Engine.getWall(wal.getPoint2());
 		int nextsector = wal.getNextsector();
 
 		switch (heinum) {
@@ -285,15 +279,15 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxFloor(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = wall[wallnum];
-		final Sector sec = sector[sectnum];
+		final Wall wal = Engine.getWall(wallnum);
+		final Sector sec = Engine.getSector(sectnum);
 
 		boolean isParallaxFloor = sec.isParallaxFloor();
 		if (!isParallaxFloor)
 			return setNull(lower_skies, wallnum);
 
 		int nextsector = wal.getNextsector();
-		boolean isParallaxNext = nextsector != -1 && (sector[nextsector].isParallaxFloor());
+		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxFloor());
 
 		GLSurface surf = null;
 		if (isParallaxFloor && (nextsector == -1 || !isParallaxNext)) {
@@ -318,15 +312,15 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxCeiling(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = wall[wallnum];
-		final Sector sec = sector[sectnum];
+		final Wall wal = Engine.getWall(wallnum);
+		final Sector sec = Engine.getSector(sectnum);
 
 		boolean isParallaxCeiling = sec.isParallaxCeiling();
 		if (!isParallaxCeiling)
 			return setNull(upper_skies, wallnum);
 
 		int nextsector = wal.getNextsector();
-		boolean isParallaxNext = nextsector != -1 && (sector[nextsector].isParallaxCeiling());
+		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxCeiling());
 
 		GLSurface surf = null;
 		if (isParallaxCeiling && (nextsector == -1 || !isParallaxNext)) {
@@ -353,7 +347,7 @@ public class WorldMesh {
 
 	private GLSurface addMiddle(FloatArray vertices, int sectnum, int wallnum) {
 		GLSurface surf = null;
-		final int nextsector = wall[wallnum].getNextsector();
+		final int nextsector = Engine.getWall(wallnum).getNextsector();
 		if (nextsector != -1)
 			return setNull(walls, wallnum);
 
@@ -378,8 +372,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addUpper(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = wall[wallnum].getNextsector();
-		if (nextsector == -1 || (sector[nextsector].isParallaxCeiling() && sector[sectnum].isParallaxCeiling()))
+		final int nextsector = Engine.getWall(wallnum).getNextsector();
+		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxCeiling() && Engine.getSector(sectnum).isParallaxCeiling()))
 			return setNull(upper_walls, wallnum);
 
 		SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Upper), wallnum, vertices);
@@ -403,8 +397,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addLower(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = wall[wallnum].getNextsector();
-		if (nextsector == -1 || (sector[nextsector].isParallaxFloor() && sector[sectnum].isParallaxFloor()))
+		final int nextsector = Engine.getWall(wallnum).getNextsector();
+		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxFloor() && Engine.getSector(sectnum).isParallaxFloor()))
 			return setNull(lower_walls, wallnum);
 
 		SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Lower), wallnum, vertices);
@@ -428,7 +422,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addMaskedWall(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = wall[wallnum];
+		final Wall wal = Engine.getWall(wallnum);
 		GLSurface surf = null;
 
 		if ((wal.isMasked() || wal.isOneWay()) && wal.getNextsector() != -1) {
@@ -453,7 +447,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addFloor(FloatArray vertices, int sectnum) {
-		if (sector[sectnum].isParallaxFloor())
+		if (Engine.getSector(sectnum).isParallaxFloor())
 			return setNull(floors, sectnum);
 
 		SurfaceInfo info = tess.getSurface(Type.Floor, sectnum, vertices);
@@ -486,7 +480,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addCeiling(FloatArray vertices, int sectnum) {
-		if (sector[sectnum].isParallaxCeiling())
+		if (Engine.getSector(sectnum).isParallaxCeiling())
 			return setNull(ceilings, sectnum);
 
 		SurfaceInfo info = tess.getSurface(Type.Ceiling, sectnum, vertices);
@@ -639,12 +633,12 @@ public class WorldMesh {
 	private int getCeilingHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final Sector sec = sector[sectnum];
+		final Sector sec = Engine.getSector(sectnum);
 
 		final int startwall = sec.getWallptr();
 		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			Wall wal = wall[z];
+			Wall wal = Engine.getWall(z);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
@@ -662,12 +656,12 @@ public class WorldMesh {
 	private int getFloorHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final Sector sec = sector[sectnum];
+		final Sector sec = Engine.getSector(sectnum);
 
 		final int startwall = sec.getWallptr();
 		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			Wall wal = wall[z];
+			Wall wal = Engine.getWall(z);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
@@ -683,16 +677,16 @@ public class WorldMesh {
 	}
 
 	private int getWallHash(int sectnum, int z) {
-		final Sector sec = sector[sectnum];
-		final Wall wal = wall[z];
+		final Sector sec = Engine.getSector(sectnum);
+		final Wall wal = Engine.getWall(z);
 
 		int hash = 1;
 		final int prime = 31;
 
 		hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 		hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
-		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.getPoint2()].getX());
-		hash = prime * hash + NumberUtils.floatToIntBits(wall[wal.getPoint2()].getY());
+		hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(wal.getPoint2()).getX());
+		hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(wal.getPoint2()).getY());
 		hash = prime * hash + wal.getCstat();
 		hash = prime * hash + wal.getXpanning();
 		hash = prime * hash + wal.getYpanning();
@@ -702,7 +696,7 @@ public class WorldMesh {
 		hash = prime * hash + wal.getOverpicnum(); // middle texture
 
 		if (wal.isSwapped() && wal.getNextwall() != -1) {
-			final Wall swal = wall[wal.getNextwall()];
+			final Wall swal = Engine.getWall(wal.getNextwall());
 			hash = prime * hash + swal.getCstat();
 			hash = prime * hash + swal.getXpanning();
 			hash = prime * hash + swal.getYpanning();
@@ -712,8 +706,8 @@ public class WorldMesh {
 		}
 
 		if (((sec.getCeilingstat() | sec.getFloorstat()) & 2) != 0) {
-			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.getWallptr()].getX());
-			hash = prime * hash + NumberUtils.floatToIntBits(wall[sec.getWallptr()].getY());
+			hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(sec.getWallptr()).getX());
+			hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(sec.getWallptr()).getY());
 		}
 
 		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorz());
@@ -727,7 +721,7 @@ public class WorldMesh {
 		hash = prime * hash + (sec.isParallaxCeiling() ? 1 : 0);
 
 		if (wal.getNextsector() != -1) {
-			final Sector nsec = sector[wal.getNextsector()];
+			final Sector nsec = getSector(wal.getNextsector());
 
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorz());
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorheinum());
@@ -740,8 +734,8 @@ public class WorldMesh {
 			hash = prime * hash + (nsec.isParallaxCeiling() ? 1 : 0);
 
 			if (((nsec.getCeilingstat() | nsec.getFloorstat()) & 2) != 0) {
-				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.getWallptr()].getX());
-				hash = prime * hash + NumberUtils.floatToIntBits(wall[nsec.getWallptr()].getY());
+				hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(nsec.getWallptr()).getX());
+				hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(nsec.getWallptr()).getY());
 			}
 		}
 
@@ -848,7 +842,7 @@ public class WorldMesh {
 		}
 
 		public int getVisibility() {
-			return sector[vis_ptr].getVisibility();
+			return Engine.getSector(vis_ptr).getVisibility();
 		}
 
 		public void render(ShaderProgram shader) {

@@ -496,7 +496,7 @@ public class Software implements Renderer {
 			mirrorsx1 = xdimen - 1;
 			mirrorsx2 = 0;
 			for (i = numscans - 1; i >= 0; i--) {
-				if (getWall()[thewall[i]].getNextsector() < 0)
+				if (Engine.getWall(thewall[i]).getNextsector() < 0)
 					continue;
 				if (xb1[i] < mirrorsx1)
 					mirrorsx1 = xb1[i];
@@ -609,7 +609,7 @@ public class Software implements Renderer {
 	private void drawalls(int bunch) {
 		int z = bunchfirst[bunch];
 		short sectnum = thesector[z];
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 
 		int andwstat1 = 0xff;
 		int andwstat2 = 0xff;
@@ -655,7 +655,7 @@ public class Software implements Renderer {
 			}
 
 			int wallnum = thewall[z];
-			Wall wal = getWall()[wallnum];
+			Wall wal = Engine.getWall(wallnum);
 			short nextsectnum = wal.getNextsector();
 			Sector nextsec = null;
 
@@ -665,17 +665,17 @@ public class Software implements Renderer {
 			int startsmostcnt = smostcnt;
 
 			if (nextsectnum >= 0) {
-				nextsec = getSector()[nextsectnum];
+				nextsec = Engine.getSector(nextsectnum);
 				engine.getzsofslope(sectnum, wal.getX(), wal.getY(), zofslope);
 				cz[0] = zofslope[CEIL];
 				fz[0] = zofslope[FLOOR];
-				engine.getzsofslope(sectnum, getWall()[wal.getPoint2()].getX(), getWall()[wal.getPoint2()].getY(), zofslope);
+				engine.getzsofslope(sectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), zofslope);
 				cz[1] = zofslope[CEIL];
 				fz[1] = zofslope[FLOOR];
 				engine.getzsofslope(nextsectnum, wal.getX(), wal.getY(), zofslope);
 				cz[2] = zofslope[CEIL];
 				fz[2] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, getWall()[wal.getPoint2()].getX(), getWall()[wal.getPoint2()].getY(), zofslope);
+				engine.getzsofslope(nextsectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), zofslope);
 				cz[3] = zofslope[CEIL];
 				fz[3] = zofslope[FLOOR];
 				engine.getzsofslope(nextsectnum, globalposx, globalposy, zofslope);
@@ -791,7 +791,7 @@ public class Software implements Renderer {
 
 						if ((wal.getCstat() & 2) > 0) {
 							wallnum = wal.getNextwall();
-							wal = getWall()[wallnum];
+							wal = Engine.getWall(wallnum);
 							globalorientation = wal.getCstat();
 							globalpicnum = wal.getPicnum();
 							if (globalpicnum >= MAXTILES)
@@ -803,7 +803,7 @@ public class Software implements Renderer {
 							globalshade = wal.getShade();
 							globalpal = wal.getPal();
 							wallnum = thewall[z];
-							wal = getWall()[wallnum];
+							wal = Engine.getWall(wallnum);
 						} else {
 							globalorientation = wal.getCstat();
 							globalpicnum = wal.getPicnum();
@@ -993,7 +993,7 @@ public class Software implements Renderer {
 		if (BuildSettings.useVoxels.get()) {
 			Tile2model entry = defs != null ? defs.mdInfo.getParams(tilenum) : null;
 			if (entry != null && entry.voxel != null) {
-				if ((getSprite()[tspr.getOwner()].getCstat() & 48) != 32) {
+				if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) != 32) {
 					vtilenum = entry.voxel;
 					cstat |= 48;
 				}
@@ -1001,7 +1001,7 @@ public class Software implements Renderer {
 		}
 
 		short sectnum = tspr.getSectnum();
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 		globalpal = tspr.getPal();
 		if (palookup[globalpal] == null)
 			globalpal = 0; // JBF: fixes null-pointer crash
@@ -1390,11 +1390,11 @@ public class Software implements Renderer {
 						x = 0x80000000;
 					} else {
 						x = thewall[j];
-						xp1 = getWall()[x].getX();
-						yp1 = getWall()[x].getY();
-						x = getWall()[x].getPoint2();
-						xp2 = getWall()[x].getX();
-						yp2 = getWall()[x].getY();
+						xp1 = Engine.getWall(x).getX();
+						yp1 = Engine.getWall(x).getY();
+						x = Engine.getWall(x).getPoint2();
+						xp2 = Engine.getWall(x).getX();
+						yp2 = Engine.getWall(x).getY();
 
 						z1 = (xp2 - xp1) * (y1 - yp1) - (yp2 - yp1) * (x1 - xp1);
 						z2 = (xp2 - xp1) * (y2 - yp1) - (yp2 - yp1) * (x2 - xp1);
@@ -1408,7 +1408,7 @@ public class Software implements Renderer {
 								x = -(z1 + z2);
 							else {
 								if ((xp2 - xp1) * (tspr.getY() - yp1) == (tspr.getX() - xp1) * (yp2 - yp1)) {
-									if (getWall()[thewall[j]].getNextsector() == tspr.getSectnum())
+									if (Engine.getWall(thewall[j]).getNextsector() == tspr.getSectnum())
 										x = 0x80000000;
 									else
 										x = 0x7fffffff;
@@ -1748,15 +1748,15 @@ public class Software implements Renderer {
 
 				// if (spritewallfront(tspr,thewall[j]) == 0)
 				x = thewall[j];
-				xp1 = getWall()[x].getX();
-				yp1 = getWall()[x].getY();
-				x = getWall()[x].getPoint2();
-				xp2 = getWall()[x].getX();
-				yp2 = getWall()[x].getY();
+				xp1 = Engine.getWall(x).getX();
+				yp1 = Engine.getWall(x).getY();
+				x = Engine.getWall(x).getPoint2();
+				xp2 = Engine.getWall(x).getX();
+				yp2 = Engine.getWall(x).getY();
 				x = (xp2 - xp1) * (tspr.getY() - yp1) - (tspr.getX() - xp1) * (yp2 - yp1);
 				if ((yp > yb1[j]) && (yp > yb2[j]))
 					x = -1;
-				if ((x >= 0) && ((x != 0) || (getWall()[thewall[j]].getNextsector() != tspr.getSectnum())))
+				if ((x >= 0) && ((x != 0) || (Engine.getWall(thewall[j]).getNextsector() != tspr.getSectnum())))
 					continue;
 
 				dalx2 = Math.max(xb1[j], lx);
@@ -1924,7 +1924,7 @@ public class Software implements Renderer {
 				i += sprext.angoff;
 
 			float f = 1.0f;
-			if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 16 || (getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
+			if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16 || (Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
 				f *= 1.25f;
 
 			voxdraw(tspr, i, (int) (tspr.getXrepeat() * f), tspr.getYrepeat(), vtilenum, lwall, swall);
@@ -1954,7 +1954,7 @@ public class Software implements Renderer {
 		int dasprz = daspr.getZ();
 		int dashade = daspr.getShade();
 		int dapal = daspr.getPal();
-		Sector sec = getSector()[daspr.getSectnum()];
+		Sector sec = getSector(daspr.getSectnum());
 
 		cosang = EngineUtils.cos((int) (globalang + 512));
 		sinang = EngineUtils.sin((int) globalang);
@@ -2327,10 +2327,10 @@ public class Software implements Renderer {
 		Wall wal;
 
 		z = maskwall[damaskwallcnt];
-		wal = getWall()[thewall[z]];
+		wal = Engine.getWall(thewall[z]);
 		sectnum = thesector[z];
-		sec = getSector()[sectnum];
-		nsec = getSector()[wal.getNextsector()];
+		sec = Engine.getSector(sectnum);
+		nsec = getSector(wal.getNextsector());
 		z1 = Math.max(nsec.getCeilingz(), sec.getCeilingz());
 		z2 = Math.min(nsec.getFloorz(), sec.getFloorz());
 
@@ -2681,7 +2681,7 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = getSector()[sectnum];
+		sec = Engine.getSector(sectnum);
 		if (sec.getFloorpal() != globalpalwritten) {
 			globalpalwritten = sec.getFloorpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
@@ -2722,8 +2722,8 @@ public class Software implements Renderer {
 			globalypanning = -(globalposy << 20);
 		} else {
 			j = sec.getWallptr();
-			ox = getWall()[getWall()[j].getPoint2()].getX() - getWall()[j].getX();
-			oy = getWall()[getWall()[j].getPoint2()].getY() - getWall()[j].getY();
+			ox = Engine.getWall(Engine.getWall(j).getPoint2()).getX() - Engine.getWall(j).getX();
+			oy = Engine.getWall(Engine.getWall(j).getPoint2()).getY() - Engine.getWall(j).getY();
 			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0)
 				i = 1024;
@@ -2734,8 +2734,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((getWall()[j].getX() - globalposx) << 6);
-			oy = ((getWall()[j].getY() - globalposy) << 6);
+			ox = ((Engine.getWall(j).getX() - globalposx) << 6);
+			oy = ((Engine.getWall(j).getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -2894,7 +2894,7 @@ public class Software implements Renderer {
 		short[] topptr, botptr;
 
 		short sectnum = thesector[bunchfirst[bunch]];
-		sec = getSector()[sectnum];
+		sec = Engine.getSector(sectnum);
 		globalhorizbak = (int) globalhoriz;
 		if (parallaxyscale != 65536)
 			globalhoriz = mulscale((int) globalhoriz - (ydimen >> 1), parallaxyscale, 16) + (ydimen >> 1);
@@ -2942,17 +2942,17 @@ public class Software implements Renderer {
 
 		for (z = bunchfirst[bunch]; z >= 0; z = p2[z]) {
 			wallnum = thewall[z];
-			nextsectnum = getWall()[wallnum].getNextsector();
+			nextsectnum = Engine.getWall(wallnum).getNextsector();
 
 			j = 0;
 			if (nextsectnum != -1) {
 				if (dastat == 0)
-					j = getSector()[nextsectnum].getCeilingstat();
+					j = Engine.getSector(nextsectnum).getCeilingstat();
 				else
-					j = getSector()[nextsectnum].getFloorstat();
+					j = Engine.getSector(nextsectnum).getFloorstat();
 			}
 
-			if ((nextsectnum < 0) || ((getWall()[wallnum].getCstat() & 32) != 0) || ((j & 1) == 0)) {
+			if ((nextsectnum < 0) || ((Engine.getWall(wallnum).getCstat() & 32) != 0) || ((j & 1) == 0)) {
 				if (x == -1)
 					x = xb1[z];
 				if (parallaxtype == 0) {
@@ -3100,7 +3100,7 @@ public class Software implements Renderer {
 		int shoffs, shinc, m1, m2;
 		int mptr1, mptr2, nptr1, nptr2;
 		Wall wal;
-		Sector sec = getSector()[sectnum];
+		Sector sec = Engine.getSector(sectnum);
 
 		if (dastat == 0) {
 			if (globalposz <= engine.getceilzofslope(sectnum, globalposx, globalposy))
@@ -3134,9 +3134,9 @@ public class Software implements Renderer {
 		if (pic.data == null)
 			engine.loadtile(globalpicnum);
 
-		wal = getWall()[sec.getWallptr()];
-		wx = getWall()[wal.getPoint2()].getX() - wal.getX();
-		wy = getWall()[wal.getPoint2()].getY() - wal.getY();
+		wal = Engine.getWall(sec.getWallptr());
+		wx = Engine.getWall(wal.getPoint2()).getX() - wal.getX();
+		wy = Engine.getWall(wal.getPoint2()).getY() - wal.getY();
 		dasqr = krecipasm(EngineUtils.sqrt(wx * wx + wy * wy));
 		i = mulscale(daslope, dasqr, 21);
 		wx *= i;
@@ -3156,8 +3156,8 @@ public class Software implements Renderer {
 
 		if ((globalorientation & 64) != 0) // Relative alignment
 		{
-			dx = mulscale(getWall()[wal.getPoint2()].getX() - wal.getX(), dasqr, 14);
-			dy = mulscale(getWall()[wal.getPoint2()].getY() - wal.getY(), dasqr, 14);
+			dx = mulscale(Engine.getWall(wal.getPoint2()).getX() - wal.getX(), dasqr, 14);
+			dy = mulscale(Engine.getWall(wal.getPoint2()).getY() - wal.getY(), dasqr, 14);
 
 			i = EngineUtils.sqrt(daslope * daslope + 16777216);
 
@@ -3294,7 +3294,7 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = getSector()[sectnum];
+		sec = Engine.getSector(sectnum);
 		if (sec.getCeilingpal() != globalpalwritten) {
 			globalpalwritten = sec.getCeilingpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
@@ -3335,8 +3335,8 @@ public class Software implements Renderer {
 			globalypanning = -(globalposy << 20);
 		} else {
 			j = sec.getWallptr();
-			ox = getWall()[getWall()[j].getPoint2()].getX() - getWall()[j].getX();
-			oy = getWall()[getWall()[j].getPoint2()].getY() - getWall()[j].getY();
+			ox = Engine.getWall(Engine.getWall(j).getPoint2()).getX() - Engine.getWall(j).getX();
+			oy = Engine.getWall(Engine.getWall(j).getPoint2()).getY() - Engine.getWall(j).getY();
 			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0)
 				i = 1024;
@@ -3347,8 +3347,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((getWall()[j].getX() - globalposx) << 6);
-			oy = ((getWall()[j].getY() - globalposy) << 6);
+			ox = ((Engine.getWall(j).getX() - globalposx) << 6);
+			oy = ((Engine.getWall(j).getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -3701,7 +3701,7 @@ public class Software implements Renderer {
 
 			for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
 				int z1 = node.getIndex();
-				spr = getSprite()[z1];
+				spr = Engine.getSprite(z1);
 				if ((((spr.getCstat() & 0x8000) == 0) || (showinvisibility)) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
 					xs = spr.getX() - globalposx;
@@ -3709,7 +3709,7 @@ public class Software implements Renderer {
 					if (((spr.getCstat() & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
 						if (tsprite[spritesortcnt] == null)
 							tsprite[spritesortcnt] = new TSprite();
-						tsprite[spritesortcnt].set(getSprite()[z1]);
+						tsprite[spritesortcnt].set(Engine.getSprite(z1));
 
 						tsprite[spritesortcnt++].setOwner((short) z1);
 					}
@@ -3721,22 +3721,22 @@ public class Software implements Renderer {
 			bunchfrst = numbunches;
 			numscansbefore = numscans;
 
-			if (getSector()[sectnum] == null)
+			if (Engine.getSector(sectnum) == null)
 				continue;
 
-			startwall = getSector()[sectnum].getWallptr();
-			endwall = startwall + getSector()[sectnum].getWallnum();
+			startwall = Engine.getSector(sectnum).getWallptr();
+			endwall = startwall + Engine.getSector(sectnum).getWallnum();
 			scanfirst = numscans;
 
 			if (startwall < 0 || endwall < 0)
 				continue;
 			for (z = startwall; z < endwall; z++) {
-				wal = getWall()[z];
+				wal = Engine.getWall(z);
 				if (wal == null || wal.getPoint2() < 0 || wal.getPoint2() >= MAXWALLS)
 					continue;
 				nextsectnum = wal.getNextsector();
 
-				wal2 = getWall()[wal.getPoint2()];
+				wal2 = Engine.getWall(wal.getPoint2());
 				if (wal2 == null)
 					continue;
 				x1 = wal.getX() - globalposx;
@@ -3753,7 +3753,7 @@ public class Software implements Renderer {
 							sectorborder[sectorbordercnt++] = nextsectnum;
 				}
 
-				if ((z == startwall) || (getWall()[z - 1].getPoint2() != z)) {
+				if ((z == startwall) || (Engine.getWall(z - 1).getPoint2() != z)) {
 					xp1 = dmulscale(y1, cosglobalang, -x1, singlobalang, 6);
 					yp1 = dmulscale(x1, cosviewingrangeglobalang, y1, sinviewingrangeglobalang, 6);
 				} else {
@@ -3829,7 +3829,7 @@ public class Software implements Renderer {
 						}
 				} while (false);
 
-				if ((getWall()[z].getPoint2() < z) && (scanfirst < numscans)) {
+				if ((Engine.getWall(z).getPoint2() < z) && (scanfirst < numscans)) {
 					p2[numscans - 1] = (short) scanfirst;
 					scanfirst = numscans;
 				}
@@ -3838,7 +3838,7 @@ public class Software implements Renderer {
 			for (z = numscansbefore; z < numscans; z++) {
 				if (z >= MAXWALLSB || p2[z] >= MAXWALLSB)
 					continue;
-				if ((getWall()[thewall[z]].getPoint2() != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
+				if ((getWall(thewall[z]).getPoint2() != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
 					bunchfirst[numbunches++] = p2[z];
 					p2[z] = -1;
 				}
@@ -3862,10 +3862,10 @@ public class Software implements Renderer {
 		if (s == null)
 			return false;
 
-		Wall wal = getWall()[w];
+		Wall wal = Engine.getWall(w);
 		int x1 = wal.getX();
 		int y1 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
@@ -3898,16 +3898,16 @@ public class Software implements Renderer {
 		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
-		wal = getWall()[thewall[l1]];
+		wal = Engine.getWall(thewall[l1]);
 		x11 = wal.getX();
 		y11 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		x21 = wal.getX();
 		y21 = wal.getY();
-		wal = getWall()[thewall[l2]];
+		wal = Engine.getWall(thewall[l2]);
 		x12 = wal.getX();
 		y12 = wal.getY();
-		wal = getWall()[wal.getPoint2()];
+		wal = Engine.getWall(wal.getPoint2());
 		x22 = wal.getX();
 		y22 = wal.getY();
 
@@ -4070,28 +4070,28 @@ public class Software implements Renderer {
 		int t;
 
 		if (dastat == 0) {
-			z = (getSector()[sectnum].getCeilingz() - globalposz);
-			if ((getSector()[sectnum].getCeilingstat() & 2) == 0)
+			z = (Engine.getSector(sectnum).getCeilingz() - globalposz);
+			if ((Engine.getSector(sectnum).getCeilingstat() & 2) == 0)
 				return (owallmost(mostbuf, w, z));
 		} else {
-			z = (getSector()[sectnum].getFloorz() - globalposz);
-			if ((getSector()[sectnum].getFloorstat() & 2) == 0)
+			z = (Engine.getSector(sectnum).getFloorz() - globalposz);
+			if ((Engine.getSector(sectnum).getFloorstat() & 2) == 0)
 				return (owallmost(mostbuf, w, z));
 		}
 
 		i = thewall[w];
-		if (i == getSector()[sectnum].getWallptr())
+		if (i == Engine.getSector(sectnum).getWallptr())
 			return (owallmost(mostbuf, w, z));
 
-		x1 = getWall()[i].getX();
-		x2 = getWall()[getWall()[i].getPoint2()].getX() - x1;
-		y1 = getWall()[i].getY();
-		y2 = getWall()[getWall()[i].getPoint2()].getY() - y1;
+		x1 = Engine.getWall(i).getX();
+		x2 = Engine.getWall(Engine.getWall(i).getPoint2()).getX() - x1;
+		y1 = Engine.getWall(i).getY();
+		y2 = Engine.getWall(Engine.getWall(i).getPoint2()).getY() - y1;
 
-		fw = getSector()[sectnum].getWallptr();
-		i = getWall()[fw].getPoint2();
-		dx = getWall()[i].getX() - getWall()[fw].getX();
-		dy = getWall()[i].getY() - getWall()[fw].getY();
+		fw = Engine.getSector(sectnum).getWallptr();
+		i = Engine.getWall(fw).getPoint2();
+		dx = Engine.getWall(i).getX() - Engine.getWall(fw).getX();
+		dy = Engine.getWall(i).getY() - Engine.getWall(fw).getY();
 		dasqr = krecipasm(EngineUtils.sqrt(dx * dx + dy * dy));
 
 		if (xb1[w] == 0) {
@@ -4106,14 +4106,14 @@ public class Software implements Renderer {
 		if (klabs(j) > klabs(i >> 3))
 			i = divscale(i, j, 28);
 		if (dastat == 0) {
-			t = mulscale(getSector()[sectnum].getCeilingheinum(), dasqr, 15);
-			z1 = getSector()[sectnum].getCeilingz();
+			t = mulscale(Engine.getSector(sectnum).getCeilingheinum(), dasqr, 15);
+			z1 = Engine.getSector(sectnum).getCeilingz();
 		} else {
-			t = mulscale(getSector()[sectnum].getFloorheinum(), dasqr, 15);
-			z1 = getSector()[sectnum].getFloorz();
+			t = mulscale(Engine.getSector(sectnum).getFloorheinum(), dasqr, 15);
+			z1 = Engine.getSector(sectnum).getFloorz();
 		}
-		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - getWall()[fw].getY()) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - getWall()[fw].getX()) << 8), 24) + ((z1 - globalposz) << 7);
+		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - Engine.getWall(fw).getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - Engine.getWall(fw).getX()) << 8), 24) + ((z1 - globalposz) << 7);
 
 		if (xb2[w] == xdimen - 1) {
 			xv = cosglobalang - sinviewingrangeglobalang;
@@ -4127,14 +4127,14 @@ public class Software implements Renderer {
 		if (klabs(j) > klabs(i >> 3))
 			i = divscale(i, j, 28);
 		if (dastat == 0) {
-			t = mulscale(getSector()[sectnum].getCeilingheinum(), dasqr, 15);
-			z2 = getSector()[sectnum].getCeilingz();
+			t = mulscale(Engine.getSector(sectnum).getCeilingheinum(), dasqr, 15);
+			z2 = Engine.getSector(sectnum).getCeilingz();
 		} else {
-			t = mulscale(getSector()[sectnum].getFloorheinum(), dasqr, 15);
-			z2 = getSector()[sectnum].getFloorz();
+			t = mulscale(Engine.getSector(sectnum).getFloorheinum(), dasqr, 15);
+			z2 = Engine.getSector(sectnum).getFloorz();
 		}
-		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - getWall()[fw].getY()) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - getWall()[fw].getX()) << 8), 24) + ((z2 - globalposz) << 7);
+		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - Engine.getWall(fw).getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - Engine.getWall(fw).getX()) << 8), 24) + ((z2 - globalposz) << 7);
 
 		s1 = mulscale(globaluclip, yb1[w], 20);
 		s2 = mulscale(globaluclip, yb2[w], 20);

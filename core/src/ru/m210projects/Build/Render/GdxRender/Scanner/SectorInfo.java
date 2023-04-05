@@ -1,16 +1,12 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.numsectors;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.wall;
-
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Engine.Clockdir;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sector.SectorIterator;
 import ru.m210projects.Build.Types.Wall;
+
+import static ru.m210projects.Build.Engine.*;
 
 public class SectorInfo {
 
@@ -23,7 +19,7 @@ public class SectorInfo {
 
 	public void init(Engine engine) {
 		for (int i = 0; i < numsectors; i++) {
-			Sector sec = sector[i];
+			Sector sec = Engine.getSector(i);
 			SectorIterator it = sec.iterator();
 
 			hasOccluders[i] = false;
@@ -33,7 +29,7 @@ public class SectorInfo {
 			while (it.hasNext()) {
 				short z = it.nexti();
 				loopinfo[z] = dir == null ? (dir = engine.clockdir(z)) : dir;
-				Wall wal = wall[z];
+				Wall wal = Engine.getWall(z);
 				int nextsector = wal.getNextsector();
 				if (dir == Clockdir.CCW && nextsector == -1) {
 					isOccluder[z] = true;

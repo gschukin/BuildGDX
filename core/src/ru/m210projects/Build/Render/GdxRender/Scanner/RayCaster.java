@@ -10,6 +10,7 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Plane;
 
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
@@ -59,7 +60,7 @@ public class RayCaster {
 		}
 
 		public boolean isPortal() {
-			return getWall()[wallid].getNextsector() != -1;
+			return Engine.getWall(wallid).getNextsector() != -1;
 		}
 
 		@Override
@@ -228,8 +229,8 @@ public class RayCaster {
 	}
 
 	public void add(int z, WallFrustum2d frust) {
-		Wall wal = getWall()[z];
-		Wall wal2 = getWall()[wal.getPoint2()];
+		Wall wal = Engine.getWall(z);
+		Wall wal2 = Engine.getWall(wal.getPoint2());
 
 		if (frust == null || frust.sectnum == globalcursectnum) {
 			addSegment(z, wal.getX(), wal.getY(), wal2.getX(), wal2.getY());
@@ -249,8 +250,8 @@ public class RayCaster {
 
 	public void addClippedSegment(WallFrustum2d frustum, int z) {
 		Plane[] planes = frustum.planes;
-		Wall p1 = getWall()[z];
-		Wall p2 = getWall()[p1.getPoint2()];
+		Wall p1 = Engine.getWall(z);
+		Wall p2 = Engine.getWall(p1.getPoint2());
 
 		float p1x = p1.getX();
 		float p1y = p1.getY();

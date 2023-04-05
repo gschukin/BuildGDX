@@ -23,6 +23,7 @@ import static ru.m210projects.Build.RenderService.MAXYDIM;
 
 import java.util.Arrays;
 
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
@@ -284,7 +285,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		int sortnum = 0;
 
 		for (s = 0; s < numsectors; s++) {
-			sec = getSector()[s];
+			sec = Engine.getSector(s);
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				npoints = 0;
@@ -295,7 +296,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 				if (startwall < 0)
 					continue;
 				for (w = sec.getWallnum(); w > 0; w--, j++) {
-					wal = getWall()[j];
+					wal = Engine.getWall(j);
 					if (wal == null)
 						continue;
 					ox = wal.getX() - dax;
@@ -328,15 +329,15 @@ public class SoftwareOrpho extends OrphoRenderer {
 					// Collect floor sprites to draw
 					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
-						if ((getSprite()[i1].getCstat() & 48) == 32) {
+						if ((Engine.getSprite(i1).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
-							if ((getSprite()[i1].getCstat() & (64 + 8)) == (64 + 8))
+							if ((Engine.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(getSprite()[i1]);
+							tsprite[sortnum].set(Engine.getSprite(i1));
 							tsprite[sortnum++].setOwner((short) i1);
 						}
 					}
@@ -381,8 +382,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = bakgxvect;
 					globaly2 = bakgyvect;
 				} else {
-					ox = getWall()[getWall()[startwall].getPoint2()].getX() - getWall()[startwall].getX();
-					oy = getWall()[getWall()[startwall].getPoint2()].getY() - getWall()[startwall].getY();
+					ox = Engine.getWall(Engine.getWall(startwall).getPoint2()).getX() - Engine.getWall(startwall).getX();
+					oy = Engine.getWall(Engine.getWall(startwall).getPoint2()).getY() - Engine.getWall(startwall).getY();
 					i = EngineUtils.sqrt(ox * ox + oy * oy);
 					if (i == 0)
 						continue;
@@ -396,7 +397,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = -globalx1;
 					globaly2 = -globaly1;
 
-					daslope = getSector()[s].getFloorheinum();
+					daslope = Engine.getSector(s).getFloorheinum();
 					i = EngineUtils.sqrt(daslope * daslope + 16777216);
 					globalposy = mulscale(globalposy, i, 12);
 					globalx2 = mulscale(globalx2, i, 12);
@@ -454,7 +455,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1)
 				for (i = 0; i < sortnum - gap; i++)
 					for (j = i; j >= 0; j -= gap) {
-						if (getSprite()[tsprite[j].getOwner()].getZ() <= getSprite()[tsprite[j + gap].getOwner()].getZ())
+						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ())
 							break;
 
 						short tmp = tsprite[j].getOwner();
@@ -463,7 +464,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				Sprite spr = getSprite()[tsprite[s].getOwner()];
+				Sprite spr = Engine.getSprite(tsprite[s].getOwner());
 				if ((spr.getCstat() & 48) == 32) {
 					npoints = 0;
 
@@ -571,10 +572,10 @@ public class SoftwareOrpho extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((getSector()[spr.getSectnum()].getCeilingstat() & 1) > 0)
-						globalshade = (getSector()[spr.getSectnum()].getCeilingshade());
+					if ((getSector(spr.getSectnum()).getCeilingstat() & 1) > 0)
+						globalshade = (getSector(spr.getSectnum()).getCeilingshade());
 					else
-						globalshade = (getSector()[spr.getSectnum()].getFloorshade());
+						globalshade = (getSector(spr.getSectnum()).getFloorshade());
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
 					parent.globvis = parent.globalhisibility;

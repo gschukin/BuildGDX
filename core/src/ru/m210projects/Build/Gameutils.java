@@ -16,14 +16,7 @@
 
 package ru.m210projects.Build;
 
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXSPRITES;
-import static ru.m210projects.Build.Engine.MAXSTATUS;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Engine.sector;
-import static ru.m210projects.Build.Engine.sprite;
-import static ru.m210projects.Build.Engine.wall;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Pragmas.scale;
 
@@ -148,7 +141,7 @@ public class Gameutils {
 	}
 
 	public static boolean isValidSector(int i) {
-		return i >= 0 && i < MAXSECTORS && sector[i] != null;
+		return i >= 0 && i < MAXSECTORS && Engine.getSector(i) != null;
 	}
 
 	public static boolean isValidStat(int i) {
@@ -156,15 +149,15 @@ public class Gameutils {
 	}
 
 	public static boolean isValidSprite(int i) {
-		return i >= 0 && i < MAXSPRITES && sprite[i] != null;
+		return i >= 0 && i < MAXSPRITES && Engine.getSprite(i) != null;
 	}
 
 	public static boolean isValidWall(int i) {
-		return i >= 0 && i < MAXWALLS && wall[i] != null;
+		return i >= 0 && i < MAXWALLS && Engine.getWall(i) != null;
 	}
 
 	public static boolean isCorruptWall(int i) {
-		return !isValidWall(i) || !isValidWall(wall[i].getPoint2());
+		return !isValidWall(i) || !isValidWall(Engine.getWall(i).getPoint2());
 	}
 
 	public static boolean isValidTile(int tile) {

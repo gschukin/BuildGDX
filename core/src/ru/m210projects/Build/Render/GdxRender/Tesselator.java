@@ -100,7 +100,7 @@ public class Tesselator {
 	}
 
 	private void initZoids(final int sectnum) {
-		final Sector sec = sector[sectnum];
+		final Sector sec = Engine.getSector(sectnum);
 		final int n = sec.getWallnum();
 
 		zoids.clear();
@@ -117,7 +117,7 @@ public class Tesselator {
 		int endwall = startwall + sec.getWallnum() - 1;
 		int i = 0;
 		for (int w = startwall; w <= endwall; w++) {
-			secy.add(getWall()[w].getY());
+			secy.add(Engine.getWall(w).getY());
 		}
 
 		secy.sort(null);
@@ -139,8 +139,8 @@ public class Tesselator {
 			startwall = sec.getWallptr();
 			endwall = startwall + sec.getWallnum() - 1;
 			for (int w = startwall; w <= endwall; w++) {
-				Wall wal = getWall()[w];
-				Wall wal2 = getWall()[wal.getPoint2()];
+				Wall wal = Engine.getWall(w);
+				Wall wal2 = Engine.getWall(wal.getPoint2());
 
 				x0 = wal.getX();
 				y0 = wal.getY();
@@ -211,7 +211,7 @@ public class Tesselator {
 
 	public int getMaxVertices() {
 		int vertices = 2 * zoids.size() * 6; // ceiling and floor
-		vertices += 30 * sector[sectnum].getWallnum(); // (6 - top, 6 - middle, 6 bottom, 12 sky)
+		vertices += 30 * Engine.getSector(sectnum).getWallnum(); // (6 - top, 6 - middle, 6 bottom, 12 sky)
 		return 2 * vertices;
 	}
 
@@ -256,7 +256,7 @@ public class Tesselator {
 		}
 		case Floor:
 		case Ceiling: {
-			Sector sec = sector[num];
+			Sector sec = Engine.getSector(num);
 			surf.picnum = type == Type.Floor ? sec.getFloorpicnum() : sec.getCeilingpicnum();
 			surf.obj = sec;
 //			surf.shade = type == Type.Floor ? sec.floorshade : sec.ceilingshade;
@@ -313,8 +313,8 @@ public class Tesselator {
 
 								// Texture Relativity
 								if ((type == Type.Floor) ? sec.isRelativeTexFloor() : sec.isRelativeTexCeiling()) {
-									Wall wal = getWall()[sec.getWallptr()];
-									Wall wal2 = getWall()[wal.getPoint2()];
+									Wall wal = Engine.getWall(sec.getWallptr());
+									Wall wal2 = Engine.getWall(wal.getPoint2());
 
 									float vecx = wal.getX() - wal2.getX();
 									float vecy = wal.getY() - wal2.getY();
@@ -390,7 +390,7 @@ public class Tesselator {
 		}
 		case Wall:
 		case Sky: {
-			Wall wal = getWall()[num];
+			Wall wal = Engine.getWall(num);
 			Heinum heinum = type.getHeinum();
 
 			ArrayList<Vertex> pol;
@@ -407,7 +407,7 @@ public class Tesselator {
 
 				Wall ptr = wal;
 				if (k == 1 && wal.getNextsector() != -1 && wal.isSwapped())
-					ptr = getWall()[wal.getNextwall()];
+					ptr = Engine.getWall(wal.getNextwall());
 				vOffs = getVCoord(wal, sectnum, k);
 
 				int picnum = (k == -1 ? ptr.getOverpicnum() : ptr.getPicnum());
@@ -432,8 +432,8 @@ public class Tesselator {
 					}
 				}
 			} else {
-				surf.picnum = heinum == Heinum.SkyLower ? sector[sectnum].getFloorpicnum() : sector[sectnum].getCeilingpicnum();
-				surf.obj = sector[sectnum];
+				surf.picnum = heinum == Heinum.SkyLower ? Engine.getSector(sectnum).getFloorpicnum() : Engine.getSector(sectnum).getCeilingpicnum();
+				surf.obj = Engine.getSector(sectnum);
 			}
 
 			vertex[0] = pol.get(0);
@@ -512,14 +512,14 @@ public class Tesselator {
 				} else {
 					align = wal.isBottomAligned() ? 1 : 0;
 					if (wal.isBottomAligned())
-						s3 = (sector[sectnum].getFloorz() < sector[nextsectnum].getFloorz()) ? sectnum : nextsectnum;
+						s3 = (Engine.getSector(sectnum).getFloorz() < Engine.getSector(nextsectnum).getFloorz()) ? sectnum : nextsectnum;
 					else
-						s3 = (sector[sectnum].getCeilingz() < sector[nextsectnum].getCeilingz()) ? nextsectnum : sectnum;
+						s3 = (Engine.getSector(sectnum).getCeilingz() < Engine.getSector(nextsectnum).getCeilingz()) ? nextsectnum : sectnum;
 				}
 			} else {
 				if (k == 1) { // under
 					if (wal.isSwapped())
-						wal = getWall()[wal.getNextwall()];
+						wal = Engine.getWall(wal.getNextwall());
 					align = wal.isBottomAligned() ? 0 : 1;
 				}
 
@@ -529,7 +529,7 @@ public class Tesselator {
 		} else
 			align = wal.isBottomAligned() ? 1 : 0;
 
-		Wall ptr = getWall()[sector[s3].getWallptr()];
+		Wall ptr = Engine.getWall(Engine.getSector(s3).getWallptr());
 		if (align == 0)
 			return engine.getceilzofslope((short) s3, ptr.getX(), ptr.getY());
 		return engine.getflorzofslope((short) s3, ptr.getX(), ptr.getY());

@@ -27,11 +27,11 @@ public class BoardService {
         if (!isValidSector(dasector)) {
             return null;
         }
-        return sector[dasector];
+        return Engine.getSector(dasector);
     }
 
     public Wall getWall(int wallptr) {
-        return wall[wallptr];
+        return Engine.getWall(wallptr);
     }
 
     public Wall getNextWall(Wall wall) {
@@ -106,7 +106,7 @@ public class BoardService {
     }
 
     public Sprite getSprite(int z) {
-        return sprite[z];
+        return Engine.getSprite(z);
     }
 
     public int getflorzofslope(Sector sec, int x, int y) {

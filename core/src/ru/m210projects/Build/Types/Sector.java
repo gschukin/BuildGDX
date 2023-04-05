@@ -17,6 +17,7 @@ import java.nio.ByteOrder;
 import java.util.Iterator;
 
 import org.jetbrains.annotations.NotNull;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
 
@@ -466,7 +467,7 @@ public class Sector {
 
 		@Override
 		public Wall next() {
-			return getWall()[nexti()];
+			return Engine.getWall(nexti());
 		}
 
 		public short nexti() {

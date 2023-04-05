@@ -62,7 +62,7 @@ public class PolymostModelRenderer {
         if (m == null)
             return 0;
 
-        if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
             return 0;
 
         int globalorientation = parent.globalorientation;
@@ -76,9 +76,9 @@ public class PolymostModelRenderer {
         modela0.x = modela0.y = modela0.z = 0;
 
         f = (tspr.getXrepeat()) * (256.0f / 320.0f) / 64.0f;
-        if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 16)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16)
             f *= 1.25f;
-        if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
             f *= 1.25f;
 
         dvoxm0.x *= f;
@@ -113,11 +113,11 @@ public class PolymostModelRenderer {
         // k0 -= yoff * (tspr.yrepeat << 2);
 
         dvoxm0.y *= f;
-        if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
             dvoxm0.y *= -1;
         modela0.y = ((x0 - globalposx) / 1024.0f + modela0.y) * f;
         dvoxm0.x *= -f;
-        if ((getSprite()[tspr.getOwner()].getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
             dvoxm0.x *= -1;
         if (xflip)
             dvoxm0.x *= -1;
@@ -323,7 +323,7 @@ public class PolymostModelRenderer {
         DefScript defs = parent.defs;
         if (defs != null) {
             if (m.isTintAffected()
-                    || (!(tspr.getOwner() >= MAXSPRITES) && getSector()[getSprite()[tspr.getOwner()].getSectnum()].getFloorpal() != 0)) {
+                    || (!(tspr.getOwner() >= MAXSPRITES) && getSector(Engine.getSprite(tspr.getOwner()).getSectnum()).getFloorpal() != 0)) {
                 Palette p = defs.texInfo.getTints(globalpal);
                 polyColor.r *= p.r / 255.0f;
                 polyColor.g *= p.g / 255.0f;
