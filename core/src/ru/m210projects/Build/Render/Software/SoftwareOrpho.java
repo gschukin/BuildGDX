@@ -23,6 +23,7 @@ import static ru.m210projects.Build.RenderService.MAXYDIM;
 
 import java.util.Arrays;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
@@ -268,6 +269,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 		beforedrawrooms = 0;
 
+		BoardService service = engine.getBoardService();
+		final int numsectors = service.getSectorCount();
+
 		Arrays.fill(gotsector, (byte) 0);
 
 		cx1 = (windowx1 << 12);
@@ -327,7 +331,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((Engine.getSprite(i1).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)

@@ -291,7 +291,7 @@ public class GDXRenderer implements GLRenderer {
 			globalcursectnum -= MAXSECTORS;
 		} else {
 			short i = globalcursectnum;
-			globalcursectnum = engine.updatesectorz(globalposx, globalposy, globalposz, globalcursectnum);
+			globalcursectnum = (short) engine.updatesectorz(globalposx, globalposy, globalposz, globalcursectnum);
 			if (globalcursectnum < 0)
 				globalcursectnum = i;
 		}

@@ -24,6 +24,7 @@ import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.RenderService.yxaspect;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
@@ -89,6 +90,8 @@ public abstract class OrphoRenderer {
 		int xvect, yvect, xvect2, yvect2;
 
 		Wall wal;
+		BoardService service = engine.getBoardService();
+		int numsectors = service.getSectorCount();
 
 		xvect = EngineUtils.sin(-cang) * czoom;
 		yvect = EngineUtils.sin(1536 - cang) * czoom;
@@ -146,7 +149,7 @@ public abstract class OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
+				for (SpriteNode node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = Engine.getSprite(j);
 

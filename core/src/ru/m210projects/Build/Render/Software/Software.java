@@ -23,7 +23,9 @@ import static ru.m210projects.Build.RenderService.*;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
@@ -139,7 +141,11 @@ public class Software implements Renderer {
 
 	protected int oxyaspect, oxdimen, oviewingrange;
 
-	private final int[] zofslope = new int[2];
+	private AtomicInteger floorz = new AtomicInteger();
+	private AtomicInteger ceilz = new AtomicInteger();
+
+	private final AtomicInteger[] cz = new AtomicInteger[5];
+	private final AtomicInteger[] fz = new AtomicInteger[5];
 
 	private final int MAXXSIZ = 256;
 	private final int[] ggxinc = new int[MAXXSIZ + 1];
@@ -474,19 +480,18 @@ public class Software implements Renderer {
 			globalcursectnum -= MAXSECTORS;
 		else {
 			i = globalcursectnum;
-			globalcursectnum = engine.updatesector(globalposx, globalposy, globalcursectnum);
+			globalcursectnum = (short) engine.updatesector(globalposx, globalposy, globalcursectnum);
 			if (globalcursectnum < 0)
 				globalcursectnum = (short) i;
 		}
 
 		globparaceilclip = 1;
 		globparaflorclip = 1;
-		engine.getzsofslope(globalcursectnum, globalposx, globalposy, zofslope);
-		int cz = zofslope[CEIL];
-		int fz = zofslope[FLOOR];
-		if (globalposz < cz)
+		engine.getzsofslope(globalcursectnum, globalposx, globalposy, floorz, ceilz);
+
+		if (globalposz < ceilz.get())
 			globparaceilclip = 0;
-		if (globalposz > fz)
+		if (globalposz > floorz.get())
 			globparaflorclip = 0;
 
 		scansector(globalcursectnum);
@@ -572,9 +577,6 @@ public class Software implements Renderer {
 			bunchlast[closest] = bunchlast[numbunches];
 		}
 	}
-
-	private final int[] cz = new int[5];
-	private final int[] fz = new int[5];
 
 	@Override
 	public void completemirror() {
@@ -666,27 +668,17 @@ public class Software implements Renderer {
 
 			if (nextsectnum >= 0) {
 				nextsec = Engine.getSector(nextsectnum);
-				engine.getzsofslope(sectnum, wal.getX(), wal.getY(), zofslope);
-				cz[0] = zofslope[CEIL];
-				fz[0] = zofslope[FLOOR];
-				engine.getzsofslope(sectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), zofslope);
-				cz[1] = zofslope[CEIL];
-				fz[1] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, wal.getX(), wal.getY(), zofslope);
-				cz[2] = zofslope[CEIL];
-				fz[2] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), zofslope);
-				cz[3] = zofslope[CEIL];
-				fz[3] = zofslope[FLOOR];
-				engine.getzsofslope(nextsectnum, globalposx, globalposy, zofslope);
-				cz[4] = zofslope[CEIL];
-				fz[4] = zofslope[FLOOR];
+				engine.getzsofslope(sectnum, wal.getX(), wal.getY(), fz[0], cz[0]);
+				engine.getzsofslope(sectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), fz[1], cz[1]);
+				engine.getzsofslope(nextsectnum, wal.getX(), wal.getY(), fz[2], cz[2]);
+				engine.getzsofslope(nextsectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), fz[3], cz[3]);
+				engine.getzsofslope(nextsectnum, globalposx, globalposy, fz[4], cz[4]);
 
 				if ((wal.getCstat() & 48) == 16)
 					maskwall[maskwallcnt++] = z;
 
 				if (((sec.getCeilingstat() & 1) == 0) || ((nextsec.getCeilingstat() & 1) == 0)) {
-					if ((cz[2] <= cz[0]) && (cz[3] <= cz[1])) {
+					if ((cz[2].get() <= cz[0].get()) && (cz[3].get() <= cz[1].get())) {
 						if (globparaceilclip != 0)
 							for (x = x1; x <= x2; x++)
 								if (uplc[x] > umost[x])
@@ -697,7 +689,7 @@ public class Software implements Renderer {
 									}
 					} else {
 						wallmost(dwall, z, nextsectnum, (char) 0);
-						if ((cz[2] > fz[0]) || (cz[3] > fz[1]))
+						if ((cz[2].get() > fz[0].get()) || (cz[3].get() > fz[1].get()))
 							for (int i = x1; i <= x2; i++)
 								if (dwall[i] > dplc[i])
 									dwall[i] = dplc[i];
@@ -740,7 +732,7 @@ public class Software implements Renderer {
 						}
 						wallscan(x1, x2, uplc, dwall, swall, lwall);
 
-						if ((cz[2] >= cz[0]) && (cz[3] >= cz[1])) {
+						if ((cz[2].get() >= cz[0].get()) && (cz[3].get() >= cz[1].get())) {
 							for (x = x1; x <= x2; x++)
 								if (dwall[x] > umost[x])
 									if (umost[x] <= dmost[x]) {
@@ -760,7 +752,7 @@ public class Software implements Renderer {
 								}
 						}
 					}
-					if ((cz[2] < cz[0]) || (cz[3] < cz[1]) || (globalposz < cz[4])) {
+					if ((cz[2].get() < cz[0].get()) || (cz[3].get() < cz[1].get()) || (globalposz < cz[4].get())) {
 						int i = x2 - x1 + 1;
 						if (smostcnt + i < MAXYSAVES) {
 							smoststart[smostwallcnt] = smostcnt;
@@ -773,7 +765,7 @@ public class Software implements Renderer {
 					}
 				}
 				if (((sec.getFloorstat() & 1) == 0) || ((nextsec.getFloorstat() & 1) == 0)) {
-					if ((fz[2] >= fz[0]) && (fz[3] >= fz[1])) {
+					if ((fz[2].get() >= fz[0].get()) && (fz[3].get() >= fz[1].get())) {
 						if (globparaflorclip != 0)
 							for (x = x1; x <= x2; x++)
 								if (dplc[x] < dmost[x])
@@ -784,7 +776,7 @@ public class Software implements Renderer {
 									}
 					} else {
 						wallmost(uwall, z, nextsectnum, (char) 1);
-						if ((fz[2] < cz[0]) || (fz[3] < cz[1]))
+						if ((fz[2].get() < cz[0].get()) || (fz[3].get() < cz[1].get()))
 							for (int i = x1; i <= x2; i++)
 								if (uwall[i] < uplc[i])
 									uwall[i] = uplc[i];
@@ -843,7 +835,7 @@ public class Software implements Renderer {
 
 						wallscan(x1, x2, uwall, dplc, swall, lwall);
 
-						if ((fz[2] <= fz[0]) && (fz[3] <= fz[1])) {
+						if ((fz[2].get() <= fz[0].get()) && (fz[3].get() <= fz[1].get())) {
 							for (x = x1; x <= x2; x++)
 								if (uwall[x] < dmost[x])
 									if (umost[x] <= dmost[x]) {
@@ -863,7 +855,7 @@ public class Software implements Renderer {
 								}
 						}
 					}
-					if ((fz[2] > fz[0]) || (fz[3] > fz[1]) || (globalposz > fz[4])) {
+					if ((fz[2].get() > fz[0].get()) || (fz[3].get() > fz[1].get()) || (globalposz > fz[4].get())) {
 						int i = x2 - x1 + 1;
 						if (smostcnt + i < MAXYSAVES) {
 							smoststart[smostwallcnt] = smostcnt;
@@ -3687,7 +3679,7 @@ public class Software implements Renderer {
 		int xs, ys, x1, y1, x2, y2, xp1, yp1, xp2 = 0, yp2 = 0, templong;
 		int z, zz, startwall, endwall, numscansbefore, scanfirst, bunchfrst;
 		short nextsectnum;
-
+		BoardService service = engine.getBoardService();
 		if (sectnum < 0)
 			return;
 
@@ -3699,7 +3691,7 @@ public class Software implements Renderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
+			for (SpriteNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 				int z1 = node.getIndex();
 				spr = Engine.getSprite(z1);
 				if ((((spr.getCstat() & 0x8000) == 0) || (showinvisibility)) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)

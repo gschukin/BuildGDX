@@ -2,6 +2,7 @@ package ru.m210projects.Build.Render.GdxRender;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.SurfaceInfo;
@@ -53,7 +55,6 @@ public class WorldMesh {
 	private final GLSurface[] ceilings = new GLSurface[MAXSECTORS];
 	private final GLSurface quad;
 
-	private final int[] zofslope = new int[2];
 	private static final int CEILING1 = 0;
 	private static final int CEILING2 = 1;
 	private static final int FLOOR2 = 2;
@@ -65,6 +66,9 @@ public class WorldMesh {
 	protected final float scalexy = 512.0f;
 	protected final float scalez = 8192.0f;
 	private int lastLimit = 0;
+
+	private AtomicInteger floorz = new AtomicInteger();
+	private AtomicInteger ceilz = new AtomicInteger();
 
 	public WorldMesh(Engine engine) {
 		this.engine = engine;
@@ -79,7 +83,8 @@ public class WorldMesh {
 
 		quad = addQuad(vertices);
 
-		for (short s = 0; s < numsectors; s++) {
+		BoardService service = engine.getBoardService();
+		for (short s = 0; s < service.getSectorCount(); s++) {
 			Sector sec = Engine.getSector(s);
 			if (sec.getFloorz() == sec.getCeilingz())
 				continue;
@@ -134,13 +139,13 @@ public class WorldMesh {
 		switch (heinum) {
 		case Max:
 		case MaxWall:
-			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), zofslope);
-			pol[CEILING1].set(wal, zofslope[CEIL], 0, 0);
-			pol[FLOOR1].set(wal, zofslope[FLOOR], 0, 1);
+			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), floorz, ceilz);
+			pol[CEILING1].set(wal, ceilz.get(), 0, 0);
+			pol[FLOOR1].set(wal, floorz.get(), 0, 1);
 
-			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), zofslope);
-			pol[FLOOR2].set(wal2, zofslope[FLOOR], 1, 1);
-			pol[CEILING2].set(wal2, zofslope[CEIL], 1, 0);
+			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), floorz, ceilz);
+			pol[FLOOR2].set(wal2, floorz.get(), 1, 1);
+			pol[CEILING2].set(wal2, ceilz.get(), 1, 0);
 
 			if (heinum == Heinum.Max) {
 				if (sec.isParallaxCeiling())
@@ -196,19 +201,19 @@ public class WorldMesh {
 			pol[CEILING2].set(wal2, fz2, 1, 0);
 			break;
 		case Portal:
-			engine.getzsofslope((short) nextsector, wal.getX(), wal.getY(), zofslope);
-			fz1 = zofslope[FLOOR];
-			cz1 = zofslope[CEIL];
-			engine.getzsofslope((short) nextsector, wal2.getX(), wal2.getY(), zofslope);
-			fz2 = zofslope[FLOOR];
-			cz2 = zofslope[CEIL];
+			engine.getzsofslope((short) nextsector, wal.getX(), wal.getY(), floorz, ceilz);
+			fz1 = floorz.get();
+			cz1 = ceilz.get();
+			engine.getzsofslope((short) nextsector, wal2.getX(), wal2.getY(), floorz, ceilz);
+			fz2 = floorz.get();
+			cz2 = ceilz.get();
 
-			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), zofslope);
-			int fz3 = zofslope[FLOOR];
-			int cz3 = zofslope[CEIL];
-			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), zofslope);
-			int fz4 = zofslope[FLOOR];
-			int cz4 = zofslope[CEIL];
+			engine.getzsofslope((short) sectnum, wal.getX(), wal.getY(), floorz, ceilz);
+			int fz3 = floorz.get();
+			int cz3 = ceilz.get();
+			engine.getzsofslope((short) sectnum, wal2.getX(), wal2.getY(), floorz, ceilz);
+			int fz4 = floorz.get();
+			int cz4 = ceilz.get();
 
 			if (fz3 <= fz1 && fz4 <= fz2) {
 				fz1 = fz3;

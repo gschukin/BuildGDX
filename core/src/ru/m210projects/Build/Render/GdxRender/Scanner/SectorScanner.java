@@ -11,10 +11,7 @@ import com.badlogic.gdx.math.Plane.PlaneSide;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Pragmas;
+import ru.m210projects.Build.*;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.QuickSort.IntComparator;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
@@ -110,6 +107,7 @@ public abstract class SectorScanner {
 		WallFrustum3d pFrustum = portqueue[pqhead];
 		gotviewport[sectnum] = pFrustum;
 
+		BoardService service = engine.getBoardService();
 		while (pqhead != pqtail) {
 			sectnum = pFrustum.sectnum;
 
@@ -143,7 +141,7 @@ public abstract class SectorScanner {
 						if (nextsectnum != -1) {
 							if (!checkWallRange(nextsectnum, wal.getNextwall())) {
 								int theline = wal.getNextwall();
-								int gap = (numsectors >> 1);
+								int gap = (service.getSectorCount() >> 1);
 								short i = (short) gap;
 								while (gap > 1) {
 									gap >>= 1;
@@ -386,7 +384,8 @@ public abstract class SectorScanner {
 	}
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
-		for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
+		BoardService service = engine.getBoardService();
+		for (SpriteNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 			int z = node.getIndex();
 			Sprite spr = Engine.getSprite(z);
 

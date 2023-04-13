@@ -4,7 +4,6 @@ import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.SpriteNode;
 
 import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.spriteSectMap;
 import static ru.m210projects.Build.Pragmas.*;
 
 public class GetZRange {
@@ -160,7 +159,7 @@ public class GetZRange {
         }
 
         for (i = 0; i < sectorSet.size(); i++) {
-            for (SpriteNode node = spriteSectMap.getFirst(sectorSet.getValue(i)); node != null; node = node.getNext()) {
+            for (SpriteNode node = service.getSectNode(sectorSet.getValue(i)); node != null; node = node.getNext()) {
                 int j = node.getIndex();
                 Sprite spr = service.getSprite(j);
                 int cstat = spr.getCstat();

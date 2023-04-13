@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Engine.Clockdir;
 import ru.m210projects.Build.Types.Sector;
@@ -18,7 +19,8 @@ public class SectorInfo {
 	public boolean[] isCorrupt = new boolean[MAXSECTORS];
 
 	public void init(Engine engine) {
-		for (int i = 0; i < numsectors; i++) {
+		BoardService service = engine.getBoardService();
+		for (int i = 0; i < service.getSectorCount(); i++) {
 			Sector sec = Engine.getSector(i);
 			SectorIterator it = sec.iterator();
 

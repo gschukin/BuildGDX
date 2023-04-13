@@ -306,7 +306,7 @@ public class RenderService {
         return retcol;
     }
 
-    public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, short dacursectnum) { // eDuke32
+    public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, int dacursectnum) { // eDuke32
         beforedrawrooms = 0;
 
         globalposx = (int) daposx;
@@ -317,7 +317,7 @@ public class RenderService {
         globalhoriz = (dahoriz - 100);
         pitch = (-EngineUtils.getAngle(160, (int) (dahoriz - 100))) / (2048.0f / 360.0f);
 
-        globalcursectnum = dacursectnum;
+        globalcursectnum = (short) dacursectnum;
         totalclocklock = totalclock;
 
         cosglobalang = (int) BCosAngle(globalang);

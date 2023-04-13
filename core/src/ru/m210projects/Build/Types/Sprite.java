@@ -34,7 +34,7 @@ public class Sprite {
 	public short yrepeat = 32; //2
 	public short xoffset;
 	public short yoffset; //2
-	public short sectnum;
+	private short sectnum;
 	public short statnum; //4
 	public short ang;
 	public short owner = -1;

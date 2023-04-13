@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
@@ -66,6 +67,7 @@ public class GDXOrtho extends OrphoRenderer {
 
 	protected ShaderManager manager;
 	private Sprite hudsprite;
+	private final BoardService service;
 
 	private final int maxSpriteCount = 128;
 
@@ -73,6 +75,7 @@ public class GDXOrtho extends OrphoRenderer {
 		super(parent.engine, settings);
 		this.parent = parent;
 		this.manager = parent.manager;
+		this.service = parent.engine.getBoardService();
 
 		int VERTEX_SIZE = 2 + 1 + 2;
 		int SPRITE_SIZE = 4 * VERTEX_SIZE;
@@ -505,7 +508,7 @@ public class GDXOrtho extends OrphoRenderer {
 		float cos = (float) Math.cos((512 - cang) * buildAngleToRadians) * czoom / 4.0f;
 		float sin = (float) Math.sin((512 - cang) * buildAngleToRadians) * czoom / 4.0f;
 
-		for (int i = 0; i < numsectors; i++) {
+		for (int i = 0; i < service.getSectorCount(); i++) {
 			if ((!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					|| !Gameutils.isValidSector(i))
 				continue;
@@ -540,11 +543,11 @@ public class GDXOrtho extends OrphoRenderer {
 
 		// Draw sprites
 		if (mapSettings.isShowSprites(MapView.Lines)) {
-			for (int i = 0; i < numsectors; i++) {
+			for (int i = 0; i < service.getSectorCount(); i++) {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (SpriteNode node = spriteSectMap.getFirst(i); node != null; node = node.getNext()) {
+				for (SpriteNode node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = Engine.getSprite(j);
 
@@ -746,13 +749,13 @@ public class GDXOrtho extends OrphoRenderer {
 		showSprites |= (mapSettings.isShowSprites(MapView.Polygons) ? 2 : 0);
 
 		int sortnum = 0;
-		for (int s = 0; s < numsectors; s++) {
+		for (int s = 0; s < service.getSectorCount(); s++) {
 			Sector sec = Engine.getSector(s);
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				if ((showSprites & 1) != 0) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
 						if ((Engine.getSprite(i).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
@@ -771,7 +774,7 @@ public class GDXOrtho extends OrphoRenderer {
 				}
 
 				if ((showSprites & 2) != 0) {
-					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
 						if ((Engine.getSprite(i).getCstat() & 48) == 32)
 							continue;

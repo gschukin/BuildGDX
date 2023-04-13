@@ -44,6 +44,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.BufferUtils;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.GLInfo;
@@ -137,6 +138,9 @@ public class Polymost2D extends OrphoRenderer {
 		int xoff, yoff, k, l, cosang, sinang, xspan, yspan;
 		int xrepeat, yrepeat, x1, y1, x2, y2, x3, y3, x4, y4;
 
+		BoardService service = engine.getBoardService();
+		final int numsectors = service.getSectorCount();
+
 		beforedrawrooms = 0;
 
 		Arrays.fill(gotsector, (byte) 0);
@@ -192,7 +196,7 @@ public class Polymost2D extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int j1 = node.getIndex();
 						if ((Engine.getSprite(j1).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
@@ -211,7 +215,7 @@ public class Polymost2D extends OrphoRenderer {
 				}
 
 				if (mapSettings.isShowSprites(MapView.Polygons))
-					for (SpriteNode node = spriteSectMap.getFirst(s); node != null; node = node.getNext()) {
+					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((show2dsprite[i1 >> 3] & pow2char[i1 & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)

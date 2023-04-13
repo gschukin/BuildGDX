@@ -95,6 +95,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
@@ -1669,12 +1670,13 @@ public class Polymost implements GLRenderer {
 		if (automapping == 1)
 			show2dsector[sectnum >> 3] |= pow2char[sectnum & 7];
 
+		BoardService service = engine.getBoardService();
 		sectorborder[0] = sectnum;
 		int sectorbordercnt = 1;
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (SpriteNode node = spriteSectMap.getFirst(sectnum); node != null; node = node.getNext()) {
+			for (SpriteNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 				int z = node.getIndex();
 				spr = Engine.getSprite(z);
 				if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
@@ -2333,7 +2335,7 @@ public class Polymost implements GLRenderer {
 			globalcursectnum -= MAXSECTORS;
 		} else {
 			i = globalcursectnum;
-			globalcursectnum = engine.updatesectorz(globalposx, globalposy, globalposz, globalcursectnum);
+			globalcursectnum = (short) engine.updatesectorz(globalposx, globalposy, globalposz, globalcursectnum);
 			if (globalcursectnum < 0)
 				globalcursectnum = (short) i;
 		}
@@ -3780,9 +3782,6 @@ public class Polymost implements GLRenderer {
 		int xe = xs + vx;
 		int vy = mulscale(EngineUtils.sin(spr.getAng()), range, 14);
 		int ye = ys + vy;
-
-		if ((sectnum < 0) || (sectnum >= numsectors))
-			return (-1);
 
 		short startwall = Engine.getSector(sectnum).getWallptr();
 		int endwall = (startwall + Engine.getSector(sectnum).getWallnum() - 1);
