@@ -349,24 +349,24 @@ public class Sector {
 		return ceilingpal;
 	}
 
-	public void setCeilingpal(short ceilingpal) {
-		this.ceilingpal = ceilingpal;
+	public void setCeilingpal(int ceilingpal) {
+		this.ceilingpal = (short) ceilingpal;
 	}
 
 	public short getCeilingxpanning() {
 		return ceilingxpanning;
 	}
 
-	public void setCeilingxpanning(short ceilingxpanning) {
-		this.ceilingxpanning = ceilingxpanning;
+	public void setCeilingxpanning(int ceilingxpanning) {
+		this.ceilingxpanning = (short) ceilingxpanning;
 	}
 
 	public short getCeilingypanning() {
 		return ceilingypanning;
 	}
 
-	public void setCeilingypanning(short ceilingypanning) {
-		this.ceilingypanning = ceilingypanning;
+	public void setCeilingypanning(int ceilingypanning) {
+		this.ceilingypanning = (short) ceilingypanning;
 	}
 
 	public short getFloorpicnum() {
@@ -397,24 +397,24 @@ public class Sector {
 		return floorpal;
 	}
 
-	public void setFloorpal(short floorpal) {
-		this.floorpal = floorpal;
+	public void setFloorpal(int floorpal) {
+		this.floorpal = (short) floorpal;
 	}
 
 	public short getFloorxpanning() {
 		return floorxpanning;
 	}
 
-	public void setFloorxpanning(short floorxpanning) {
-		this.floorxpanning = floorxpanning;
+	public void setFloorxpanning(int floorxpanning) {
+		this.floorxpanning = (short) floorxpanning;
 	}
 
 	public short getFloorypanning() {
 		return floorypanning;
 	}
 
-	public void setFloorypanning(short floorypanning) {
-		this.floorypanning = floorypanning;
+	public void setFloorypanning(int floorypanning) {
+		this.floorypanning = (short) floorypanning;
 	}
 
 	public short getVisibility() {
@@ -429,8 +429,8 @@ public class Sector {
 		return filler;
 	}
 
-	public void setFiller(short filler) {
-		this.filler = filler;
+	public void setFiller(int filler) {
+		this.filler = (short) filler;
 	}
 
 	public short getLotag() {

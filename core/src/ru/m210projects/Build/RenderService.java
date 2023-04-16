@@ -123,7 +123,7 @@ public class RenderService {
         bakwindowx2 = new int[4];
         bakwindowy2 = new int[4];
 
-        Tables tables = engine.getTables();
+        Tables tables = EngineUtils.getTables();
         pTextfont = new TextFont(tables.getTextFont());
         pSmallTextfont = new SmallTextFont(tables.getSmallTextFont());
         calcbritable();

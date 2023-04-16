@@ -30,7 +30,6 @@ public class Tables {
         radarang = new short[1280];
 
         byte[] buf = new byte[2048 * 2];
-
         res.read(buf);
         ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
 

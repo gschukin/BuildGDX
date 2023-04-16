@@ -45,6 +45,9 @@ public class Sprite {
 	public short hitag;
 	public short extra = -1;
 
+	public Sprite() {
+	}
+
 	public void buildSprite(Resource bb)
 	{
 		setX(bb.readInt());

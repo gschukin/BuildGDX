@@ -264,48 +264,48 @@ public class Wall {
 		return xrepeat;
 	}
 
-	public void setXrepeat(short xrepeat) {
-		this.xrepeat = xrepeat;
+	public void setXrepeat(int xrepeat) {
+		this.xrepeat = (short) xrepeat;
 	}
 
 	public short getYrepeat() {
 		return yrepeat;
 	}
 
-	public void setYrepeat(short yrepeat) {
-		this.yrepeat = yrepeat;
+	public void setYrepeat(int yrepeat) {
+		this.yrepeat = (short) yrepeat;
 	}
 
 	public short getXpanning() {
 		return xpanning;
 	}
 
-	public void setXpanning(short xpanning) {
-		this.xpanning = xpanning;
+	public void setXpanning(int xpanning) {
+		this.xpanning = (short) xpanning;
 	}
 
 	public short getYpanning() {
 		return ypanning;
 	}
 
-	public void setYpanning(short ypanning) {
-		this.ypanning = ypanning;
+	public void setYpanning(int ypanning) {
+		this.ypanning = (short) ypanning;
 	}
 
 	public short getLotag() {
 		return lotag;
 	}
 
-	public void setLotag(short lotag) {
-		this.lotag = lotag;
+	public void setLotag(int lotag) {
+		this.lotag = (short) lotag;
 	}
 
 	public short getHitag() {
 		return hitag;
 	}
 
-	public void setHitag(short hitag) {
-		this.hitag = hitag;
+	public void setHitag(int hitag) {
+		this.hitag = (short) hitag;
 	}
 
 	public short getExtra() {

@@ -113,6 +113,9 @@ public abstract class Engine {
     public static int clipmove_x, clipmove_y, clipmove_z;
     public static short clipmove_sectnum;
 
+    public static int pushmove_x, pushmove_y, pushmove_z;
+    public static short pushmove_sectnum;
+
     // Constants
 
     public static Object lock = new Object();
@@ -151,20 +154,11 @@ public abstract class Engine {
     public static Palette curpalette;
     public static int paletteloaded = 0;
 
-
-
-    // board
-//    public static short numsectors, numwalls, numsprites;
     public static short[] pskyoff;
     public static short[] zeropskyoff;
     public static short pskybits;
     public static byte parallaxtype;
     public static int visibility, parallaxvisibility;
-//    protected static Sector[] sector;
-//    protected static Wall[] wall;
-//    protected static Sprite[] sprite;
-//    public static SpriteMap spriteSectMap;
-//    public static SpriteMap spriteStatMap;
 
     // automapping
     public static byte automapping;
@@ -194,33 +188,6 @@ public abstract class Engine {
     public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
     public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
 
-    public static Sector getSector(int index) {
-        return boardService.getSector(index);
-    }
-
-    public static Wall getWall(int index) {
-        return boardService.getWall(index);
-    }
-
-    public static Sprite getSprite(int index) {
-        return boardService.getSprite(index);
-    }
-
-//    // FIXME: delete this in the future
-//    public static void setWall(int index, Wall wal) {
-//        wall[index] = wal;
-//    }
-//
-//    // FIXME: delete this in the future
-//    public static void setSector(int index, Sector sec) {
-//        sector[index] = sec;
-//    }
-//
-//    // FIXME: delete this in the future
-//    public static void setSprite(int index, Sprite sec) {
-//        sprite[index] = sec;
-//    }
-
     // Engine.c
 
     public void InitArrays() { // gdxBuild
@@ -245,13 +212,17 @@ public abstract class Engine {
         Arrays.fill(show2dwall, (byte) 0);
     }
 
+    protected Tables loadtables() throws Exception {
+        return new Tables(BuildGdx.cache.open("tables.dat", 0));
+    }
+
     public Engine() throws Exception { // gdxBuild
         InitArrays();
 
         // loadtables
         EngineUtils.init(this);
         this.renderService = new RenderService(this);
-        boardService = new BoardService();
+        this.boardService = new BoardService();
 
         parallaxtype = 2;
         pskybits = 0;
@@ -268,23 +239,11 @@ public abstract class Engine {
         Console.setFunction(new DEFOSDFUNC(this));
         randomseed = 1; // random for voxels
     }
-    public Tables getTables() {
-        return EngineUtils.tables;
-    }
-    public boolean rIntersect(int xs, int ys, int zs, int vx, int vy, int vz, int x1, int y1, int x2, int y2, Variable rx, Variable ry, Variable rz) {
-        return engineService.rIntersect(xs, ys, zs, vx, vy, vz, x1, y1, x2, y2, rx, ry, rz);
-    }
-    public BoardService getBoardService() {
-        return boardService;
-    }
+
+
     public int getpalookup(int davis, int dashade) { // jfBuild
         return (min(max(dashade + (davis >> 8), 0), numshades - 1));
     }
-
-    protected Tables loadtables() throws Exception { // jfBuild
-        return new Tables(BuildGdx.cache.open("tables.dat", 0));
-    }
-
     public void loadpalette() throws Exception // jfBuild
     {
         Resource fil;
@@ -318,56 +277,6 @@ public abstract class Engine {
         paletteloaded = 1;
     }
 
-
-
-
-    ////////// SPRITE LIST MANIPULATION FUNCTIONS //////////
-
-    public int insertspritesect(int sectnum) {
-        return boardService.insertspritesect(sectnum);
-    }
-
-    public int insertspritestat(int newstatnum) {
-        return boardService.insertspritestat(newstatnum);
-    }
-
-    public int insertsprite(int sectnum, int statnum) // jfBuild
-    {
-        return boardService.insertsprite(sectnum, statnum);
-    }
-
-    public int deletesprite(int spritenum) // jfBuild
-    {
-        GLRenderer gl = glrender();
-        if (gl != null) gl.removeSpriteCorr(spritenum);
-        boardService.deletesprite(spritenum);
-        return 0;
-    }
-
-    public int changespritesect(int spritenum, int newsectnum) // jfBuild
-    {
-        boardService.changespritesect(spritenum, newsectnum);
-        return (0);
-    }
-
-    public boolean changespritestat(int spritenum, int newstatnum) // jfBuild
-    {
-        return boardService.changespritestat(spritenum, newstatnum);
-    }
-
-    public boolean deletespritesect(int spritenum) {
-        return boardService.deletespritesect(spritenum);
-    }
-
-    public boolean deletespritestat(int spritenum) {
-        return boardService.deletespritestat(spritenum);
-    }
-
-    public boolean lIntersect(int x1, int y1, int z1, int x2, int y2, int z2, int x3, // jfBuild
-                              int y3, int x4, int y4, Variable x, Variable y, Variable z) {
-        return engineService.lIntersect(x1, y1, z1, x2, y2, z2, x3, y3, x4, y4, x, y, z);
-    }
-
     //
     // Exported Engine Functions
     //
@@ -393,22 +302,6 @@ public abstract class Engine {
         BuildGdx.message.dispose();
     }
 
-    public BuildPos loadboard(String filename) throws InvalidVersionException, FileNotFoundException, RuntimeException {
-        Resource fil;
-        if ((fil = BuildGdx.cache.open(filename, 0)) == null) {
-            throw new FileNotFoundException("Map " + filename + " not found!");
-        }
-        boardService.load(fil);
-
-        Arrays.fill(show2dsector, (byte) 0);
-        Arrays.fill(show2dsprite, (byte) 0);
-        Arrays.fill(show2dwall, (byte) 0);
-
-        fil.close();
-
-        return boardService.getBoard().getPos();
-    }
-
     public void inittimer(int tickspersecond) { // jfBuild
         if (timerfreq != 0) return; // already installed
 
@@ -431,9 +324,7 @@ public abstract class Engine {
         return System.currentTimeMillis();
     }
 
-
-
-    public synchronized void loadpic(String filename) // gdxBuild
+    public void loadpic(String filename) // gdxBuild
     {
         Resource fil;
         if ((fil = BuildGdx.cache.open(filename, 0)) != null) {
@@ -477,7 +368,7 @@ public abstract class Engine {
         picsiz[tilenum] += (j << 4);
     }
 
-    public synchronized int loadpics() { // jfBuild
+    public int loadpics() { // jfBuild
         int offscount, localtilestart, localtileend, dasiz;
         int i, k;
 
@@ -534,7 +425,7 @@ public abstract class Engine {
         return (numtilefiles);
     }
 
-    public synchronized byte[] loadtile(int tilenume) { // jfBuild
+    public byte[] loadtile(int tilenume) { // jfBuild
         if (tilenume >= MAXTILES) return null;
 
         Tile pic = getTile(tilenume);
@@ -585,33 +476,6 @@ public abstract class Engine {
         return (pic.data);
     }
 
-    public int clipInsideBox(int x, int y, int wallnum, int walldist) {
-        return clipinsidebox(x, y, wallnum, walldist);
-    }
-
-    public int clipinsidebox(int x, int y, int wallnum, int walldist) { // jfBuild
-        return engineService.clipInsideBox(x, y, wallnum, walldist);
-    }
-
-    public int clipInsideBoxLine(int x, int y, int x1, int y1, int x2, int y2, int walldist) { // jfBuild
-        return clipinsideboxline(x, y, x1, y1, x2, y2, walldist);
-    }
-
-    public int clipinsideboxline(int x, int y, int x1, int y1, int x2, int y2, int walldist) { // jfBuild
-        return engineService.clipInsideBoxLine(x, y, x1, y1, x2, y2, walldist);
-    }
-
-    public int inside(int x, int y, int sectnum) { // jfBuild
-        return boardService.inside(x, y, Engine.getSector(sectnum)) ? 1 : 0;
-    }
-
-    protected static int SETSPRITEZ = 0;
-
-    public boolean setsprite(int spritenum, int newx, int newy, int newz) // jfBuild
-    {
-        return boardService.setSprite(spritenum, newx, newy, newz, SETSPRITEZ != 0);
-    }
-
     public int nextsectorneighborz(int sectnum, int thez, int topbottom, int direction) { // jfBuild
         int nextz = 0x80000000;
         if (direction == 1) nextz = 0x7fffffff;
@@ -645,20 +509,6 @@ public abstract class Engine {
         } while (i != 0);
 
         return (sectortouse);
-    }
-
-    public boolean cansee(int x1, int y1, int z1, int sect1, int x2, int y2, int z2, int sect2) { // eduke32
-        return engineService.canSee(x1, y1, z1, sect1, x2, y2, z2, sect2);
-    }
-
-
-    public int hitscan(int xs, int ys, int zs, int sectnum, int vx, int vy, int vz, // jfBuild
-                       Hitscan hit, int cliptype) {
-        scanner.setGoal(hitscangoalx, hitscangoaly);
-        boolean result = scanner.run(xs, ys, zs, sectnum, vx, vy, vz, cliptype);
-        HitInfo is = scanner.getInfo();
-        hit.set(is.x, is.y, is.z, is.sector, is.wall, is.sprite);
-        return result ? 0 : -1;
     }
 
     public void nextpage() { // gdxBuild
@@ -866,42 +716,8 @@ public abstract class Engine {
         return (point);
     }
 
-    public int clipmove(int x, int y, int z, int sectnum, // jfBuild
-                        long xvect, long yvect, int walldist, int ceildist, int flordist, int cliptype) {
-        int result = clipmove.invoke(x, y, z, sectnum, xvect, yvect, walldist, ceildist, flordist, cliptype);
 
-        ClipInfo info = clipmove.getInfo();
-        clipmove_x = info.getX();
-        clipmove_y = info.getY();
-        clipmove_z = info.getZ();
-        clipmove_sectnum = (short) info.getSectnum();
 
-        return result;
-    }
-
-    public static int pushmove_x, pushmove_y, pushmove_z;
-    public static short pushmove_sectnum;
-
-    public int pushmove(int x, int y, int z, int sectnum, // jfBuild
-                        int walldist, int ceildist, int flordist, int cliptype) {
-        int result = pushMover.move(x, y, z, sectnum, walldist, ceildist, flordist, cliptype);
-
-        ClipInfo info = pushMover.getInfo();
-        pushmove_x = info.getX();
-        pushmove_y = info.getY();
-        pushmove_z = info.getZ();
-        pushmove_sectnum = (short) info.getSectnum();
-
-        return result;
-    }
-
-    public int updatesector(int x, int y, int sectnum) { // jfBuild
-        return boardService.updatesector(x, y, sectnum);
-    }
-
-    public int updatesectorz(int x, int y, int z, int sectnum) { // jfBuild
-        return boardService.updatesectorz(x, y, z, sectnum);
-    }
 
     protected Point rotatepoint = new Point();
 
@@ -935,18 +751,6 @@ public abstract class Engine {
     {
         return (int) (Math.random() * 32767);
     }
-
-    public void getzrange(int x, int y, int z, int sectnum, // jfBuild
-                          int walldist, int cliptype) {
-
-        RangeZInfo info = getZRange.invoke(x, y, z, sectnum, walldist, cliptype);
-        zr_ceilz = info.getCeilz();
-        zr_ceilhit = info.getCeilhit();
-        zr_florz = info.getFlorz();
-        zr_florhit = info.getFlorhit();
-    }
-
-
 
     public void makepalookup(final int palnum, byte[] remapbuf, int r, int g, int b, int dastat) // jfBuild
     {
@@ -998,6 +802,7 @@ public abstract class Engine {
             }
         });
     }
+
     public void squarerotatetile(int tilenume) {
         Tile pic = getTile(tilenume);
         int xsiz = pic.getWidth();
@@ -1031,34 +836,6 @@ public abstract class Engine {
         byte tmp = pic.data[p1];
         pic.data[p1] = pic.data[p2];
         pic.data[p2] = tmp;
-    }
-
-
-    public int sectorofwall(int theline) { // jfBuild
-        return boardService.sectorOfWall(theline);
-    }
-
-    public int getceilzofslope(int sectnum, int dax, int day) { // jfBuild
-        return boardService.getceilzofslope(boardService.getSector(sectnum), dax, day);
-    }
-
-    public int getflorzofslope(int sectnum, int dax, int day) { // jfBuild
-        return boardService.getflorzofslope(getSector(sectnum), dax, day);
-    }
-
-    public void getzsofslope(int sectnum, int dax, int day, AtomicInteger fz, AtomicInteger cz) {
-        Sector sec = getSector(sectnum);
-        fz.set(sec.getFloorz());
-        cz.set(sec.getCeilingz());
-        boardService.getzsofslope(sec, dax, day, fz, cz);
-    }
-
-    public void alignceilslope(int dasect, int x, int y, int z) { // jfBuild
-        boardService.alignSlope(dasect, x, y, z,true);
-    }
-
-    public void alignflorslope(int dasect, int x, int y, int z) { // jfBuild
-        boardService.alignSlope(dasect, x, y, z, false);
     }
 
     public int loopnumofsector(int sectnum, int wallnum) { // jfBuild
@@ -1107,8 +884,6 @@ public abstract class Engine {
     }
 
     public abstract void faketimerhandler();
-
-
 
     public enum Clockdir {
         CW(0), CCW(1);
@@ -1232,8 +1007,194 @@ public abstract class Engine {
 
 
 
+    public boolean rIntersect(int xs, int ys, int zs, int vx, int vy, int vz, int x1, int y1, int x2, int y2, Variable rx, Variable ry, Variable rz) {
+        return engineService.rIntersect(xs, ys, zs, vx, vy, vz, x1, y1, x2, y2, rx, ry, rz);
+    }
 
+    public int clipInsideBox(int x, int y, int wallnum, int walldist) {
+        return clipinsidebox(x, y, wallnum, walldist);
+    }
 
+    public int clipinsidebox(int x, int y, int wallnum, int walldist) { // jfBuild
+        return engineService.clipInsideBox(x, y, wallnum, walldist);
+    }
+
+    public int clipInsideBoxLine(int x, int y, int x1, int y1, int x2, int y2, int walldist) { // jfBuild
+        return clipinsideboxline(x, y, x1, y1, x2, y2, walldist);
+    }
+
+    public int clipinsideboxline(int x, int y, int x1, int y1, int x2, int y2, int walldist) { // jfBuild
+        return engineService.clipInsideBoxLine(x, y, x1, y1, x2, y2, walldist);
+    }
+
+    public boolean cansee(int x1, int y1, int z1, int sect1, int x2, int y2, int z2, int sect2) { // eduke32
+        return engineService.canSee(x1, y1, z1, sect1, x2, y2, z2, sect2);
+    }
+
+    public boolean lIntersect(int x1, int y1, int z1, int x2, int y2, int z2, int x3, // jfBuild
+                              int y3, int x4, int y4, Variable x, Variable y, Variable z) {
+        return engineService.lIntersect(x1, y1, z1, x2, y2, z2, x3, y3, x4, y4, x, y, z);
+    }
+
+    public int hitscan(int xs, int ys, int zs, int sectnum, int vx, int vy, int vz, // jfBuild
+                       Hitscan hit, int cliptype) {
+        scanner.setGoal(hitscangoalx, hitscangoaly);
+        boolean result = scanner.run(xs, ys, zs, sectnum, vx, vy, vz, cliptype);
+        HitInfo is = scanner.getInfo();
+        hit.set(is.x, is.y, is.z, is.sector, is.wall, is.sprite);
+        return result ? 0 : -1;
+    }
+
+    public int clipmove(int x, int y, int z, int sectnum, // jfBuild
+                        long xvect, long yvect, int walldist, int ceildist, int flordist, int cliptype) {
+        int result = clipmove.invoke(x, y, z, sectnum, xvect, yvect, walldist, ceildist, flordist, cliptype);
+
+        ClipInfo info = clipmove.getInfo();
+        clipmove_x = info.getX();
+        clipmove_y = info.getY();
+        clipmove_z = info.getZ();
+        clipmove_sectnum = (short) info.getSectnum();
+
+        return result;
+    }
+
+    public int pushmove(int x, int y, int z, int sectnum, // jfBuild
+                        int walldist, int ceildist, int flordist, int cliptype) {
+        int result = pushMover.move(x, y, z, sectnum, walldist, ceildist, flordist, cliptype);
+
+        ClipInfo info = pushMover.getInfo();
+        pushmove_x = info.getX();
+        pushmove_y = info.getY();
+        pushmove_z = info.getZ();
+        pushmove_sectnum = (short) info.getSectnum();
+
+        return result;
+    }
+
+    public void getzrange(int x, int y, int z, int sectnum, // jfBuild
+                          int walldist, int cliptype) {
+
+        RangeZInfo info = getZRange.invoke(x, y, z, sectnum, walldist, cliptype);
+        zr_ceilz = info.getCeilz();
+        zr_ceilhit = info.getCeilhit();
+        zr_florz = info.getFlorz();
+        zr_florhit = info.getFlorhit();
+    }
+
+    ////////// BOARD MANIPULATION FUNCTIONS //////////
+
+    public BuildPos loadboard(String filename) throws FileNotFoundException {
+        Resource fil;
+        if ((fil = BuildGdx.cache.open(filename, 0)) == null) {
+            throw new FileNotFoundException("Map " + filename + " not found!");
+        }
+        boardService.load(fil);
+
+        Arrays.fill(show2dsector, (byte) 0);
+        Arrays.fill(show2dsprite, (byte) 0);
+        Arrays.fill(show2dwall, (byte) 0);
+
+        fil.close();
+
+        return boardService.getBoard().getPos();
+    }
+
+    public BoardService getBoardService() {
+        return boardService;
+    }
+
+    public static Sector getSector(int index) {
+        return boardService.getSector(index);
+    }
+
+    public static Wall getWall(int index) {
+        return boardService.getWall(index);
+    }
+
+    public static Sprite getSprite(int index) {
+        return boardService.getSprite(index);
+    }
+
+    public int insertspritesect(int sectnum) {
+        return boardService.insertspritesect(sectnum);
+    }
+
+    public int insertspritestat(int newstatnum) {
+        return boardService.insertspritestat(newstatnum);
+    }
+
+    public int insertsprite(int sectnum, int statnum) { // jfBuild
+        return boardService.insertsprite(sectnum, statnum);
+    }
+
+    public int deletesprite(int spritenum) { // jfBuild
+        GLRenderer gl = glrender();
+        if (gl != null) gl.removeSpriteCorr(spritenum);
+        boardService.deletesprite(spritenum);
+        return 0;
+    }
+
+    public int changespritesect(int spritenum, int newsectnum) { // jfBuild
+        boardService.changespritesect(spritenum, newsectnum);
+        return (0);
+    }
+
+    public boolean changespritestat(int spritenum, int newstatnum) { // jfBuild
+        return boardService.changespritestat(spritenum, newstatnum);
+    }
+
+    public boolean deletespritesect(int spritenum) {
+        return boardService.deletespritesect(spritenum);
+    }
+
+    public boolean deletespritestat(int spritenum) {
+        return boardService.deletespritestat(spritenum);
+    }
+
+    public int inside(int x, int y, int sectnum) { // jfBuild
+        return boardService.inside(x, y, Engine.getSector(sectnum)) ? 1 : 0;
+    }
+
+    protected static int SETSPRITEZ = 0;
+
+    public boolean setsprite(int spritenum, int newx, int newy, int newz) { // jfBuild
+        return boardService.setSprite(spritenum, newx, newy, newz, SETSPRITEZ != 0);
+    }
+
+    public int sectorofwall(int theline) { // jfBuild
+        return boardService.sectorOfWall(theline);
+    }
+
+    public int getceilzofslope(int sectnum, int dax, int day) { // jfBuild
+        return boardService.getceilzofslope(boardService.getSector(sectnum), dax, day);
+    }
+
+    public int getflorzofslope(int sectnum, int dax, int day) { // jfBuild
+        return boardService.getflorzofslope(getSector(sectnum), dax, day);
+    }
+
+    public void getzsofslope(int sectnum, int dax, int day, AtomicInteger fz, AtomicInteger cz) {
+        Sector sec = getSector(sectnum);
+        fz.set(sec.getFloorz());
+        cz.set(sec.getCeilingz());
+        boardService.getzsofslope(sec, dax, day, fz, cz);
+    }
+
+    public void alignceilslope(int dasect, int x, int y, int z) { // jfBuild
+        boardService.alignSlope(dasect, x, y, z,true);
+    }
+
+    public void alignflorslope(int dasect, int x, int y, int z) { // jfBuild
+        boardService.alignSlope(dasect, x, y, z, false);
+    }
+
+    public int updatesector(int x, int y, int sectnum) { // jfBuild
+        return boardService.updatesector(x, y, sectnum);
+    }
+
+    public int updatesectorz(int x, int y, int z, int sectnum) { // jfBuild
+        return boardService.updatesectorz(x, y, z, sectnum);
+    }
 
     ////////// RENDERER MANIPULATION FUNCTIONS //////////
 

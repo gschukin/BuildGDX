@@ -9,6 +9,10 @@ public class EngineUtils {
         return tables;
     }
 
+    public static Tables getTables() {
+        return tables;
+    }
+
     public static int sin(int k) {
         return tables.sin(k);
     }

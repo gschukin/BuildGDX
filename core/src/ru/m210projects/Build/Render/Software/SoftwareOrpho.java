@@ -109,7 +109,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			}
 		} else {
 			int fontsize = 0;
-			if (font.ptr == engine.getTables().getSmallTextFont())
+			if (font.ptr == EngineUtils.getTables().getSmallTextFont())
 				fontsize = 1;
 
 			printext(xpos, ypos, col, -1, text, fontsize, scale);
@@ -121,9 +121,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 		int stx = xpos;
 		int charxsiz = 8;
 		int charysiz = (int) (scale * 7);
-		byte[] fontptr = engine.getTables().getTextFont();
+		byte[] fontptr = EngineUtils.getTables().getTextFont();
 		if (fontsize != 0) {
-			fontptr = engine.getTables().getSmallTextFont();
+			fontptr = EngineUtils.getTables().getSmallTextFont();
 			charxsiz = 4;
 		}
 

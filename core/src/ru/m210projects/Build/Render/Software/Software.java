@@ -164,6 +164,11 @@ public class Software implements Renderer {
 		this.engine = engine;
 
 		ortho = allocOrphoRenderer(settings);
+
+		for (int i = 0; i < 5; i++) {
+			cz[i] = new AtomicInteger();
+			fz[i] = new AtomicInteger();
+		}
 	}
 
 	@Override
@@ -3646,7 +3651,7 @@ public class Software implements Renderer {
 			int x = (640 << 16) - mulscale(xinc, xdimen, 1);
 
 
-			Tables tables = engine.getTables();
+			Tables tables = EngineUtils.getTables();
 			for (i = 0; i < xdimen; i++) {
 				j = x & 65535;
 				k = x >> 16;

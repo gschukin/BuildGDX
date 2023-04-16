@@ -2,6 +2,7 @@ package ru.m210projects.Build.Types.collections;
 
 import ru.m210projects.Build.Types.Sprite;
 
+import java.net.ProtocolException;
 import java.util.List;
 
 public class SpriteMap {
@@ -44,9 +45,17 @@ public class SpriteMap {
     }
 
     public boolean set(int element, int value) {
-        if (value < 0 || value >= basket.length
-                || element < 0 || element >= nodeMap.length) {
+        if (value < 0 || value >= basket.length) {
             return false;
+        }
+
+        if (element < 0 || element >= nodeMap.length) {
+            // if spriteList was increased by another sprite map
+            if (element < spriteList.size()) {
+                increase();
+            } else {
+                return false;
+            }
         }
 
         SpriteNode node = nodeMap[element];
@@ -58,7 +67,11 @@ public class SpriteMap {
 
     public boolean remove(int element) {
         if (element < 0 || element >= nodeMap.length) {
-            return false;
+            if (element < spriteList.size()) {
+                increase();
+            } else {
+                return false;
+            }
         }
 
         SpriteNode node = nodeMap[element];
@@ -108,7 +121,7 @@ public class SpriteMap {
             SpriteNode newNode = new SpriteNode(i, valueSetter);
             list.addLast(newNode);
             if (i >= spriteList.size()) {
-                spriteList.add(new Sprite());
+                spriteList.add(newInstance());
                 setValue(newNode, poolIndex);
             }
             nodeMap[i] = newNode;
@@ -123,5 +136,9 @@ public class SpriteMap {
 
         this.nodeMap = newNodeMap;
         fill(size);
+    }
+
+    protected Sprite newInstance() {
+        return new Sprite();
     }
 }
