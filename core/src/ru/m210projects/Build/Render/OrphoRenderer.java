@@ -35,7 +35,8 @@ import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.Wall;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
+
 import static ru.m210projects.Build.RenderService.*;
 
 public abstract class OrphoRenderer {
@@ -149,7 +150,7 @@ public abstract class OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (SpriteNode node = service.getSectNode(i); node != null; node = node.getNext()) {
+				for (MapNode node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = Engine.getSprite(j);
 

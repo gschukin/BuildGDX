@@ -1,6 +1,5 @@
 package ru.m210projects.Build;
 
-import org.jetbrains.annotations.Nullable;
 import ru.m210projects.Build.Types.BuildPos;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
@@ -38,7 +37,6 @@ public class Board {
         return walls;
     }
 
-    @Nullable
     public Sprite getSprite(int index) {
         if(index < 0 || index >= sprites.size()) {
             return null;
@@ -46,7 +44,6 @@ public class Board {
         return sprites.get(index);
     }
 
-    @Nullable
     public Wall getWall(int index) {
         if(index < 0 || index >= walls.length) {
             return null;
@@ -54,7 +51,7 @@ public class Board {
         return walls[index];
     }
 
-    @Nullable
+
     public Sector getSector(int index) {
         if(index < 0 || index >= sectors.length) {
             return null;

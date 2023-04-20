@@ -5,9 +5,9 @@ import ru.m210projects.Build.Types.BuildPos;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Wall;
-import ru.m210projects.Build.Types.collections.MapType;
+import ru.m210projects.Build.Types.collections.LinkedMap;
+import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.collections.SpriteMap;
-import ru.m210projects.Build.Types.collections.SpriteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BoardService {
 
     protected Board board;
-    protected SpriteMap spriteSectMap;
-    protected SpriteMap spriteStatMap;
+    protected LinkedMap<Sprite> spriteSectMap;
+    protected LinkedMap<Sprite> spriteStatMap;
     protected final AtomicInteger floorz = new AtomicInteger();
     protected final AtomicInteger ceilingz = new AtomicInteger();
 
@@ -147,8 +147,8 @@ public class BoardService {
 
         this.board = new Board(startPos, sectors, walls, sprites);
 
-        this.spriteStatMap = new SpriteMap(1024, sprites, 1024, MapType.STATUS_SETTER);
-        this.spriteSectMap = new SpriteMap(sectors.length, sprites, 1024, MapType.SECTOR_SETTER);
+        this.spriteStatMap = new SpriteMap(1024, sprites, 1024, Sprite::setStatnum);
+        this.spriteSectMap = new SpriteMap(sectors.length, sprites, 1024, Sprite::setSectnum);
 
         // init maps for new board
         for (int i = 0; i < numSprites; i++) {
@@ -530,11 +530,11 @@ public class BoardService {
         return board;
     }
 
-    public SpriteNode getSectNode(int sector) {
+    public MapNode getSectNode(int sector) {
         return spriteSectMap.getFirst(sector);
     }
 
-    public SpriteNode getStatNode(int statnum) {
+    public MapNode getStatNode(int statnum) {
         return spriteStatMap.getFirst(statnum);
     }
 

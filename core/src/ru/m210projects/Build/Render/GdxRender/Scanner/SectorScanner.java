@@ -19,7 +19,8 @@ import ru.m210projects.Build.Render.GdxRender.Pool;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
+
 import static ru.m210projects.Build.RenderService.*;
 
 public abstract class SectorScanner {
@@ -385,7 +386,7 @@ public abstract class SectorScanner {
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
 		BoardService service = engine.getBoardService();
-		for (SpriteNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
+		for (MapNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 			int z = node.getIndex();
 			Sprite spr = Engine.getSprite(z);
 

@@ -151,4 +151,7 @@ public class FEntryResource implements Resource {
 		return file.getName();
 	}
 
+	public String getPath() {
+		return file.getPath();
+	}
 }

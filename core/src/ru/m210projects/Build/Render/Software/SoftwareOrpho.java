@@ -33,7 +33,7 @@ import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 public class SoftwareOrpho extends OrphoRenderer {
 
@@ -331,7 +331,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((Engine.getSprite(i1).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)

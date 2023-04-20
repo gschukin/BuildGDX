@@ -2,14 +2,14 @@ package ru.m210projects.Build.Types.collections;
 
 import java.util.NoSuchElementException;
 
-public class SpriteList {
+public class MapList {
 
-    private SpriteNode first;
-    private SpriteNode last;
+    private MapNode first;
+    private MapNode last;
     private int size;
 
-    public void addFirst(SpriteNode newNode) {
-        final SpriteNode f = first;
+    public void addFirst(MapNode newNode) {
+        final MapNode f = first;
         first = newNode.link(this, null, f);
         if (f == null) {
             last = newNode;
@@ -19,8 +19,8 @@ public class SpriteList {
         size++;
     }
 
-    public void addLast(SpriteNode newNode) {
-        final SpriteNode l = last;
+    public void addLast(MapNode newNode) {
+        final MapNode l = last;
         last = newNode.link(this, l, null);
         if (l == null) {
             first = newNode;
@@ -30,8 +30,8 @@ public class SpriteList {
         size++;
     }
 
-    public SpriteNode removeFirst() {
-        final SpriteNode f = first;
+    public MapNode removeFirst() {
+        final MapNode f = first;
         if (f == null) {
             throw new NoSuchElementException();
         }
@@ -39,8 +39,8 @@ public class SpriteList {
         return f;
     }
 
-    public SpriteNode removeLast() {
-        final SpriteNode l = last;
+    public MapNode removeLast() {
+        final MapNode l = last;
         if (l == null) {
             throw new NoSuchElementException();
         }
@@ -52,10 +52,10 @@ public class SpriteList {
         return size;
     }
 
-    protected void unlink(SpriteNode x) {
+    protected void unlink(MapNode x) {
         x.parent = null;
-        final SpriteNode next = x.next;
-        final SpriteNode prev = x.prev;
+        final MapNode next = x.next;
+        final MapNode prev = x.prev;
 
         if (prev == null) {
             first = next;
@@ -73,11 +73,11 @@ public class SpriteList {
         size--;
     }
 
-    public SpriteNode getFirst() {
+    public MapNode getFirst() {
         return first;
     }
 
-    public SpriteNode getLast() {
+    public MapNode getLast() {
         return last;
     }
 
@@ -89,7 +89,7 @@ public class SpriteList {
 
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (SpriteNode x = first; x != null; x = x.next) {
+        for (MapNode x = first; x != null; x = x.next) {
             sb.append(x.getIndex());
             if (x.next != null) {
                 sb.append(',').append(' ');

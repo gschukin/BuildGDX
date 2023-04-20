@@ -33,7 +33,7 @@ import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -547,7 +547,7 @@ public class GDXOrtho extends OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (SpriteNode node = service.getSectNode(i); node != null; node = node.getNext()) {
+				for (MapNode node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = Engine.getSprite(j);
 
@@ -755,7 +755,7 @@ public class GDXOrtho extends OrphoRenderer {
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				if ((showSprites & 1) != 0) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
 						if ((Engine.getSprite(i).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
@@ -774,7 +774,7 @@ public class GDXOrtho extends OrphoRenderer {
 				}
 
 				if ((showSprites & 2) != 0) {
-					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
 						if ((Engine.getSprite(i).getCstat() & 48) == 32)
 							continue;

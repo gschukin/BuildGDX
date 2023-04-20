@@ -62,7 +62,7 @@ import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 public class Polymost2D extends OrphoRenderer {
 
@@ -196,7 +196,7 @@ public class Polymost2D extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int j1 = node.getIndex();
 						if ((Engine.getSprite(j1).getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
@@ -215,7 +215,7 @@ public class Polymost2D extends OrphoRenderer {
 				}
 
 				if (mapSettings.isShowSprites(MapView.Polygons))
-					for (SpriteNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((show2dsprite[i1 >> 3] & pow2char[i1 & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)

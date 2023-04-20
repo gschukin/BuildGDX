@@ -1,7 +1,7 @@
 package ru.m210projects.Build;
 
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 import static java.lang.Math.abs;
 import static ru.m210projects.Build.Engine.MAXSECTORS;
@@ -179,7 +179,7 @@ public class HitScanner {
                 sectorSet.addValue(nextsector);
             }
 
-            for (SpriteNode node = service.getSectNode(dasector); node != null; node = node.getNext()) {
+            for (MapNode node = service.getSectNode(dasector); node != null; node = node.getNext()) {
                 int z = node.getIndex();
                 Sprite spr = service.getSprite(z);
 

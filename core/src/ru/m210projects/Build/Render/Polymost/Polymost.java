@@ -126,7 +126,7 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 public class Polymost implements GLRenderer {
 
@@ -1676,7 +1676,7 @@ public class Polymost implements GLRenderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (SpriteNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
+			for (MapNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 				int z = node.getIndex();
 				spr = Engine.getSprite(z);
 				if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)

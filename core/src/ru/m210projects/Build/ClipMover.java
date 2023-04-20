@@ -1,7 +1,7 @@
 package ru.m210projects.Build;
 
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.collections.SpriteNode;
+import ru.m210projects.Build.Types.collections.MapNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,7 +195,7 @@ public class ClipMover {
                 }
             }
 
-            for (SpriteNode node = service.getSectNode(dasect); node != null; node = node.getNext()) {
+            for (MapNode node = service.getSectNode(dasect); node != null; node = node.getNext()) {
                 int j = node.getIndex();
                 Sprite spr = service.getSprite(j);
 

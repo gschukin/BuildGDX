@@ -16,7 +16,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 
-import org.jetbrains.annotations.NotNull;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
@@ -30,7 +29,7 @@ public class Sector {
 	public Wall[] getWalls() {
 		return walls;
 	}
-	public void setWalls(@NotNull Wall[] walls) {
+	public void setWalls(Wall[] walls) {
 		this.walls = walls;
 	}
 
