@@ -1,7 +1,7 @@
 package ru.m210projects.Build;
 
 import ru.m210projects.Build.Types.ClipInfo;
-import ru.m210projects.Build.Types.IntSet;
+import ru.m210projects.Build.Types.collections.IntSet;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Wall;
 

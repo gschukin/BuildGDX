@@ -73,7 +73,7 @@ public abstract class LinkedMap<T> {
         list.unlink(node);
         list = basket[poolIndex];
         list.addFirst(node);
-        setValue(node, poolIndex);
+        setValue(node, -1);
         return true;
     }
 
@@ -111,7 +111,7 @@ public abstract class LinkedMap<T> {
             list.addLast(newNode);
             if (i >= this.list.size()) {
                 this.list.add(getInstance());
-                setValue(newNode, poolIndex);
+                setValue(newNode, -1);
             }
             nodeMap[i] = newNode;
         }

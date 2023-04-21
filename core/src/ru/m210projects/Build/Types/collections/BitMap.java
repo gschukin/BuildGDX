@@ -1,4 +1,4 @@
-package ru.m210projects.Build;
+package ru.m210projects.Build.Types.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;

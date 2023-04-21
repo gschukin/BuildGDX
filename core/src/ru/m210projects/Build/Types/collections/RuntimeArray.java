@@ -1,4 +1,6 @@
-package ru.m210projects.Build.Types;
+package ru.m210projects.Build.Types.collections;
+
+import ru.m210projects.Build.Types.QuickSort;
 
 import java.util.AbstractList;
 import java.util.Arrays;

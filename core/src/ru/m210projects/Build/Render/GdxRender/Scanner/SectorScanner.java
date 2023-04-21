@@ -15,7 +15,7 @@ import ru.m210projects.Build.*;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.QuickSort.IntComparator;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
-import ru.m210projects.Build.Render.GdxRender.Pool;
+import ru.m210projects.Build.Types.collections.Pool;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;

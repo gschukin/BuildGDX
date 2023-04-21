@@ -1,7 +1,5 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
-import static ru.m210projects.Build.Engine.*;
-
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Plane;
@@ -10,8 +8,8 @@ import com.badlogic.gdx.math.Vector3;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
-import ru.m210projects.Build.Render.GdxRender.Pool;
-import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
+import ru.m210projects.Build.Types.collections.Pool;
+import ru.m210projects.Build.Types.collections.Pool.Poolable;
 import static ru.m210projects.Build.RenderService.*;
 
 public class WallFrustum3d implements Poolable {

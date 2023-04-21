@@ -9,7 +9,7 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Types.Wall;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
-import ru.m210projects.Build.Render.GdxRender.Pool;
+import ru.m210projects.Build.Types.collections.Pool;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
 

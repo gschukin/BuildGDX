@@ -1,6 +1,6 @@
 package ru.m210projects.Build.Types;
 
-import ru.m210projects.Build.BitMap;
+import ru.m210projects.Build.Types.collections.BitMap;
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.math.Frustum;
 import com.badlogic.gdx.math.Plane;
 
-import ru.m210projects.Build.Render.GdxRender.Pool;
+import ru.m210projects.Build.Types.collections.Pool;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 
 public class PolygonClipper {

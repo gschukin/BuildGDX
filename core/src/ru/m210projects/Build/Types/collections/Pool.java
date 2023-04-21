@@ -1,4 +1,4 @@
-package ru.m210projects.Build.Render.GdxRender;
+package ru.m210projects.Build.Types.collections;
 
 import java.util.ArrayList;
 

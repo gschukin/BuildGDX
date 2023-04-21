@@ -3,8 +3,7 @@ package ru.m210projects.Build.Render.GdxRender;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntArray;
 
-import ru.m210projects.Build.Render.GdxRender.Pool;
-import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
+import ru.m210projects.Build.Types.collections.Pool.Poolable;
 
 public class VisibleSector implements Poolable {
 

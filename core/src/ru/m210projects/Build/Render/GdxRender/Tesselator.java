@@ -1,7 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender;
 
 import static java.lang.Math.sqrt;
-import static ru.m210projects.Build.Engine.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,8 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
 import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.Types.collections.Pool;
+import ru.m210projects.Build.Types.collections.RuntimeArray;
 
 public class Tesselator {
 

@@ -1,6 +1,4 @@
-package ru.m210projects.Build.Types;
-
-import ru.m210projects.Build.BitMap;
+package ru.m210projects.Build.Types.collections;
 
 import java.util.ArrayList;
 import java.util.List;

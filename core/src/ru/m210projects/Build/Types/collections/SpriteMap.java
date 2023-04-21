@@ -15,4 +15,8 @@ public class SpriteMap extends LinkedMap<Sprite> {
         return new Sprite();
     }
 
+    @Override
+    protected void setValue(MapNode node, int value) {
+        super.setValue(node, (value == -1) ? poolIndex : value);
+    }
 }

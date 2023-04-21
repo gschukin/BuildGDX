@@ -1,13 +1,12 @@
 package ru.m210projects.Build.Render.GdxRender.Scanner;
 
-import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.RenderService.*;
 
 import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
+import ru.m210projects.Build.Types.collections.Pool.Poolable;
 import ru.m210projects.Build.Types.Wall;
 
 public class WallFrustum2d implements Poolable {

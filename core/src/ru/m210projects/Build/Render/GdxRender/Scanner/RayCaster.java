@@ -12,11 +12,11 @@ import com.badlogic.gdx.math.Plane;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Render.GdxRender.Pool;
-import ru.m210projects.Build.Render.GdxRender.Pool.Poolable;
-import ru.m210projects.Build.Types.LinkedList;
-import ru.m210projects.Build.Types.LinkedList.Node;
-import ru.m210projects.Build.Types.RuntimeArray;
+import ru.m210projects.Build.Types.collections.Pool;
+import ru.m210projects.Build.Types.collections.Pool.Poolable;
+import ru.m210projects.Build.Types.collections.LinkedList;
+import ru.m210projects.Build.Types.collections.LinkedList.Node;
+import ru.m210projects.Build.Types.collections.RuntimeArray;
 import ru.m210projects.Build.Types.Wall;
 
 public class RayCaster {

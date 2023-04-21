@@ -1,4 +1,4 @@
-package ru.m210projects.Build.Types;
+package ru.m210projects.Build.Types.collections;
 
 import java.util.Arrays;
 import java.util.Comparator;
