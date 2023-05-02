@@ -2,14 +2,14 @@ package ru.m210projects.Build.Types.collections;
 
 import java.util.NoSuchElementException;
 
-public class MapList {
+public class MapList<T> {
 
-    private MapNode first;
-    private MapNode last;
+    private MapNode<T> first;
+    private MapNode<T> last;
     private int size;
 
-    public void addFirst(MapNode newNode) {
-        final MapNode f = first;
+    public void addFirst(MapNode<T> newNode) {
+        final MapNode<T> f = first;
         first = newNode.link(this, null, f);
         if (f == null) {
             last = newNode;
@@ -19,8 +19,8 @@ public class MapList {
         size++;
     }
 
-    public void addLast(MapNode newNode) {
-        final MapNode l = last;
+    public void addLast(MapNode<T> newNode) {
+        final MapNode<T> l = last;
         last = newNode.link(this, l, null);
         if (l == null) {
             first = newNode;
@@ -30,8 +30,8 @@ public class MapList {
         size++;
     }
 
-    public MapNode removeFirst() {
-        final MapNode f = first;
+    public MapNode<T> removeFirst() {
+        final MapNode<T> f = first;
         if (f == null) {
             throw new NoSuchElementException();
         }
@@ -39,8 +39,8 @@ public class MapList {
         return f;
     }
 
-    public MapNode removeLast() {
-        final MapNode l = last;
+    public MapNode<T> removeLast() {
+        final MapNode<T> l = last;
         if (l == null) {
             throw new NoSuchElementException();
         }
@@ -52,10 +52,10 @@ public class MapList {
         return size;
     }
 
-    protected void unlink(MapNode x) {
+    protected void unlink(MapNode<T> x) {
         x.parent = null;
-        final MapNode next = x.next;
-        final MapNode prev = x.prev;
+        final MapNode<T> next = x.next;
+        final MapNode<T> prev = x.prev;
 
         if (prev == null) {
             first = next;
@@ -73,11 +73,11 @@ public class MapList {
         size--;
     }
 
-    public MapNode getFirst() {
+    public MapNode<T> getFirst() {
         return first;
     }
 
-    public MapNode getLast() {
+    public MapNode<T> getLast() {
         return last;
     }
 
@@ -89,8 +89,8 @@ public class MapList {
 
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        for (MapNode x = first; x != null; x = x.next) {
-            sb.append(x.getIndex());
+        for (MapNode<T> x = first; x != null; x = x.next) {
+            sb.append(x.index);
             if (x.next != null) {
                 sb.append(',').append(' ');
             }

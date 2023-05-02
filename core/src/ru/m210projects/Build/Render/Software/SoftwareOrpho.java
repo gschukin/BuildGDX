@@ -331,9 +331,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
-						if ((Engine.getSprite(i1).getCstat() & 48) == 32) {
+						if ((node.get().getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
 							if ((Engine.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8))
@@ -341,7 +341,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(Engine.getSprite(i1));
+							tsprite[sortnum].set(node.get());
 							tsprite[sortnum++].setOwner((short) i1);
 						}
 					}

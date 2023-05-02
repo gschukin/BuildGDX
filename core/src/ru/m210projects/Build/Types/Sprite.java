@@ -21,29 +21,29 @@ public class Sprite {
 	public static final int sizeof = 44;
 	private static final ByteBuffer buffer = ByteBuffer.allocate(sizeof).order( ByteOrder.LITTLE_ENDIAN);
 
-	public int x;
-	public int y;
-	public int z; //12
-	public short cstat = 0;
-	public short picnum; //4
-	public byte shade; //1
-	public short pal;
-	public short detail; //3
-	public int clipdist = 32;
-	public short xrepeat = 32;
-	public short yrepeat = 32; //2
-	public short xoffset;
-	public short yoffset; //2
+	private int x;
+	private int y;
+	private int z; //12
+	private short cstat = 0;
+	private short picnum; //4
+	private byte shade; //1
+	private short pal;
+	private short detail; //3
+	private int clipdist = 32;
+	private short xrepeat = 32;
+	private short yrepeat = 32; //2
+	private short xoffset;
+	private short yoffset; //2
 	private short sectnum;
-	public short statnum; //4
-	public short ang;
-	public short owner = -1;
-	public short xvel;
-	public short yvel;
-	public short zvel; //10
-	public short lotag;
-	public short hitag;
-	public short extra = -1;
+	private short statnum; //4
+	private short ang;
+	private short owner = -1;
+	private short xvel;
+	private short yvel;
+	private short zvel; //10
+	private short lotag;
+	private short hitag;
+	private short extra = -1;
 
 	public Sprite() {
 	}

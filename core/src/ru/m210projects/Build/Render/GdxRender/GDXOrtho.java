@@ -547,9 +547,9 @@ public class GDXOrtho extends OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (MapNode node = service.getSectNode(i); node != null; node = node.getNext()) {
+				for (MapNode<Sprite> node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
-					Sprite spr = Engine.getSprite(j);
+					Sprite spr = node.get();
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
@@ -755,9 +755,9 @@ public class GDXOrtho extends OrphoRenderer {
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				if ((showSprites & 1) != 0) {
 					// Collect floor sprites to draw
-					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
-						if ((Engine.getSprite(i).getCstat() & 48) == 32) {
+						if ((node.get().getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								break;
 
@@ -774,9 +774,9 @@ public class GDXOrtho extends OrphoRenderer {
 				}
 
 				if ((showSprites & 2) != 0) {
-					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
-						if ((Engine.getSprite(i).getCstat() & 48) == 32)
+						if ((node.get().getCstat() & 48) == 32)
 							continue;
 
 						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {

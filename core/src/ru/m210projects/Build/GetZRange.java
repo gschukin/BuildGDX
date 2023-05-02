@@ -160,9 +160,9 @@ public class GetZRange {
         }
 
         for (i = 0; i < sectorSet.size(); i++) {
-            for (MapNode node = service.getSectNode(sectorSet.getValue(i)); node != null; node = node.getNext()) {
+            for (MapNode<Sprite> node = service.getSectNode(sectorSet.getValue(i)); node != null; node = node.getNext()) {
                 int j = node.getIndex();
-                Sprite spr = service.getSprite(j);
+                Sprite spr = node.get();
                 int cstat = spr.getCstat();
                 if ((cstat & dasprclipmask) == 0) {
                     continue;

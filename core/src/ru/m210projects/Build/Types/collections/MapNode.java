@@ -1,37 +1,39 @@
 package ru.m210projects.Build.Types.collections;
 
-public class MapNode {
+public abstract class MapNode<T> {
 
-    private final int index;
-
-    protected MapList parent;
-    protected MapNode next;
-    protected MapNode prev;
+    protected final int index;
+    protected MapList<T> parent;
+    protected MapNode<T> next;
+    protected MapNode<T> prev;
 
     protected MapNode(int index) {
         this.index = index;
     }
 
-    public MapNode getNext() {
+    public abstract T get();
+
+    public MapNode<T> getNext() {
         return next;
     }
 
-    public MapNode getPrev() {
+    public MapNode<T> getPrev() {
         return prev;
     }
 
-    protected MapNode link(MapList parent, MapNode prev, MapNode next) {
+    protected MapNode<T> link(MapList<T> parent, MapNode<T> prev, MapNode<T> next) {
         this.parent = parent;
         this.next = next;
         this.prev = prev;
         return this;
     }
 
-    protected MapList getParent() {
+    protected MapList<T> getParent() {
         return parent;
     }
 
     public int getIndex() {
         return index;
     }
+
 }

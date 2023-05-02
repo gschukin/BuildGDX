@@ -530,11 +530,11 @@ public class BoardService {
         return board;
     }
 
-    public MapNode getSectNode(int sector) {
+    public MapNode<Sprite> getSectNode(int sector) {
         return spriteSectMap.getFirst(sector);
     }
 
-    public MapNode getStatNode(int statnum) {
+    public MapNode<Sprite> getStatNode(int statnum) {
         return spriteStatMap.getFirst(statnum);
     }
 
@@ -559,6 +559,10 @@ public class BoardService {
     }
 
     public Sprite getSprite(int index) {
+        if (index == -1) {
+            return null;
+        }
+
         return board.getSprite(index);
     }
 

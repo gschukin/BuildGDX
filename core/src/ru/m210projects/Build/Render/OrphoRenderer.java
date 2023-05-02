@@ -150,9 +150,9 @@ public abstract class OrphoRenderer {
 				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
 					continue;
 
-				for (MapNode node = service.getSectNode(i); node != null; node = node.getNext()) {
+				for (MapNode<Sprite> node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
-					Sprite spr = Engine.getSprite(j);
+					Sprite spr = node.get();
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
 							|| !mapSettings.isSpriteVisible(MapView.Lines, j))

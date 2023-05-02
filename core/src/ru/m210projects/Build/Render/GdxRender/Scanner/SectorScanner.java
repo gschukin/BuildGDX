@@ -386,9 +386,9 @@ public abstract class SectorScanner {
 
 	private void checkSprites(WallFrustum3d pFrustum, int sectnum) {
 		BoardService service = engine.getBoardService();
-		for (MapNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
+		for (MapNode<Sprite> node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 			int z = node.getIndex();
-			Sprite spr = Engine.getSprite(z);
+			Sprite spr = node.get();
 
 			if ((((spr.getCstat() & 0x8000) == 0) || showinvisibility) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 					&& (spritesortcnt < MAXSPRITESONSCREEN)) {

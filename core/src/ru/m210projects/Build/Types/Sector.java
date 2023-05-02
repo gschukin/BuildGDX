@@ -33,30 +33,30 @@ public class Sector {
 		this.walls = walls;
 	}
 
-	public short wallptr;
-	public short wallnum; // 4
-	public int ceilingz;
-	public int floorz; // 8
-	public short ceilingstat;
-	public short floorstat; // 4
-	public short ceilingpicnum;
-	public short ceilingheinum; // 4
-	public byte ceilingshade; // 1
+	private short wallptr;
+	private short wallnum; // 4
+	private int ceilingz;
+	private int floorz; // 8
+	private short ceilingstat;
+	private short floorstat; // 4
+	private short ceilingpicnum;
+	private short ceilingheinum; // 4
+	private byte ceilingshade; // 1
 
-	public short ceilingpal;
-	public short ceilingxpanning;
-	public short ceilingypanning; // 3
-	public short floorpicnum;
-	public short floorheinum; // 4
-	public byte floorshade; // 1
-	public short floorpal;
-	public short floorxpanning;
-	public short floorypanning; // 3
-	public short visibility;
-	public short filler; // 2
-	public short lotag;
-	public short hitag;
-	public short extra; // 6
+	private short ceilingpal;
+	private short ceilingxpanning;
+	private short ceilingypanning; // 3
+	private short floorpicnum;
+	private short floorheinum; // 4
+	private byte floorshade; // 1
+	private short floorpal;
+	private short floorxpanning;
+	private short floorypanning; // 3
+	private short visibility;
+	private short filler; // 2
+	private short lotag;
+	private short hitag;
+	private short extra; // 6
 
 	public Sector() {
 	}

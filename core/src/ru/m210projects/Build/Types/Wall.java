@@ -23,23 +23,23 @@ public class Wall {
     private static final int sizeof = 32;
     private static final ByteBuffer buffer = ByteBuffer.allocate(getSizeof()).order(ByteOrder.LITTLE_ENDIAN);
 
-    public int x;
-	public int y; //8
-    public short point2;
-	public short nextwall;
-	public short nextsector;
-	public short cstat; //8
-    public short picnum;
-	public short overpicnum; //4
-    public byte shade; //1
-    public short pal;
-	public short xrepeat;
-	public short yrepeat;
-	public short xpanning;
-	public short ypanning; //5
-    public short lotag;
-	public short hitag;
-	public short extra; //6
+    private int x;
+	private int y; //8
+    private short point2;
+	private short nextwall;
+	private short nextsector;
+	private short cstat; //8
+    private short picnum;
+	private short overpicnum; //4
+    private byte shade; //1
+    private short pal;
+	private short xrepeat;
+	private short yrepeat;
+	private short xpanning;
+	private short ypanning; //5
+    private short lotag;
+	private short hitag;
+	private short extra; //6
 
     public Wall() {
     }

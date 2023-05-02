@@ -180,9 +180,9 @@ public class HitScanner {
                 sectorSet.addValue(nextsector);
             }
 
-            for (MapNode node = service.getSectNode(dasector); node != null; node = node.getNext()) {
+            for (MapNode<Sprite> node = service.getSectNode(dasector); node != null; node = node.getNext()) {
                 int z = node.getIndex();
-                Sprite spr = service.getSprite(z);
+                Sprite spr = node.get();
 
                 if (hitallsprites == 0) {
                     if ((spr.getCstat() & dasprclipmask) == 0) {

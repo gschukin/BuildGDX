@@ -196,26 +196,26 @@ public class Polymost2D extends OrphoRenderer {
 
 				if (mapSettings.isShowFloorSprites()) {
 					// Collect floor sprites to draw
-					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int j1 = node.getIndex();
-						if ((Engine.getSprite(j1).getCstat() & 48) == 32) {
+						if ((node.get().getCstat() & 48) == 32) {
 							if (sortnum >= MAXSPRITESONSCREEN)
 								continue;
 
-							if ((Engine.getSprite(j1).getCstat() & (64 + 8)) == (64 + 8)
+							if ((node.get().getCstat() & (64 + 8)) == (64 + 8)
 									|| !mapSettings.isSpriteVisible(MapView.Polygons, j1))
 								continue;
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(Engine.getSprite(j1));
+							tsprite[sortnum].set(node.get());
 							tsprite[sortnum++].setOwner((short) j1);
 						}
 					}
 				}
 
 				if (mapSettings.isShowSprites(MapView.Polygons))
-					for (MapNode node = service.getSectNode(s); node != null; node = node.getNext()) {
+					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((show2dsprite[i1 >> 3] & pow2char[i1 & 7]) != 0) {
 							if (sortnum >= MAXSPRITESONSCREEN)
@@ -226,7 +226,7 @@ public class Polymost2D extends OrphoRenderer {
 
 							if (tsprite[sortnum] == null)
 								tsprite[sortnum] = new TSprite();
-							tsprite[sortnum].set(Engine.getSprite(i1));
+							tsprite[sortnum].set(node.get());
 							tsprite[sortnum++].setOwner((short) i1);
 						}
 					}

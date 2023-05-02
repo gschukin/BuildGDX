@@ -3696,9 +3696,9 @@ public class Software implements Renderer {
 		do {
 			sectnum = sectorborder[--sectorbordercnt];
 
-			for (MapNode node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
+			for (MapNode<Sprite> node = service.getSectNode(sectnum); node != null; node = node.getNext()) {
 				int z1 = node.getIndex();
-				spr = Engine.getSprite(z1);
+				spr = node.get();
 				if ((((spr.getCstat() & 0x8000) == 0) || (showinvisibility)) && (spr.getXrepeat() > 0) && (spr.getYrepeat() > 0)
 						&& (spritesortcnt < MAXSPRITESONSCREEN)) {
 					xs = spr.getX() - globalposx;
@@ -3706,8 +3706,7 @@ public class Software implements Renderer {
 					if (((spr.getCstat() & 48) != 0) || (xs * cosglobalang + ys * singlobalang > 0)) {
 						if (tsprite[spritesortcnt] == null)
 							tsprite[spritesortcnt] = new TSprite();
-						tsprite[spritesortcnt].set(Engine.getSprite(z1));
-
+						tsprite[spritesortcnt].set(spr);
 						tsprite[spritesortcnt++].setOwner((short) z1);
 					}
 				}

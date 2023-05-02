@@ -121,9 +121,9 @@ public class NearScanner {
                 }
             }
 
-            for (MapNode node = service.getSectNode(dasector); node != null; node = node.getNext()) {
+            for (MapNode<Sprite> node = service.getSectNode(dasector); node != null; node = node.getNext()) {
                 int z = node.getIndex();
-                Sprite spr = service.getSprite(z);
+                Sprite spr = node.get();
 
                 int good = 0;
                 if (((tagsearch & 1) != 0) && spr.getLotag() != 0) {
