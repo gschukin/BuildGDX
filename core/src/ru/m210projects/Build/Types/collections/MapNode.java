@@ -21,6 +21,14 @@ public abstract class MapNode<T> {
         return prev;
     }
 
+    public boolean hasNext() {
+        return next != null;
+    }
+
+    public boolean hasPrev() {
+        return prev != null;
+    }
+
     protected MapNode<T> link(MapList<T> parent, MapNode<T> prev, MapNode<T> next) {
         this.parent = parent;
         this.next = next;

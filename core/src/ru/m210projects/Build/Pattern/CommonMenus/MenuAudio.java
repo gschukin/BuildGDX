@@ -141,14 +141,16 @@ public abstract class MenuAudio extends BuildMenu {
 					List<String> names = new ArrayList<String>();
 					BuildAudio.getDeviceslList(Driver.Sound, names);
 					this.list = new char[names.size()][];
-					for (int i = 0; i < list.length; i++)
+					for (int i = 0; i < list.length; i++) {
 						this.list[i] = names.get(i).toCharArray();
+					}
 				}
 				num = snddriver = osnddriver = cfg.snddrv;
-				if (BuildGdx.audio.IsInited(Driver.Sound))
+				if (BuildGdx.audio.IsInited(Driver.Sound)) {
 					list[num] = BuildGdx.audio.getSound().getName().toCharArray();
-				else
+				} else {
 					list[num] = "initialization failed".toCharArray();
+				}
 			}
 		};
 
@@ -166,14 +168,16 @@ public abstract class MenuAudio extends BuildMenu {
 					List<String> names = new ArrayList<String>();
 					BuildAudio.getDeviceslList(Driver.Music, names);
 					this.list = new char[names.size()][];
-					for (int i = 0; i < list.length; i++)
+					for (int i = 0; i < list.length; i++) {
 						this.list[i] = names.get(i).toCharArray();
+					}
 				}
 				num = middriver = omiddriver = cfg.middrv;
 				if (BuildGdx.audio.IsInited(Driver.Music)) {
 					list[num] = BuildGdx.audio.getMusic().getName().toCharArray();
-				} else
+				} else {
 					list[num] = "initialization failed".toCharArray();
+				}
 			}
 		};
 
@@ -189,11 +193,13 @@ public abstract class MenuAudio extends BuildMenu {
 			public void open() {
 				if (this.list == null) {
 					this.list = new char[BuildGdx.audio.getSound().getNumResamplers()][];
-					for (int i = 0; i < list.length; i++)
+					for (int i = 0; i < list.length; i++) {
 						this.list[i] = BuildGdx.audio.getSound().getSoftResamplerName(i).toCharArray();
+					}
 				}
-				if (cfg.resampler_num < 0 || cfg.resampler_num >= BuildGdx.audio.getSound().getNumResamplers())
+				if (cfg.resampler_num < 0 || cfg.resampler_num >= BuildGdx.audio.getSound().getNumResamplers()) {
 					cfg.resampler_num = 0;
+				}
 				num = resampler = oresampler = cfg.resampler_num;
 			}
 		};
@@ -209,8 +215,9 @@ public abstract class MenuAudio extends BuildMenu {
 						MenuSlider slider = (MenuSlider) pItem;
 						cfg.soundVolume = slider.value / 256.0f;
 						BuildGdx.audio.setVolume(Driver.Sound, cfg.soundVolume);
-						if (listener != null)
+						if (listener != null) {
 							listener.SoundVolumeChange();
+						}
 					}
 				}, false) {
 
@@ -227,8 +234,9 @@ public abstract class MenuAudio extends BuildMenu {
 					public void run(MenuHandler handler, MenuItem pItem) {
 						MenuSlider slider = (MenuSlider) pItem;
 						voices = slider.value;
-						if (listener != null)
+						if (listener != null) {
 							listener.VoicesChange();
+						}
 					}
 				}, true) {
 			@Override
@@ -273,8 +281,9 @@ public abstract class MenuAudio extends BuildMenu {
 						MenuSlider slider = (MenuSlider) pItem;
 						cfg.musicVolume = slider.value / 256.0f;
 						BuildGdx.audio.setVolume(Driver.Music, cfg.musicVolume);
-						if (listener != null)
+						if (listener != null) {
 							listener.MusicVolumeChange();
+						}
 					}
 				}, false) {
 
@@ -291,10 +300,11 @@ public abstract class MenuAudio extends BuildMenu {
 					public void run(MenuHandler handler, MenuItem pItem) {
 						MenuSwitch sw = (MenuSwitch) pItem;
 						cfg.muteMusic = !sw.value;
-						if (cfg.muteMusic)
+						if (cfg.muteMusic) {
 							BuildGdx.audio.setVolume(Driver.Music, 0);
-						else
+						} else {
 							BuildGdx.audio.setVolume(Driver.Music, cfg.musicVolume);
+						}
 
 						sMusic.mCheckEnableItem(!cfg.muteMusic);
 						if (listener != null) {
@@ -323,8 +333,9 @@ public abstract class MenuAudio extends BuildMenu {
 				}) {
 			@Override
 			public void open() {
-				if (this.list == null)
+				if (this.list == null) {
 					this.list = getMusicTypeList();
+				}
 				cdaudio = ocdaudio = num = cfg.musicType;
 			}
 
@@ -339,16 +350,20 @@ public abstract class MenuAudio extends BuildMenu {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				if (snddriver != osnddriver || voices != ovoices || resampler != oresampler) {
-					if (listener != null)
+					if (listener != null) {
 						listener.PreDrvChange(Driver.Sound);
+					}
 
 					int olddrv = BuildGdx.audio.getDriver(Driver.Sound);
-					if (snddriver != osnddriver)
+					if (snddriver != osnddriver) {
 						BuildGdx.audio.setDriver(Driver.Sound, snddriver);
-					if (voices != ovoices)
+					}
+					if (voices != ovoices) {
 						cfg.maxvoices = voices;
-					if (resampler != oresampler)
+					}
+					if (resampler != oresampler) {
 						cfg.resampler_num = resampler;
+					}
 
 					if (SoundRestart(cfg.maxvoices, cfg.resampler_num)) {
 						cfg.snddrv = osnddriver = snddriver;
@@ -358,10 +373,12 @@ public abstract class MenuAudio extends BuildMenu {
 						oresampler = resampler;
 
 						sResampler.list = new char[BuildGdx.audio.getSound().getNumResamplers()][];
-						for (int i = 0; i < sResampler.list.length; i++)
+						for (int i = 0; i < sResampler.list.length; i++) {
 							sResampler.list[i] = BuildGdx.audio.getSound().getSoftResamplerName(i).toCharArray();
-						if (cfg.resampler_num < 0 || cfg.resampler_num >= BuildGdx.audio.getSound().getNumResamplers())
+						}
+						if (cfg.resampler_num < 0 || cfg.resampler_num >= BuildGdx.audio.getSound().getNumResamplers()) {
 							cfg.resampler_num = 0;
+						}
 						sResampler.num = resampler = oresampler = cfg.resampler_num;
 
 					} else {
@@ -369,8 +386,9 @@ public abstract class MenuAudio extends BuildMenu {
 						BuildGdx.audio.setDriver(Driver.Sound, olddrv);
 					}
 				} else {
-					if (listener != null)
+					if (listener != null) {
 						listener.PreDrvChange(Driver.Music);
+					}
 
 					if (middriver != omiddriver) {
 						int olddrv = BuildGdx.audio.getDriver(Driver.Music);
@@ -389,8 +407,9 @@ public abstract class MenuAudio extends BuildMenu {
 						ocdaudio = cdaudio;
 					}
 				}
-				if (listener != null)
+				if (listener != null) {
 					listener.PostDrvChange();
+				}
 			}
 		};
 
@@ -405,10 +424,11 @@ public abstract class MenuAudio extends BuildMenu {
 
 			@Override
 			public void mCheckEnableItem(boolean nEnable) {
-				if (nEnable)
+				if (nEnable) {
 					flags = 3 | 4;
-				else
+				} else {
 					flags = 3;
+				}
 			}
 		};
 

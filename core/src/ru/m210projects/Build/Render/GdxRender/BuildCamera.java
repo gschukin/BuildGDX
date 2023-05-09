@@ -91,8 +91,9 @@ public class BuildCamera extends PerspectiveCamera {
 
 	public float getAngle() {
 		float angle = MathUtils.atan2(direction.y, direction.x);
-		if (angle < 0)
+		if (angle < 0) {
 			angle += MathUtils.PI2;
+		}
 		return BClampAngle(angle * radiansToBuildAngle);
 	}
 
@@ -129,15 +130,18 @@ public class BuildCamera extends PerspectiveCamera {
 	}
 
 	public boolean polyInCamera(ArrayList<? extends Vector3> list) {
-		if (list == null)
+		if (list == null) {
 			return false;
+		}
 
 		Plane[] planes = this.frustum.planes;
 		Plane: for (int i = 2; i < planes.length; i++) {
 			Plane plane = planes[i];
-			for (int p = 0; p < list.size(); p++)
-				if (plane.testPoint(list.get(p)) != PlaneSide.Back)
+			for (int p = 0; p < list.size(); p++) {
+				if (plane.testPoint(list.get(p)) != PlaneSide.Back) {
 					continue Plane;
+				}
+			}
 
 			return false;
 		}

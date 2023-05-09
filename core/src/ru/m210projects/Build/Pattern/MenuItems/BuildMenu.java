@@ -33,7 +33,9 @@ public class BuildMenu {
 
 	public int addItem(MenuItem pItem, boolean nFirstItem)
 	{
-		if(pItem == null) return -1;
+		if(pItem == null) {
+			return -1;
+		}
 
 	  	m_pItems[m_nItems] = pItem;
 	  	pItem.m_pMenu = this;
@@ -48,17 +50,21 @@ public class BuildMenu {
 	
 	public int removeItem(MenuItem pItem)
 	{
-		if(pItem == null) return -1;
+		if(pItem == null) {
+			return -1;
+		}
 		
-		for(int i = 0; i < m_nItems; i++)
+		for(int i = 0; i < m_nItems; i++) {
 			if(m_pItems[i] == pItem)
 			{
 				int pos = i;
-				while(pos < m_nItems) 
+				while(pos < m_nItems) {
 					m_pItems[pos] = ++pos < m_nItems ? m_pItems[pos] : null;
+				}
 				m_nItems--;
 				return i;
 			}
+		}
 		
 		return -1;
 	}
@@ -66,8 +72,9 @@ public class BuildMenu {
 	public int open(MenuHandler handler, int nItem)
 	{
 		if ( nItem >= 0 && nItem < nMaxGameMenuItems) {
-			if ( mCheckItemsFlags(nItem) )
+			if ( mCheckItemsFlags(nItem) ) {
 				m_nFocus = m_nFirst = (short) nItem;
+			}
 		}
 
 		mLoadRes(handler, MenuOpt.Open);
@@ -77,49 +84,58 @@ public class BuildMenu {
 	
 	public boolean mLoadRes(MenuHandler handler, MenuOpt opt)
 	{
-		if ( m_nItems <= 0 )
+		if ( m_nItems <= 0 ) {
 			return true;
+		}
 		
-		if(m_nFocus >= 0 && m_pItems[m_nFocus] != null)
+		if(m_nFocus >= 0 && m_pItems[m_nFocus] != null) {
 			handler.mSound(m_pItems[m_nFocus], opt);
+		}
 		
 		switch(opt) {
 		case Open:
-			if ( m_nFirst >= 0 )
+			if ( m_nFirst >= 0 ) {
 				m_nFocus = m_nFirst;
-			for ( int i = 0; i < m_nItems; i++ )
+			}
+			for ( int i = 0; i < m_nItems; i++ ) {
 				m_pItems[i].open();
+			}
 			return false;
 		case Close:
-			for ( int i = 0; i < m_nItems; i++ )
+			for ( int i = 0; i < m_nItems; i++ ) {
 				m_pItems[i].close();
+			}
 			return false;
 		default:
-			if ( m_nFocus >= 0 && mCheckItemsFlags(m_nFocus)) 
-		    	return m_pItems[m_nFocus].callback(handler, opt);
+			if ( m_nFocus >= 0 && mCheckItemsFlags(m_nFocus)) {
+				return m_pItems[m_nFocus].callback(handler, opt);
+			}
 		}
 		return false;
 	}
 	
 	protected boolean mCheckItemsFlags(int nItem) {
-		if ( nItem < 0 || nItem >= nMaxGameMenuItems || m_pItems[nItem] == null ) 
+		if ( nItem < 0 || nItem >= nMaxGameMenuItems || m_pItems[nItem] == null ) {
 			return false;
+		}
 			
 		MenuItem pItem = m_pItems[nItem];
 		return (pItem.flags & 1) != 0 && (pItem.flags & 2) != 0;
 	}
 	
 	public boolean mCheckMouseFlag(int nItem) {
-		if ( nItem < 0 || nItem >= nMaxGameMenuItems || m_pItems[nItem] == null ) 
+		if ( nItem < 0 || nItem >= nMaxGameMenuItems || m_pItems[nItem] == null ) {
 			return false;
+		}
 			
 		MenuItem pItem = m_pItems[nItem];
 		return (pItem.flags & 2) != 0;
 	}
 	
 	public boolean mGetFocusedItem(MenuItem m_pItem) {
-		if ( m_nFocus >= 0 && m_nFocus < nMaxGameMenuItems) 
-		    return m_pItem == m_pItems[m_nFocus];
+		if ( m_nFocus >= 0 && m_nFocus < nMaxGameMenuItems) {
+			return m_pItem == m_pItems[m_nFocus];
+		}
 		
 		return false;
 	}
@@ -128,8 +144,9 @@ public class BuildMenu {
 	{
 		for ( int i = 0; i < m_nItems; ++i )
 		{
-			if ( i == m_nFocus || i != m_nFocus && (m_pItems[i].flags & 8) == 0 )
+			if ( i == m_nFocus || i != m_nFocus && (m_pItems[i].flags & 8) == 0 ) {
 				m_pItems[i].draw(handler);
+			}
 		}
 	}
 	
@@ -139,8 +156,9 @@ public class BuildMenu {
 		do
 		{
 			nItem = m_nFocus - 1;
-			if ( nItem < 0 )
+			if ( nItem < 0 ) {
 				nItem += m_nItems;
+			}
 			m_nFocus = (short) nItem;
 		}
 		while ( !mCheckItemsFlags(nItem) );
@@ -153,8 +171,9 @@ public class BuildMenu {
 		do
 		{
 			nItem = m_nFocus + 1;
-			if ( nItem >= m_nItems )
+			if ( nItem >= m_nItems ) {
 				nItem = 0;
+			}
 			m_nFocus = (short) nItem;
 		}
 		while ( !mCheckItemsFlags(nItem) );

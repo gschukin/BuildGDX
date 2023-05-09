@@ -43,21 +43,25 @@ public class Gameutils {
 
 	public static void fill(byte[] array, int value) {
 		int len = array.length;
-		if (len > 0)
+		if (len > 0) {
 			array[0] = (byte) value;
+		}
 
-		for (int i = 1; i < len; i += i)
+		for (int i = 1; i < len; i += i) {
 			System.arraycopy(array, 0, array, i, Math.min((len - i), i));
+		}
 	}
 
 	public static void fill(byte[] array, int start, int end, int value) {
-		if (array.length > 0)
+		if (array.length > 0) {
 			array[start] = (byte) value;
+		}
 
 		int len = end - start;
 
-		for (int i = 1; i < len; i += i)
+		for (int i = 1; i < len; i += i) {
 			System.arraycopy(array, start, array, start + i, Math.min((len - i), i));
+		}
 	}
 
 	public static float invSqrt(float x) {
@@ -75,8 +79,9 @@ public class Gameutils {
 
 	public static double angle(double dx, double dy, boolean deg) {
 		double k = deg ? 90.0 : Math.PI / 2.0;
-		if (dy >= 0.0)
+		if (dy >= 0.0) {
 			return k * ((dx >= 0 ? dy / (dx + dy) : 1 - dx / (-dx + dy)));
+		}
 		return k * ((dx < 0 ? 2 - dy / (-dx - dy) : 3 + dx / (dx - dy)));
 	}
 
@@ -85,15 +90,17 @@ public class Gameutils {
 	}
 
 	public static float BClipRange(float value, float min, float max) {
-		if (value < min)
+		if (value < min) {
 			return min;
+		}
 		return Math.min(value, max);
 
 	}
 
 	public static int BClipRange(int value, int min, int max) {
-		if (value < min)
+		if (value < min) {
 			return min;
+		}
 		return Math.min(value, max);
 
 	}
@@ -173,25 +180,31 @@ public class Gameutils {
 
 		int xdim = (4 * ydim) / 3;
 		if (4 * oxdim / 5 == ydim) // 1280 : 1024
+		{
 			xdim = (5 * ydim) / 4;
+		}
 
 		int offset = oxdim - xdim;
 		int buildim = 320;
-		if (type == ConvertType.Stretch)
+		if (type == ConvertType.Stretch) {
 			buildim = buildim * xdim / oxdim;
+		}
 
 		int normxofs = coord - (buildim << 15);
 		int wx = (xdim << 15) + scale(normxofs, xdim, buildim);
 
-		if (type == ConvertType.Stretch)
+		if (type == ConvertType.Stretch) {
 			return wx;
+		}
 
 		wx += (oxdim - xdim) / 2;
 
-		if (type == ConvertType.AlignLeft)
+		if (type == ConvertType.AlignLeft) {
 			return wx - offset / 2 - 1;
-		if (type == ConvertType.AlignRight)
+		}
+		if (type == ConvertType.AlignRight) {
 			return wx + offset / 2 - 1;
+		}
 
 		return wx - 1;
 	}
@@ -263,8 +276,9 @@ public class Gameutils {
 		if (data != null) {
 			DataResource res = new DataResource(null, filename, -1, data);
 			Group group = BuildGdx.cache.add(res, filename);
-			if (group == null)
+			if (group == null) {
 				return;
+			}
 
 			GroupResource def = group.open(appdef);
 			if (def != null) {

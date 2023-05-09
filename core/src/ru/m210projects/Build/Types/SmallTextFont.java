@@ -40,8 +40,9 @@ public class SmallTextFont extends TileFont {
 
 	@Override
 	public GLTile getGL(TextureManager textureCache, PixelFormat fmt, int col) {
-		if (atlas == null || atlas.getTextureObjectHandle() == 0)
+		if (atlas == null || atlas.getTextureObjectHandle() == 0) {
 			init(textureCache);
+		}
 
 		return atlas;
 	}

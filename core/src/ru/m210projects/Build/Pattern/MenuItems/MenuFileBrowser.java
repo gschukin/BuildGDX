@@ -67,12 +67,14 @@ public abstract class MenuFileBrowser extends MenuItem {
 			ExtProp p2 = getPropertie(o2);
 			if (p1 != null && p2 != null) {
 				int c = p2.priority - p1.priority;
-				if (c != 0)
+				if (c != 0) {
 					return c;
+				}
 			}
 
-			if (o1 instanceof FileEntry && o2 instanceof FileEntry)
+			if (o1 instanceof FileEntry && o2 instanceof FileEntry) {
 				return ((FileEntry) o1).compareTo((FileEntry) o2);
+			}
 
 			return s1.compareTo(s2);
 		}
@@ -168,8 +170,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	private void changeDir(DirectoryEntry dir) {
-		if (!dir.checkCacheList() && currDir == dir)
+		if (!dir.checkCacheList() && currDir == dir) {
 			return;
+		}
 
 		list[DIRECTORY].clear();
 		fileUnit.clear();
@@ -177,24 +180,28 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 		currDir = dir;
 		path = File.separator;
-		if (dir.getRelativePath() != null)
+		if (dir.getRelativePath() != null) {
 			path += currDir.getRelativePath();
+		}
 
 		for (Iterator<DirectoryEntry> it = dir.getDirectories().values().iterator(); it.hasNext();) {
 			DirectoryEntry sdir = it.next();
-			if (!sdir.getName().equals("<userdir>"))
+			if (!sdir.getName().equals("<userdir>")) {
 				list[DIRECTORY].add(toLowerCase(sdir.getName()));
+			}
 		}
 		Collections.sort(list[DIRECTORY]);
-		if (dir.getParent() != null)
+		if (dir.getParent() != null) {
 			list[DIRECTORY].add(0, back);
+		}
 
 		handleDirectory(dir);
 
 		for (Iterator<FileEntry> it = dir.getFiles().values().iterator(); it.hasNext();) {
 			FileEntry file = it.next();
-			if (extensionProperties.get(file.getExtension()) != null)
+			if (extensionProperties.get(file.getExtension()) != null) {
 				handleFile(file);
+			}
 		}
 		sortFiles();
 
@@ -242,8 +249,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 			int pal = listPal; // handler.getPal(font, item); //listPal;
 			int shade = handler.getShade(
 					currColumn == DIRECTORY && i == l_nFocus[DIRECTORY] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
-			if (currColumn == DIRECTORY && i == l_nFocus[DIRECTORY])
+			if (currColumn == DIRECTORY && i == l_nFocus[DIRECTORY]) {
 				pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+			}
 
 			text = toCharArray(list[DIRECTORY].get(i));
 //			if(list[DIRECTORY].get(i).equals(back))
@@ -255,8 +263,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 		py = yList;
 		for (int i = l_nMin[FILE]; i >= 0 && i < l_nMin[FILE] + nListItems && i < list[FILE].size(); i++) {
 			int pal = listPal;
-			if (currColumn == FILE && i == l_nFocus[FILE])
+			if (currColumn == FILE && i == l_nFocus[FILE]) {
 				pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+			}
 			int shade = handler
 					.getShade(currColumn == FILE && i == l_nFocus[FILE] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
 
@@ -269,8 +278,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 			ExtProp p = getPropertie(obj);
 			if (p != null) {
 				int itemPal = p.pal;
-				if (itemPal != 0)
+				if (itemPal != 0) {
 					pal = itemPal;
+				}
 			}
 
 			px = x + width - font.getWidth(text) - scrollerWidth - 5;
@@ -299,8 +309,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 				handler.getShade(currColumn == DIRECTORY ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
 
 		if (System.currentTimeMillis() - checkDirectory >= 2000) {
-			if (currDir.checkCacheList())
+			if (currDir.checkCacheList()) {
 				refreshList();
+			}
 			checkDirectory = System.currentTimeMillis();
 		}
 	}
@@ -309,10 +320,11 @@ public abstract class MenuFileBrowser extends MenuItem {
 		int tptr = 0, tx = 0;
 
 		while (tptr < text.length && text[tptr] != 0) {
-			if (tx + x > x1 && tx + x <= x2)
+			if (tx + x > x1 && tx + x <= x2) {
 				x += font.drawChar(x, y, text[tptr], shade, pal, 2, fontShadow);
-			else
+			} else {
 				x += font.getWidth(text[tptr]);
+			}
 
 			tptr++;
 		}
@@ -348,48 +360,57 @@ public abstract class MenuFileBrowser extends MenuItem {
 	public boolean callback(MenuHandler handler, MenuOpt opt) {
 		switch (opt) {
 		case MWUP:
-			if (l_nMin[currColumn] > 0)
+			if (l_nMin[currColumn] > 0) {
 				l_nMin[currColumn]--;
+			}
 			return false;
 		case MWDW:
-			if (l_nMin[currColumn] < list[currColumn].size() - nListItems)
+			if (l_nMin[currColumn] < list[currColumn].size() - nListItems) {
 				l_nMin[currColumn]++;
+			}
 			return false;
 		case UP:
 			l_nFocus[currColumn]--;
-			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn])
-				if (l_nMin[currColumn] > 0)
+			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
+				if (l_nMin[currColumn] > 0) {
 					l_nMin[currColumn]--;
+				}
+			}
 			if (l_nFocus[currColumn] < 0) {
 				l_nFocus[currColumn] = list[currColumn].size() - 1;
 				l_nMin[currColumn] = list[currColumn].size() - nListItems;
-				if (l_nMin[currColumn] < 0)
+				if (l_nMin[currColumn] < 0) {
 					l_nMin[currColumn] = 0;
+				}
 			}
 			return false;
 		case DW:
 			l_nFocus[currColumn]++;
 			if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems
-					&& l_nFocus[currColumn] < list[currColumn].size())
+					&& l_nFocus[currColumn] < list[currColumn].size()) {
 				l_nMin[currColumn]++;
+			}
 			if (l_nFocus[currColumn] >= list[currColumn].size()) {
 				l_nFocus[currColumn] = 0;
 				l_nMin[currColumn] = 0;
 			}
 			return false;
 		case LEFT:
-			if (list[DIRECTORY].size() > 0)
+			if (list[DIRECTORY].size() > 0) {
 				currColumn = DIRECTORY;
+			}
 			return false;
 		case RIGHT:
-			if (list[FILE].size() > 0)
+			if (list[FILE].size() > 0) {
 				currColumn = FILE;
+			}
 			return false;
 		case ENTER:
 		case LMB:
 			if (opt == MenuOpt.LMB && scrollTouch[FILE] || scrollTouch[DIRECTORY]) {
-				if (list[currColumn].size() <= nListItems)
+				if (list[currColumn].size() <= nListItems) {
 					return false;
+				}
 
 				int nList = BClipLow(list[currColumn].size() - nListItems, 1);
 				int nRange = scrollerHeight;
@@ -402,17 +423,20 @@ public abstract class MenuFileBrowser extends MenuItem {
 				return false;
 			}
 			if (list[DIRECTORY].size() > 0 && currColumn == DIRECTORY) {
-				if (l_nFocus[DIRECTORY] == -1)
+				if (l_nFocus[DIRECTORY] == -1) {
 					return false;
+				}
 				String dirName = list[DIRECTORY].get(l_nFocus[DIRECTORY]);
-				if (dirName.equals(back))
+				if (dirName.equals(back)) {
 					changeDir(currDir.getParent());
-				else
+				} else {
 					changeDir(currDir.checkDirectory(dirName));
+				}
 			} else if (list[FILE].size() > 0 && currColumn == FILE) {
 
-				if (l_nFocus[FILE] == -1)
+				if (l_nFocus[FILE] == -1) {
 					return false;
+				}
 
 				invoke(fileUnit.get(getFileName()));
 			}
@@ -428,9 +452,11 @@ public abstract class MenuFileBrowser extends MenuItem {
 			return false;
 		case PGUP:
 			l_nFocus[currColumn] -= (nListItems - 1);
-			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn])
-				if (l_nMin[currColumn] > 0)
+			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
+				if (l_nMin[currColumn] > 0) {
 					l_nMin[currColumn] -= (nListItems - 1);
+				}
+			}
 			if (l_nFocus[currColumn] < 0 || l_nMin[currColumn] < 0) {
 				l_nFocus[currColumn] = 0;
 				l_nMin[currColumn] = 0;
@@ -439,15 +465,17 @@ public abstract class MenuFileBrowser extends MenuItem {
 		case PGDW:
 			l_nFocus[currColumn] += (nListItems - 1);
 			if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems
-					&& l_nFocus[currColumn] < list[currColumn].size())
+					&& l_nFocus[currColumn] < list[currColumn].size()) {
 				l_nMin[currColumn] += (nListItems - 1);
+			}
 			if (l_nFocus[currColumn] >= list[currColumn].size()
 					|| l_nMin[currColumn] > list[currColumn].size() - nListItems) {
 				l_nFocus[currColumn] = list[currColumn].size() - 1;
-				if (list[currColumn].size() >= nListItems)
+				if (list[currColumn].size() >= nListItems) {
 					l_nMin[currColumn] = list[currColumn].size() - nListItems;
-				else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems)
+				} else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
 					l_nMin[currColumn] = list[currColumn].size() - 1;
+				}
 			}
 			return false;
 		case HOME:
@@ -456,10 +484,11 @@ public abstract class MenuFileBrowser extends MenuItem {
 			return false;
 		case END:
 			l_nFocus[currColumn] = list[currColumn].size() - 1;
-			if (list[currColumn].size() >= nListItems)
+			if (list[currColumn].size() >= nListItems) {
 				l_nMin[currColumn] = list[currColumn].size() - nListItems;
-			else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems)
+			} else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
 				l_nMin[currColumn] = list[currColumn].size() - 1;
+			}
 			return false;
 		default:
 			return false;
@@ -468,10 +497,11 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		if (mx >= x + width / 2)
+		if (mx >= x + width / 2) {
 			currColumn = 1;
-		else
+		} else {
 			currColumn = 0;
+		}
 
 		if (!BuildGdx.input.isTouched()) {
 			scrollTouch[DIRECTORY] = false;
@@ -489,11 +519,12 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 			for (int i = l_nMin[currColumn]; i >= 0 && i < l_nMin[currColumn] + nListItems
 					&& i < list[currColumn].size(); i++) {
-				if (mx > x && mx < scrollX[FILE])
+				if (mx > x && mx < scrollX[FILE]) {
 					if (my > py && my < py + font.getHeight()) {
 						l_nFocus[currColumn] = i;
 						return true;
 					}
+				}
 
 				py += mFontOffset();
 			}
@@ -502,10 +533,11 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	private ExtProp getPropertie(Object obj) {
-		if (obj instanceof FileEntry)
+		if (obj instanceof FileEntry) {
 			return extensionProperties.get(((FileEntry) obj).getExtension());
-		else if (obj != null)
+		} else if (obj != null) {
 			return classProperties.get(obj.getClass());
+		}
 
 		return null;
 	}
@@ -522,8 +554,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 	@Override
 	public void close() {
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++) {
 			l_nFocus[i] = l_nMin[i] = 0;
+		}
 	}
 
 }

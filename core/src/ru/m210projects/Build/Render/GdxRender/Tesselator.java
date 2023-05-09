@@ -76,10 +76,11 @@ public class Tesselator {
 
 		int size = 0;
 		for (int i = 0; i < attributes.length; i++) {
-			if (!attributes[i].equals(VertexAttribute.ColorPacked()))
+			if (!attributes[i].equals(VertexAttribute.ColorPacked())) {
 				size += attributes[i].numComponents;
-			else
+			} else {
 				size++;
+			}
 		}
 
 		this.vertexSize = size;
@@ -91,8 +92,9 @@ public class Tesselator {
 	}
 
 	public void setSector(int sectnum, boolean initZoids) {
-		if (initZoids && this.sectnum != sectnum)
+		if (initZoids && this.sectnum != sectnum) {
 			initZoids(sectnum);
+		}
 		this.sectnum = sectnum;
 	}
 
@@ -108,8 +110,9 @@ public class Tesselator {
 		secy.clear();
 		pZoidsPool.reset();
 
-		if (n < 3)
+		if (n < 3) {
 			return;
+		}
 
 		float f, x0, y0, x1, y1, sy0, sy1;
 		int g, s, secn, ntrap, cury;
@@ -156,12 +159,15 @@ public class Tesselator {
 					y0 = y1;
 					y1 = f;
 				}
-				if ((y0 >= sy1) || (y1 <= sy0))
+				if ((y0 >= sy1) || (y1 <= sy0)) {
 					continue;
-				if (y0 < sy0)
+				}
+				if (y0 < sy0) {
 					x0 = (sy0 - wal.getY()) * (wal2.getX() - wal.getX()) / (wal2.getY() - wal.getY()) + wal.getX();
-				if (y1 > sy1)
+				}
+				if (y1 > sy1) {
 					x1 = (sy1 - wal.getY()) * (wal2.getX() - wal.getX()) / (wal2.getY() - wal.getY()) + wal.getX();
+				}
 
 				trapx0.add(x0);
 				trapx1.add(x1);
@@ -169,12 +175,13 @@ public class Tesselator {
 			}
 
 			int j;
-			for (g = (ntrap >> 1); g != 0; g >>= 1)
-				for (i = 0; i < ntrap - g; i++)
+			for (g = (ntrap >> 1); g != 0; g >>= 1) {
+				for (i = 0; i < ntrap - g; i++) {
 					for (j = i; j >= 0; j -= g) {
 
-						if (trapx0.get(j) + trapx1.get(j) <= trapx0.get(j + g) + trapx1.get(j + g))
+						if (trapx0.get(j) + trapx1.get(j) <= trapx0.get(j + g) + trapx1.get(j + g)) {
 							break;
+						}
 
 						f = trapx0.get(j);
 						trapx0.set(j, trapx0.get(j + g));
@@ -183,6 +190,8 @@ public class Tesselator {
 						trapx1.set(j, trapx1.get(j + g));
 						trapx1.set(j + g, f);
 					}
+				}
+			}
 
 			if (ntrap < 2) {
 				continue;
@@ -191,10 +200,12 @@ public class Tesselator {
 			for (i = 0; i < ntrap; i = j + 1) {
 				j = i + 1;
 
-				if ((trapx0.get(j) <= trapx0.get(i)) && (trapx1.get(j) <= trapx1.get(i)))
+				if ((trapx0.get(j) <= trapx0.get(i)) && (trapx1.get(j) <= trapx1.get(i))) {
 					continue;
-				while ((j + 2 < ntrap) && (trapx0.get(j + 1) <= trapx0.get(j)) && (trapx1.get(j + 1) <= trapx1.get(j)))
+				}
+				while ((j + 2 < ntrap) && (trapx0.get(j + 1) <= trapx0.get(j)) && (trapx1.get(j + 1) <= trapx1.get(j))) {
 					j += 2;
+				}
 
 				Zoid_t zoid = pZoidsPool.obtain();
 
@@ -278,8 +289,9 @@ public class Tesselator {
 					}
 				}
 
-				if (n < 3)
+				if (n < 3) {
 					continue;
+				}
 
 				vertex[0] = pol[0];
 				for (j = 2; j < n; j++) {
@@ -334,10 +346,11 @@ public class Tesselator {
 										double r = ((type == Type.Floor) ? sec.getFloorheinum() : sec.getCeilingheinum())
 												/ 4096.0;
 										r = sqrt(r * r + 1);
-										if ((type == Type.Floor) ? !sec.isTexSwapedFloor() : !sec.isTexSwapedCeiling())
+										if ((type == Type.Floor) ? !sec.isTexSwapedFloor() : !sec.isTexSwapedCeiling()) {
 											vptr *= r;
-										else
+										} else {
 											uptr *= r;
+										}
 									}
 								}
 
@@ -358,12 +371,14 @@ public class Tesselator {
 								}
 
 								// Texture's x is flipped
-								if ((type == Type.Floor) ? sec.isTexXFlippedFloor() : sec.isTexXFlippedCeiling())
+								if ((type == Type.Floor) ? sec.isTexXFlippedFloor() : sec.isTexXFlippedCeiling()) {
 									uCoff *= -1;
+								}
 
 								// Texture's y is flipped
-								if ((type == Type.Floor) ? sec.isTexYFlippedFloor() : sec.isTexYFlippedCeiling())
+								if ((type == Type.Floor) ? sec.isTexYFlippedFloor() : sec.isTexYFlippedCeiling()) {
 									vCoff *= -1;
+								}
 
 								float uPanning = ((type == Type.Floor) ? sec.getFloorxpanning() : sec.getCeilingxpanning())
 										/ 255.0f;
@@ -395,20 +410,23 @@ public class Tesselator {
 			Heinum heinum = type.getHeinum();
 
 			ArrayList<Vertex> pol;
-			if ((pol = mesh.getPoints(type.getHeinum(), sectnum, num)) == null || pol.size() < 3)
+			if ((pol = mesh.getPoints(type.getHeinum(), sectnum, num)) == null || pol.size() < 3) {
 				return null;
+			}
 
 			float uCoff = 1, vCoff = 1, uPanning = 0, vPanning = 0, vOffs = 0;
 			if (type != Type.Sky) {
 				int k = 0;
-				if (heinum == Heinum.Portal)
+				if (heinum == Heinum.Portal) {
 					k = -1;
-				else if (heinum == Heinum.Lower)
+				} else if (heinum == Heinum.Lower) {
 					k = 1;
+				}
 
 				Wall ptr = wal;
-				if (k == 1 && wal.getNextsector() != -1 && wal.isSwapped())
+				if (k == 1 && wal.getNextsector() != -1 && wal.isSwapped()) {
 					ptr = Engine.getWall(wal.getNextwall());
+				}
 				vOffs = getVCoord(wal, sectnum, k);
 
 				int picnum = (k == -1 ? ptr.getOverpicnum() : ptr.getPicnum());
@@ -456,11 +474,12 @@ public class Tesselator {
 							vertices.addAll(ver.x / mesh.scalexy, ver.y / mesh.scalexy, ver.z / mesh.scalez);
 							break;
 						case Usage.TextureCoordinates:
-							if (type != Type.Sky)
+							if (type != Type.Sky) {
 								vertices.addAll(uCoff * ver.u + uPanning,
 										(vCoff * (vOffs - ver.z) / mesh.scalez) + vPanning);
-							else
+							} else {
 								vertices.addAll(ver.u, ver.v);
+							}
 							break;
 						case Usage.ColorUnpacked:
 							vertices.addAll(1, 1, 1, 1);
@@ -481,8 +500,9 @@ public class Tesselator {
 		// end switch
 		}
 
-		if (count == 0)
+		if (count == 0) {
 			return null;
+		}
 
 		surf.size = count;
 		if (type == Type.Wall || type == Type.Sky) {
@@ -490,12 +510,14 @@ public class Tesselator {
 			if (mesh.getMesh() == null) { // when initializing
 				int pads = 6 - count;
 				for (int i = 0; i < pads; i++) {
-					for (int j = 0; j < getVertexSize(); j++)
+					for (int j = 0; j < getVertexSize(); j++) {
 						vertices.add(-1);
+					}
 				}
 			}
-		} else
+		} else {
 			surf.limit = count;
+		}
 
 		return surf;
 	}
@@ -508,31 +530,37 @@ public class Tesselator {
 		if (nextsectnum != -1) {
 			if (k == -1) { // masked wall
 				if (wal.isOneWay()) {
-					if (!wal.isBottomAligned())
+					if (!wal.isBottomAligned()) {
 						s3 = nextsectnum;
+					}
 				} else {
 					align = wal.isBottomAligned() ? 1 : 0;
-					if (wal.isBottomAligned())
+					if (wal.isBottomAligned()) {
 						s3 = (Engine.getSector(sectnum).getFloorz() < Engine.getSector(nextsectnum).getFloorz()) ? sectnum : nextsectnum;
-					else
+					} else {
 						s3 = (Engine.getSector(sectnum).getCeilingz() < Engine.getSector(nextsectnum).getCeilingz()) ? nextsectnum : sectnum;
+					}
 				}
 			} else {
 				if (k == 1) { // under
-					if (wal.isSwapped())
+					if (wal.isSwapped()) {
 						wal = Engine.getWall(wal.getNextwall());
+					}
 					align = wal.isBottomAligned() ? 0 : 1;
 				}
 
-				if (!wal.isBottomAligned())
+				if (!wal.isBottomAligned()) {
 					s3 = nextsectnum;
+				}
 			}
-		} else
+		} else {
 			align = wal.isBottomAligned() ? 1 : 0;
+		}
 
 		Wall ptr = Engine.getWall(Engine.getSector(s3).getWallptr());
-		if (align == 0)
+		if (align == 0) {
 			return engine.getceilzofslope((short) s3, ptr.getX(), ptr.getY());
+		}
 		return engine.getflorzofslope((short) s3, ptr.getX(), ptr.getY());
 	}
 

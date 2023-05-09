@@ -48,22 +48,25 @@ public class GLSettings extends BuildSettings {
 					@Override
 					public void run() {
 						GLRenderer gl = engine.glrender();
-						if (gl != null)
+						if (gl != null) {
 							gl.gltexapplyprops();
+						}
 					}
 				});
 
-				for (int i = 0; i < glfiltermodes.length; i++)
+				for (int i = 0; i < glfiltermodes.length; i++) {
 					if (value.equals(glfiltermodes[i])) {
 						cfg.glfilter = i;
 						break;
 					}
+				}
 			}
 
 			@Override
 			public GLFilter check(Object value) {
-				if (value instanceof GLFilter)
+				if (value instanceof GLFilter) {
 					return (GLFilter) value;
+				}
 				return null;
 			}
 		};
@@ -75,8 +78,9 @@ public class GLSettings extends BuildSettings {
 					@Override
 					public void run() {
 						GLRenderer gl = engine.glrender();
-						if (gl != null)
+						if (gl != null) {
 							gl.gltexapplyprops();
+						}
 						cfg.glanisotropy = value;
 					}
 				});
@@ -87,8 +91,9 @@ public class GLSettings extends BuildSettings {
 				if (value instanceof Integer) {
 					int anisotropy = (Integer) value;
 					if (GLInfo.maxanisotropy > 1.0) {
-						if (anisotropy <= 0 || anisotropy > GLInfo.maxanisotropy)
+						if (anisotropy <= 0 || anisotropy > GLInfo.maxanisotropy) {
 							anisotropy = (int) GLInfo.maxanisotropy;
+						}
 					}
 					return pow2long[checkAnisotropy(anisotropy)];
 				}
@@ -97,8 +102,9 @@ public class GLSettings extends BuildSettings {
 
 			int checkAnisotropy(int anisotropy) {
 				int anisotropysize = 0;
-				for (int s = anisotropy; s > 1; s >>= 1)
+				for (int s = anisotropy; s > 1; s >>= 1) {
 					anisotropysize++;
+				}
 				return anisotropysize;
 			}
 		};
@@ -114,11 +120,12 @@ public class GLSettings extends BuildSettings {
 						}
 						try {
 							int value = Integer.parseInt(osd_argv[1]);
-							if (GLSettings.textureFilter.set(glfiltermodes[value]) == RespondType.Success)
+							if (GLSettings.textureFilter.set(glfiltermodes[value]) == RespondType.Success) {
 								Console.Println(
 										"Texture filtering mode changed to " + GLSettings.textureFilter.get().name);
-							else
+							} else {
 								Console.Println("Texture filtering mode out of range");
+							}
 						} catch (Exception e) {
 							Console.Println("r_texturemode: Out of range");
 						}
@@ -137,8 +144,9 @@ public class GLSettings extends BuildSettings {
 					@Override
 					public void run() {
 						GLRenderer gl = engine.glrender();
-						if (gl != null)
+						if (gl != null) {
 							gl.gltexinvalidateall(GLInvalidateFlag.All, GLInvalidateFlag.Uninit);
+						}
 					}
 				});
 			}
@@ -149,8 +157,9 @@ public class GLSettings extends BuildSettings {
 			@Override
 			public void execute(Boolean value) {
 				GLRenderer gl = engine.glrender();
-				if (gl != null)
+				if (gl != null) {
 					gl.enableIndexedShader(value);
+				}
 				cfg.paletteEmulation = value;
 			}
 		};
@@ -196,8 +205,9 @@ public class GLSettings extends BuildSettings {
 						float gamma = (Integer) value / 4096.0f;
 						if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(Option.GLSetConfiguration,
 								//1 - gamma, cfg.fbrightness, cfg.fcontrast))
-								1 - gamma, 0.0f, 1.0f))
+								1 - gamma, 0.0f, 1.0f)) {
 							return (Integer) value;
+						}
 					} catch(Throwable ignored) {
 					}
 				}

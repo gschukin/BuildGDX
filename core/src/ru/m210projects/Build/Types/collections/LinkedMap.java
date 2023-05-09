@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Types.collections;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class LinkedMap<T> {
@@ -28,15 +29,15 @@ public abstract class LinkedMap<T> {
     protected abstract T getInstance();
 
     public int insert(int value) {
-        if (value < 0 || value >= basket.length - 1) {
-            return -1;
+        if (value < 0 || value >= basket.length) {
+            value = poolIndex;
         }
         return insert(obtain(), value);
     }
 
     public boolean set(int element, int value) {
         if (value < 0 || value >= basket.length) {
-            return false;
+            value = poolIndex;
         }
 
         if (element < 0 || element >= nodeMap.length) {
@@ -141,4 +142,5 @@ public abstract class LinkedMap<T> {
     protected MapNode<T>[] buildNodeArray(int size) {
         return new MapNode[size];
     }
+
 }

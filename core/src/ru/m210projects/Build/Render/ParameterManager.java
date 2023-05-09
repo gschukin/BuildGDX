@@ -32,17 +32,19 @@ public class ParameterManager {
 	}
 
 	public void setDepthTest(boolean enable) {
-		if (enable)
-			BuildGdx.gl20.glEnable(GL_DEPTH_TEST);
-		else
-			BuildGdx.gl20.glDisable(GL_DEPTH_TEST);
+		if (enable) {
+            BuildGdx.gl20.glEnable(GL_DEPTH_TEST);
+        } else {
+            BuildGdx.gl20.glDisable(GL_DEPTH_TEST);
+        }
 	}
 
 	public void setCullFace(boolean enable) {
-		if (enable)
-			BuildGdx.gl20.glEnable(GL_CULL_FACE);
-		else
-			BuildGdx.gl20.glDisable(GL_CULL_FACE);
+		if (enable) {
+            BuildGdx.gl20.glEnable(GL_CULL_FACE);
+        } else {
+            BuildGdx.gl20.glDisable(GL_CULL_FACE);
+        }
 	}
 
 	public void viewport(int x, int y, int width, int height) {
@@ -50,17 +52,19 @@ public class ParameterManager {
 	}
 
 	public void setBlend(boolean enable) {
-		if (enable)
-			BuildGdx.gl20.glEnable(GL_BLEND);
-		else
-			BuildGdx.gl20.glDisable(GL_BLEND);
+		if (enable) {
+            BuildGdx.gl20.glEnable(GL_BLEND);
+        } else {
+            BuildGdx.gl20.glDisable(GL_BLEND);
+        }
 	}
 
 	public void setTexture2D(boolean enable) {
-		if (enable)
-			BuildGdx.gl20.glEnable(GL_TEXTURE_2D);
-		else
-			BuildGdx.gl20.glDisable(GL_TEXTURE_2D);
+		if (enable) {
+            BuildGdx.gl20.glEnable(GL_TEXTURE_2D);
+        } else {
+            BuildGdx.gl20.glDisable(GL_TEXTURE_2D);
+        }
 	}
 
 	public void frontFace(int mode) {
@@ -76,19 +80,21 @@ public class ParameterManager {
 	}
 
 	public void setPolygonOffset(boolean enable) {
-		if (enable)
-			BuildGdx.gl20.glEnable(GL_POLYGON_OFFSET_FILL);
-		else
-			BuildGdx.gl20.glDisable(GL_POLYGON_OFFSET_FILL);
+		if (enable) {
+            BuildGdx.gl20.glEnable(GL_POLYGON_OFFSET_FILL);
+        } else {
+            BuildGdx.gl20.glDisable(GL_POLYGON_OFFSET_FILL);
+        }
 	}
 
 	// Deprecated method
 
 	public void setMultisample(boolean enable) {
-		if (enable)
-			BuildGdx.gl.glEnable(GL10.GL_MULTISAMPLE);
-		else
-			BuildGdx.gl.glDisable(GL10.GL_MULTISAMPLE);
+		if (enable) {
+            BuildGdx.gl.glEnable(GL10.GL_MULTISAMPLE);
+        } else {
+            BuildGdx.gl.glDisable(GL10.GL_MULTISAMPLE);
+        }
 	}
 
 	public void loadMatrixf(float[][] m) {
@@ -100,10 +106,11 @@ public class ParameterManager {
 	}
 
 	public void setAlphaTest(boolean enable) {
-		if (enable)
-			BuildGdx.gl.glEnable(GL10.GL_ALPHA_TEST);
-		else
-			BuildGdx.gl.glDisable(GL10.GL_ALPHA_TEST);
+		if (enable) {
+            BuildGdx.gl.glEnable(GL10.GL_ALPHA_TEST);
+        } else {
+            BuildGdx.gl.glDisable(GL10.GL_ALPHA_TEST);
+        }
 	}
 
 	public void alphaFunc(int func, float ref) {
@@ -147,10 +154,11 @@ public class ParameterManager {
 	}
 
 	public void setFog(boolean enable) {
-		if (enable)
-			BuildGdx.gl.glEnable(GL10.GL_FOG);
-		else
-			BuildGdx.gl.glDisable(GL10.GL_FOG);
+		if (enable) {
+            BuildGdx.gl.glEnable(GL10.GL_FOG);
+        } else {
+            BuildGdx.gl.glDisable(GL10.GL_FOG);
+        }
 	}
 
 	public void popMatrix() {

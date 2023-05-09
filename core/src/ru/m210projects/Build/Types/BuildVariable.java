@@ -35,7 +35,9 @@ public abstract class BuildVariable<T> {
 	
 	public RespondType set(Object i)
 	{
-		if(i == null) return RespondType.Description;
+		if(i == null) {
+			return RespondType.Description;
+		}
 		
 		T val = check(i);
 		if(val != null) {

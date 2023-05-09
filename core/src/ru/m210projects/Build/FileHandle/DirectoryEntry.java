@@ -42,8 +42,9 @@ public class DirectoryEntry {
 		this.files = new HashMap<String, FileEntry>();
 		this.subDirectory = new HashMap<String, DirectoryEntry>();
 		this.name = name;
-		if (Path != null)
+		if (Path != null) {
 			this.relativePath = getRelativePath(Path);
+		}
 		this.absolutePath = Path;
 	}
 
@@ -70,21 +71,24 @@ public class DirectoryEntry {
 	}
 
 	public FileEntry checkFile(String filepath) {
-		if (filepath == null)
+		if (filepath == null) {
 			return null;
+		}
 
 		filepath = toLowerCase(filepath);
 		DirectoryEntry dir = this;
 		while (filepath.indexOf(File.separator) != -1) {
 			int index = filepath.indexOf(File.separator);
 			String folder = filepath.substring(0, index);
-			if (dir == null)
+			if (dir == null) {
 				return null;
+			}
 			dir = dir.checkDirectory(folder);
 			filepath = filepath.substring(index + 1);
 		}
-		if (dir == null)
+		if (dir == null) {
 			return null;
+		}
 		return dir.files.get(filepath);
 	}
 
@@ -94,16 +98,19 @@ public class DirectoryEntry {
 		while (dirpath.indexOf(File.separator) != -1) {
 			int index = dirpath.indexOf(File.separator);
 			String folder = dirpath.substring(0, index);
-			if (dir == null)
+			if (dir == null) {
 				return null;
+			}
 			dir = dir.checkDirectory(folder);
 			dirpath = dirpath.substring(index + 1);
 		}
-		if (dir == null)
+		if (dir == null) {
 			return null;
+		}
 		DirectoryEntry subDir = dir.subDirectory.get(dirpath);
-		if (subDir != null)
+		if (subDir != null) {
 			subDir.InitDirectory(subDir.getAbsolutePath());
+		}
 		return subDir;
 	}
 
@@ -129,10 +136,11 @@ public class DirectoryEntry {
 	}
 
 	protected static DirectoryEntry init(String mainpath, String userpath) {
-		if (cache == null)
+		if (cache == null) {
 			cache = new HashMap<String, DirectoryEntry>();
-		else
+		} else {
 			cache.clear();
+		}
 
 		String dirName = "<main>";
 		DirectoryEntry dir = new DirectoryEntry(dirName, null);
@@ -146,8 +154,9 @@ public class DirectoryEntry {
 	}
 
 	public boolean checkCacheList() {
-		if (!inited)
+		if (!inited) {
 			return false;
+		}
 		int currentSize = files.size() + subDirectory.size();
 		boolean isMain = this == BuildGdx.compat.getDirectory(Path.Game);
 		File directory;
@@ -155,14 +164,16 @@ public class DirectoryEntry {
 		if (isMain) {
 			directory = new File(Path.Game.getPath());
 			currentSize--; // because <userdir>
-		} else
+		} else {
 			directory = new File(absolutePath);
+		}
 
 		File[] fList = directory.listFiles();
 		if (fList != null && currentSize != fList.length) {
 			DirectoryEntry userdir = null;
-			if (isMain)
+			if (isMain) {
 				userdir = BuildGdx.compat.getDirectory(Path.User);
+			}
 
 			subDirectory.clear();
 			files.clear();
@@ -176,8 +187,9 @@ public class DirectoryEntry {
 				}
 			}
 
-			if (isMain)
+			if (isMain) {
 				subDirectory.put("<userdir>", userdir);
+			}
 			return currentSize != (files.size() + subDirectory.size() - 1);
 		}
 
@@ -185,15 +197,16 @@ public class DirectoryEntry {
 	}
 
 	public void InitDirectory(String directoryPath) {
-		if (inited)
+		if (inited) {
 			return;
+		}
 		File directory = new File(directoryPath);
 		File[] fList = directory.listFiles();
 		if (fList != null) {
 			for (File file : fList) {
-				if (file.isFile())
+				if (file.isFile()) {
 					addFile(file);
-				else {
+				} else {
 					DirectoryEntry subDir = addDirectory(file.getName(), file.getAbsolutePath());
 					subDir.parentDir = this;
 				}
@@ -225,19 +238,24 @@ public class DirectoryEntry {
 
 	private String getRelativePath(String path) {
 		String mainpath = Path.Game.getPath();
-		if (name.equals("<userdir>"))
+		if (name.equals("<userdir>")) {
 			mainpath = Path.User.getPath();
+		}
 
 		if (path.length() > mainpath.length()) {
 			int i;
-			for (i = 0; i < mainpath.length(); i++)
-				if (mainpath.charAt(i) != path.charAt(i))
+			for (i = 0; i < mainpath.length(); i++) {
+				if (mainpath.charAt(i) != path.charAt(i)) {
 					break;
-			if (i == 0)
+				}
+			}
+			if (i == 0) {
 				return null; // not match
+			}
 			path = path.substring(i);
-		} else if (mainpath.startsWith(path))
+		} else if (mainpath.startsWith(path)) {
 			return null;
+		}
 
 		return toLowerCase(path);
 	}

@@ -42,8 +42,9 @@ public class FileEntry implements Comparable<FileEntry> {
 	
 	public long getChecksum()
 	{
-		if(checksum == -1)
+		if(checksum == -1) {
 			checksum = CRC32.getChecksum(this);
+		}
 		
 		return checksum;
 	}

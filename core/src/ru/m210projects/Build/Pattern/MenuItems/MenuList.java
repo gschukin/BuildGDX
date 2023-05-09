@@ -45,8 +45,9 @@ public class MenuList extends MenuItem {
 		this.nListItems = nListItems;
 		this.nextMenu = nextMenu;
 		this.callback = callback;
-		if (text != null)
+		if (text != null) {
 			this.len = text.size();
+		}
 	}
 
 	public int mFontOffset() {
@@ -59,14 +60,17 @@ public class MenuList extends MenuItem {
 			int px = x, py = y;
 			for (int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
 				int pal = this.pal; // handler.getPal(font, i == l_nFocus ? this : null);
-				if (i == l_nFocus)
+				if (i == l_nFocus) {
 					pal = handler.getPal(font, this);
+				}
 				int shade = handler.getShade(i == l_nFocus ? this : null);
 
-				if (align == 1)
+				if (align == 1) {
 					px = width / 2 + x - font.getWidth(text.get(i)) / 2;
-				if (align == 2)
+				}
+				if (align == 2) {
 					px = x + width - 1 - font.getWidth(text.get(i));
+				}
 				font.drawText(px, py, text.get(i), shade, pal, TextAlign.Left, 2, fontShadow);
 				py += mFontOffset();
 			}
@@ -76,10 +80,12 @@ public class MenuList extends MenuItem {
 			String text = "List is empty";
 			int fontx = font.getWidth(text.toCharArray());
 			int px = x, py = y;
-			if (align == 1)
+			if (align == 1) {
 				px = width / 2 + x - fontx / 2;
-			if (align == 2)
+			}
+			if (align == 2) {
 				px = x + width - 1 - fontx;
+			}
 
 			int shade = handler.getShade(this);
 			font.drawText(px, py, text.toCharArray(), shade, pal, TextAlign.Left, 2, fontShadow);
@@ -111,10 +117,12 @@ public class MenuList extends MenuItem {
 			return false;
 		case ENTER:
 		case LMB:
-			if ((flags & 4) == 0)
+			if ((flags & 4) == 0) {
 				return false;
-			if (len > 0)
+			}
+			if (len > 0) {
 				ListCallback(handler, opt);
+			}
 			return false;
 		case ESC:
 		case RMB:
@@ -144,16 +152,19 @@ public class MenuList extends MenuItem {
 			int px = x, py = y;
 			for (int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
 				int wd = font.getWidth(text.get(i));
-				if (align == 1)
+				if (align == 1) {
 					px = width / 2 + x - wd / 2;
-				if (align == 2)
+				}
+				if (align == 2) {
 					px = x + width - 1 - wd;
+				}
 
-				if (mx > px && mx < px + wd)
+				if (mx > px && mx < px + wd) {
 					if (my > py && my < py + font.getHeight()) {
 						l_nFocus = i;
 						return true;
 					}
+				}
 
 				py += mFontOffset();
 			}
@@ -163,10 +174,11 @@ public class MenuList extends MenuItem {
 
 	protected void ListEnd(MenuHandler handler, int len) {
 		l_nFocus = len - 1;
-		if (len >= nListItems)
+		if (len >= nListItems) {
 			l_nMin = len - nListItems;
-		else if (l_nFocus >= l_nMin + nListItems)
+		} else if (l_nFocus >= l_nMin + nListItems) {
 			l_nMin = len - 1;
+		}
 	}
 
 	protected void ListHome(MenuHandler handler) {
@@ -176,9 +188,11 @@ public class MenuList extends MenuItem {
 
 	protected void ListPGUp(MenuHandler handler) {
 		l_nFocus -= (nListItems - 1);
-		if (l_nFocus >= 0 && l_nFocus < l_nMin)
-			if (l_nMin > 0)
+		if (l_nFocus >= 0 && l_nFocus < l_nMin) {
+			if (l_nMin > 0) {
 				l_nMin -= (nListItems - 1);
+			}
+		}
 		if (l_nFocus < 0 || l_nMin < 0) {
 			l_nFocus = 0;
 			l_nMin = 0;
@@ -187,34 +201,40 @@ public class MenuList extends MenuItem {
 
 	protected void ListPGDown(MenuHandler handler, int len) {
 		l_nFocus += (nListItems - 1);
-		if (l_nFocus >= l_nMin + nListItems && l_nFocus < len)
+		if (l_nFocus >= l_nMin + nListItems && l_nFocus < len) {
 			l_nMin += (nListItems - 1);
+		}
 		if (l_nFocus >= len || l_nMin > len - nListItems) {
 			l_nFocus = len - 1;
-			if (len >= nListItems)
+			if (len >= nListItems) {
 				l_nMin = len - nListItems;
-			else if (l_nFocus >= l_nMin + nListItems)
+			} else if (l_nFocus >= l_nMin + nListItems) {
 				l_nMin = len - 1;
+			}
 		}
 	}
 
 	protected void ListUp(MenuHandler handler, int len) {
 		l_nFocus--;
-		if (l_nFocus >= 0 && l_nFocus < l_nMin)
-			if (l_nMin > 0)
+		if (l_nFocus >= 0 && l_nFocus < l_nMin) {
+			if (l_nMin > 0) {
 				l_nMin--;
+			}
+		}
 		if (l_nFocus < 0) {
 			l_nFocus = len - 1;
 			l_nMin = len - nListItems;
-			if (l_nMin < 0)
+			if (l_nMin < 0) {
 				l_nMin = 0;
+			}
 		}
 	}
 
 	protected void ListDown(MenuHandler handler, int len) {
 		l_nFocus++;
-		if (l_nFocus >= l_nMin + nListItems && l_nFocus < len)
+		if (l_nFocus >= l_nMin + nListItems && l_nFocus < len) {
 			l_nMin++;
+		}
 		if (l_nFocus >= len) {
 			l_nFocus = 0;
 			l_nMin = 0;
@@ -230,13 +250,15 @@ public class MenuList extends MenuItem {
 	}
 
 	protected void ListMouseWheelUp(MenuHandler handler) {
-		if (l_nMin > 0)
+		if (l_nMin > 0) {
 			l_nMin--;
+		}
 	}
 
 	protected void ListMouseWheelDown(MenuHandler handler, int len) {
-		if (l_nMin < len - nListItems)
+		if (l_nMin < len - nListItems) {
 			l_nMin++;
+		}
 	}
 
 	protected void ListEscape(MenuHandler handler, MenuOpt opt) {
@@ -247,10 +269,12 @@ public class MenuList extends MenuItem {
 	}
 	
 	protected void ListCallback(MenuHandler handler, MenuOpt opt) {
-		if (callback != null)
+		if (callback != null) {
 			callback.run(handler, this);
-		if (nextMenu != null)
+		}
+		if (nextMenu != null) {
 			handler.mOpen(nextMenu, -1);
+		}
 	}
 
 	@Override

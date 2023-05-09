@@ -45,11 +45,13 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 	protected MenuHandler menu;
 
 	public void addQueue(String name, Runnable runnable) {
-		if (!game.pCfg.gPrecache)
-			return;
+		if (!game.pCfg.gPrecache) {
+            return;
+        }
 
-		if(queues.size() == 0)
-			queues.add(new PrecacheQueue("Preload models...", glmodels));
+		if(queues.size() == 0) {
+            queues.add(new PrecacheQueue("Preload models...", glmodels));
+        }
 
 		queues.add(new PrecacheQueue(name, runnable));
 	}
@@ -86,13 +88,15 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		if (pic.getType() != AnimType.None) {
 			int frames = pic.getFrames();
 			for (int i = frames; i >= 0; i--) {
-				if (pic.getType() == AnimType.Backward)
-					tiles[(tile - i) >> 3] |= (1 << ((tile - i) & 7));
-				else
-					tiles[(tile + i) >> 3] |= (1 << ((tile + i) & 7));
+				if (pic.getType() == AnimType.Backward) {
+                    tiles[(tile - i) >> 3] |= (1 << ((tile - i) & 7));
+                } else {
+                    tiles[(tile + i) >> 3] |= (1 << ((tile + i) & 7));
+                }
 			}
-		} else
-			tiles[tile >> 3] |= pow2char[tile & 7];
+		} else {
+            tiles[tile >> 3] |= pow2char[tile & 7];
+        }
 	}
 
 	protected abstract void draw(String title, int index);
@@ -101,8 +105,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		@Override
 		public void run() {
 			GLRenderer gl = engine.glrender();
-			if (gl != null)
-				gl.preload(GLPreloadFlag.Other);
+			if (gl != null) {
+                gl.preload(GLPreloadFlag.Other);
+            }
 
 			BuildGdx.app.postRunnable(toLoad);
 			toLoad = null;
@@ -113,8 +118,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		@Override
 		public void run() {
 			GLRenderer gl = engine.glrender();
-			if (gl != null)
-				gl.preload(GLPreloadFlag.Models);
+			if (gl != null) {
+                gl.preload(GLPreloadFlag.Models);
+            }
 		}
 	};
 
@@ -147,13 +153,16 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 
 			Tile pic = engine.getTile(i);
 			if ((tiles[i >> 3] & pow2char[i & 7]) != 0) {
-				if (!revalidate && pic.data != null)
-					continue;
+				if (!revalidate && pic.data != null) {
+                    continue;
+                }
 
-				if (pic.data == null)
-					engine.loadtile(i);
-				if (gl != null)
-					gl.precache(i, 0, method);
+				if (pic.data == null) {
+                    engine.loadtile(i);
+                }
+				if (gl != null) {
+                    gl.precache(i, 0, method);
+                }
 			}
 		}
 		Arrays.fill(tiles, (byte) 0);
@@ -161,8 +170,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 
 	@Override
 	public void pause() {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL)
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+            BuildGdx.graphics.extra(Option.GLDefConfiguration);
+        }
 	}
 
 	@Override

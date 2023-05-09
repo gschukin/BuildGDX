@@ -68,8 +68,9 @@ public abstract class MDModel implements GLModel {
 		GLTile texptr = null;
 		MDSkinmap sk, skzero = null;
 
-		if (pal >= MAXPALOOKUPS)
+		if (pal >= MAXPALOOKUPS) {
 			return null;
+		}
 
 		int i = -1;
 		for (sk = skinmap; sk != null; sk = sk.next) {
@@ -104,8 +105,9 @@ public abstract class MDModel implements GLModel {
 		}
 
 		if (sk == null) {
-			if (pal >= (MAXPALOOKUPS - RESERVEDPALS))
+			if (pal >= (MAXPALOOKUPS - RESERVEDPALS)) {
 				return null;
+			}
 
 			if (skzero != null) {
 				sk = skzero;
@@ -118,11 +120,13 @@ public abstract class MDModel implements GLModel {
 			}
 		}
 
-		if (skinfile == null)
+		if (skinfile == null) {
 			return null;
+		}
 
-		if (texptr != null)
+		if (texptr != null) {
 			return texptr;
+		}
 
 		return sk.texid = loadTexture(skinfile, pal);
 	}
@@ -211,8 +215,9 @@ public abstract class MDModel implements GLModel {
 
 			nframe = anim.startframe;
 			cframe = smooth.mdoldframe;
-			if (cframe >= anim.endframe)
+			if (cframe >= anim.endframe) {
 				cframe = nframe; // old HUD sprite animation
+			}
 
 			smooth.mdsmooth = 1;
 			return;
@@ -224,8 +229,9 @@ public abstract class MDModel implements GLModel {
 		int i = (int) ((mdtims - sprext.mdanimtims) * ((fps * timerticspersec) / 120));
 
 		int j = 65536;
-		if (smooth.mdsmooth == 0)
+		if (smooth.mdsmooth == 0) {
 			j = ((anim.endframe + 1 - anim.startframe) << 16);
+		}
 
 		// Just in case you play the game for a VERY long time...
 		if (i < 0) {
@@ -235,18 +241,22 @@ public abstract class MDModel implements GLModel {
 		// compare with j*2 instead of j to ensure i stays > j-65536 for MDANIM_ONESHOT
 		if (anim != null && (i >= j + j) && (fps != 0) && mdpause == 0) // Keep mdanimtims close to mdtims to avoid the
 																		// use of MOD
+		{
 			sprext.mdanimtims += j / ((fps * timerticspersec) / 120);
+		}
 
 		int k = i;
 
 		if (anim != null && (anim.flags & MDANIM_ONESHOT) != 0) {
-			if (i > j - 65536)
+			if (i > j - 65536) {
 				i = j - 65536;
+			}
 		} else {
 			if (i >= j) {
 				i -= j;
-				if (i >= j)
+				if (i >= j) {
 					i %= j;
+				}
 			}
 		}
 
@@ -266,22 +276,27 @@ public abstract class MDModel implements GLModel {
 		} else {
 			cframe = (i >> 16) + anim.startframe;
 			nframe = cframe + 1;
-			if (nframe > anim.endframe)
+			if (nframe > anim.endframe) {
 				nframe = anim.startframe;
+			}
 
 			smooth.mdoldframe = (short) cframe;
 		}
 		interpol = BClipRange((i & 65535) / 65536.f, 0.0f, 1.0f);
 
 		if (cframe < 0 || cframe >= numframes || nframe < 0 || nframe >= numframes) {
-			if (cframe < 0)
+			if (cframe < 0) {
 				cframe = 0;
-			if (cframe >= numframes)
+			}
+			if (cframe >= numframes) {
 				cframe = numframes - 1;
-			if (nframe < 0)
+			}
+			if (nframe < 0) {
 				nframe = 0;
-			if (nframe >= numframes)
+			}
+			if (nframe >= numframes) {
 				nframe = numframes - 1;
+			}
 		}
 	}
 

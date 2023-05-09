@@ -45,16 +45,19 @@ public class MDInfo extends ModelInfo {
 		bb.read(buf);
 
 		for (int i = 0; i < buf.length; i++) {
-			if (buf[i] == 0)
+			if (buf[i] == 0) {
 				return new String(buf, 0, i);
+			}
 		}
 		return new String(buf);
 	}
 
 	protected MDSkinmap getSkin(int palnum, int skinnum, int surfnum) {
-		for (MDSkinmap sk = skinmap; sk != null; sk = sk.next)
-			if (sk.palette == palnum && skinnum == sk.skinnum && surfnum == sk.surfnum)
-				return sk;
+		for (MDSkinmap sk = skinmap; sk != null; sk = sk.next) {
+			if (sk.palette == palnum && skinnum == sk.skinnum && surfnum == sk.surfnum) {
+                return sk;
+            }
+		}
 
 		return null;
 	}
@@ -66,17 +69,22 @@ public class MDInfo extends ModelInfo {
 
 	public int setSkin(String skinfn, int palnum, int skinnum, int surfnum, double param, double specpower,
 			double specfactor) {
-		if (skinfn == null)
-			return -2;
-		if (palnum >= MAXPALOOKUPS)
-			return -3;
+		if (skinfn == null) {
+            return -2;
+        }
+		if (palnum >= MAXPALOOKUPS) {
+            return -3;
+        }
 
-		if (type == Type.Md2)
-			surfnum = 0;
+		if (type == Type.Md2) {
+            surfnum = 0;
+        }
 
 		MDSkinmap sk = getSkin(palnum, skinnum, surfnum);
 		if (sk == null) // no replacement yet defined
+		{
 			addSkin(sk = new MDSkinmap());
+		}
 
 		sk.palette = palnum;
 		sk.skinnum = skinnum;
@@ -95,14 +103,16 @@ public class MDInfo extends ModelInfo {
 
 		// find index of start frame
 		i = getFrameIndex(framestart);
-		if (i == numframes)
-			return -2;
+		if (i == numframes) {
+            return -2;
+        }
 		ma.startframe = i;
 
 		// find index of finish frame which must trail start frame
 		i = getFrameIndex(frameend);
-		if (i == numframes)
-			return -3;
+		if (i == numframes) {
+            return -3;
+        }
 		ma.endframe = i;
 
 		ma.fpssc = fpssc;

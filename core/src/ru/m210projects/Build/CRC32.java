@@ -67,8 +67,9 @@ public class CRC32 {
 		while ((rem = bb.remaining()) != 0) {
 			int len = Math.min(rem, bytes.length);
 			bb.get(bytes, 0, len);
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < len; i++) {
 				crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xff];
+			}
 		}
 
 		// flip bits

@@ -184,8 +184,9 @@ public abstract class MenuMouse extends BuildMenu {
 
 		char[][] keymaplist = new char[cfg.keymap.length + 1][];
 		keymaplist[0] = "None".toCharArray();
-		for (int i = 1; i < keymaplist.length; i++)
+		for (int i = 1; i < keymaplist.length; i++) {
 			keymaplist[i] = cfg.keymap[i - 1].getName().toCharArray();
+		}
 
 		mAxisUp = new MenuConteiner("Digital up", style, posx, posy += 10, width, null, 0, null) {
 			@Override
@@ -250,24 +251,38 @@ public abstract class MenuMouse extends BuildMenu {
 		{
 		case LEFT:
 		case MWDW:
-			if ( (item.flags & 4) == 0 ) return false;
-			if(item.num > 0) item.num--;
-			else item.num = 0;
+			if ( (item.flags & 4) == 0 ) {
+				return false;
+			}
+			if(item.num > 0) {
+				item.num--;
+			} else {
+				item.num = 0;
+			}
 			cfg.mouseaxis[nAxis] = item.num - 1;
 			return false;
 		case RIGHT:
 		case MWUP:
-			if ( (item.flags & 4) == 0 ) return false;
-			if(item.num < item.list.length - 1) item.num++;
-			else item.num = item.list.length - 1;
+			if ( (item.flags & 4) == 0 ) {
+				return false;
+			}
+			if(item.num < item.list.length - 1) {
+				item.num++;
+			} else {
+				item.num = item.list.length - 1;
+			}
 			cfg.mouseaxis[nAxis] = item.num - 1;
 			return false;
 		case ENTER:
 		case LMB:
-			if ( (item.flags & 4) == 0 ) return false;
+			if ( (item.flags & 4) == 0 ) {
+				return false;
+			}
 			if(item.num < item.list.length - 1) {
 				item.num++;
-			} else item.num = 0;
+			} else {
+				item.num = 0;
+			}
 			cfg.mouseaxis[nAxis] = item.num - 1;
 			return false;
 		default:

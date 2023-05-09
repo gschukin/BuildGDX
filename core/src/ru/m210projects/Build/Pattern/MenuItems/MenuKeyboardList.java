@@ -68,18 +68,21 @@ public abstract class MenuKeyboardList extends MenuList
 			int pal1 = this.pal_left; 
 			int pal2 = this.pal_right; 
 			
-			if(i == l_nFocus)
+			if(i == l_nFocus) {
 				pal2 = pal1 = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+			}
 			
 			String text = keynames[i].getName();
 			String key = getKeyName(cfg.primarykeys[i]);
 		
-			if(cfg.secondkeys[i] != 0)
+			if(cfg.secondkeys[i] != 0) {
 				key += " or " + getKeyName(cfg.secondkeys[i]);
+			}
 
 			if ( i == l_nFocus ) {
-				if(l_set == 1 && (totalclock & 0x20) != 0)
+				if(l_set == 1 && (totalclock & 0x20) != 0) {
 					key = "____";
+				}
 			}
 
 			char[] k = key.toCharArray();
@@ -87,9 +90,11 @@ public abstract class MenuKeyboardList extends MenuList
 
 			font.drawText(x + width / 2 - 1 - font.getWidth(k) + 40, py, k, shade, pal2, TextAlign.Left, 2, fontShadow);		
 			
-			if(cfg.mousekeys[i] != 0)
+			if(cfg.mousekeys[i] != 0) {
 				key = getKeyName(cfg.mousekeys[i]);
-			else key = " - ";
+			} else {
+				key = " - ";
+			}
 			if ( i == l_nFocus ) {
 				if(l_set == 1 && (totalclock & 0x20) != 0)
 				{
@@ -134,12 +139,15 @@ public abstract class MenuKeyboardList extends MenuList
 				return false;
 			case ENTER:
 			case LMB:
-				if ( (flags & 4) == 0 ) return false;
+				if ( (flags & 4) == 0 ) {
+					return false;
+				}
 				
 				if(opt == MenuOpt.LMB && isTouched)
 				{
-					if(len <= nListItems)
+					if(len <= nListItems) {
 						return false;
+					}
 
 					int nList = BClipLow(len - nListItems, 1);
 					int nRange = scrollerHeight;
@@ -151,13 +159,16 @@ public abstract class MenuKeyboardList extends MenuList
 					return false;
 				}
 				
-				if(l_nFocus != -1 && callback != null) 
+				if(l_nFocus != -1 && callback != null) {
 					callback.run(handler, this);
+				}
 				
 				getInput().resetKeyStatus();
 				return false;
 			case DELETE:
-				if(l_nFocus == -1) return false;
+				if(l_nFocus == -1) {
+					return false;
+				}
 				
 				cfg.primarykeys[l_nFocus] = 0;
 				cfg.secondkeys[l_nFocus] = 0;
@@ -188,11 +199,13 @@ public abstract class MenuKeyboardList extends MenuList
 		else
 		{
 			l_pressedId = opt;
-			if((flags & 4) != 0 && callback != null)
+			if((flags & 4) != 0 && callback != null) {
 				callback.run(handler, this);
+			}
 			
-			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) 
+			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) {
 				getInput().resetKeyStatus();
+			}
 
 			return false;
 		}
@@ -208,11 +221,13 @@ public abstract class MenuKeyboardList extends MenuList
 	
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		if(l_set != 0)
+		if(l_set != 0) {
 			return false;
+		}
 		
-		if(!BuildGdx.input.isTouched()) 
+		if(!BuildGdx.input.isTouched()) {
 			isTouched = false;
+		}
 				
 		touchY = my;
 		if(mx > scrollerX && mx < scrollerX + slider.getScrollerWidth()) 

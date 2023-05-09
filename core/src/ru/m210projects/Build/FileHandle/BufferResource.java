@@ -19,23 +19,25 @@ public class BufferResource extends ByteArrayOutputStream {
 
 	public int writeBytes(Object array) {
 		int len;
-		if (array instanceof byte[])
+		if (array instanceof byte[]) {
 			len = ((byte[]) array).length;
-		else if (array instanceof ByteBuffer)
+		} else if (array instanceof ByteBuffer) {
 			len = ((ByteBuffer) array).capacity();
-		else if (array instanceof short[])
+		} else if (array instanceof short[]) {
 			len = ((short[]) array).length;
-		else if (array instanceof int[])
+		} else if (array instanceof int[]) {
 			len = ((int[]) array).length;
-		else if (array instanceof char[])
+		} else if (array instanceof char[]) {
 			len = ((char[]) array).length;
-		else if (array instanceof String)
+		} else if (array instanceof String) {
 			len = ((String) array).getBytes().length;
-		else
+		} else {
 			throw new UnsupportedOperationException("Couldn't write. \r\n + Not implemented!");
+		}
 
-		if (len != 0)
+		if (len != 0) {
 			return writeBytes(array, len);
+		}
 
 		return -1;
 	}
@@ -54,19 +56,20 @@ public class BufferResource extends ByteArrayOutputStream {
 					rem -= l;
 				}
 				return len;
-			} else if (obj instanceof byte[])
+			} else if (obj instanceof byte[]) {
 				data = (byte[]) obj;
-			else if (obj instanceof char[]) {
+			} else if (obj instanceof char[]) {
 				data = new byte[len];
 				char[] src = (char[]) obj;
-				for (int i = 0; i < Math.min(len, src.length); i++)
+				for (int i = 0; i < Math.min(len, src.length); i++) {
 					data[i] = (byte) src[i];
+				}
 			} else if (obj instanceof ByteBuffer) {
 				ByteBuffer buf = (ByteBuffer) obj;
 				buf.rewind();
-				if (!buf.isDirect())
+				if (!buf.isDirect()) {
 					data = buf.array();
-				else {
+				} else {
 					data = new byte[Math.min(len, buf.capacity())];
 					buf.get(data);
 				}
@@ -74,18 +77,21 @@ public class BufferResource extends ByteArrayOutputStream {
 				var = 0;
 				short[] shortArr = (short[]) obj;
 				len = Math.min(len, shortArr.length);
-				for (int i = 0; i < len; i++)
+				for (int i = 0; i < len; i++) {
 					var += writeShort(shortArr[i]);
+				}
 			} else if (obj instanceof int[]) {
 				var = 0;
 				int[] intArr = (int[]) obj;
 				len = Math.min(len, intArr.length);
-				for (int i = 0; i < len; i++)
+				for (int i = 0; i < len; i++) {
 					var += writeInt(intArr[i]);
+				}
 			} else if (obj instanceof String) {
 				data = ((String) obj).getBytes();
-			} else
+			} else {
 				throw new UnsupportedOperationException("Couldn't write to file. \r\n + Not implemented!");
+			}
 
 			if (data != null) {
 				len = Math.min(len, data.length);
@@ -144,8 +150,9 @@ public class BufferResource extends ByteArrayOutputStream {
 
 	public void skip(int count) {
 		tmpbuf[0] = 0;
-		while (count-- > 0)
+		while (count-- > 0) {
 			this.write(tmpbuf, 0, 1);
+		}
 	}
 
 	@Override

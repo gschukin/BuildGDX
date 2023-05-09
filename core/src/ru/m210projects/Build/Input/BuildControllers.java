@@ -40,12 +40,13 @@ public abstract class BuildControllers {
 	public BuildControllers init() {
 		gamepads = new ArrayList<BuildController>();
 		getControllers(gamepads);
-		if(TestGamepad)
+		if(TestGamepad) {
 			gamepads.add(new TestController());
+		}
 		
-		if(gamepads.size() == 0)
+		if(gamepads.size() == 0) {
 			Console.Println("No gamepads found.", OSDTEXT_YELLOW);
-		else {
+		} else {
 			for(int i = 0; i < gamepads.size(); i++)
 			{
 				BuildController c = gamepads.get(i);
@@ -80,8 +81,9 @@ public abstract class BuildControllers {
 	public boolean buttonPressed()
 	{
 		for(int i = 0; i < gamepads.size(); i++) {
-			if(gamepads.get(i).buttonPressed())
+			if(gamepads.get(i).buttonPressed()) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -89,15 +91,17 @@ public abstract class BuildControllers {
 	public int getButtonCount(int num)
 	{
 		int size = getControllers();
-		if(size > 0 && size > num)
+		if(size > 0 && size > num) {
 			return gamepads.get(num).getButtonCount();
+		}
 		return 0;
 	}
 
 	public void handler()
 	{
-		for(int i = 0; i < gamepads.size(); i++)
+		for(int i = 0; i < gamepads.size(); i++) {
 			gamepads.get(i).update();
+		}
 	}
 	
 	public void resetButtonStatus()

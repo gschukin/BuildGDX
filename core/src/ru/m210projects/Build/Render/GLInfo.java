@@ -100,8 +100,9 @@ public class GLInfo {
 			gltexmaxsize = 6; // 2^6 = 64 == default GL max texture size
 		} else {
 			gltexmaxsize = 0;
-			for (; i > 1; i >>= 1)
+			for (; i > 1; i >>= 1) {
 				gltexmaxsize++;
+			}
 		}
 	}
 
@@ -112,8 +113,9 @@ public class GLInfo {
 	public static int calcSize(int size) {
 		int nsize = 1;
 		if (GLInfo.texnpot == 0) {
-			for (; nsize < size; nsize *= 2)
+			for (; nsize < size; nsize *= 2) {
 				;
+			}
 			return nsize;
 		}
 		return size == 0 ? 1 : size;

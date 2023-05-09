@@ -21,8 +21,9 @@ public class NaturalComparator {
 				return 1;
 			} else if (!isDigit1 && !isDigit2) {
 				int c = c1 - c2;
-				if (c != 0) 
+				if (c != 0) {
 					return c;
+				}
 			} else {
 				long num1 = parse(c1);
 				while (idx1 < len1) {

@@ -57,8 +57,9 @@ public class PolygonClipper {
 		dst.clear();
 		for (int i = 0; i < src.size(); i++) {
 			int j = i + 1;
-			if (j >= src.size())
+			if (j >= src.size()) {
 				j = 0;
+			}
 
 			Vertex v1 = src.get(i);
 			Vertex v2 = src.get(j);
@@ -66,8 +67,9 @@ public class PolygonClipper {
 			float t1 = p.distance(v1);
 			float t2 = p.distance(v2);
 
-			if (t1 >= 0.0f)
+			if (t1 >= 0.0f) {
 				dst.add(v1);
+			}
 
 			if ((t1 >= 0.0f) != (t2 >= 0.0f)) {
 				float r = t1 / (t1 - t2);
@@ -96,8 +98,9 @@ public class PolygonClipper {
 		for (int i = 3; i < 6; i++) {
 			if ((i % 2) != 0) {
 				ClipPlane(planes[i], list, src);
-			} else
+			} else {
 				ClipPlane(planes[i], src, list);
+			}
 		}
 		return src;
 	}

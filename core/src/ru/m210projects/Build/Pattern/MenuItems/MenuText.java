@@ -37,10 +37,12 @@ public class MenuText extends MenuItem
 		if ( text != null )
 		{
 		    int px = x;
-		    if(align == 1) 
-		        px = width / 2 + x - font.getWidth(text) / 2;
-		    if(align == 2) 
-		        px = x + width - 1 - font.getWidth(text);
+		    if(align == 1) {
+				px = width / 2 + x - font.getWidth(text) / 2;
+			}
+		    if(align == 2) {
+				px = x + width - 1 - font.getWidth(text);
+			}
 
 		    font.drawText(px, y, text, -128, pal, TextAlign.Left, 2, fontShadow);
 		}

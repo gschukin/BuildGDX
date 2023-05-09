@@ -47,9 +47,11 @@ public class BuildSettings {
 			public Integer check(Object value) {
 				if(value instanceof Integer) {
 					int fps = (Integer) value;
-					for(int i = 0; i < fpslimits.length; i++)
-						if(fps == fpslimits[i])
+					for(int i = 0; i < fpslimits.length; i++) {
+						if(fps == fpslimits[i]) {
 							return fps;
+						}
+					}
 				}
 				return null;
 			}
@@ -95,8 +97,9 @@ public class BuildSettings {
 		
 		@Override
 		public Boolean check(Object value) {
-			if(value instanceof Boolean)
+			if(value instanceof Boolean) {
 				return (Boolean) value;
+			}
 			return null;
 		}
 	}
@@ -111,8 +114,9 @@ public class BuildSettings {
 		
 		@Override
 		public Integer check(Object value) {
-			if(value instanceof Integer)
+			if(value instanceof Integer) {
 				return (Integer) value;
+			}
 			return null;
 		}
 	}

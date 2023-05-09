@@ -62,8 +62,12 @@ public class Sync {
 	 * @param fps - the desired frame rate, in frames per second
 	 */
 	public static void sync(int fps) {
-		if (fps <= 0) return;
-		if (!initialised) initialise();
+		if (fps <= 0) {
+			return;
+		}
+		if (!initialised) {
+			initialise();
+		}
 		
 		try {
 			// sleep until the average sleep time is greater than the time remaining till nextFrame

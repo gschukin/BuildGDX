@@ -59,10 +59,12 @@ public class Interpolation {
 	protected int[] gSpriteLoc = new int[MAXSPRITES >> 3];
 
 	public Interpolation() {
-		for (int i = 0; i < MAXINTERPOLATIONS; i++)
+		for (int i = 0; i < MAXINTERPOLATIONS; i++) {
 			gInterpolationData[i] = new IData();
-		for (int i = 0; i < MAXSPRITES; i++)
+		}
+		for (int i = 0; i < MAXSPRITES; i++) {
 			gOldSpriteLoc[i] = new ILoc();
+		}
 	}
 
 	protected void setinterpolation(Object obj, InterpolationType type) {
@@ -109,8 +111,9 @@ public class Interpolation {
 	}
 
 	public boolean clearinterpolations() {
-		if (!requestUpdating)
+		if (!requestUpdating) {
 			return false;
+		}
 
 		InterpolationCount = 0;
 		Arrays.fill(gWallLoc, 0);
@@ -245,8 +248,9 @@ public class Interpolation {
 	}
 
 	public ILoc getsprinterpolate(int nSprite) {
-		if ((gSpriteLoc[nSprite >> 3] & pow2char[nSprite & 7]) != 0)
+		if ((gSpriteLoc[nSprite >> 3] & pow2char[nSprite & 7]) != 0) {
 			return gOldSpriteLoc[nSprite];
+		}
 		return null;
 	}
 

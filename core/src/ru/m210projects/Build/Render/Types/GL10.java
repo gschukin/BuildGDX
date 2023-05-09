@@ -116,20 +116,22 @@ public abstract class GL10 implements com.badlogic.gdx.graphics.GL20 {
 
 	protected IntBuffer toBuffer(int[] src, int offset) {
 		int n = src.length - offset;
-		if (tempInt.capacity() < n)
+		if (tempInt.capacity() < n) {
 			tempInt = BufferUtils.newIntBuffer(n);
-		else
+		} else {
 			tempInt.clear();
+		}
 		tempInt.put(src, offset, n);
 		tempInt.flip();
 		return tempInt;
 	}
 
 	protected IntBuffer toBuffer(int n, int[] src, int offset) {
-		if (tempInt.capacity() < n)
+		if (tempInt.capacity() < n) {
 			tempInt = BufferUtils.newIntBuffer(n);
-		else
+		} else {
 			tempInt.clear();
+		}
 		tempInt.put(src, offset, n);
 		tempInt.flip();
 		return tempInt;
@@ -137,10 +139,11 @@ public abstract class GL10 implements com.badlogic.gdx.graphics.GL20 {
 
 	protected FloatBuffer toBuffer(float[] src, int offset) {
 		int n = src.length - offset;
-		if (tempFloat.capacity() < n)
+		if (tempFloat.capacity() < n) {
 			tempFloat = BufferUtils.newFloatBuffer(n);
-		else
+		} else {
 			tempFloat.clear();
+		}
 		tempFloat.put(src, offset, src.length - offset);
 		tempFloat.flip();
 		return tempFloat;

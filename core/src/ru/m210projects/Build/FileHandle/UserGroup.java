@@ -67,8 +67,9 @@ public class UserGroup extends Group {
 		
 		@Override
 		public int size() {
-			if(fil != null)
+			if(fil != null) {
 				return fil.size();
+			}
 			
 			return size;
 		}
@@ -80,7 +81,9 @@ public class UserGroup extends Group {
 					fil.close();
 					
 					if(entry != null) //else the fileresource with absolute path
+					{
 						fil = null;
+					}
 				}
 			}
 		}
@@ -88,8 +91,9 @@ public class UserGroup extends Group {
 		@Override
 		public int seek(long offset, Whence whence) {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.seek(offset, whence);
+				}
 				
 				return -1;
 			}
@@ -98,8 +102,9 @@ public class UserGroup extends Group {
 		@Override
 		public int read(byte[] buf, int offset, int len) {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.read(buf, offset, len);
+				}
 				
 				return -1;
 			}
@@ -121,8 +126,9 @@ public class UserGroup extends Group {
 					int p = 0;
 					while(len > 0)
 					{
-						if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1)
+						if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1) {
 							return p;
+						}
 						bb.put(tmp, 0, var);
 						len -= var;
 						p += var;
@@ -137,8 +143,9 @@ public class UserGroup extends Group {
 		@Override
 		public Byte readByte() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readByte();
+				}
 				
 				return null;
 			}
@@ -147,16 +154,18 @@ public class UserGroup extends Group {
 		@Override
 		public Boolean readBoolean() {
 			Byte var = readByte();
-			if(var != null)
+			if(var != null) {
 				return var == 1;
+			}
 			return null;
 		}
 		
 		@Override
 		public Short readShort() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readShort();
+				}
 				
 				return null;
 			}
@@ -165,8 +174,9 @@ public class UserGroup extends Group {
 		@Override
 		public Integer readInt() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readInt();
+				}
 				
 				return null;
 			}
@@ -175,8 +185,9 @@ public class UserGroup extends Group {
 		@Override
 		public Long readLong() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readLong();
+				}
 				
 				return null;
 			}
@@ -185,8 +196,9 @@ public class UserGroup extends Group {
 		@Override
 		public Float readFloat() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readFloat();
+				}
 				
 				return null;
 			}
@@ -196,8 +208,9 @@ public class UserGroup extends Group {
 		public String readString(int len)
 		{
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.readString(len);
+				}
 				
 				return null;
 			}
@@ -206,8 +219,9 @@ public class UserGroup extends Group {
 		@Override
 		public int position() {
 			synchronized(parent) {
-				if(fil != null)
+				if(fil != null) {
 					return fil.position();
+				}
 				
 				return -1;
 			}
@@ -216,22 +230,26 @@ public class UserGroup extends Group {
 		@Override
 		public void toMemory() {
 			synchronized(parent) {
-				if(isClosed())
+				if(isClosed()) {
 					parent.open(this);
+				}
 				
-				if(fil != null)
+				if(fil != null) {
 					fil.toMemory();
+				}
 			}
 		}
 
 		@Override
 		public byte[] getBytes() {
 			synchronized(parent) {
-				if(isClosed())
+				if(isClosed()) {
 					parent.open(this);
+				}
 				
-				if(fil != null)
+				if(fil != null) {
 					return fil.getBytes();
+				}
 				
 				return null;
 			}
@@ -239,8 +257,9 @@ public class UserGroup extends Group {
 
 		@Override
 		public boolean isClosed() {
-			if(fil != null)
+			if(fil != null) {
 				return fil.isClosed();
+			}
 			return true;
 		}
 
@@ -284,7 +303,9 @@ public class UserGroup extends Group {
 	}
 
 	public UserResource add(FileEntry entry, int fileid) {
-		if(entry == null) return null;
+		if(entry == null) {
+			return null;
+		}
 
 		UserResource out = null;
 		add(out = new UserResource(entry, fileid));
@@ -294,7 +315,9 @@ public class UserGroup extends Group {
 	}
 	
 	public UserResource add(String absolutePath, int fileid) {
-		if(absolutePath == null || absolutePath.isEmpty()) return null;
+		if(absolutePath == null || absolutePath.isEmpty()) {
+			return null;
+		}
 
 		UserResource out = null;
 		add(out = new UserResource(absolutePath, fileid));

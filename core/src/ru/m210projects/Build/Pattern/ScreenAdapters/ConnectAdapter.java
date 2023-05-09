@@ -84,17 +84,19 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 					style.drawText(160, 150, toCharArray("Local IP: " + inet.myip), -128, 0, TextAlign.Center, 2, false);
 					if (inet.useUPnP) {
 						String extip = "Public IP: ";
-						if (inet.extip != null)
+						if (inet.extip != null) {
 							extip += inet.extip;
+						}
 
 						style.drawText(160, 160, toCharArray(extip), -128, 0, TextAlign.Center, 2, false);
 					}
 				}
 
-				if (inet.message != null && !inet.message.isEmpty())
+				if (inet.message != null && !inet.message.isEmpty()) {
 					style.drawText(160, 180, toCharArray(inet.message), -128, 0, TextAlign.Center, 2, false);
-				else
+				} else {
 					style.drawText(160, 180, toCharArray("Initializing..."), -128, 0, TextAlign.Center, 2, false);
+				}
 					
 				game.pEngine.nextpage();
 				return;
@@ -109,10 +111,11 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 			}
 
 			if (ConnectStep == 0) {
-				if (inet.message != null)
+				if (inet.message != null) {
 					style.drawText(160, 180, toCharArray(inet.message), -128, 0, TextAlign.Center, 2, false);
-				else
+				} else {
 					style.drawText(160, 180, toCharArray("Connected! Waiting for other players..."), -128, 0, TextAlign.Center, 2, false);
+				}
 				ConnectStep = 1;
 
 				game.pNet.StartWaiting(5000);
@@ -129,8 +132,9 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 	
 	@Override
 	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) 
+		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
 			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+		}
 	}
 
 	@Override

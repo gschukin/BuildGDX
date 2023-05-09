@@ -89,8 +89,9 @@ public class DefScript {
 			this.internal = src.internal;
 			this.optional = src.optional;
 
-			if (src.next != null)
+			if (src.next != null) {
 				this.next = new DefTile(src.next);
+			}
 		}
 
 		public DefTile(int sizx, int sizy, long crc32, boolean internal) {
@@ -104,8 +105,9 @@ public class DefScript {
 			DefTile out = this;
 			while (true) {
 				DefTile n = out.next;
-				if (n == null)
-					return out;
+				if (n == null) {
+                    return out;
+                }
 				out = n;
 			}
 		}
@@ -121,8 +123,9 @@ public class DefScript {
 		this.mapInfo = createMapHackInfo(src.mapInfo);
 		this.engine = src.engine;
 		for (int i = 0; i < MAXTILES; i++) {
-			if (src.tiles[i] == null)
-				continue;
+			if (src.tiles[i] == null) {
+                continue;
+            }
 
 			this.tiles[i] = new DefTile(src.tiles[i]);
 		}
@@ -153,8 +156,9 @@ public class DefScript {
 	}
 
 	protected MapHackInfo createMapHackInfo(MapHackInfo src) {
-		if (src != null)
+		if (src != null) {
 			return new MapHackInfo(src);
+		}
 		return new MapHackInfo();
 	}
 
@@ -217,12 +221,14 @@ public class DefScript {
 			} else if (def.crc32 != texstatus.crc32) {
 				def = tiles[tile].getLast();
 				def.next = texstatus;
-			} else if (def.internal || disposable)
-				tiles[tile] = texstatus;
+			} else if (def.internal || disposable) {
+                tiles[tile] = texstatus;
+            }
 		} else if (def == null || def.internal || disposable) {
 			tiles[tile] = texstatus;
-		} else
-			return false;
+		} else {
+            return false;
+        }
 
 		return true;
 	}
@@ -232,8 +238,9 @@ public class DefScript {
 		while (true) {
 			Token basetoken = (Token) gettoken(script, basetokens);
 			if (basetoken != null) {
-				if (basetoken == BaseToken.EOF)
-					return;
+				if (basetoken == BaseToken.EOF) {
+                    return;
+                }
 
 				synchronized (Engine.lock) {
 					basetoken.parse(script);
@@ -244,14 +251,17 @@ public class DefScript {
 
 	protected Object gettoken(Scriptfile sf, Map<String, ?> list) {
 		int tok;
-		if (sf == null)
+		if (sf == null) {
 			return BaseToken.Error;
-		if ((tok = sf.gettoken()) == -2)
+		}
+		if ((tok = sf.gettoken()) == -2) {
 			return BaseToken.EOF;
+		}
 
 		Object out = list.get(toLowerCase(sf.textbuf.substring(tok, sf.textptr)));
-		if (out != null)
-			return out;
+		if (out != null) {
+            return out;
+        }
 
 		sf.errorptr = sf.textptr;
 		return BaseToken.Error;
@@ -259,12 +269,14 @@ public class DefScript {
 
 	protected String getFile(Scriptfile script) {
 		String fn = script.getstring();
-		if (fn == null)
-			return null;
+		if (fn == null) {
+            return null;
+        }
 
 		fn = FileUtils.getCorrectPath(fn);
-		if (script.path != null)
+		if (script.path != null) {
 			fn = script.path + File.separator + fn;
+		}
 
 		return fn;
 	}
@@ -298,22 +310,26 @@ public class DefScript {
 	}
 
 	protected int getPtr(Scriptfile script, int line) {
-		if (line <= 2)
+		if (line <= 2) {
 			return script.lineoffs[0];
+		}
 
-		if (line <= script.linenum)
+		if (line <= script.linenum) {
 			return script.lineoffs[line - 2];
+		}
 		return script.eof;
 	}
 
 	public void dispose() {
-		if (!disposable)
-			return;
+		if (!disposable) {
+            return;
+        }
 
 		engine.loadpics();
 		for (int i = 0; i < MAXTILES; i++) {
-			if (tiles[i] == null)
-				continue;
+			if (tiles[i] == null) {
+                continue;
+            }
 
 			texInfo.remove(i, 0);
 
@@ -346,16 +362,18 @@ public class DefScript {
 		}
 
 		for (int i = 0; i < MAXTILES; i++) {
-			if (tiles[i] == null)
-				continue;
+			if (tiles[i] == null) {
+                continue;
+            }
 
 			DefTile tile = tiles[i];
 			Tile pic = engine.getTile(i);
 
 			if (tile.crc32 != 0) {
 				byte[] data = pic.data;
-				if (data == null)
+				if (data == null) {
 					data = engine.loadtile(i);
+				}
 
 				long crc32 = data != null ? CRC32.getChecksum(data) : -1;
 				if (crc32 != tile.crc32) {
@@ -368,13 +386,15 @@ public class DefScript {
 						}
 					}
 
-					if (!found)
-						continue;
+					if (!found) {
+                        continue;
+                    }
 				}
 			}
 
-			if (tile.waloff == null)
-				continue;
+			if (tile.waloff == null) {
+                continue;
+            }
 
 			engine.getrender().invalidatetile(i, -1, -1);
 
@@ -464,15 +484,17 @@ public class DefScript {
 		@Override
 		public BaseToken parse(Scriptfile script) {
 			int end;
-			if ((end = script.getbraces()) == -1)
+			if ((end = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			Object tk;
 			String file = null, mhk = null, md4 = null;
 			while (script.textptr < end) {
 				tk = gettoken(script, maptokens);
-				if (checkErrorToken(script, tk))
-					continue;
+				if (checkErrorToken(script, tk)) {
+                    continue;
+                }
 
 				switch ((MapHackTokens) tk) {
 				default:
@@ -492,8 +514,9 @@ public class DefScript {
 				}
 			}
 
-			if (mapInfo.addMapInfo(file, mhk, md4))
+			if (mapInfo.addMapInfo(file, mhk, md4)) {
 				return BaseToken.Ok;
+			}
 
 			return BaseToken.Error;
 		}
@@ -504,8 +527,9 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			String fn;
 
-			if ((fn = DefScript.this.getFile(script)) == null)
+			if ((fn = DefScript.this.getFile(script)) == null) {
 				return BaseToken.Warning;
+			}
 
 			include(DefScript.this, fn, script, script.ltextptr);
 			return BaseToken.Ok;
@@ -514,11 +538,12 @@ public class DefScript {
 		private void include(DefScript def, String fn, Scriptfile script, int cmdtokptr) {
 			byte[] data = BuildGdx.cache.getBytes(fn, 0);
 			if (data == null) {
-				if (cmdtokptr == 0)
+				if (cmdtokptr == 0) {
 					Console.Println("Warning: Failed including " + fn + " as module", OSDTEXT_YELLOW);
-				else
+				} else {
 					Console.Println("Warning: Failed including " + fn + " on line " + script.filename + ":"
 							+ script.getlinum(cmdtokptr), OSDTEXT_YELLOW);
+				}
 				return;
 			}
 
@@ -534,8 +559,9 @@ public class DefScript {
 			DefScript def = DefScript.this;
 			String fn;
 
-			if (def.addonsIncludes == null)
+			if (def.addonsIncludes == null) {
 				def.addonsIncludes = new HashMap<String, List<String>>();
+			}
 			String addon = script.getstring();
 			if (addon != null && (fn = def.getFile(script)) != null) {
 				if (def.addonsIncludes.get(addon) == null) {
@@ -555,9 +581,11 @@ public class DefScript {
 		@Override
 		public BaseToken parse(Scriptfile script) {
 			String message = script.getstring();
-			if(message != null)
+			if(message != null) {
 				Console.Println(message, Console.OSDTEXT_GOLD);
-			else Console.Println("");
+			} else {
+				Console.Println("");
+			}
 			return BaseToken.Ok;
 		}
 	}
@@ -566,14 +594,18 @@ public class DefScript {
 		@Override
 		public BaseToken parse(Scriptfile script) {
 			Integer tile0, tile1, speed, anm;
-			if ((tile0 = script.getsymbol()) == null)
+			if ((tile0 = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((tile1 = script.getsymbol()) == null)
+			}
+			if ((tile1 = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((speed = script.getsymbol()) == null)
+			}
+			if ((speed = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((anm = script.getsymbol()) == null)
+			}
+			if ((anm = script.getsymbol()) == null) {
 				return BaseToken.Error;
+			}
 
 			int length = (tile1 - tile0);
 			if (length <= 0) {
@@ -622,10 +654,12 @@ public class DefScript {
 			long tilecrc = 0;
 			boolean istexture = false;
 
-			if ((tile = script.getsymbol()) == null)
+			if ((tile = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((ttextureend = script.getbraces()) == -1)
+			}
+			if ((ttextureend = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			while (script.textptr < ttextureend) {
 				Object tk = def.gettoken(script, tilefromtexturetokens);
@@ -648,15 +682,16 @@ public class DefScript {
 					break;
 				case ALPHACUT:
 					value = script.getsymbol();
-					if (value != null)
-						talphacut = value;
+					if (value != null) {
+                        talphacut = value;
+                    }
 					talphacut = BClipRange(talphacut, 0, 255);
 					break;
 				case XOFFSET:
 					String xoffs = script.getstring();
-					if (xoffs.equalsIgnoreCase("ART"))
+					if (xoffs.equalsIgnoreCase("ART")) {
 						xoffset = engine.getTile(tile).getOffsetX();
-					else {
+					} else {
 						try {
 							xoffset = Byte.parseByte(xoffs);
 						} catch (Exception e) {
@@ -668,9 +703,9 @@ public class DefScript {
 					break;
 				case YOFFSET:
 					String yoffs = script.getstring();
-					if (yoffs.equalsIgnoreCase("ART"))
+					if (yoffs.equalsIgnoreCase("ART")) {
 						yoffset = engine.getTile(tile).getOffsetY();
-					else {
+					} else {
 						try {
 							yoffset = Byte.parseByte(yoffs);
 						} catch (Exception e) {
@@ -690,8 +725,9 @@ public class DefScript {
 			}
 			script.skipbrace(ttextureend); // close bracke
 
-			if (addTile(script, fn, tile, xoffset, yoffset, tilecrc, talphacut, istexture, ttexturetokptr) != null)
+			if (addTile(script, fn, tile, xoffset, yoffset, tilecrc, talphacut, istexture, ttexturetokptr) != null) {
 				return BaseToken.Ok;
+			}
 			return BaseToken.Error;
 		}
 
@@ -712,17 +748,21 @@ public class DefScript {
 				String ext = FileUtils.getExtension(script.filename);
 				DefTile deftile = new DefTile(engine.getTile(tile).getWidth(), engine.getTile(tile).getHeight(),
 						tilecrc, ext != null && ext.equals("dat"));
-				if (xoffset != null)
+				if (xoffset != null) {
 					deftile.xoffset = xoffset;
-				if (yoffset != null)
+				}
+				if (yoffset != null) {
 					deftile.yoffset = yoffset;
+				}
 
-				if (xoffset == null && yoffset == null)
+				if (xoffset == null && yoffset == null) {
 					Console.Println("Error: missing 'file name' for tilefromtexture definition near line "
 							+ script.filename + ":" + script.getlinum(ttexturetokptr), OSDTEXT_RED);
+				}
 
-				if (def.addDefTile(deftile, tile))
-					return deftile;
+				if (def.addDefTile(deftile, tile)) {
+                    return deftile;
+                }
 
 				return null;
 			}
@@ -730,13 +770,16 @@ public class DefScript {
 			String ext = FileUtils.getExtension(script.filename);
 			DefTile texstatus = ImportTileFromTexture(fn, tile, tilecrc, talphacut, istexture,
 					ext != null && ext.equals("dat"));
-			if (texstatus == null)
-				return null;
+			if (texstatus == null) {
+                return null;
+            }
 
-			if (xoffset != null)
+			if (xoffset != null) {
 				texstatus.xoffset = xoffset;
-			if (yoffset != null)
+			}
+			if (yoffset != null) {
 				texstatus.yoffset = yoffset;
+			}
 
 			if (!def.addDefTile(texstatus, tile)) {
 				Console.Println("Error: \"" + fn + "\" has more than one tile, in tilefromtexture definition near line "
@@ -778,19 +821,22 @@ public class DefScript {
 			ByteBuffer bb = pix.getPixels();
 			byte[] waloff = deftile.waloff;
 
-			for (int y = 0; y < ysiz; y++)
+			for (int y = 0; y < ysiz; y++) {
 				for (int x = 0; x < xsiz; x++) {
 					int r = (bb.get() & 0xFF) >> 2;
 					int g = (bb.get() & 0xFF) >> 2;
 					int b = (bb.get() & 0xFF) >> 2;
 					if (fmt == Format.RGBA4444 || fmt == Format.RGBA8888) {
-						if (bb.get() == 0)
-							waloff[x * ysiz + y] = -1;
-						else
+						if (bb.get() == 0) {
+                            waloff[x * ysiz + y] = -1;
+                        } else {
 							waloff[x * ysiz + y] = def.engine.getclosestcol(palette, r, g, b);
-					} else
+						}
+					} else {
 						waloff[x * ysiz + y] = def.engine.getclosestcol(palette, r, g, b);
+					}
 				}
+			}
 
 			if (istexture) {
 				deftile.hrp = fn;
@@ -901,10 +947,12 @@ public class DefScript {
 			modelskin = lastmodelskin = 0;
 			seenframe = 0;
 
-			if ((modelfn = script.getstring()) == null)
+			if ((modelfn = script.getstring()) == null) {
 				return BaseToken.Error;
-			if ((modelend = script.getbraces()) == -1)
+			}
+			if ((modelend = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			res = BuildGdx.cache.open(modelfn, 0);
 			if (res == null) {
@@ -925,8 +973,9 @@ public class DefScript {
 					m = new MD3Info(res, modelfn);
 					break;
 				default:
-					if (res.getExtension().equals("kvx"))
+					if (res.getExtension().equals("kvx")) {
 						m = new ModelInfo(modelfn, Type.Voxel);
+					}
 					break;
 				}
 			} catch (Exception e) {
@@ -960,8 +1009,9 @@ public class DefScript {
 					break;
 				case SCALE:
 					dvalue = script.getdouble();
-					if (dvalue != null)
-						mdscale = dvalue;
+					if (dvalue != null) {
+                        mdscale = dvalue;
+                    }
 					break;
 				case SHADE: // XXX
 					if ((ivalue = script.getsymbol()) != null) {
@@ -969,16 +1019,18 @@ public class DefScript {
 					}
 					break;
 				case ZADD:
-					if ((dvalue = script.getdouble()) != null)
-						mzadd = dvalue;
+					if ((dvalue = script.getdouble()) != null) {
+                        mzadd = dvalue;
+                    }
 					break;
 //				case YOFFSET:
 //					if ((dvalue = script.getdouble()) != null)
 //						myoffset = dvalue;
 //					break;
 				case FLAGS:
-					if ((ivalue = script.getsymbol()) != null)
-						mdflags = ivalue;
+					if ((ivalue = script.getsymbol()) != null) {
+                        mdflags = ivalue;
+                    }
 					break;
 				case FRAME: {
 					int frametokptr = script.ltextptr;
@@ -987,8 +1039,9 @@ public class DefScript {
 					int ftilenume = -1, ltilenume = -1, tilex;
 					double smoothduration = 0.1;
 
-					if ((frameend = script.getbraces()) == -1)
-						break;
+					if ((frameend = script.getbraces()) == -1) {
+                        break;
+                    }
 
 					while (script.textptr < frameend) {
 						tk = gettoken(script, modelframetokens);
@@ -1007,8 +1060,9 @@ public class DefScript {
 						default:
 							break;
 						case PAL:
-							if ((ivalue = script.getsymbol()) != null)
-								mdpal = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                mdpal = ivalue;
+                            }
 							break;
 						case FRAME:
 							framename = script.getstring();
@@ -1020,16 +1074,19 @@ public class DefScript {
 							}
 							break;
 						case TILE0:
-							if ((ivalue = script.getsymbol()) != null)
-								ftilenume = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                ftilenume = ivalue;
+                            }
 							break; // first tile number
 						case TILE1:
-							if ((ivalue = script.getsymbol()) != null)
-								ltilenume = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                ltilenume = ivalue;
+                            }
 							break; // last tile number (inclusive)
 						case SMOOTHDURATION:
-							if ((dvalue = script.getdouble()) != null)
-								smoothduration = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                smoothduration = dvalue;
+                            }
 							break;
 						}
 					}
@@ -1073,8 +1130,9 @@ public class DefScript {
 					int flags = 0;
 					double dfps = 1.0;
 
-					if ((animend = script.getbraces()) == -1)
-						break;
+					if ((animend = script.getbraces()) == -1) {
+                        break;
+                    }
 					while (script.textptr < animend) {
 						tk = gettoken(script, modelanimtokens);
 						if (tk instanceof BaseToken) {
@@ -1098,12 +1156,14 @@ public class DefScript {
 							endframe = script.getstring();
 							break;
 						case FPS:
-							if ((dvalue = script.getdouble()) != null)
-								dfps = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                dfps = dvalue;
+                            }
 							break; // animation frame rate
 						case FLAGS:
-							if ((ivalue = script.getsymbol()) != null)
-								flags = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                flags = ivalue;
+                            }
 							break;
 						}
 					}
@@ -1121,8 +1181,9 @@ public class DefScript {
 						happy = 0;
 					}
 					model_ok &= happy;
-					if (happy == 0 || m.getType() == Type.Voxel)
-						break;
+					if (happy == 0 || m.getType() == Type.Voxel) {
+                        break;
+                    }
 
 					switch (((MDInfo) m).setAnimation(startframe, endframe, (int) (dfps * (65536.0 * .001)), flags)) {
 					case -2:
@@ -1149,8 +1210,9 @@ public class DefScript {
 					int palnum = 0, surfnum = 0;
 					double param = 1.0, specpower = 1.0, specfactor = 1.0;
 
-					if ((skinend = script.getbraces()) == -1)
-						break;
+					if ((skinend = script.getbraces()) == -1) {
+                        break;
+                    }
 
 					while (script.textptr < skinend) {
 						tk = gettoken(script, modelskintokens);
@@ -1172,8 +1234,9 @@ public class DefScript {
 							palnum = script.getsymbol();
 							break;
 						case PARAM:
-							if ((dvalue = script.getdouble()) != null)
-								param = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                param = dvalue;
+                            }
 							break;
 						case PARALLAXSCALE:
 							script.getdouble(); // XXX
@@ -1183,19 +1246,22 @@ public class DefScript {
 							script.getdouble(); // XXX
 							break;
 						case SPECPOWER:
-							if ((dvalue = script.getdouble()) != null)
-								specpower = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                specpower = dvalue;
+                            }
 							break;
 						case SPECFACTOR:
-							if ((dvalue = script.getdouble()) != null)
-								specfactor = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                specfactor = dvalue;
+                            }
 							break;
 						case FILE:
 							skinfn = getFile(script);
 							break; // skin filename
 						case SURF:
-							if ((ivalue = script.getsymbol()) != null)
-								surfnum = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                surfnum = ivalue;
+                            }
 							break; // getnumber
 						}
 					}
@@ -1231,8 +1297,9 @@ public class DefScript {
 						break;
 					}
 
-					if (!BuildGdx.cache.contains(skinfn, 0) || m.getType() == Type.Voxel)
-						break;
+					if (!BuildGdx.cache.contains(skinfn, 0) || m.getType() == Type.Voxel) {
+                        break;
+                    }
 
 					switch (((MDInfo) m).setSkin(skinfn, palnum, Math.max(0, modelskin), surfnum, param, specpower,
 							specfactor)) {
@@ -1257,8 +1324,9 @@ public class DefScript {
 					int ftilenume = -1, ltilenume = -1, tilex, flags = 0, fov = -1;
 					double xadd = 0.0, yadd = 0.0, zadd = 0.0, angadd = 0.0;
 
-					if ((frameend = script.getbraces()) == -1)
-						break;
+					if ((frameend = script.getbraces()) == -1) {
+                        break;
+                    }
 
 					while (script.textptr < frameend) {
 						tk = gettoken(script, modelhudtokens);
@@ -1277,37 +1345,45 @@ public class DefScript {
 						default:
 							break;
 						case TILE:
-							if ((ivalue = script.getsymbol()) != null)
-								ftilenume = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                ftilenume = ivalue;
+                            }
 							ltilenume = ftilenume;
 							break;
 						case TILE0:
-							if ((ivalue = script.getsymbol()) != null)
-								ftilenume = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                ftilenume = ivalue;
+                            }
 							break; // first tile number
 						case TILE1:
-							if ((ivalue = script.getsymbol()) != null)
-								ltilenume = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                ltilenume = ivalue;
+                            }
 							break; // last tile number (inclusive)
 						case XADD:
-							if ((dvalue = script.getdouble()) != null)
-								xadd = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                xadd = dvalue;
+                            }
 							break;
 						case YADD:
-							if ((dvalue = script.getdouble()) != null)
-								yadd = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                yadd = dvalue;
+                            }
 							break;
 						case ZADD:
-							if ((dvalue = script.getdouble()) != null)
-								zadd = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                zadd = dvalue;
+                            }
 							break;
 						case ANGADD:
-							if ((dvalue = script.getdouble()) != null)
-								angadd = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                angadd = dvalue;
+                            }
 							break;
 						case FOV:
-							if ((ivalue = script.getsymbol()) != null)
-								fov = ivalue;
+							if ((ivalue = script.getsymbol()) != null) {
+                                fov = ivalue;
+                            }
 							break;
 						case HIDE:
 							flags |= 1;
@@ -1404,10 +1480,12 @@ public class DefScript {
 			Integer ttile;
 			Object tk;
 
-			if ((ttile = script.getsymbol()) == null)
+			if ((ttile = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((textureend = script.getbraces()) == -1)
+			}
+			if ((textureend = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			while (script.textptr < textureend) {
 				tk = gettoken(script, texturetokens);
@@ -1438,10 +1516,12 @@ public class DefScript {
 					int flags = 0;
 					int palend;
 
-					if (token == TextureTokens.PAL && (tpal = script.getsymbol()) == null)
-						break;
-					if ((palend = script.getbraces()) == -1)
-						break;
+					if (token == TextureTokens.PAL && (tpal = script.getsymbol()) == null) {
+                        break;
+                    }
+					if ((palend = script.getbraces()) == -1) {
+                        break;
+                    }
 					while (script.textptr < palend) {
 						tk = gettoken(script, texturetokens);
 						if (tk instanceof BaseToken) {
@@ -1462,26 +1542,32 @@ public class DefScript {
 							tfn = getFile(script);
 							break;
 						case ALPHACUT:
-							if (token != TextureTokens.PAL)
-								break;
-							if ((dvalue = script.getdouble()) != null)
-								alphacut = dvalue;
+							if (token != TextureTokens.PAL) {
+                                break;
+                            }
+							if ((dvalue = script.getdouble()) != null) {
+                                alphacut = dvalue;
+                            }
 							break;
 						case XSCALE:
-							if ((dvalue = script.getdouble()) != null)
-								xscale = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                xscale = dvalue;
+                            }
 							break;
 						case YSCALE:
-							if ((dvalue = script.getdouble()) != null)
-								yscale = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                yscale = dvalue;
+                            }
 							break;
 						case SPECPOWER:
-							if ((dvalue = script.getdouble()) != null)
-								specpower = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                specpower = dvalue;
+                            }
 							break;
 						case SPECFACTOR:
-							if ((dvalue = script.getdouble()) != null)
-								specfactor = dvalue;
+							if ((dvalue = script.getdouble()) != null) {
+                                specfactor = dvalue;
+                            }
 							break;
 
 						case PARALLAXSCALE:
@@ -1525,8 +1611,9 @@ public class DefScript {
 						break;
 					}
 
-					if (ttile >= MAXTILES)
-						break; // message is printed later
+					if (ttile >= MAXTILES) {
+                        break; // message is printed later
+                    }
 					if (token == TextureTokens.PAL && tpal >= MAXPALOOKUPS - RESERVEDPALS) {
 						Console.Println("Error: missing or invalid 'palette number' for texture definition near line "
 								+ script.filename + ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
@@ -1591,10 +1678,13 @@ public class DefScript {
 			boolean vrotate = false;
 
 			if ((fn = getFile(script)) == null) // voxel filename
+			{
 				return BaseToken.Error;
+			}
 
-			if ((vmodelend = script.getbraces()) == -1)
+			if ((vmodelend = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			Resource res = BuildGdx.cache.open(fn, 0);
 			if (res == null) {
@@ -1635,29 +1725,34 @@ public class DefScript {
 				switch ((VoxelTokens) tk) {
 				case TILE:
 					tilex = script.getsymbol();
-					if (check_tile("voxel", tilex, script, script.ltextptr))
-						break;
+					if (check_tile("voxel", tilex, script, script.ltextptr)) {
+                        break;
+                    }
 
 					mdInfo.addVoxelInfo(vox, tilex);
 					break;
 				case TILE0:
-					if ((ivalue = script.getsymbol()) != null)
-						tile0 = ivalue;
+					if ((ivalue = script.getsymbol()) != null) {
+                        tile0 = ivalue;
+                    }
 					break; // 1st tile #
 
 				case TILE1:
-					if ((ivalue = script.getsymbol()) != null)
-						tile1 = ivalue;
+					if ((ivalue = script.getsymbol()) != null) {
+                        tile1 = ivalue;
+                    }
 
-					if (check_tile_range("voxel", tile0, tile1, script, script.ltextptr))
-						break;
+					if (check_tile_range("voxel", tile0, tile1, script, script.ltextptr)) {
+                        break;
+                    }
 					for (tilex = tile0; tilex <= tile1; tilex++) {
 						mdInfo.addVoxelInfo(vox, tilex);
 					}
 					break; // last tile number (inclusive)
 				case SCALE:
-					if ((dvalue = script.getdouble()) != null)
-						vscale = dvalue;
+					if ((dvalue = script.getdouble()) != null) {
+                        vscale = dvalue;
+                    }
 					break;
 				case ROTATE:
 					vrotate = true;
@@ -1717,8 +1812,9 @@ public class DefScript {
 			Integer ivalue;
 			String[] sfn = new String[6];
 
-			if ((sskyend = script.getbraces()) == -1)
+			if ((sskyend = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			while (script.textptr < sskyend) {
 				try {
@@ -1735,12 +1831,14 @@ public class DefScript {
 
 					switch ((SkyboxTokens) tk) {
 					case TILE:
-						if ((ivalue = script.getsymbol()) != null)
-							stile = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            stile = ivalue;
+                        }
 						break;
 					case PAL:
-						if ((ivalue = script.getsymbol()) != null)
-							spal = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            spal = ivalue;
+                        }
 						break;
 					case FRONT:
 						sfn[0] = getFile(script);
@@ -1775,8 +1873,9 @@ public class DefScript {
 				}
 			}
 			script.skipbrace(sskyend); // close bracke
-			if (addSkybox(script, stile, spal, sfn))
+			if (addSkybox(script, stile, spal, sfn)) {
 				return BaseToken.Ok;
+			}
 			return BaseToken.Error;
 		}
 
@@ -1812,10 +1911,12 @@ public class DefScript {
 			Integer ivalue;
 			String[] sfn = new String[6];
 
-			if ((ivalue = script.getsymbol()) != null)
-				stile = ivalue;
-			if ((ivalue = script.getsymbol()) != null)
-				spal = ivalue;
+			if ((ivalue = script.getsymbol()) != null) {
+                stile = ivalue;
+            }
+			if ((ivalue = script.getsymbol()) != null) {
+                spal = ivalue;
+            }
 			script.getsymbol();
 
 			sfn[0] = getFile(script);
@@ -1825,8 +1926,9 @@ public class DefScript {
 			sfn[4] = getFile(script);
 			sfn[5] = getFile(script);
 
-			if (addSkybox(script, stile, spal, sfn))
+			if (addSkybox(script, stile, spal, sfn)) {
 				return BaseToken.Ok;
+			}
 			return BaseToken.Error;
 		}
 	}
@@ -1837,16 +1939,21 @@ public class DefScript {
 
 			Integer pal, r, g, b, f;
 
-			if ((pal = script.getsymbol()) == null)
+			if ((pal = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((r = script.getsymbol()) == null)
+			}
+			if ((r = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((g = script.getsymbol()) == null)
+			}
+			if ((g = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((b = script.getsymbol()) == null)
+			}
+			if ((b = script.getsymbol()) == null) {
 				return BaseToken.Error;
-			if ((f = script.getsymbol()) == null)
+			}
+			if ((f = script.getsymbol()) == null) {
 				return BaseToken.Error;
+			}
 
 			Console.Println("Loading tint " + pal);
 			texInfo.setPaletteTint(pal.intValue(), r.intValue(), g.intValue(), b.intValue(), f.intValue());
@@ -1878,8 +1985,9 @@ public class DefScript {
 			Integer ivalue;
 			int send;
 
-			if ((send = script.getbraces()) == -1)
+			if ((send = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 
 			while (script.textptr < send) {
 				try {
@@ -1896,24 +2004,29 @@ public class DefScript {
 
 					switch ((TintTokens) tk) {
 					case PAL:
-						if ((ivalue = script.getsymbol()) != null)
-							pal = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            pal = ivalue;
+                        }
 						break;
 					case RED:
-						if ((ivalue = script.getsymbol()) != null)
-							r = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            r = ivalue;
+                        }
 						break;
 					case GREEN:
-						if ((ivalue = script.getsymbol()) != null)
-							g = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            g = ivalue;
+                        }
 						break;
 					case BLUE:
-						if ((ivalue = script.getsymbol()) != null)
-							b = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            b = ivalue;
+                        }
 						break;
 					case FLAGS:
-						if ((ivalue = script.getsymbol()) != null)
-							f = ivalue;
+						if ((ivalue = script.getsymbol()) != null) {
+                            f = ivalue;
+                        }
 						break;
 
 					default:
@@ -1956,8 +2069,9 @@ public class DefScript {
 			int dummy;
 			String t_id = null, t_file = null;
 
-			if ((dummy = script.getbraces()) == -1)
+			if ((dummy = script.getbraces()) == -1) {
 				return BaseToken.Error;
+			}
 			while (script.textptr < dummy) {
 				Object tk = gettoken(script, sound_musictokens);
 				if (tk instanceof BaseToken) {
@@ -1977,8 +2091,9 @@ public class DefScript {
 					break;
 				case ID:
 					String t = script.getstring();
-					if (t != null)
+					if (t != null) {
 						t_id = t.trim();
+					}
 					break;
 				case FILE:
 					t_file = getFile(script);

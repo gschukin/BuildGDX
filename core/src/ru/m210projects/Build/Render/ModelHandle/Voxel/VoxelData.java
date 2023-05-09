@@ -41,17 +41,21 @@ public class VoxelData {
 
 			int offset = ((xs + 1) << 2) + (xs * (ys + 1) << 1);
 			slabxoffs[mip] = new int[xs + 1];
-			for (int i = 0; i <= xs; i++)
+			for (int i = 0; i <= xs; i++) {
 				slabxoffs[mip][i] = dat.readInt() - offset;
+			}
 
 			xyoffs[mip] = new short[xs][ys + 1];
-			for (int i = 0; i < xs; ++i)
-				for (int j = 0; j <= ys; ++j)
+			for (int i = 0; i < xs; ++i) {
+				for (int j = 0; j <= ys; ++j) {
 					xyoffs[mip][i][j] = dat.readShort();
+				}
+			}
 
 			int i = dat.size() - dat.position() - 768;
-			if (i < mip1leng - (24 + offset))
+			if (i < mip1leng - (24 + offset)) {
 				break;
+			}
 
 			data[mip] = new byte[mip1leng - (24 + offset)];
 			dat.read(data[mip]);
@@ -59,8 +63,9 @@ public class VoxelData {
 			mip++;
 		}
 
-		if (mip == 0)
+		if (mip == 0) {
 			throw new Exception("Can't load voxel");
+		}
 
 		this.pal = new int[256];
 		dat.seek(dat.size() - 768, Whence.Set);
@@ -68,7 +73,8 @@ public class VoxelData {
 		byte[] buf = new byte[768];
 		dat.read(buf);
 
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++) {
 			pal[i] = ((buf[3 * i + 0]) << 18) + ((buf[3 * i + 1]) << 10) + ((buf[3 * i + 2]) << 2) + (i << 24);
+		}
 	}
 }

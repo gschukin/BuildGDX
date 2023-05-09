@@ -23,8 +23,9 @@ public class Strhandler {
 	private static final Locale usLocal = Locale.US;
 	public static String toLowerCase(String text)
 	{
-		if(text != null)
+		if(text != null) {
 			return text.toLowerCase(usLocal); //Turkish language issue
+		}
 		return null;
 	}
 
@@ -48,8 +49,9 @@ public class Strhandler {
 				pos += text[i].length();
 			}
 		}
-		if(pos< buffer.length)
+		if(pos< buffer.length) {
 			buffer[pos] = 0;
+		}
 
 		return pos;
 	}
@@ -66,8 +68,9 @@ public class Strhandler {
 		System.arraycopy(tmp_buffer, 0, buffer, pos, lnum);
 
 		pos += lnum;
-		if(pos < buffer.length)
+		if(pos < buffer.length) {
 			buffer[pos] = 0;
+		}
 
 		return pos;
 	}
@@ -84,29 +87,37 @@ public class Strhandler {
 		System.arraycopy(tmp_buffer, 0, buffer, pos, lnum);
 
 		pos += lnum;
-		if(pos < buffer.length)
+		if(pos < buffer.length) {
 			buffer[pos] = 0;
+		}
 
 		return pos;
 	}
 
 	public static int indexOf(String target, byte[] source, int fromIndex) {
-        if (fromIndex >= source.length)
-            return (target.length() == 0 ? source.length : -1);
+        if (fromIndex >= source.length) {
+			return (target.length() == 0 ? source.length : -1);
+		}
 
         char first = target.charAt(0);
         int max = (source.length - target.length());
 
         for (int i = fromIndex; i <= max; i++) {
-            if (source[i] != first)
-                while (++i <= max && source[i] != first);
+            if (source[i] != first) {
+				while (++i <= max && source[i] != first) {
+					;
+				}
+			}
 
             if (i <= max) {
                 int j = i + 1;
                 int end = j + target.length() - 1;
-                for (int k = 1; j < end && source[j] == target.charAt(k); j++, k++);
-                if (j == end)
-                    return i;
+                for (int k = 1; j < end && source[j] == target.charAt(k); j++, k++) {
+					;
+				}
+                if (j == end) {
+					return i;
+				}
 
             }
         }
@@ -117,14 +128,17 @@ public class Strhandler {
 		Bitoa(num, tmp_buffer);
 		int len = Bstrlen(tmp_buffer);
 		if( align == 0) {
-			for(int i = 0; i < len && i < slen; i++)
+			for(int i = 0; i < len && i < slen; i++) {
 				b[i] = tmp_buffer[i];
+			}
 		} else if( align == 1 ) {
 			int dx = (slen - 1) - (len - 1);
 			for(int i = slen - 1; i >= 0; i--) {
-				if(i-dx >= 0)
+				if(i-dx >= 0) {
 					b[i] = tmp_buffer[i-dx];
-				else b[i] = ' ';
+				} else {
+					b[i] = ' ';
+				}
 			}
 		}
 		return slen;
@@ -140,10 +154,12 @@ public class Strhandler {
 			buffer[i++] = (char) (n1%10+'0');
 			n1=n1/10;
 		}
-		if(isneg)
+		if(isneg) {
 			buffer[i++] = '-';
-		if(i < buffer.length)
+		}
+		if(i < buffer.length) {
 			buffer[i] = '\0';
+		}
 
 		for(int t = 0; t < i/2; t++) {
 			buffer[t] ^= buffer[i-t-1];
@@ -153,8 +169,9 @@ public class Strhandler {
 
 		if(n == 0) {
 			buffer[i++] = '0';
-			if(i < buffer.length)
+			if(i < buffer.length) {
 				buffer[i] = '\0';
+			}
 		}
 		return i;
 	}
@@ -174,10 +191,12 @@ public class Strhandler {
 			buffer[i] = '0';
 		}
 
-		if(isneg)
+		if(isneg) {
 			buffer[i++] = '-';
-		if(i < buffer.length)
+		}
+		if(i < buffer.length) {
 			buffer[i] = '\0';
+		}
 
 		for(int t = 0; t < i/2; t++) {
 			buffer[t] ^= buffer[i-t-1];
@@ -189,26 +208,34 @@ public class Strhandler {
 			for(i = 0; i < numsymbols; i++) {
 				buffer[i] = '0';
 			}
-			if(i < buffer.length)
+			if(i < buffer.length) {
 				buffer[i] = '\0';
+			}
 		}
 		return i;
 	}
 
 	public static int Bstrcmp(char[] txt1, int offset1, char[] txt2, int offset2) {
 		int i = 0;
-		if(txt1 == null || txt2 == null)
+		if(txt1 == null || txt2 == null) {
 			return -1;
+		}
 
 		int len = Math.max(txt1.length - offset1, txt2.length - offset2);
 		while(i < len) {
 			char ch1 = 0, ch2 = 0;
-			if(offset1 + i < txt1.length) ch1 = txt1[offset1 + i];
-			if(offset2 + i < txt2.length) ch2 = txt2[offset2 + i];
-			if(ch1 != ch2)
+			if(offset1 + i < txt1.length) {
+				ch1 = txt1[offset1 + i];
+			}
+			if(offset2 + i < txt2.length) {
+				ch2 = txt2[offset2 + i];
+			}
+			if(ch1 != ch2) {
 				return -1;
-			if(ch1 == ch2 && ch1 == 0)
+			}
+			if(ch1 == ch2 && ch1 == 0) {
 				return 0;
+			}
 			i++;
 		}
 		return 0;
@@ -216,18 +243,25 @@ public class Strhandler {
 
 	public static int Bstrcmp(char[] txt1, char[] txt2) {
 		int i = 0;
-		if(txt1 == null || txt2 == null)
+		if(txt1 == null || txt2 == null) {
 			return -1;
+		}
 
 		int len = Math.max(txt1.length, txt2.length);
 		while(i < len) {
 			char ch1 = 0, ch2 = 0;
-			if(i < txt1.length) ch1 = txt1[i];
-			if(i < txt2.length) ch2 = txt2[i];
-			if(ch1 != ch2)
+			if(i < txt1.length) {
+				ch1 = txt1[i];
+			}
+			if(i < txt2.length) {
+				ch2 = txt2[i];
+			}
+			if(ch1 != ch2) {
 				return -1;
-			if(ch1 == ch2 && ch1 == 0)
+			}
+			if(ch1 == ch2 && ch1 == 0) {
 				return 0;
+			}
 			i++;
 		}
 		return 0;

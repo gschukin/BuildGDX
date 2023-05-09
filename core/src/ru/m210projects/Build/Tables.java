@@ -12,62 +12,24 @@ import static ru.m210projects.Build.Pragmas.scale;
 
 public class Tables {
 
-    private final short[] sintable;
-    private final short[] radarang;
-    private final short[] sqrtable;
-    private final short[] shlookup;
-    private final byte[] textfont;
-    private final byte[] smalltextfont;
+    protected final short[] sintable;
+    protected final short[] radarang;
+    protected final short[] sqrtable;
+    protected final short[] shlookup;
+    protected final byte[] textfont;
+    protected final byte[] smalltextfont;
 
     public Tables(Resource res) throws IOException {
-        if(res == null) {
-            throw new FileNotFoundException("Failed to load \"tables.dat\"!");
-        }
-
         sqrtable = new short[4096];
         shlookup = new short[4096 + 256];
         sintable = new short[2048];
         radarang = new short[1280];
-
-        byte[] buf = new byte[2048 * 2];
-        res.read(buf);
-        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
-
-        buf = new byte[640 * 2];
-        res.read(buf);
-        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0, 640);
-        for (int i = 0; i < 640; i++)
-            radarang[1279 - i] = (short) -radarang[i];
-
         textfont = new byte[2048];
         smalltextfont = new byte[2048];
-        res.read(textfont, 0, 1024);
-        res.read(smalltextfont, 0, 1024);
 
-//        try(InputStream is = entry.getInputStream()) {
-//            ByteBuffer.wrap(StreamUtils.readBytes(is, sintable.length * 2)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
-//            ByteBuffer.wrap(StreamUtils.readBytes(is, radarang.length)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0,  radarang.length / 2);
-//            this.textfont = StreamUtils.readBytes(is, 1024);
-//            this.smalltextfont = StreamUtils.readBytes(is, 1024);
-//        }
-
-        initSqrtTable();
-        for (int i = 0; i < 640; i++) {
-            radarang[1279 - i] = (short) -radarang[i];
-        }
-    }
-
-    public byte[] getTextFont() {
-        return textfont;
-    }
-
-    public byte[] getSmallTextFont() {
-        return smalltextfont;
-    }
-
-    private void initSqrtTable() {
-        int i, j = 1, k = 0;
-        for (i = 0; i < 4096; i++) {
+        // init sqrt table
+        int j = 1, k = 0;
+        for (int i = 0; i < 4096; i++) {
             if (i >= j) {
                 j <<= 2;
                 k++;
@@ -79,6 +41,44 @@ public class Tables {
                 shlookup[i + 4096] = (short) (((k + 6) << 1) + ((10 - (k + 6)) << 8));
             }
         }
+
+        read(res);
+    }
+
+    protected void read(Resource res) throws IOException {
+        if(res == null) {
+            throw new FileNotFoundException("Failed to load \"tables.dat\"!");
+        }
+
+        byte[] buf = new byte[2048 * 2];
+        res.read(buf);
+        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
+
+        buf = new byte[640 * 2];
+        res.read(buf);
+        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0, 640);
+        for (int i = 0; i < 640; i++) {
+            radarang[1279 - i] = (short) -radarang[i];
+        }
+
+        res.read(textfont, 0, 1024);
+        res.read(smalltextfont, 0, 1024);
+
+//        try(InputStream is = entry.getInputStream()) {
+//            ByteBuffer.wrap(StreamUtils.readBytes(is, sintable.length * 2)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
+//            ByteBuffer.wrap(StreamUtils.readBytes(is, radarang.length)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0,  radarang.length / 2);
+//            this.textfont = StreamUtils.readBytes(is, 1024);
+//            this.smalltextfont = StreamUtils.readBytes(is, 1024);
+//        }
+        res.close();
+    }
+
+    public byte[] getTextFont() {
+        return textfont;
+    }
+
+    public byte[] getSmallTextFont() {
+        return smalltextfont;
     }
 
     public int sin(int angle) {

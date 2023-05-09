@@ -22,15 +22,18 @@ public class IndexedTileData extends TileData {
 		int tsizx = tile.getWidth();
 		int tsizy = tile.getHeight();
 
-		if (data != null && (data.length == 0 || tile.getSize() > data.length))
+		if (data != null && (data.length == 0 || tile.getSize() > data.length)) {
 			data = null;
+		}
 
 		int xsiz = tsizx;
 		int ysiz = tsizy;
-		if ((expflag & 1) != 0)
+		if ((expflag & 1) != 0) {
 			xsiz = calcSize(tsizx);
-		if ((expflag & 2) != 0)
+		}
+		if ((expflag & 2) != 0) {
 			ysiz = calcSize(tsizy);
+		}
 
 		ByteBuffer buffer = ByteBuffer.allocateDirect(data != null ? xsiz * ysiz : 1).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -48,8 +51,9 @@ public class IndexedTileData extends TileData {
 				for (int y = ysiz - 1; y >= 0; y--) {
 					sptr = y >= tsizy ? 0 : tsizx;
 					dptr = (xsiz * y + sptr);
-					for (int x = sptr; x < xsiz; x++)
+					for (int x = sptr; x < xsiz; x++) {
 						buffer.put(dptr++, (byte) 255);
+					}
 				}
 
 				sptr = 0;
@@ -69,11 +73,13 @@ public class IndexedTileData extends TileData {
 					for (j = 0; j < ysiz; j++) {
 						buffer.put(dptr, data[sptr + p++]);
 						dptr += xsiz;
-						if (p >= tsizy)
+						if (p >= tsizy) {
 							p = 0;
+						}
 					}
-					if ((sptr += tsizy) >= len)
+					if ((sptr += tsizy) >= len) {
 						sptr = 0;
+					}
 				}
 			}
 		}

@@ -37,14 +37,16 @@ public class MenuSwitch extends MenuItem
 		this.width = width;
 		this.value = value;
 		this.callback = callback;
-		if(onMessage != null)
+		if(onMessage != null) {
 			this.onMessage = onMessage.toCharArray();
-		else
+		} else {
 			this.onMessage = new char[]{ 'O', 'n' };
-		if(offMessage != null)
+		}
+		if(offMessage != null) {
 			this.offMessage = offMessage.toCharArray();
-		else
+		} else {
 			this.offMessage = new char[]{ 'O', 'f', 'f' };
+		}
 		
 		this.switchFont = font;
 	}
@@ -54,10 +56,13 @@ public class MenuSwitch extends MenuItem
 		int shade = handler.getShade(this);
 		int pal = handler.getPal(font, this);
 		
-		if ( text != null )
+		if ( text != null ) {
 			font.drawText(x, y, text, shade, pal, TextAlign.Left, 2, fontShadow);
+		}
 		char[] sw = offMessage;
-		if(value) sw = onMessage;
+		if(value) {
+			sw = onMessage;
+		}
 		
 		switchFont.drawText(x + width - 1 - switchFont.getWidth(sw), y + (font.getHeight() - switchFont.getHeight()) / 2, sw, shade, handler.getPal(switchFont, this), TextAlign.Left, 2, fontShadow);
 		handler.mPostDraw(this);
@@ -67,31 +72,41 @@ public class MenuSwitch extends MenuItem
 	public boolean callback(MenuHandler handler, MenuOpt opt) {
 		if(opt == MenuOpt.LEFT || opt == MenuOpt.RIGHT || opt == MenuOpt.ENTER || opt == MenuOpt.LMB)
 		{
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			
 			value = !value;
-			if(callback != null) 
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			return false;
-		} else return m_pMenu.mNavigation(opt);
+		} else {
+			return m_pMenu.mNavigation(opt);
+		}
 	}
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text))
-				if(my > y && my < y + font.getHeight())
+			if(mx > x && mx < x + font.getWidth(text)) {
+				if(my > y && my < y + font.getHeight()) {
 					return true;
+				}
+			}
 		}
 		
 		char[] sw = offMessage;
-		if(value) sw = onMessage;
+		if(value) {
+			sw = onMessage;
+		}
 
 		int fontx = font.getWidth(sw);
 		int px = x + width - 1 - fontx;
-		if(mx > px && mx < px + fontx)
-            return my > y && my < y + font.getHeight();
+		if(mx > px && mx < px + fontx) {
+			return my > y && my < y + font.getHeight();
+		}
 		
 		return false;
 	}

@@ -57,8 +57,9 @@ public class MenuResolutionList extends MenuList {
 		}
 
 		if (l_nFocus != -1) {
-			if (l_nFocus >= l_nMin + nListItems)
+			if (l_nFocus >= l_nMin + nListItems) {
 				l_nMin = l_nFocus - nListItems + 1;
+			}
 		} 
 	}
 	
@@ -75,10 +76,12 @@ public class MenuResolutionList extends MenuList {
 					shade = handler.getShade(this);
 					pal = handler.getPal(font, this);
 				}
-			    if(align == 1) 
-			        px = width / 2 + x - font.getWidth(text.get(i)) / 2;
-			    if(align == 2) 
-			        px = x + width - 1 - font.getWidth(text.get(i));
+			    if(align == 1) {
+					px = width / 2 + x - font.getWidth(text.get(i)) / 2;
+				}
+			    if(align == 2) {
+					px = x + width - 1 - font.getWidth(text.get(i));
+				}
 			    font.drawText(px, py, text.get(i), shade, pal, TextAlign.Left, 2, fontShadow);
 
 				py += mFontOffset();
@@ -90,10 +93,12 @@ public class MenuResolutionList extends MenuList {
 			String text = "List is empty";
 			
 			int px = x, py = y;		
-			if(align == 1) 
-		        px = width / 2 + x - font.getWidth(text.toCharArray()) / 2;
-		    if(align == 2) 
-		        px = x + width - 1 - font.getWidth(text.toCharArray());
+			if(align == 1) {
+				px = width / 2 + x - font.getWidth(text.toCharArray()) / 2;
+			}
+		    if(align == 2) {
+				px = x + width - 1 - font.getWidth(text.toCharArray());
+			}
 		    int shade = handler.getShade(this);
 		    
 		    font.drawText(px, py, text.toCharArray(), shade, pal, TextAlign.Left, 2, fontShadow);
@@ -110,8 +115,9 @@ public class MenuResolutionList extends MenuList {
 				ListMouseWheelUp(handler);
 				return false;
 			case MWDW:
-				if(text != null)
+				if(text != null) {
 					ListMouseWheelDown(handler, text.size());
+				}
 				return false;
 			case UP:
 				ListUp(handler, text.size());
@@ -127,12 +133,15 @@ public class MenuResolutionList extends MenuList {
 				return false;
 			case ENTER:
 			case LMB:
-				if ( (flags & 4) == 0 ) return false;
+				if ( (flags & 4) == 0 ) {
+					return false;
+				}
 				
 				if(l_nFocus != -1 && text.size() > 0 && callback != null) {
 					callback.run(handler, this);
-					if ( nextMenu != null )
-				    	handler.mOpen(nextMenu, -1);
+					if ( nextMenu != null ) {
+						handler.mOpen(nextMenu, -1);
+					}
 				}
 				getInput().resetKeyStatus();
 				return false;
@@ -164,17 +173,20 @@ public class MenuResolutionList extends MenuList {
 			int px = x, py = y;
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < text.size(); i++) {	
 				int fontx = font.getWidth(text.get(i));
-				if(align == 1) 
-			        px = width / 2 + x - fontx / 2;
-			    if(align == 2) 
-			        px = x + width - 1 - fontx;
+				if(align == 1) {
+					px = width / 2 + x - fontx / 2;
+				}
+			    if(align == 2) {
+					px = x + width - 1 - fontx;
+				}
 	
-			    if(mx > px && mx < px + fontx)
+			    if(mx > px && mx < px + fontx) {
 					if(my > py && my < py + font.getHeight())
 					{
 						l_nFocus = i;
 						return true;
 					}
+				}
 			    
 				py += mFontOffset();
 			}

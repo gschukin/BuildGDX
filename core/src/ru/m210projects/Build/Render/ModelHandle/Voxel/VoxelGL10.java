@@ -77,13 +77,15 @@ public abstract class VoxelGL10 extends GLVoxel {
 	@Override
 	public boolean render(int pal, int shade, int surfnum, int visibility, float alpha) {
 		GLTile skin = getSkin(pal);
-		if (skin == null)
+		if (skin == null) {
 			return false;
+		}
 
-		if (alpha != 1.0f)
+		if (alpha != 1.0f) {
 			BuildGdx.gl.glEnable(GL_BLEND);
-		else
+		} else {
 			BuildGdx.gl.glDisable(GL_BLEND);
+		}
 
 		skin.bind(); // TODO skinBind instead of setTextureParams
 		setTextureParameters(skin, pal, shade, visibility, alpha);

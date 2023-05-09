@@ -86,10 +86,11 @@ public abstract class FadeEffect {
 
     public static void setParams(FadeShader shader, int r, int g, int b, int a, int sfactor, int dfactor) {
         BuildGdx.gl.glBlendFunc(sfactor, dfactor);
-        if (shader == null)
+        if (shader == null) {
             BuildGdx.gl.glColor4ub(r, g, b, a);
-        else
+        } else {
             shader.setColor(r, g, b, a);
+        }
     }
 
     public static void render(FadeShader shader) {
@@ -98,8 +99,9 @@ public abstract class FadeEffect {
             return;
         }
 
-        if (mesh == null)
+        if (mesh == null) {
             mesh = buildMesh();
+        }
         mesh.render(shader, GL_TRIANGLES);
     }
 
@@ -110,8 +112,9 @@ public abstract class FadeEffect {
 
     protected static void gl10draw() {
         BuildGdx.gl.glBegin(GL_TRIANGLES);
-        for (int i = 0; i < 6; i += 2)
+        for (int i = 0; i < 6; i += 2) {
             BuildGdx.gl.glVertex2f(vertices[i], vertices[i + 1]);
+        }
         BuildGdx.gl.glEnd();
     }
 }

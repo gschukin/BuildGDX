@@ -61,8 +61,9 @@ public class MapHackInfo {
 	}
 
 	public Spriteext getSpriteInfo(int spriteid) {
-		if(maphack != null)
+		if(maphack != null) {
 			return maphack.getSpriteInfo(spriteid);
+		}
 		return null;
 	}
 

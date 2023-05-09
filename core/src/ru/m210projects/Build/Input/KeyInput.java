@@ -82,8 +82,9 @@ public class KeyInput {
 		boolean keyPressed = false;
 		if (BuildGdx.input.isKeyPressed(Keys.ANY_KEY)) {
 			for (int kb = 1; kb < 256; kb++) {
-				if(kb == MOUSE_WHELLUP)
+				if(kb == MOUSE_WHELLUP) {
 					kb = MOUSE_BUTTON11 + 1;
+				}
 				
 				if (BuildGdx.input.isKeyPressed(kb)) {
 					keyPressed = true;
@@ -99,8 +100,9 @@ public class KeyInput {
 			}
 		} else {
 			for (int kb = 1; kb < 256; kb++) {
-				if(kb == MOUSE_WHELLUP)
+				if(kb == MOUSE_WHELLUP) {
 					kb = MOUSE_BUTTON11 + 1;
+				}
 				
 				keystatus[kb] = (byte) 0;
 				hitkey[kb] = false;
@@ -147,8 +149,9 @@ public class KeyInput {
 			hitkey[MOUSE_WHELLDN] = false;
 		}
 		
-		if(!keyPressed)
+		if(!keyPressed) {
 			keystatus[ANYKEY] = 0;
+		}
 		return rv;
 	}
 	
@@ -186,9 +189,11 @@ public class KeyInput {
 		{
 			if(!text.isEmpty() && !text.equals("Empty")) {
         		int len = 0;
-        		for(int i = 0; i < text.length(); i++)
-        			if(text.charAt(i) != 0)
-        				lockeybuf[len++] = text.charAt(i);
+        		for(int i = 0; i < text.length(); i++) {
+					if(text.charAt(i) != 0) {
+						lockeybuf[len++] = text.charAt(i);
+					}
+				}
         		locmessagelen = len;
         	} 
 		}
@@ -219,8 +224,9 @@ public class KeyInput {
                 }
 				if (ch == Keys.BACKSPACE) { 
                 	keystatus[Keys.BACKSPACE]=0;
-                	if (locmessagelen == 0)
-                        break;
+                	if (locmessagelen == 0) {
+						break;
+					}
           
                 	locmessagelen--;
                 	lockeybuf[locmessagelen]=0;
@@ -230,9 +236,11 @@ public class KeyInput {
 					return 1;
 				}
 				if (locmessagelen < (maxsize-1) && ch < 128) {
-                    if(specialSymbols && BuildGdx.input.isKeyPressed(Keys.SHIFT_LEFT) || BuildGdx.input.isKeyPressed(Keys.SHIFT_RIGHT))
-                    	ch=gdxscantoascwithshift[ch];
-                    else ch=gdxscantoasc[ch];
+                    if(specialSymbols && BuildGdx.input.isKeyPressed(Keys.SHIFT_LEFT) || BuildGdx.input.isKeyPressed(Keys.SHIFT_RIGHT)) {
+						ch=gdxscantoascwithshift[ch];
+					} else {
+						ch=gdxscantoasc[ch];
+					}
                     
                     if (ch != 0) {
                     	if (specialSymbols || (!specialSymbols && (isalpha((char)ch) || isdigit((char)ch) || ch == ' '))) {
@@ -245,7 +253,9 @@ public class KeyInput {
     	if(cursor) {
 	    	if ( (totalclock & 0x20) != 0 ) {
 	    		lockeybuf[locmessagelen]= '_';
-	    	} else lockeybuf[locmessagelen] = 0;
+	    	} else {
+				lockeybuf[locmessagelen] = 0;
+			}
     	}
     	return 0;
 	}
@@ -264,7 +274,9 @@ public class KeyInput {
     	if(cursor) {
 	    	if ( (totalclock & 0x20) != 0 ) {
 	    		lockeybuf[locmessagelen]= '_';
-	    	} else lockeybuf[locmessagelen] = 0;
+	    	} else {
+				lockeybuf[locmessagelen] = 0;
+			}
     	}
     	return 0;
 	}

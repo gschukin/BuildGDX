@@ -66,8 +66,9 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	@Override
 	public void show() {
-		if (game.pMenu.gShowMenu)
+		if (game.pMenu.gShowMenu) {
 			game.pMenu.mClose();
+		}
 
 		StopAllSounds();
 		engine.sampletimer();
@@ -89,12 +90,14 @@ public abstract class MovieScreen extends SkippableAdapter {
 	}
 
 	protected boolean open(String fn) {
-		if (mvfil != null)
+		if (mvfil != null) {
 			return false;
+		}
 
 		mvfil = GetFile(fn);
-		if (mvfil == null)
+		if (mvfil == null) {
 			return false;
+		}
 
 		Tile pic = engine.getTile(TILE_MOVIE);
 		pic.setWidth(mvfil.getWidth());
@@ -133,14 +136,16 @@ public abstract class MovieScreen extends SkippableAdapter {
 //        nPosX = (xdim / 2) - (int) (tilesizy[TILE_MOVIE] / 2.0f * scale);
 //        nPosY = (ydim / 2) - (int) (tilesizx[TILE_MOVIE] / 2.0f * scale);
 
-		for (int i = 0; i < MAXPALOOKUPS; i++)
+		for (int i = 0; i < MAXPALOOKUPS; i++) {
 			palookup[0][i] = (byte) i;
+		}
 
 		changepalette(mvfil.getPalette());
 
 		final GLRenderer gl = engine.glrender();
-		if (gl != null)
+		if (gl != null) {
 			gl.gltexinvalidateall(GLInvalidateFlag.Palookup);
+		}
 
 		frame = 0;
 		mvtime = 0;
@@ -154,8 +159,9 @@ public abstract class MovieScreen extends SkippableAdapter {
 	}
 
 	protected void changepalette(byte[] pal) {
-		if (pal == null)
+		if (pal == null) {
 			return;
+		}
 
 //		engine.setbrightness(BuildSettings.paletteGamma.get(), pal, 2);
 		engine.changepalette(pal);
@@ -170,26 +176,30 @@ public abstract class MovieScreen extends SkippableAdapter {
 			}
 		}
 
-		if (white == -1)
+		if (white == -1) {
 			return;
+		}
 
 		int palnum = MAXPALOOKUPS - RESERVEDPALS - 1;
 		byte[] remapbuf = new byte[768];
-		for (int i = 0; i < 768; i++)
+		for (int i = 0; i < 768; i++) {
 			remapbuf[i] = (byte) white;
+		}
 		engine.makepalookup(palnum, remapbuf, 0, 1, 0, 1);
 
 		for (int i = 0; i < 256; i++) {
 			int tile = GetFont().getTile(i);
-			if (tile >= 0)
+			if (tile >= 0) {
 				engine.getrender().invalidatetile(tile, palnum, -1);
+			}
 		}
 	}
 
 	protected boolean play() {
 		if (mvfil != null) {
-			if (LastMS == -1)
+			if (LastMS == -1) {
 				LastMS = engine.getticks();
+			}
 			Tile pic = engine.getTile(TILE_MOVIE);
 
 			long ms = engine.getticks();
@@ -202,18 +212,21 @@ public abstract class MovieScreen extends SkippableAdapter {
 					engine.getrender().invalidatetile(TILE_MOVIE, 0, -1); // JBF 20031228
 
 					frame++;
-				} else
+				} else {
 					return false;
+				}
 				mvtime -= tick;
 			}
 			LastMS = ms;
 
-			if (pic.getWidth() <= 0)
+			if (pic.getWidth() <= 0) {
 				return false;
+			}
 
-			if (pic.data != null)
+			if (pic.data != null) {
 				engine.rotatesprite(nPosX << 16, nPosY << 16, nScale, 512, TILE_MOVIE, 0, 0, nFlags, 0, 0, xdim - 1,
 						ydim - 1);
+			}
 			return true;
 		}
 		return false;
@@ -235,22 +248,27 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	@Override
 	public void draw(float delta) {
-		if (!play() && skipCallback != null)
+		if (!play() && skipCallback != null) {
 			callback();
+		}
 
-		if (game.pInput.ctrlKeyStatus(ANYKEY))
+		if (game.pInput.ctrlKeyStatus(ANYKEY)) {
 			gCutsClock = totalclock;
+		}
 
 		if (totalclock - gCutsClock < 200 && escSkip) // 2 sec
+		{
 			DrawEscText(GetFont(), MAXPALOOKUPS - RESERVEDPALS - 1);
+		}
 	}
 
 	protected void close() {
 		if (mvfil != null) {
 			System.arraycopy(opalookup, 0, palookup[0], 0, opalookup.length);
 			final GLRenderer gl = engine.glrender();
-			if (gl != null)
+			if (gl != null) {
 				gl.gltexinvalidateall(GLInvalidateFlag.Palookup);
+			}
 			mvfil.close();
 		}
 

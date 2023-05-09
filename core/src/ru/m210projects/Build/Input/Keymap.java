@@ -43,8 +43,9 @@ public class Keymap {
 	public static final int KEY_NUMDECIMAL = 0xF0;
 
 	public static String toString (int libgdx_keycode) {
-		if(libgdx_keycode < 0 || libgdx_keycode > 255)
+		if(libgdx_keycode < 0 || libgdx_keycode > 255) {
 			libgdx_keycode = 0;
+		}
 		
 		switch (libgdx_keycode) {
 		case UNKNOWN:
@@ -370,7 +371,9 @@ public class Keymap {
 	private static ObjectIntMap<String> keyNames;
 
 	public static int valueOf (String keyname) {
-		if (keyNames == null) initializeKeyNames();
+		if (keyNames == null) {
+			initializeKeyNames();
+		}
 		return keyNames.get(keyname, -1);
 	}
 
@@ -378,7 +381,9 @@ public class Keymap {
 		keyNames = new ObjectIntMap<String>();
 		for (int i = 0; i < 256; i++) {
 			String name = toString(i);
-			if (name != null) keyNames.put(name, i);
+			if (name != null) {
+				keyNames.put(name, i);
+			}
 		}
 	}
 }

@@ -69,8 +69,9 @@ public abstract class GLVoxel implements GLModel {
 		ArrayList<GLTile> list = new ArrayList<GLTile>();
 		for (int i = 0; i < texid.length; i++) {
 			GLTile tex = texid[i];
-			if (tex != null)
+			if (tex != null) {
 				list.add(tex);
+			}
 		}
 		return list.iterator();
 	}
@@ -79,8 +80,9 @@ public abstract class GLVoxel implements GLModel {
 	public void clearSkins() {
 		for (int i = 0; i < texid.length; i++) {
 			GLTile tex = texid[i];
-			if (tex == null)
+			if (tex == null) {
 				continue;
+			}
 
 			tex.delete();
 			texid[i] = null;

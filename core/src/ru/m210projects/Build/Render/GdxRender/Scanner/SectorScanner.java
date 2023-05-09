@@ -86,8 +86,9 @@ public abstract class SectorScanner {
 	}
 
 	public void process(ArrayList<VisibleSector> sectors, BuildCamera cam, WorldMesh mesh, int sectnum) {
-		if (!Gameutils.isValidSector(sectnum))
+		if (!Gameutils.isValidSector(sectnum)) {
 			return;
+		}
 
 		pvs.process(cam, mesh, sectnum);
 
@@ -113,8 +114,9 @@ public abstract class SectorScanner {
 			sectnum = pFrustum.sectnum;
 
 			VisibleSector sec = handled[sectnum];
-			if (handled[sectnum] == null)
+			if (handled[sectnum] == null) {
 				sec = pSectorPool.obtain().set(sectnum);
+			}
 
 			if (!pFrustum.handled) {
 				pFrustum.handled = true;
@@ -123,8 +125,9 @@ public abstract class SectorScanner {
 				int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 				for (int z = startwall; z < endwall; z++) {
 					Wall wal = Engine.getWall(z);
-					if (!pvs.checkWall(z))
+					if (!pvs.checkWall(z)) {
 						continue;
+					}
 
 					int nextsectnum = wal.getNextsector();
 					if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Max, sectnum, z))) {
@@ -132,12 +135,14 @@ public abstract class SectorScanner {
 
 						if ((Engine.getSector(sectnum).isParallaxFloor()
 								&& (nextsectnum == -1 || !Engine.getSector(nextsectnum).isParallaxFloor()))
-								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyLower, sectnum, z)))
+								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyLower, sectnum, z))) {
 							wallflags[z] |= 8;
+						}
 						if ((Engine.getSector(sectnum).isParallaxCeiling()
 								&& (nextsectnum == -1 || !Engine.getSector(nextsectnum).isParallaxCeiling()))
-								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyUpper, sectnum, z)))
+								&& pFrustum.wallInFrustum(mesh.getPoints(Heinum.SkyUpper, sectnum, z))) {
 							wallflags[z] |= 16;
+						}
 
 						if (nextsectnum != -1) {
 							if (!checkWallRange(nextsectnum, wal.getNextwall())) {
@@ -146,28 +151,34 @@ public abstract class SectorScanner {
 								short i = (short) gap;
 								while (gap > 1) {
 									gap >>= 1;
-									if (Engine.getSector(i).getWallptr() < theline)
+									if (Engine.getSector(i).getWallptr() < theline) {
 										i += gap;
-									else
+									} else {
 										i -= gap;
+									}
 								}
-								while (Engine.getSector(i).getWallptr() > theline)
+								while (Engine.getSector(i).getWallptr() > theline) {
 									i--;
-								while (Engine.getSector(i).getWallptr() + Engine.getSector(i).getWallnum() <= theline)
+								}
+								while (Engine.getSector(i).getWallptr() + Engine.getSector(i).getWallnum() <= theline) {
 									i++;
+								}
 								nextsectnum = i;
 
 								System.err.println("Error on " + i);
 								wal.setNextsector(i); // XXX
 							}
 
-							if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Lower, sectnum, z)))
+							if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Lower, sectnum, z))) {
 								wallflags[z] |= 1;
-							if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Upper, sectnum, z)))
+							}
+							if (pFrustum.wallInFrustum(mesh.getPoints(Heinum.Upper, sectnum, z))) {
 								wallflags[z] |= 2;
+							}
 
-							if (!pvs.checkSector(nextsectnum))
+							if (!pvs.checkSector(nextsectnum)) {
 								continue;
+							}
 
 							WallFrustum3d portal = null;
 							if ((((Engine.getSector(sectnum).getCeilingstat() & Engine.getSector(nextsectnum).getCeilingstat()) & 1) != 0)
@@ -177,8 +188,9 @@ public abstract class SectorScanner {
 							} else {
 								// Handle the next portal
 								ArrayList<Vertex> points;
-								if ((points = mesh.getPoints(Heinum.Portal, sectnum, z)) == null)
+								if ((points = mesh.getPoints(Heinum.Portal, sectnum, z)) == null) {
 									continue;
+								}
 
 								WallFrustum3d clip = null;
 								boolean bNearPlaneClipped;
@@ -197,12 +209,14 @@ public abstract class SectorScanner {
 
 								if ((sectnum == cursectnum || bNearPlaneClipped) && clip == null) {
 									points = cl.ClipPolygon(cam.frustum, points);
-									if (points.size() < 3)
+									if (points.size() < 3) {
 										continue;
+									}
 								}
 
-								if (wal.isOneWay() && clip == null)
+								if (wal.isOneWay() && clip == null) {
 									continue;
+								}
 
 								portal = clip != null ? clip : pFrustum.build(cam, pFrustumPool, points, nextsectnum);
 							}
@@ -225,13 +239,15 @@ public abstract class SectorScanner {
 				}
 			}
 
-			if (handled[sectnum] == null)
+			if (handled[sectnum] == null) {
 				handled[sectnum] = sec;
+			}
 
-			if (pFrustum.next != null)
+			if (pFrustum.next != null) {
 				pFrustum = pFrustum.next;
-			else
+			} else {
 				pFrustum = portqueue[(++pqhead) & queuemask];
+			}
 		}
 
 		pqhead = pqtail = 0;
@@ -245,8 +261,9 @@ public abstract class SectorScanner {
 			sectnum = pFrustum.sectnum;
 			VisibleSector sec = handled[sectnum];
 
-			if (automapping == 1)
+			if (automapping == 1) {
 				show2dsector[sectnum >> 3] |= pow2char[sectnum & 7];
+			}
 
 			boolean isParallaxCeiling = Engine.getSector(sectnum).isParallaxCeiling();
 			boolean isParallaxFloor = Engine.getSector(sectnum).isParallaxFloor();
@@ -256,8 +273,9 @@ public abstract class SectorScanner {
 				Wall wal = Engine.getWall(z);
 				int nextsectnum = wal.getNextsector();
 
-				if ((gotwall[z >> 3] & pow2char[z & 7]) == 0)
+				if ((gotwall[z >> 3] & pow2char[z & 7]) == 0) {
 					continue;
+				}
 
 				if (nextsectnum != -1) {
 					if (gotviewport[nextsectnum] != null) {
@@ -266,8 +284,9 @@ public abstract class SectorScanner {
 						gotviewport[nextsectnum] = null;
 					}
 				}
-				if (wal.isMasked() || wal.isOneWay())
+				if (wal.isMasked() || wal.isOneWay()) {
 					maskwall[maskwallcnt++] = z;
+				}
 
 				if ((wallflags[z] & (8 | 16)) != 0) {
 					wallflags[z] &= ~(8 | 16);
@@ -292,10 +311,12 @@ public abstract class SectorScanner {
 			}
 
 			byte secflags = 0;
-			if (!isParallaxFloor && isSectorVisible(pFrustum, cam.frustum.planes[0], true, sectnum))
+			if (!isParallaxFloor && isSectorVisible(pFrustum, cam.frustum.planes[0], true, sectnum)) {
 				secflags |= 1;
-			if (!isParallaxCeiling && isSectorVisible(pFrustum, cam.frustum.planes[0], false, sectnum))
+			}
+			if (!isParallaxCeiling && isSectorVisible(pFrustum, cam.frustum.planes[0], false, sectnum)) {
 				secflags |= 2;
+			}
 
 			checkSprites(pFrustum, sectnum);
 
@@ -310,8 +331,9 @@ public abstract class SectorScanner {
 	protected IntComparator wallcomp = new IntComparator() {
 		@Override
 		public int compare(int o1, int o2) {
-			if (!wallfront(Engine.getWall(o1), Engine.getWall(o2)))
+			if (!wallfront(Engine.getWall(o1), Engine.getWall(o2))) {
 				return -1;
+			}
 			return 0;
 		}
 	};
@@ -375,8 +397,9 @@ public abstract class SectorScanner {
 	}
 
 	public Sector getLastSkySector(Heinum h) {
-		if (h == Heinum.SkyLower)
+		if (h == Heinum.SkyLower) {
 			return skyFloor;
+		}
 		return skyCeiling;
 	}
 
@@ -422,8 +445,9 @@ public abstract class SectorScanner {
 
 			WallFrustum3d n = frustum;
 			do {
-				if (n.wallInFrustum(points, 4))
+				if (n.wallInFrustum(points, 4)) {
 					return true;
+				}
 				n = n.next;
 			} while (n != null);
 		}
@@ -434,8 +458,9 @@ public abstract class SectorScanner {
 	protected abstract Matrix4 getSpriteMatrix(Sprite tspr);
 
 	private Sprite addTSprite() {
-		if (tsprite[spritesortcnt] == null)
+		if (tsprite[spritesortcnt] == null) {
 			tsprite[spritesortcnt] = new TSprite();
+		}
 		return tsprite[spritesortcnt++];
 	}
 
@@ -453,15 +478,18 @@ public abstract class SectorScanner {
 						: engine.getceilzofslope((short) sectnum, wal.getX(), wal.getY());
 
 				if ((isFloor && !Engine.getSector(sectnum).isFloorSlope() && globalposz > wz)
-						|| (!isFloor && !Engine.getSector(sectnum).isCeilingSlope() && globalposz < wz))
+						|| (!isFloor && !Engine.getSector(sectnum).isCeilingSlope() && globalposz < wz)) {
 					continue;
+				}
 
-				if (plane.testPoint(wal.getX(), wal.getY(), wz) != PlaneSide.Back)
+				if (plane.testPoint(wal.getX(), wal.getY(), wz) != PlaneSide.Back) {
 					continue Plane;
+				}
 			}
 
-			if (frustum.next != null)
+			if (frustum.next != null) {
 				return isSectorVisible(frustum.next, null, isFloor, sectnum);
+			}
 
 			return false;
 		}
@@ -471,8 +499,9 @@ public abstract class SectorScanner {
 	private boolean NearPlaneCheck(BuildCamera cam, ArrayList<? extends Vector3> points) {
 		Plane near = cam.frustum.planes[0];
 		for (int i = 0; i < points.size(); i++) {
-			if (near.testPoint(points.get(i)) == PlaneSide.Back)
+			if (near.testPoint(points.get(i)) == PlaneSide.Back) {
 				return true;
+			}
 		}
 		return false;
 	}

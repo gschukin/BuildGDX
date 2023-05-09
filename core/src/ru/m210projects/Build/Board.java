@@ -1,5 +1,6 @@
 package ru.m210projects.Build;
 
+import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Types.BuildPos;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
@@ -19,6 +20,30 @@ public class Board {
         this.sectors = sectors;
         this.walls = walls;
         this.sprites = sprites;
+
+        // sector wall array init with wall checking
+        for (int s = 0; s < sectors.length; s++) {
+            Sector sec = sectors[s];
+            Wall[] sectorWalls = new Wall[sec.getWallnum()];
+
+            int w = 0;
+            int startWall = sec.getWallptr();
+            int endWall = startWall + sec.getWallnum() - 1;
+            for (int i = startWall; i <= endWall; i++) {
+                Wall wal = getWall(i);
+                Wall wal2;
+                if (wal == null || (wal2 = getWall(wal.getPoint2())) == null) {
+                    Console.Println(String.format("Sector %d has corrupt contour", s), Console.OSDTEXT_RED);
+                    sec.setWallnum(0);
+                    sec.setWallptr(0);
+                    sectorWalls = new Wall[0];
+                    break;
+                }
+                wal.setWall2(wal2);
+                sectorWalls[w++] = wal;
+            }
+            sec.setWalls(sectorWalls);
+        }
     }
 
     public BuildPos getPos() {
@@ -38,22 +63,21 @@ public class Board {
     }
 
     public Sprite getSprite(int index) {
-        if(index < 0 || index >= sprites.size()) {
+        if(!isValidSprite(index)) {
             return null;
         }
         return sprites.get(index);
     }
 
     public Wall getWall(int index) {
-        if(index < 0 || index >= walls.length) {
+        if(!isValidWall(index)) {
             return null;
         }
         return walls[index];
     }
 
-
     public Sector getSector(int index) {
-        if(index < 0 || index >= sectors.length) {
+        if(!isValidSector(index)) {
             return null;
         }
         return sectors[index];

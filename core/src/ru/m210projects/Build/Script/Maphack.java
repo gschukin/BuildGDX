@@ -61,50 +61,58 @@ public class Maphack extends Scriptfile {
 		super("", new byte[0]);
 
 		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
-		for (int i = 0; i < spriteext.length; i++)
+		for (int i = 0; i < spriteext.length; i++) {
 			spriteext[i] = new Spriteext();
+		}
 	}
 
 	public Maphack(String filename) {
 		super(filename, BuildGdx.cache.getBytes(filename, 0));
 
 		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
-		for (int i = 0; i < spriteext.length; i++)
+		for (int i = 0; i < spriteext.length; i++) {
 			spriteext[i] = new Spriteext();
+		}
 
 		Integer value;
 		while (true) {
 			switch (gettoken(basetokens)) {
 			case MapCRC:
 				Integer crc32 = getsymbol();
-				if (crc32 == null)
+				if (crc32 == null) {
 					break;
+				}
 
 				MapCRC = crc32 & 0xFFFFFFFFL;
 				break;
 			case Sprite:
 				Integer sprnum = getsymbol();
-				if (sprnum == null)
+				if (sprnum == null) {
 					break;
+				}
 
 				switch (gettoken(sprite_tokens)) {
 				default:
 					break;
 				case AngleOffset:
-					if ((value = getsymbol()) != null)
+					if ((value = getsymbol()) != null) {
 						spriteext[sprnum].angoff = value.shortValue();
+					}
 					break;
 				case XOffset:
-					if ((value = getsymbol()) != null)
+					if ((value = getsymbol()) != null) {
 						spriteext[sprnum].xoff = value;
+					}
 					break;
 				case YOffset:
-					if ((value = getsymbol()) != null)
+					if ((value = getsymbol()) != null) {
 						spriteext[sprnum].yoff = value;
+					}
 					break;
 				case ZOffset:
-					if ((value = getsymbol()) != null)
+					if ((value = getsymbol()) != null) {
 						spriteext[sprnum].zoff = value;
+					}
 					break;
 				case NoModel:
 					spriteext[sprnum].flags |= 1; // SPREXT_NOTMD;
@@ -124,20 +132,23 @@ public class Maphack extends Scriptfile {
 
 	private Token gettoken(Map<String, Token> list) {
 		int tok;
-		if ((tok = gettoken()) == -2)
+		if ((tok = gettoken()) == -2) {
 			return Token.EOF;
+		}
 
 		Token out = list.get(toLowerCase(textbuf.substring(tok, textptr)));
-		if (out != null)
+		if (out != null) {
 			return out;
+		}
 
 		errorptr = textptr;
 		return Token.Error;
 	}
 
 	public Spriteext getSpriteInfo(int spriteid) {
-		if (spriteid < 0 || spriteid >= spriteext.length)
+		if (spriteid < 0 || spriteid >= spriteext.length) {
 			return null;
+		}
 		return spriteext[spriteid];
 	}
 

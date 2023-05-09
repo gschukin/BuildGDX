@@ -55,12 +55,14 @@ public class JController implements BuildController {
 			Component component = components[i];
             Identifier componentIdentifier = component.getIdentifier();
 
-            if(componentIdentifier instanceof Button)
-            	buttons.add(component);
-            if(componentIdentifier == Axis.POV)
-                povs.add(component);
-            else if(component.isAnalog())
-            	axises.add(component);
+            if(componentIdentifier instanceof Button) {
+				buttons.add(component);
+			}
+            if(componentIdentifier == Axis.POV) {
+				povs.add(component);
+			} else if(component.isAnalog()) {
+				axises.add(component);
+			}
         }
 		
 		allButtonsCount = buttons.size + povs.size * 4 + ((axises.size > 3) ? 2 : 0); //4 - buttons in DPad(pov) and 2 - triggers (axis 4)
@@ -85,8 +87,9 @@ public class JController implements BuildController {
 
 	@Override
 	public Vector2 getStickValue(int aCode1, int aCode2, float deadZone) {
-		if(aCode1 >= axises.size || aCode2 >= axises.size) 
+		if(aCode1 >= axises.size || aCode2 >= axises.size) {
 			return stickVector.set(0.0f, 0.0f);
+		}
 		
 		float lx = axises.get(aCode1).getPollData();
 		float ly = axises.get(aCode2).getPollData();
@@ -96,8 +99,9 @@ public class JController implements BuildController {
 		float nlm;
 		if (mag > deadZone)
 		{
-			if (mag > 1.0f)
+			if (mag > 1.0f) {
 				mag = 1.0f;
+			}
 
 			mag -= deadZone;
 			nlm = mag / (1.0f - deadZone);
@@ -105,8 +109,9 @@ public class JController implements BuildController {
 			float y1 = nly * nlm;
 			return stickVector.set(x1, y1);
 		}
-		else
+		else {
 			return stickVector.set(0.0f, 0.0f);
+		}
 	}
 
 	@Override
@@ -116,8 +121,9 @@ public class JController implements BuildController {
 
 	@Override
 	public void update() {
-		if(!controller.poll())
+		if(!controller.poll()) {
 			System.err.println("Disconnected");
+		}
 
 		buttonPressed = false;
 		dPadHandler();
@@ -153,8 +159,9 @@ public class JController implements BuildController {
 	@Override
 	public boolean buttonPressed(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount)
+		if(buttonCode >= 0 && buttonCode < allButtonsCount) {
 			return hitButton[buttonCode];
+		}
 		
 		return false;
 	}
@@ -225,7 +232,9 @@ public class JController implements BuildController {
 	
 	private void triggerHandler()
 	{
-		if(axises.size < 5) return;
+		if(axises.size < 5) {
+			return;
+		}
 		
 		float value = axises.get(4).getPollData();
 		int num = buttons.size + (4 * povs.size);

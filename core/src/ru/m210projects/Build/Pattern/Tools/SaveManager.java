@@ -80,8 +80,9 @@ public class SaveManager {
 	
 	public String getLast()
 	{
-		if(SavList.size() > 0)
+		if(SavList.size() > 0) {
 			return SavList.get(0).filename;
+		}
 		return null;
 	}
 	

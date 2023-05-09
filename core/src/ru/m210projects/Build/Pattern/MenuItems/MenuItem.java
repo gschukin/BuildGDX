@@ -44,10 +44,11 @@ public abstract class MenuItem {
 	
 	public MenuItem(Object text, BuildFont textStyle) {
 		if(text != null) {
-			if(text instanceof String) 
+			if(text instanceof String) {
 				this.text = ((String)text).toCharArray();
-			else if(text instanceof char[])
+			} else if(text instanceof char[]) {
 				this.text = (char[]) text;
+			}
 		}
 		this.font = textStyle;
 		
@@ -60,9 +61,11 @@ public abstract class MenuItem {
 	}
 	
 	public void mCheckEnableItem(boolean nEnable) {
-		if (nEnable) 
+		if (nEnable) {
 			flags = 3 | 4;
-		else flags = 1;
+		} else {
+			flags = 1;
+		}
 	}
 	
 	public boolean isEnabled()

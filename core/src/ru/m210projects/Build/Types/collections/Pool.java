@@ -23,8 +23,9 @@ public abstract class Pool<T> {
 	}
 
 	protected T reset(T object) {
-		if (object instanceof Poolable)
+		if (object instanceof Poolable) {
 			((Poolable) object).reset();
+		}
 		return object;
 	}
 

@@ -69,15 +69,18 @@ public class MidiReceiver implements Receiver  {
 			try { volumeMessage.setMessage(data[0], data[1], (byte) (data[2] * volume));
 			} catch (InvalidMidiDataException e) {}
 			receiver.send(volumeMessage, timeStamp);
-		} else receiver.send(message, timeStamp);
+		} else {
+			receiver.send(message, timeStamp);
+		}
 	}
 	
 	private ShortMessage getVolumeMessage(MidiMessage message) {
 		if((message.getStatus() & 0xF0) == ShortMessage.CONTROL_CHANGE)
     	{
     		ShortMessage m = (ShortMessage) message;
-    		if(m.getData1() == CONTROL_VOLUME) 
-    			return m;
+    		if(m.getData1() == CONTROL_VOLUME) {
+				return m;
+			}
     	}
 		  
     	return null;

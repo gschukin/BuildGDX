@@ -30,8 +30,9 @@ public class MidiMusicSource extends MusicSource {
 
 	public MidiMusicSource(MidiSequencer sequencer, byte[] buf) throws Exception
 	{
-		if(sequencer == null || !sequencer.isOpen())
+		if(sequencer == null || !sequencer.isOpen()) {
 			throw new Exception("Sequencer not ready!");
+		}
 		
 		this.sequencer = sequencer;
 		this.data = MidiSystem.getSequence(new ByteArrayInputStream(buf));

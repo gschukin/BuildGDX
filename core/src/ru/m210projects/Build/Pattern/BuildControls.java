@@ -68,8 +68,9 @@ public abstract class BuildControls {
 
 	public void resetMousePos()
 	{
-		if(BuildGdx.app.isActive())
+		if(BuildGdx.app.isActive()) {
 			BuildGdx.input.setCursorPosition(xdim / 2, ydim / 2);
+		}
 		oldPosX = xdim / 2;
 		oldPosY = ydim / 2;
 	}
@@ -128,8 +129,9 @@ public abstract class BuildControls {
 
 	public float ctrlGetMouseLook(boolean invert)
 	{
-		if(invert)
+		if(invert) {
 			return -mouseMove.y * pCfg.gMouseLookSpeed / 65536f;
+		}
 		return mouseMove.y * pCfg.gMouseLookSpeed / 65536f;
 	}
 
@@ -154,24 +156,27 @@ public abstract class BuildControls {
 
 	public Vector2 ctrlGetStick(JoyStick stick) {
 
-		if(stick == JoyStick.Turning)
+		if(stick == JoyStick.Turning) {
 			return stick1;
+		}
 
 		return stick2;
 	}
 
 	public boolean ctrlPadStatusOnce(KeyType buttonCode)
 	{
-		if(buttonCode instanceof MenuKeys)
+		if(buttonCode instanceof MenuKeys) {
 			return gpmanager.isValidDevice(pCfg.gJoyDevice) && gpmanager.buttonStatusOnce(pCfg.gJoyDevice, pCfg.gJoyMenukeys[((MenuKeys) buttonCode).getJoyNum()]);
+		}
 
 		return gpmanager.isValidDevice(pCfg.gJoyDevice) && gpmanager.buttonStatusOnce(pCfg.gJoyDevice, pCfg.gpadkeys[buttonCode.getNum()]);
 	}
 
 	public boolean ctrlPadStatus(KeyType buttonCode)
 	{
-		if(buttonCode instanceof MenuKeys)
+		if(buttonCode instanceof MenuKeys) {
 			return gpmanager.isValidDevice(pCfg.gJoyDevice) && gpmanager.buttonStatus(pCfg.gJoyDevice, pCfg.gJoyMenukeys[((MenuKeys) buttonCode).getJoyNum()]);
+		}
 
 		return gpmanager.isValidDevice(pCfg.gJoyDevice) && gpmanager.buttonStatus(pCfg.gJoyDevice, pCfg.gpadkeys[buttonCode.getNum()]);
 	}

@@ -71,8 +71,9 @@ public class DataResource extends GroupResource {
 	@Override
 	public int read(byte[] buf, int offset, int len) {
 		synchronized(parent != null ? parent : this) {
-			if(position() >= size) 
+			if(position() >= size) {
 				return -1;
+			}
 			
 			len = Math.min(len, size - position());
 			buffer.get(buf, offset, len);
@@ -90,16 +91,18 @@ public class DataResource extends GroupResource {
 	@Override
 	public int read(ByteBuffer bb, int offset, int len) {
 		synchronized(parent != null ? parent : this) {
-			if(position() >= size) 
+			if(position() >= size) {
 				return -1;
+			}
 			
 			int var;
 			bb.position(offset);
 			int p = 0;
 			while(len > 0)
 			{
-				if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1)
+				if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1) {
 					return p;
+				}
 				bb.put(tmp, 0, var);
 				len -= var;
 				p += var;
@@ -118,8 +121,9 @@ public class DataResource extends GroupResource {
 	@Override
 	public Boolean readBoolean() {
 		Byte var = readByte();
-		if(var != null)
+		if(var != null) {
 			return var == 1;
+		}
 		return null;
 	}
 	
@@ -156,8 +160,9 @@ public class DataResource extends GroupResource {
 	{
 		synchronized(parent != null ? parent : this) {
 			byte[] data = new byte[len];
-			if(read(data) != len)
+			if(read(data) != len) {
 				return null;
+			}
 			
 			return new String(data);
 		}

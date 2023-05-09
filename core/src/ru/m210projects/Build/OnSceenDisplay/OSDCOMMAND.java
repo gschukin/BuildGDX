@@ -68,8 +68,9 @@ public class OSDCOMMAND {
 			return 2;
 		}
     	
-    	if(value == null) 
-    		return 1; // description
+    	if(value == null) {
+			return 1; // description
+		}
     	try {
     		float var = Float.parseFloat(value);
     		if((type & CVARTYPE) != 0) {

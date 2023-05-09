@@ -45,11 +45,13 @@ public class LZWDecoder implements Closeable {
 		}
 
 		Short leng = fil.readShort();
-		if(leng == null)
+		if(leng == null) {
 			return -1;
+		}
 
-		if (fil.read(lzwbuf5, 0, leng) != leng)
+		if (fil.read(lzwbuf5, 0, leng) != leng) {
 			return -1;
+		}
 		int k = 0;
 		int kgoal = lzwuncompress(lzwbuf5, leng, lzwbuf4);
 		System.arraycopy(lzwbuf4, 0, buf, 0, dasizeof);
@@ -60,15 +62,19 @@ public class LZWDecoder implements Closeable {
 			if (k >= kgoal) {
 				leng = fil.readShort();
 				if(leng == null) //EOF reached
+				{
 					return ptr + dasizeof;
+				}
 				
-				if (fil.read(lzwbuf5, 0, leng) != leng)
+				if (fil.read(lzwbuf5, 0, leng) != leng) {
 					return -1;
+				}
 				k = 0;
 				kgoal = lzwuncompress(lzwbuf5, leng, lzwbuf4);
 			}
-			for (j = 0; j < dasizeof; j++)
+			for (j = 0; j < dasizeof; j++) {
 				buf[ptr + j + dasizeof] = (byte) ((buf[ptr + j] + lzwbuf4[j + k]) & 255);
+			}
 			k += dasizeof;
 			ptr += dasizeof;
 		}
@@ -76,13 +82,15 @@ public class LZWDecoder implements Closeable {
 	}
 
 	public int write(byte[] buf, int len) {
-		if (!(fil instanceof FileResource))
+		if (!(fil instanceof FileResource)) {
 			throw new UnsupportedOperationException("unsupported, won't implement");
+		}
 
 		FileResource fil = (FileResource) this.fil;
 		
-		if(fil.isClosed() || fil.getMode() != Mode.Write)
+		if(fil.isClosed() || fil.getMode() != Mode.Write) {
 			return -1;
+		}
 		
 		int dasizeof = this.sizeof;
 
@@ -103,8 +111,9 @@ public class LZWDecoder implements Closeable {
 		}
 
 		for (int i = 1, j; i < len; i++) {
-			for (j = 0; j < dasizeof; j++)
+			for (j = 0; j < dasizeof; j++) {
 				lzwbuf4[j + k] = (byte) ((buf[ptr + j + dasizeof] - buf[ptr + j]) & 255);
+			}
 			k += dasizeof;
 			if (k > LZWSIZE - dasizeof) {
 				leng = lzwcompress(lzwbuf4, k, lzwbuf5);
@@ -151,8 +160,9 @@ public class LZWDecoder implements Closeable {
 			addr = (short) (lzwinbuf[bytecnt1] & 0xFF);
 			do {
 				bytecnt1++;
-				if (bytecnt1 == uncompleng)
+				if (bytecnt1 == uncompleng) {
 					break;
+				}
 				if (lzwbuf2[addr] < 0) {
 					lzwbuf2[addr] = addrcnt;
 					break;
@@ -166,8 +176,9 @@ public class LZWDecoder implements Closeable {
 					}
 					newaddr = zx;
 				}
-				if (lzwbuf3[newaddr] == addrcnt)
+				if (lzwbuf3[newaddr] == addrcnt) {
 					break;
+				}
 				addr = newaddr;
 			} while (addr >= 0);
 			lzwbuf1[addrcnt] = lzwinbuf[bytecnt1];
@@ -178,8 +189,9 @@ public class LZWDecoder implements Closeable {
 			outbuf.putInt(bitcnt >> 3, intptr | (addr << (bitcnt & 7)));
 
 			bitcnt += numbits;
-			if ((addr & ((oneupnumbits >> 1) - 1)) > ((addrcnt - 1) & ((oneupnumbits >> 1) - 1)))
+			if ((addr & ((oneupnumbits >> 1) - 1)) > ((addrcnt - 1) & ((oneupnumbits >> 1) - 1))) {
 				bitcnt--;
+			}
 
 			addrcnt++;
 			if (addrcnt > oneupnumbits) {
@@ -192,8 +204,9 @@ public class LZWDecoder implements Closeable {
 		outbuf.putInt(bitcnt >> 3, intptr | (addr << (bitcnt & 7)));
 
 		bitcnt += numbits;
-		if ((addr & ((oneupnumbits >> 1) - 1)) > ((addrcnt - 1) & ((oneupnumbits >> 1) - 1)))
+		if ((addr & ((oneupnumbits >> 1) - 1)) > ((addrcnt - 1) & ((oneupnumbits >> 1) - 1))) {
 			bitcnt--;
+		}
 
 		outbuf.putShort(0, (short) uncompleng);
 		if (((bitcnt + 7) >> 3) < uncompleng) {
@@ -202,8 +215,9 @@ public class LZWDecoder implements Closeable {
 		}
 
 		outbuf.putShort(2, (short) 0);
-		for (int i = 0; i < uncompleng; i++)
+		for (int i = 0; i < uncompleng; i++) {
 			outbuf.put(i + 4, lzwinbuf[i]);
+		}
 
 		return (uncompleng + 4);
 	}
@@ -237,12 +251,14 @@ public class LZWDecoder implements Closeable {
 
 			lzwbuf3[currstr] = (short) dat;
 
-			for (leng = 0; dat >= 256; leng++, dat = lzwbuf3[dat])
+			for (leng = 0; dat >= 256; leng++, dat = lzwbuf3[dat]) {
 				lzwbuf1[leng] = (byte) lzwbuf2[dat];
+			}
 
 			lzwoutbuf[outbytecnt++] = (byte) dat;
-			for (int i = leng - 1; i >= 0; i--)
+			for (int i = leng - 1; i >= 0; i--) {
 				lzwoutbuf[outbytecnt++] = lzwbuf1[i];
+			}
 
 			lzwbuf2[currstr - 1] = (short) dat;
 			lzwbuf2[currstr] = (short) dat;

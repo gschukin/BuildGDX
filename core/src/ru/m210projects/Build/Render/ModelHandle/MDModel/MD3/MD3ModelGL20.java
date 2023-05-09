@@ -69,15 +69,18 @@ public abstract class MD3ModelGL20 extends MDModel {
 				vertices.flip();
 
 				indices.clear();
-				for (int i = s.numtris - 1; i >= 0; i--)
-					for (int j = 0; j < 3; j++)
+				for (int i = s.numtris - 1; i >= 0; i--) {
+					for (int j = 0; j < 3; j++) {
 						indices.put((short) s.tris[i][j]);
+					}
+				}
 				indices.flip();
 
 				mesh.render(getShader(), GL20.GL_TRIANGLES);
 				isRendered = true;
-			} else
+			} else {
 				break;
+			}
 		}
 
 		return isRendered;
@@ -85,8 +88,9 @@ public abstract class MD3ModelGL20 extends MDModel {
 
 	@Override
 	public void loadSkins(int pal, int skinnum) {
-		for (int surfi = 0; surfi < numSurfaces; surfi++)
+		for (int surfi = 0; surfi < numSurfaces; surfi++) {
 			getSkin(pal, skinnum, surfi);
+		}
 	}
 
 	@Override

@@ -65,10 +65,13 @@ public class IniFile {
 
 		String l = new String(data, pointer.get(nContext), length.get(nContext));
 		
-		if(!l.contains("\\\\")) l = l.replace("\\","\\\\");
+		if(!l.contains("\\\\")) {
+			l = l.replace("\\","\\\\");
+		}
 		
-		if(reader != null) 
+		if(reader != null) {
 			reader.close();
+		}
 		reader = new StringReader(l);
 
 		try {
@@ -85,16 +88,18 @@ public class IniFile {
 
 	public String GetKeyString(String key) {
 		String out = ini.getPropertyIgnoreCase(key);
-		if(out != null)
+		if(out != null) {
 			out = out.trim();
+		}
 		return out;
 	}
 	
 	public String GetKeyString(String key, int num)
 	{
 		String line = ini.getPropertyIgnoreCase(key);
-		if(line == null)
+		if(line == null) {
 			return null;
+		}
 		
 		line = line.trim();
 
@@ -109,9 +114,9 @@ public class IniFile {
 			}
 
 			if(line.charAt(pos) == ',') {
-				if(keynum == num)
-					break; 
-				else {
+				if(keynum == num) {
+					break;
+				} else {
 					keynum++;
 					mark = 0;
 				}
@@ -119,8 +124,9 @@ public class IniFile {
 			}
 			pos++;
 		}
-		if(keynum != num)
+		if(keynum != num) {
 			return null;
+		}
 		line = line.substring(startpos, pos);
 		line = line.replaceAll("\"", "");
 		line = line.trim();
@@ -131,35 +137,41 @@ public class IniFile {
 	public int GetKeyInt(String key, int num)
 	{
 		String line = ini.getPropertyIgnoreCase(key);
-		if(line == null)
+		if(line == null) {
 			return 0;
+		}
 		line = line.trim();
 		
 		int startpos = 0, pos = 0, keynum = 0;
 		while(pos < line.length()) {
 			if(line.charAt(pos) == ',') {
-				if(keynum == num)
-					break; 
-				else
+				if(keynum == num) {
+					break;
+				} else {
 					keynum++;
+				}
 				startpos = pos+1;
 			}
 			pos++;
 		}
 		line = line.substring(startpos, pos);
 		line = line.replaceAll("[^0-9]", ""); 
-		if(!line.isEmpty())
+		if(!line.isEmpty()) {
 			return Integer.parseInt(line);
-		else return 0;
+		} else {
+			return 0;
+		}
 	}
 	
 	public int GetKeyInt(String key) {
 		String s;
 		if((s = ini.getPropertyIgnoreCase(key)) != null && !s.isEmpty()) {
 			s = s.replaceAll("[^0-9-]", ""); 
-			if(!s.isEmpty())
+			if(!s.isEmpty()) {
 				return Integer.parseInt(s);
-			else return 0;
+			} else {
+				return 0;
+			}
 		}
 		
 		return -1;
@@ -168,8 +180,9 @@ public class IniFile {
 	public List<String> getPropertyList() 
 	{
 	    List<String> result = new ArrayList<String>();
-	    for (Map.Entry<Object, Object> entry : ini.entrySet())
-	    	result.add((String) entry.getKey());
+	    for (Map.Entry<Object, Object> entry : ini.entrySet()) {
+			result.add((String) entry.getKey());
+		}
 	    
 	    return result;
 	}
@@ -182,7 +195,9 @@ public class IniFile {
 	protected void init(byte[] data) {
 		this.data = data;
 		
-		if(data == null) return;
+		if(data == null) {
+			return;
+		}
 	
 		ini = new PropertyIgnoreCase();
 		context = new HashMap<String, Integer>();

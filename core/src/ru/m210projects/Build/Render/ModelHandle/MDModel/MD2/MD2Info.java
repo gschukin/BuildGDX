@@ -12,8 +12,9 @@ public class MD2Info extends MDInfo {
 		super(file, Type.Md2);
 
 		this.header = loadHeader(res);
-		if ((header.ident != 0x32504449) || (header.version != 8))
+		if ((header.ident != 0x32504449) || (header.version != 8)) {
 			throw new Exception(); // "IDP2"
+		}
 
 		res.seek(header.offsetFrames, Whence.Set);
 		this.frames = new String[header.numFrames];

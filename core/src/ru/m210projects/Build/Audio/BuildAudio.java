@@ -34,7 +34,9 @@ public class BuildAudio {
 
 	private static void init()
 	{
-		if(initDrivers) return;
+		if(initDrivers) {
+			return;
+		}
 		
 		if(fxdrivers == null) {
 			fxdrivers = new ArrayList<Sound>();
@@ -53,24 +55,31 @@ public class BuildAudio {
 	{
 		init();
 		
-		if(drv == null)
+		if(drv == null) {
 			throw new NullPointerException();
+		}
 		
-		if(type == Driver.Sound && drv instanceof Sound) 
+		if(type == Driver.Sound && drv instanceof Sound) {
 			fxdrivers.add((Sound) drv);
-		if(type == Driver.Music && drv instanceof Music) 
+		}
+		if(type == Driver.Music && drv instanceof Music) {
 			mxdrivers.add((Music) drv);
+		}
 	}
 	
 	public static List<String> getDeviceslList(Driver type, List<String> list)
 	{
-		if(type == Driver.Sound) 
-			for(Sound s : fxdrivers)
-				list.add(s.getName());	
+		if(type == Driver.Sound) {
+			for(Sound s : fxdrivers) {
+				list.add(s.getName());
+			}
+		}
 
-		if(type == Driver.Music) 
-			for(Music m : mxdrivers)
-				list.add(m.getName());	
+		if(type == Driver.Music) {
+			for(Music m : mxdrivers) {
+				list.add(m.getName());
+			}
+		}
 		
 		return list;
 	}
@@ -84,18 +93,21 @@ public class BuildAudio {
 	
 	public boolean IsInited(Driver type)
 	{
-		if(type == Driver.Sound) 
+		if(type == Driver.Sound) {
 			return fx.isInited();
-		if(type == Driver.Music) 
+		}
+		if(type == Driver.Music) {
 			return mx.isInited();
+		}
 		
 		return false;
 	}
 	
 	private Sound getSound(int sndnum)
 	{
-		if(sndnum < 0 || sndnum >= fxdrivers.size())
+		if(sndnum < 0 || sndnum >= fxdrivers.size()) {
 			sndnum = 0;
+		}
 		
 		return fxdrivers.get(sndnum);
 	}
@@ -107,8 +119,9 @@ public class BuildAudio {
 	
 	private Music getMusic(int musnum)
 	{
-		if(musnum < 0 || musnum >= mxdrivers.size())
+		if(musnum < 0 || musnum >= mxdrivers.size()) {
 			musnum = 0;
+		}
 		
 		return mxdrivers.get(musnum);
 	}
@@ -122,14 +135,16 @@ public class BuildAudio {
 	{
 		if(type == Driver.Sound) 
 		{
-			if(drvnum < 0 || drvnum >= fxdrivers.size())
+			if(drvnum < 0 || drvnum >= fxdrivers.size()) {
 				drvnum = 0;
+			}
 		}
 		
 		if(type == Driver.Music) 
 		{
-			if(drvnum < 0 || drvnum >= mxdrivers.size())
+			if(drvnum < 0 || drvnum >= mxdrivers.size()) {
 				drvnum = 0;
+			}
 		}
 
 		return drvnum;
@@ -149,8 +164,9 @@ public class BuildAudio {
 		
 		if(type == Driver.Music) 
 		{
-			if(this.mx != null) 
+			if(this.mx != null) {
 				this.mx.dispose();
+			}
 			
 			this.mx = getMusic(drvnum);
 		}
@@ -162,16 +178,20 @@ public class BuildAudio {
 	{
 		if(type == Driver.Sound) 
 		{
-			for(int num = 0; num < fxdrivers.size(); num++)
-				if(fxdrivers.get(num) == fx)
+			for(int num = 0; num < fxdrivers.size(); num++) {
+				if(fxdrivers.get(num) == fx) {
 					return num;
+				}
+			}
 		}
 		
 		if(type == Driver.Music) 
 		{
-			for(int num = 0; num < mxdrivers.size(); num++)
-				if(mxdrivers.get(num) == mx)
+			for(int num = 0; num < mxdrivers.size(); num++) {
+				if(mxdrivers.get(num) == mx) {
 					return num;
+				}
+			}
 		}
 		
 		return 0;
@@ -182,23 +202,28 @@ public class BuildAudio {
 		switch(type)
 		{
 		case Sound:
-			if(fx.isInited()) 
+			if(fx.isInited()) {
 				fx.setVolume(volume);
+			}
 			break;
 		case Music:
-			if(fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited()) 
+			if(fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited()) {
 				fx.getDigitalMusic().setVolume(volume);
-			if(mx.isInited()) 
+			}
+			if(mx.isInited()) {
 				mx.setVolume(volume);
+			}
 			break;
 		}
 	}
 	
 	public void dispose() {
-		for(Sound drv : fxdrivers)
+		for(Sound drv : fxdrivers) {
 			drv.dispose();
-		for(Music drv : mxdrivers)
+		}
+		for(Music drv : mxdrivers) {
 			drv.dispose();
+		}
 		fxdrivers.clear();
 		mxdrivers.clear();
 		fx = null;
@@ -207,10 +232,12 @@ public class BuildAudio {
 	
 	public void update()
 	{
-		if(fx != null && fx.isInited()) 
+		if(fx != null && fx.isInited()) {
 			fx.update();
-		if(mx != null && mx.isInited()) 
+		}
+		if(mx != null && mx.isInited()) {
 			mx.update();
+		}
 	}
 	
 	public String getName(Driver type) {
@@ -231,30 +258,38 @@ public class BuildAudio {
 	
 	public Source newSound(ByteBuffer data, int rate, int bits, int priority)
 	{
-		if(priority == 0) priority = 1;
+		if(priority == 0) {
+			priority = 1;
+		}
 		return fx.newSound(data, rate, bits, 1, priority);
 	}
 	
 	public Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority)
 	{
-		if(priority == 0) priority = 1;
+		if(priority == 0) {
+			priority = 1;
+		}
 		return fx.newSound(data, rate, bits, channels, priority);
 	}
 	
 	public MusicSource newMusic(MusicType type, String file) {
-		if(type == MusicType.Midi && mx.isInited()) 
+		if(type == MusicType.Midi && mx.isInited()) {
 			return mx.newMusic(file);
-		if(type == MusicType.Digital && fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited())
+		}
+		if(type == MusicType.Digital && fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited()) {
 			return fx.getDigitalMusic().newMusic(file);
+		}
 		
 		return null;
 	}
 	
 	public MusicSource newMusic(MusicType type, byte[] data) {
-		if(type == MusicType.Midi && mx.isInited()) 
+		if(type == MusicType.Midi && mx.isInited()) {
 			return mx.newMusic(data);
-		if(type == MusicType.Digital && fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited())
+		}
+		if(type == MusicType.Digital && fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited()) {
 			return fx.getDigitalMusic().newMusic(data);
+		}
 		
 		return null;
 	}

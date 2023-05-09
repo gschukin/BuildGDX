@@ -38,8 +38,9 @@ public class MD3Builder {
 		bb.read(buf);
 
 		for (int i = 0; i < buf.length; i++) {
-			if (buf[i] == 0)
+			if (buf[i] == 0) {
 				return new String(buf, 0, i);
+			}
 		}
 		return new String(buf);
 	}

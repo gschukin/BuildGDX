@@ -73,31 +73,37 @@ public class SoftwareOrpho extends OrphoRenderer {
 	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
 
-		if(col < 0)
+		if(col < 0) {
 			return;
+		}
 
 		if (font.type == FontType.Tilemap) {
-			if (palookup[col] == null)
+			if (palookup[col] == null) {
 				col = 0;
+			}
 
 			int nTile = (Integer) font.ptr;
 			Tile pic = engine.getTile(nTile);
-			if (pic.data == null && engine.loadtile(nTile) == null)
+			if (pic.data == null && engine.loadtile(nTile) == null) {
 				return;
+			}
 
 			int flags = 0;
-			if (bit == Transparent.Bit1)
+			if (bit == Transparent.Bit1) {
 				flags = 1;
-			if (bit == Transparent.Bit2)
+			}
+			if (bit == Transparent.Bit2) {
 				flags = 1 | 32;
+			}
 
 			float tx, ty;
 			int mscale = (int) (scale * 65536);
 			int ctx, cty, textsize = mulscale(font.charsizx, mscale, 16);
 
 			for (int i = 0; i < text.length && text[i] != 0; i++, xpos += textsize) {
-				if (xpos < 0)
+				if (xpos < 0) {
 					continue;
+				}
 				tx = (text[i] % font.cols) / (float) font.cols;
 				ty = (text[i] / font.cols) / (float) font.rows;
 
@@ -109,8 +115,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			}
 		} else {
 			int fontsize = 0;
-			if (font.ptr == EngineUtils.getTables().getSmallTextFont())
+			if (font.ptr == EngineUtils.getTables().getSmallTextFont()) {
 				fontsize = 1;
+			}
 
 			printext(xpos, ypos, col, -1, text, fontsize, scale);
 		}
@@ -129,14 +136,16 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 		for (int i = 0; i < text.length && text[i] != 0; i++) {
 			int ptr = parent.bytesperline * (ypos + charysiz) + (stx - fontsize);
-			if (ptr < 0)
+			if (ptr < 0) {
 				continue;
+			}
 
 			for (int y = charysiz; y >= 0; y--) {
 				for (int x = (int) (scale * (charxsiz - 1)); x >= 0; x--) {
 					int index = Math.round(y / scale) + (text[i] << 3);
-					if (index >= fontptr.length)
+					if (index >= fontptr.length) {
 						continue;
+					}
 					if ((fontptr[index] & pow2char[7 - fontsize - Math.round(x / scale)]) != 0) {
 						parent.getA().drawpixel(ptr + x, (byte) col);
 					} else if (backcol >= 0) {
@@ -158,8 +167,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 		dx = x2 - x1;
 		dy = y2 - y1;
 		if (dx >= 0) {
-			if ((x1 >= wx2) || (x2 < wx1))
+			if ((x1 >= wx2) || (x2 < wx1)) {
 				return;
+			}
 			if (x1 < wx1) {
 				y1 += scale(wx1 - x1, dy, dx);
 				x1 = wx1;
@@ -169,8 +179,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 				x2 = wx2;
 			}
 		} else {
-			if ((x2 >= wx2) || (x1 < wx1))
+			if ((x2 >= wx2) || (x1 < wx1)) {
 				return;
+			}
 			if (x2 < wx1) {
 				y2 += scale(wx1 - x2, dy, dx);
 				x2 = wx1;
@@ -181,8 +192,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			}
 		}
 		if (dy >= 0) {
-			if ((y1 >= wy2) || (y2 < wy1))
+			if ((y1 >= wy2) || (y2 < wy1)) {
 				return;
+			}
 			if (y1 < wy1) {
 				x1 += scale(wy1 - y1, dx, dy);
 				y1 = wy1;
@@ -192,8 +204,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 				y2 = wy2;
 			}
 		} else {
-			if ((y2 >= wy2) || (y1 < wy1))
+			if ((y2 >= wy2) || (y1 < wy1)) {
 				return;
+			}
 			if (y2 < wy1) {
 				x2 += scale(wy1 - y2, dx, dy);
 				y2 = wy1;
@@ -205,8 +218,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 		}
 
 		if (klabs(dx) >= klabs(dy)) {
-			if (dx == 0)
+			if (dx == 0) {
 				return;
+			}
 			if (dx < 0) {
 				i = x1;
 				x1 = x2;
@@ -223,8 +237,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 			for (; i < daend; i++) {
 				j = (plc >> 12);
-				if ((j >= parent.startumost[i]) && (j < parent.startdmost[i]))
+				if ((j >= parent.startumost[i]) && (j < parent.startdmost[i])) {
 					parent.getA().drawpixel(parent.ylookup[j] + i, col);
+				}
 				plc += inc;
 			}
 		} else {
@@ -246,8 +261,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 			for (; i < daend; i++) {
 				j = (plc >> 12);
-				if ((i >= parent.startumost[j]) && (i < parent.startdmost[j]))
+				if ((i >= parent.startumost[j]) && (i < parent.startdmost[j])) {
 					parent.getA().drawpixel(p + j, col);
+				}
 				plc += inc;
 				p += parent.ylookup[1];
 			}
@@ -297,12 +313,14 @@ public class SoftwareOrpho extends OrphoRenderer {
 				startwall = sec.getWallptr();
 
 				j = startwall;
-				if (startwall < 0)
+				if (startwall < 0) {
 					continue;
+				}
 				for (w = sec.getWallnum(); w > 0; w--, j++) {
 					wal = Engine.getWall(j);
-					if (wal == null)
+					if (wal == null) {
 						continue;
+					}
 					ox = wal.getX() - dax;
 					oy = wal.getY() - day;
 					x = dmulscale(ox, xvect, -oy, yvect, 16) + (xdim << 11);
@@ -311,22 +329,25 @@ public class SoftwareOrpho extends OrphoRenderer {
 					rx1[npoints] = x;
 					ry1[npoints] = y;
 					xb1[npoints] = wal.getPoint2() - startwall;
-					if (xb1[npoints] < 0)
+					if (xb1[npoints] < 0) {
 						xb1[npoints] = 0;
+					}
 
 					npoints++;
 				}
 
-				if ((i & 0xf0) != 0xf0)
+				if ((i & 0xf0) != 0xf0) {
 					continue;
+				}
 
 				bakx1 = rx1[0];
 				baky1 = mulscale(ry1[0] - (ydim << 11), xyaspect, 16) + (ydim << 11);
 
 				if ((i & 0x0f) != 0) {
 					npoints = clippoly(npoints, i);
-					if (npoints < 3)
+					if (npoints < 3) {
 						continue;
+					}
 				}
 
 				if (mapSettings.isShowFloorSprites()) {
@@ -334,13 +355,16 @@ public class SoftwareOrpho extends OrphoRenderer {
 					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i1 = node.getIndex();
 						if ((node.get().getCstat() & 48) == 32) {
-							if (sortnum >= MAXSPRITESONSCREEN)
+							if (sortnum >= MAXSPRITESONSCREEN) {
 								continue;
-							if ((Engine.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8))
+							}
+							if ((Engine.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8)) {
 								continue;
+							}
 
-							if (tsprite[sortnum] == null)
+							if (tsprite[sortnum] == null) {
 								tsprite[sortnum] = new TSprite();
+							}
 							tsprite[sortnum].set(node.get());
 							tsprite[sortnum++].setOwner((short) i1);
 						}
@@ -350,8 +374,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 				gotsector[s >> 3] |= pow2char[s & 7];
 
 				globalorientation = sec.getFloorstat();
-				if ((globalorientation & 1) != 0)
+				if ((globalorientation & 1) != 0) {
 					continue;
+				}
 				globalpal = sec.getFloorpal();
 				if (sec.getFloorpal() != parent.globalpalwritten) {
 					parent.globalpalwritten = sec.getFloorpal();
@@ -359,21 +384,24 @@ public class SoftwareOrpho extends OrphoRenderer {
 				}
 
 				globalpicnum = sec.getFloorpicnum();
-				if (globalpicnum >= MAXTILES)
+				if (globalpicnum >= MAXTILES) {
 					globalpicnum = 0;
+				}
 				engine.setgotpic(globalpicnum);
 				Tile pic = engine.getTile(globalpicnum);
 
-				if (!pic.hasSize())
+				if (!pic.hasSize()) {
 					continue;
+				}
 
 				if (pic.getType() != AnimType.None) {
 					globalpicnum += engine.animateoffs(globalpicnum, s);
 					pic = engine.getTile(globalpicnum);
 				}
 
-				if (pic.data == null)
+				if (pic.data == null) {
 					engine.loadtile(globalpicnum);
+				}
 
 				parent.globalbufplc = pic.data;
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
@@ -389,8 +417,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					ox = Engine.getWall(Engine.getWall(startwall).getPoint2()).getX() - Engine.getWall(startwall).getX();
 					oy = Engine.getWall(Engine.getWall(startwall).getPoint2()).getY() - Engine.getWall(startwall).getY();
 					i = EngineUtils.sqrt(ox * ox + oy * oy);
-					if (i == 0)
+					if (i == 0) {
 						continue;
+					}
 					i = 1048576 / i;
 					globalx1 = mulscale(dmulscale(ox, bakgxvect, oy, bakgyvect, 10), i, 10);
 					globaly1 = mulscale(dmulscale(ox, bakgyvect, -oy, bakgxvect, 10), i, 10);
@@ -415,8 +444,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 				}
 
 				parent.globvis = parent.globalhisibility;
-				if (sec.getVisibility() != 0)
+				if (sec.getVisibility() != 0) {
 					parent.globvis = mulscale(parent.globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+				}
 				globalpolytype = 0;
 
 				if ((globalorientation & 0x4) > 0) {
@@ -454,35 +484,42 @@ public class SoftwareOrpho extends OrphoRenderer {
 		if (mapSettings.isShowSprites(MapView.Polygons) || mapSettings.isShowFloorSprites()) {
 			// Sort sprite list
 			int gap = 1;
-			while (gap < sortnum)
+			while (gap < sortnum) {
 				gap = (gap << 1) + 1;
-			for (gap >>= 1; gap > 0; gap >>= 1)
-				for (i = 0; i < sortnum - gap; i++)
+			}
+			for (gap >>= 1; gap > 0; gap >>= 1) {
+				for (i = 0; i < sortnum - gap; i++) {
 					for (j = i; j >= 0; j -= gap) {
-						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ())
+						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ()) {
 							break;
+						}
 
 						short tmp = tsprite[j].getOwner();
 						tsprite[j].setOwner(tsprite[j + gap].getOwner());
 						tsprite[j + gap].setOwner(tmp);
 					}
+				}
+			}
 
 			for (s = sortnum - 1; s >= 0; s--) {
 				Sprite spr = Engine.getSprite(tsprite[s].getOwner());
 				if ((spr.getCstat() & 48) == 32) {
 					npoints = 0;
 
-					if (spr.getPicnum() >= MAXTILES)
+					if (spr.getPicnum() >= MAXTILES) {
 						spr.setPicnum(0);
+					}
 
 					Tile pic = engine.getTile(spr.getPicnum());
 
 					xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
 					yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
-					if ((spr.getCstat() & 4) > 0)
+					if ((spr.getCstat() & 4) > 0) {
 						xoff = -xoff;
-					if ((spr.getCstat() & 8) > 0)
+					}
+					if ((spr.getCstat() & 8) > 0) {
 						yoff = -yoff;
+					}
 
 					k = spr.getAng() & 2047;
 					cosang = EngineUtils.cos(k);
@@ -544,15 +581,17 @@ public class SoftwareOrpho extends OrphoRenderer {
 					rx1[3] = x;
 					ry1[3] = y;
 
-					if ((i & 0xf0) != 0xf0)
+					if ((i & 0xf0) != 0xf0) {
 						continue;
+					}
 					bakx1 = rx1[0];
 					baky1 = mulscale(ry1[0] - (ydim << 11), xyaspect, 16) + (ydim << 11);
 
 					if ((i & 0x0f) != 0) {
 						npoints = clippoly(npoints, i);
-						if (npoints < 3)
+						if (npoints < 3) {
 							continue;
+						}
 					}
 
 					globalpicnum = spr.getPicnum();
@@ -560,15 +599,17 @@ public class SoftwareOrpho extends OrphoRenderer {
 					engine.setgotpic(globalpicnum);
 					Tile sprpic = engine.getTile(globalpicnum);
 
-					if (!sprpic.hasSize())
+					if (!sprpic.hasSize()) {
 						continue;
+					}
 					if (sprpic.getType() != AnimType.None) {
 						globalpicnum += engine.animateoffs(globalpicnum, s);
 						sprpic = engine.getTile(globalpicnum);
 					}
 
-					if (sprpic.data == null)
+					if (sprpic.data == null) {
 						engine.loadtile(globalpicnum);
+					}
 
 					parent.globalbufplc = sprpic.data;
 
@@ -576,15 +617,17 @@ public class SoftwareOrpho extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((getSector(spr.getSectnum()).getCeilingstat() & 1) > 0)
+					if ((getSector(spr.getSectnum()).getCeilingstat() & 1) > 0) {
 						globalshade = (getSector(spr.getSectnum()).getCeilingshade());
-					else
+					} else {
 						globalshade = (getSector(spr.getSectnum()).getFloorshade());
+					}
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
 					parent.globvis = parent.globalhisibility;
-					if (sec.getVisibility() != 0)
+					if (sec.getVisibility() != 0) {
 						parent.globvis = mulscale(parent.globvis, (sec.getVisibility() + 16) & 0xFF, 4);
+					}
 					globalpolytype = ((spr.getCstat() & 2) >> 1) + 1;
 
 					parent.getA().setuphline(palookup[spr.getPal()], globalshade << 8);
@@ -593,16 +636,18 @@ public class SoftwareOrpho extends OrphoRenderer {
 					ox = x2 - x1;
 					oy = y2 - y1;
 					i = ox * ox + oy * oy;
-					if (i == 0)
+					if (i == 0) {
 						continue;
+					}
 					i = (65536 * 16384) / i;
 					globalx1 = mulscale(dmulscale(ox, bakgxvect, oy, bakgyvect, 10), i, 10);
 					globaly1 = mulscale(dmulscale(ox, bakgyvect, -oy, bakgxvect, 10), i, 10);
 					ox = y1 - y4;
 					oy = x4 - x1;
 					i = ox * ox + oy * oy;
-					if (i == 0)
+					if (i == 0) {
 						continue;
+					}
 					i = (65536 * 16384) / i;
 					globalx2 = mulscale(dmulscale(ox, bakgxvect, oy, bakgyvect, 10), i, 10);
 					globaly2 = mulscale(dmulscale(ox, bakgyvect, -oy, bakgxvect, 10), i, 10);
@@ -621,13 +666,14 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalposx = dmulscale(-baky1, globalx1, -bakx1, globaly1, 28);
 					globalposy = dmulscale(bakx1, globalx2, -baky1, globaly2, 28);
 
-					if ((spr.getCstat() & 2) == 0)
+					if ((spr.getCstat() & 2) == 0) {
 						parent.getA().msethlineshift(ox, oy);
-					else {
-						if ((spr.getCstat() & 512) != 0)
+					} else {
+						if ((spr.getCstat() & 512) != 0) {
 							parent.getA().settransreverse();
-						else
+						} else {
 							parent.getA().settransnormal();
+						}
 						parent.getA().tsethlineshift(ox, oy);
 					}
 
@@ -687,8 +733,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					if ((s1 ^ s2) < 0) {
 						rx2[npoints2] = rx1[z] + scale((rx1[zz] - rx1[z]), s1, s1 - s2);
 						ry2[npoints2] = ry1[z] + scale((ry1[zz] - ry1[z]), s1, s1 - s2);
-						if (s1 < 0)
+						if (s1 < 0) {
 							p2[splitcnt++] = (short) npoints2;
+						}
 						xb2[npoints2] = npoints2 + 1;
 						npoints2++;
 					}
@@ -698,17 +745,20 @@ public class SoftwareOrpho extends OrphoRenderer {
 				if (npoints2 >= start2 + 3) {
 					xb2[npoints2 - 1] = start2;
 					start2 = npoints2;
-				} else
+				} else {
 					npoints2 = start2;
+				}
 
 				z = 1;
-				while ((z < npoints) && (xb1[z] < 0))
+				while ((z < npoints) && (xb1[z] < 0)) {
 					z++;
+				}
 			} while (z < npoints);
-			if (npoints2 <= 2)
+			if (npoints2 <= 2) {
 				return (0);
+			}
 
-			for (z = 1; z < splitcnt; z++)
+			for (z = 1; z < splitcnt; z++) {
 				for (zz = 0; zz < z; zz++) {
 					z1 = p2[z];
 					z2 = xb2[z1];
@@ -724,6 +774,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						xb2[p2[zz]] = t;
 					}
 				}
+			}
 
 			npoints = 0;
 			start2 = 0;
@@ -745,8 +796,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					if ((s1 ^ s2) < 0) {
 						rx1[npoints] = rx2[z] + scale((rx2[zz] - rx2[z]), s1, s1 - s2);
 						ry1[npoints] = ry2[z] + scale((ry2[zz] - ry2[z]), s1, s1 - s2);
-						if (s1 < 0)
+						if (s1 < 0) {
 							p2[splitcnt++] = (short) npoints;
+						}
 						xb1[npoints] = npoints + 1;
 						npoints++;
 					}
@@ -756,17 +808,20 @@ public class SoftwareOrpho extends OrphoRenderer {
 				if (npoints >= start2 + 3) {
 					xb1[npoints - 1] = start2;
 					start2 = npoints;
-				} else
+				} else {
 					npoints = start2;
+				}
 
 				z = 1;
-				while ((z < npoints2) && (xb2[z] < 0))
+				while ((z < npoints2) && (xb2[z] < 0)) {
 					z++;
+				}
 			} while (z < npoints2);
-			if (npoints <= 2)
+			if (npoints <= 2) {
 				return (0);
+			}
 
-			for (z = 1; z < splitcnt; z++)
+			for (z = 1; z < splitcnt; z++) {
 				for (zz = 0; zz < z; zz++) {
 					z1 = p2[z];
 					z2 = xb1[z1];
@@ -782,6 +837,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						xb1[p2[zz]] = t;
 					}
 				}
+			}
 		}
 
 		if ((clipstat & 0x5) != 0) // Need to clip bottom or right
@@ -806,8 +862,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					if ((s1 ^ s2) < 0) {
 						rx2[npoints2] = rx1[z] + scale((rx1[zz] - rx1[z]), s1, s1 - s2);
 						ry2[npoints2] = ry1[z] + scale((ry1[zz] - ry1[z]), s1, s1 - s2);
-						if (s1 < 0)
+						if (s1 < 0) {
 							p2[splitcnt++] = (short) npoints2;
+						}
 						xb2[npoints2] = npoints2 + 1;
 						npoints2++;
 					}
@@ -817,17 +874,20 @@ public class SoftwareOrpho extends OrphoRenderer {
 				if (npoints2 >= start2 + 3) {
 					xb2[npoints2 - 1] = start2;
 					start2 = npoints2;
-				} else
+				} else {
 					npoints2 = start2;
+				}
 
 				z = 1;
-				while ((z < npoints) && (xb1[z] < 0))
+				while ((z < npoints) && (xb1[z] < 0)) {
 					z++;
+				}
 			} while (z < npoints);
-			if (npoints2 <= 2)
+			if (npoints2 <= 2) {
 				return (0);
+			}
 
-			for (z = 1; z < splitcnt; z++)
+			for (z = 1; z < splitcnt; z++) {
 				for (zz = 0; zz < z; zz++) {
 					z1 = p2[z];
 					z2 = xb2[z1];
@@ -843,6 +903,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						xb2[p2[zz]] = t;
 					}
 				}
+			}
 
 			npoints = 0;
 			start2 = 0;
@@ -864,8 +925,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					if ((s1 ^ s2) < 0) {
 						rx1[npoints] = rx2[z] + scale((rx2[zz] - rx2[z]), s1, s1 - s2);
 						ry1[npoints] = ry2[z] + scale((ry2[zz] - ry2[z]), s1, s1 - s2);
-						if (s1 < 0)
+						if (s1 < 0) {
 							p2[splitcnt++] = (short) npoints;
+						}
 						xb1[npoints] = npoints + 1;
 						npoints++;
 					}
@@ -875,17 +937,20 @@ public class SoftwareOrpho extends OrphoRenderer {
 				if (npoints >= start2 + 3) {
 					xb1[npoints - 1] = start2;
 					start2 = npoints;
-				} else
+				} else {
 					npoints = start2;
+				}
 
 				z = 1;
-				while ((z < npoints2) && (xb2[z] < 0))
+				while ((z < npoints2) && (xb2[z] < 0)) {
 					z++;
+				}
 			} while (z < npoints2);
-			if (npoints <= 2)
+			if (npoints <= 2) {
 				return (0);
+			}
 
-			for (z = 1; z < splitcnt; z++)
+			for (z = 1; z < splitcnt; z++) {
 				for (zz = 0; zz < z; zz++) {
 					z1 = p2[z];
 					z2 = xb1[z1];
@@ -901,6 +966,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						xb1[p2[zz]] = t;
 					}
 				}
+			}
 		}
 		return (npoints);
 	}
@@ -920,10 +986,12 @@ public class SoftwareOrpho extends OrphoRenderer {
 		}
 		miny = (miny >> 12);
 		maxy = (maxy >> 12);
-		if (miny < 0)
+		if (miny < 0) {
 			miny = 0;
-		if (maxy >= ydim)
+		}
+		if (maxy >= ydim) {
 			maxy = ydim - 1;
+		}
 
 		int ptr = 0; // They're pointers! - watch how you optimize this thing
 		for (y = miny; y <= maxy; y++) {
@@ -977,17 +1045,20 @@ public class SoftwareOrpho extends OrphoRenderer {
 				day1 = 0;
 				day2 = 0;
 				for (zz = z; zz > 0; zz--) {
-					if (parent.smost[ptr + zz] < parent.smost[ptr + day1])
+					if (parent.smost[ptr + zz] < parent.smost[ptr + day1]) {
 						day1 = zz;
-					if (parent.smost[ptr2 + zz] < parent.smost[ptr2 + day2])
+					}
+					if (parent.smost[ptr2 + zz] < parent.smost[ptr2 + day2]) {
 						day2 = zz;
+					}
 				}
 				x1 = parent.smost[ptr + day1];
 				parent.smost[ptr + day1] = parent.smost[ptr + z];
 				x2 = parent.smost[ptr2 + day2] - 1;
 				parent.smost[ptr2 + day2] = parent.smost[ptr2 + z];
-				if (x1 > x2)
+				if (x1 > x2) {
 					continue;
+				}
 
 				if (globalpolytype < 1) {
 					// maphline
@@ -1004,9 +1075,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					by = ox * asm2 - globalposy;
 
 					p = parent.ylookup[y] + x1;
-					if (globalpolytype == 1)
+					if (globalpolytype == 1) {
 						parent.getA().mhline(parent.globalbufplc, bx, (x2 - x1) << 16, 0, by, p);
-					else {
+					} else {
 						parent.getA().thline(parent.globalbufplc, bx, (x2 - x1) << 16, 0, by, p);
 					}
 				}
@@ -1024,13 +1095,16 @@ public class SoftwareOrpho extends OrphoRenderer {
 		int i;
 		PermFifo per, per2;
 
-		if (picnum >= MAXTILES)
+		if (picnum >= MAXTILES) {
 			return;
+		}
 
-		if ((cx1 > cx2) || (cy1 > cy2))
+		if ((cx1 > cx2) || (cy1 > cy2)) {
 			return;
-		if (z <= 16)
+		}
+		if (z <= 16) {
 			return;
+		}
 
 		Tile pic = engine.getTile(picnum);
 
@@ -1039,8 +1113,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			pic = engine.getTile(picnum);
 		}
 
-		if (!pic.hasSize())
+		if (!pic.hasSize()) {
 			return;
+		}
 
 		// Experimental / development bits. ONLY FOR INTERNAL USE!
 		// bit RS_CENTERORIGIN: see dorotspr_handle_bit2
@@ -1051,16 +1126,19 @@ public class SoftwareOrpho extends OrphoRenderer {
 		}
 
 		if (((dastat & 64) != 0) && (cx1 <= 0) && (cy1 <= 0) && (cx2 >= xdim - 1) && (cy2 >= ydim - 1)
-				&& (sx == (160 << 16)) && (sy == (100 << 16)) && (z == 65536L) && (a == 0) && ((dastat & 1) == 0))
+				&& (sx == (160 << 16)) && (sy == (100 << 16)) && (z == 65536L) && (a == 0) && ((dastat & 1) == 0)) {
 			parent.permhead = parent.permtail = 0;
+		}
 
-		if ((dastat & 128) == 0)
+		if ((dastat & 128) == 0) {
 			return;
+		}
 
 		if (numpages >= 2) {
 			per = parent.permfifo[parent.permhead];
-			if (per == null)
+			if (per == null) {
 				per = new PermFifo();
+			}
 			per.sx = sx;
 			per.sy = sy;
 			per.z = z;
@@ -1081,65 +1159,90 @@ public class SoftwareOrpho extends OrphoRenderer {
 			{
 				for (i = parent.permtail; i != parent.permhead; i = ((i + 1) & (MAXPERMS - 1))) {
 					per2 = parent.permfifo[i];
-					if (per2 == null)
+					if (per2 == null) {
 						per2 = new PermFifo();
-					if ((per2.pagesleft & 127) == 0)
+					}
+					if ((per2.pagesleft & 127) == 0) {
 						continue;
-					if (per2.sx != per.sx)
+					}
+					if (per2.sx != per.sx) {
 						continue;
-					if (per2.sy != per.sy)
+					}
+					if (per2.sy != per.sy) {
 						continue;
-					if (per2.z != per.z)
+					}
+					if (per2.z != per.z) {
 						continue;
-					if (per2.a != per.a)
+					}
+					if (per2.a != per.a) {
 						continue;
+					}
 					Tile pic2 = engine.getTile(per2.picnum);
 
-					if (pic2.getWidth() > pic.getWidth())
+					if (pic2.getWidth() > pic.getWidth()) {
 						continue;
-					if (pic2.getHeight() > pic.getHeight())
+					}
+					if (pic2.getHeight() > pic.getHeight()) {
 						continue;
-					if (per2.cx1 < per.cx1)
+					}
+					if (per2.cx1 < per.cx1) {
 						continue;
-					if (per2.cy1 < per.cy1)
+					}
+					if (per2.cy1 < per.cy1) {
 						continue;
-					if (per2.cx2 > per.cx2)
+					}
+					if (per2.cx2 > per.cx2) {
 						continue;
-					if (per2.cy2 > per.cy2)
+					}
+					if (per2.cy2 > per.cy2) {
 						continue;
+					}
 					per2.pagesleft = 0;
 				}
-				if ((per.z == 65536) && (per.a == 0))
+				if ((per.z == 65536) && (per.a == 0)) {
 					for (i = parent.permtail; i != parent.permhead; i = ((i + 1) & (MAXPERMS - 1))) {
 						per2 = parent.permfifo[i];
-						if (per2 == null)
+						if (per2 == null) {
 							per2 = new PermFifo();
-						if ((per2.pagesleft & 127) == 0)
+						}
+						if ((per2.pagesleft & 127) == 0) {
 							continue;
-						if (per2.z != 65536)
+						}
+						if (per2.z != 65536) {
 							continue;
-						if (per2.a != 0)
+						}
+						if (per2.a != 0) {
 							continue;
-						if (per2.cx1 < per.cx1)
+						}
+						if (per2.cx1 < per.cx1) {
 							continue;
-						if (per2.cy1 < per.cy1)
+						}
+						if (per2.cy1 < per.cy1) {
 							continue;
-						if (per2.cx2 > per.cx2)
+						}
+						if (per2.cx2 > per.cx2) {
 							continue;
-						if (per2.cy2 > per.cy2)
+						}
+						if (per2.cy2 > per.cy2) {
 							continue;
-						if ((per2.sx >> 16) < (per.sx >> 16))
+						}
+						if ((per2.sx >> 16) < (per.sx >> 16)) {
 							continue;
-						if ((per2.sy >> 16) < (per.sy >> 16))
+						}
+						if ((per2.sy >> 16) < (per.sy >> 16)) {
 							continue;
+						}
 						Tile pic2 = engine.getTile(per2.picnum);
 
-						if ((per2.sx >> 16) + pic2.getWidth() > (per.sx >> 16) + pic.getWidth())
+						if ((per2.sx >> 16) + pic2.getWidth() > (per.sx >> 16) + pic.getWidth()) {
 							continue;
-						if ((per2.sy >> 16) + pic2.getHeight() > (per.sy >> 16) + pic.getHeight())
+						}
+						if ((per2.sy >> 16) + pic2.getHeight() > (per.sy >> 16) + pic.getHeight()) {
 							continue;
+						}
 						per2.pagesleft = 0;
 					}
+				}
 			}
 
 			parent.permhead = ((parent.permhead + 1) & (MAXPERMS - 1));
@@ -1150,17 +1253,22 @@ public class SoftwareOrpho extends OrphoRenderer {
 			int cx1, int cy1, int cx2, int cy2, int uniqid) {
 		int x, y;
 
-		if (dapalnum < 0 || dapalnum >= palookup.length || palookup[dapalnum] == null)
+		if (dapalnum < 0 || dapalnum >= palookup.length || palookup[dapalnum] == null) {
 			dapalnum = 0;
+		}
 
-		if (cx1 < 0)
+		if (cx1 < 0) {
 			cx1 = 0;
-		if (cy1 < 0)
+		}
+		if (cy1 < 0) {
 			cy1 = 0;
-		if (cx2 > xdim - 1)
+		}
+		if (cx2 > xdim - 1) {
 			cx2 = xdim - 1;
-		if (cy2 > ydim - 1)
+		}
+		if (cy2 > ydim - 1) {
 			cy2 = ydim - 1;
+		}
 
 		Tile pic = engine.getTile(picnum);
 
@@ -1173,8 +1281,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			yoff = pic.getOffsetY() + (ysiz >> 1);
 		}
 
-		if ((dastat & 4) != 0)
+		if ((dastat & 4) != 0) {
 			yoff = ysiz - yoff;
+		}
 
 		int cosang = EngineUtils.cos(ang);
 		int sinang = EngineUtils.sin(ang);
@@ -1209,8 +1318,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 				int xbord = 0;
 				if ((dastat & (256 | 512)) != 0) {
 					xbord = scale(oxdim - xdim, twice_midcx, oxdim);
-					if ((dastat & 512) == 0)
+					if ((dastat & 512) == 0) {
 						xbord = -xbord;
+					}
 				}
 
 				sx = ((twice_midcx + xbord) << 15) + scaledxofs;
@@ -1222,10 +1332,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 				sx = (xdim << 15) + 32768 + scale(normxofs, xdim, 320);
 
-				if ((dastat & 512) != 0)
+				if ((dastat & 512) != 0) {
 					sx += (oxdim - xdim) << 16;
-				else if ((dastat & 256) == 0)
+				} else if ((dastat & 256) == 0) {
 					sx += (oxdim - xdim) << 15;
+				}
 
 				zoomsc = scale(xdim, ouryxaspect, 320);
 				sy = (ydim << 15) + 32768 + mulscale(normyofs, zoomsc, 16);
@@ -1250,29 +1361,34 @@ public class SoftwareOrpho extends OrphoRenderer {
 		nry1[3] = nry1[0] + xv * ysiz;
 		nry1[2] = nry1[1] + nry1[3] - nry1[0];
 		int i = (cy1 << 16);
-		if ((nry1[0] < i) && (nry1[1] < i) && (nry1[2] < i) && (nry1[3] < i))
+		if ((nry1[0] < i) && (nry1[1] < i) && (nry1[2] < i) && (nry1[3] < i)) {
 			return;
+		}
 		i = (cy2 << 16);
-		if ((nry1[0] > i) && (nry1[1] > i) && (nry1[2] > i) && (nry1[3] > i))
+		if ((nry1[0] > i) && (nry1[1] > i) && (nry1[2] > i) && (nry1[3] > i)) {
 			return;
+		}
 
 		nrx1[0] = sx - (xv2 * xoff - yv2 * yoff);
 		nrx1[1] = nrx1[0] + xv2 * xsiz;
 		nrx1[3] = nrx1[0] - yv2 * ysiz;
 		nrx1[2] = nrx1[1] + nrx1[3] - nrx1[0];
 		i = (cx1 << 16);
-		if ((nrx1[0] < i) && (nrx1[1] < i) && (nrx1[2] < i) && (nrx1[3] < i))
+		if ((nrx1[0] < i) && (nrx1[1] < i) && (nrx1[2] < i) && (nrx1[3] < i)) {
 			return;
+		}
 		i = (cx2 << 16);
-		if ((nrx1[0] > i) && (nrx1[1] > i) && (nrx1[2] > i) && (nrx1[3] > i))
+		if ((nrx1[0] > i) && (nrx1[1] > i) && (nrx1[2] > i) && (nrx1[3] > i)) {
 			return;
+		}
 
 		int gx1 = nrx1[0];
 		int gy1 = nry1[0]; // back up these before clipping
 
 		int npoints;
-		if ((npoints = clippoly4(cx1 << 16, cy1 << 16, (cx2 + 1) << 16, (cy2 + 1) << 16)) < 3)
+		if ((npoints = clippoly4(cx1 << 16, cy1 << 16, (cx2 + 1) << 16, (cy2 + 1) << 16)) < 3) {
 			return;
+		}
 
 		int lx = nrx1[0];
 		int rx = nrx1[0];
@@ -1282,11 +1398,13 @@ public class SoftwareOrpho extends OrphoRenderer {
 			int x1 = nrx1[v];
 			int x2 = nrx1[nextv];
 			int dax1 = (x1 >> 16);
-			if (x1 < lx)
+			if (x1 < lx) {
 				lx = x1;
+			}
 			int dax2 = (x2 >> 16);
-			if (x1 > rx)
+			if (x1 > rx) {
 				rx = x1;
+			}
 			if (dax1 != dax2) {
 				int y1 = nry1[v];
 				int y2 = nry1[nextv];
@@ -1303,8 +1421,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			nextv = v;
 		}
 
-		if (pic.data == null)
+		if (pic.data == null) {
 			engine.loadtile(picnum);
+		}
 		engine.setgotpic(picnum);
 		byte[] bufplc = pic.data;
 
@@ -1338,20 +1457,23 @@ public class SoftwareOrpho extends OrphoRenderer {
 		}
 
 		if ((dastat & 1) == 0) {
-			if ((dastat & 64) != 0)
+			if ((dastat & 64) != 0) {
 				parent.getA().setupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
-			else
+			} else {
 				parent.getA().msetupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
+			}
 		} else {
 			parent.getA().tsetupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
-			if ((dastat & 32) != 0)
+			if ((dastat & 32) != 0) {
 				parent.getA().settransreverse();
-			else
+			} else {
 				parent.getA().settransnormal();
+			}
 		}
 
-		if (x1 < 0)
+		if (x1 < 0) {
 			return; // GDX 24.03.2020 crash fix
+		}
 
 		for (x = x1; x < x2; x++) {
 			bx += xv2;
@@ -1359,13 +1481,16 @@ public class SoftwareOrpho extends OrphoRenderer {
 			int y1 = parent.uplc[x];
 			int y2 = parent.dplc[x];
 			if ((dastat & 8) == 0) {
-				if (parent.startumost[x] > y1)
+				if (parent.startumost[x] > y1) {
 					y1 = parent.startumost[x];
-				if (parent.startdmost[x] < y2)
+				}
+				if (parent.startdmost[x] < y2) {
 					y2 = parent.startdmost[x];
+				}
 			}
-			if (y2 <= y1)
+			if (y2 <= y1) {
 				continue;
+			}
 
 			switch (y1 - oy) {
 			case -1:
@@ -1420,10 +1545,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 				nn++;
 			}
 
-			if (x2 <= 0)
+			if (x2 <= 0) {
 				x = cx2;
-			else
+			} else {
 				x = cx1;
+			}
 			t = x - x1;
 			if (((t - x2) ^ t) < 0) {
 				nrx2[nn] = x;
@@ -1431,10 +1557,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 				nn++;
 			}
 
-			if (x2 <= 0)
+			if (x2 <= 0) {
 				x = cx1;
-			else
+			} else {
 				x = cx2;
+			}
 			t = x - x1;
 			if (((t - x2) ^ t) < 0) {
 				nrx2[nn] = x;
@@ -1444,15 +1571,17 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 			z = zz;
 		} while (z != 0);
-		if (nn < 3)
+		if (nn < 3) {
 			return (0);
+		}
 
 		n = 0;
 		z = 0;
 		do {
 			zz = z + 1;
-			if (zz == nn)
+			if (zz == nn) {
 				zz = 0;
+			}
 			y1 = nry2[z];
 			y2 = nry2[zz] - y1;
 
@@ -1462,10 +1591,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 				n++;
 			}
 
-			if (y2 <= 0)
+			if (y2 <= 0) {
 				y = cy2;
-			else
+			} else {
 				y = cy1;
+			}
 			t = y - y1;
 			if (((t - y2) ^ t) < 0) {
 				nry1[n] = y;
@@ -1473,10 +1603,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 				n++;
 			}
 
-			if (y2 <= 0)
+			if (y2 <= 0) {
 				y = cy1;
-			else
+			} else {
 				y = cy2;
+			}
 			t = y - y1;
 			if (((t - y2) ^ t) < 0) {
 				nry1[n] = y;

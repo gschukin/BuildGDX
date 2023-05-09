@@ -94,8 +94,9 @@ public abstract class MenuJoin extends BuildMenu {
 		mConnect = new MenuButton("Connect", style, 0, posy + (2 * menuHeight), 320, 1, 0, null, -1, new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
-				if (app.pCfg.mAddress.isEmpty())
+				if (app.pCfg.mAddress.isEmpty()) {
 					return;
+				}
 				String[] param = new String[] { "-n0", app.pCfg.mAddress, (app.pCfg.mPort != NETPORT ? ("-p " + app.pCfg.mPort) : null) };
 				joinGame(param);
 			}

@@ -243,8 +243,9 @@ public class AWTGraphics extends BuildGraphics {
 
 	@Override
 	public boolean setWindowedMode(int width, int height) {
-		if (getWidth() == width && getHeight() == height && !display.isFullscreen()) 
+		if (getWidth() == width && getHeight() == height && !display.isFullscreen()) {
 			return true;
+		}
 
 		java.awt.DisplayMode targetDisplayMode = new java.awt.DisplayMode(width, height, 
 				display.getDesktopDisplayMode().getRefreshRate(), display.getDesktopDisplayMode().getBitDepth());
@@ -369,8 +370,9 @@ public class AWTGraphics extends BuildGraphics {
 			return display.getCanvas().getFrame();
 		case SWChangePalette:
 			byte[] palette = (byte[]) obj[0];
-			if(palette.length != 768)
-				throw new UnsupportedOperationException("The array should be 256 bytes!"); 
+			if(palette.length != 768) {
+				throw new UnsupportedOperationException("The array should be 256 bytes!");
+			}
 			
 			display.getCanvas().changepalette(palette);
 			break;

@@ -135,8 +135,9 @@ public class Console {
 
 	public static int RegisterCvar(OSDCOMMAND cvar)
 	{
-	    if ((osdflags & OSD_INITIALIZED) == 0)
-	        Init();
+	    if ((osdflags & OSD_INITIALIZED) == 0) {
+			Init();
+		}
 
 	    if (cvar.name == null || cvar.name.isEmpty())
 	    {
@@ -172,8 +173,9 @@ public class Console {
 	public static boolean Set(String cmd, int value)
     {
     	OSDCOMMAND cvar = Get(cmd);
-    	if(cvar != null)
-    		return cvar.SetValue(value);
+    	if(cvar != null) {
+			return cvar.SetValue(value);
+		}
 
     	return false;
     }
@@ -181,16 +183,18 @@ public class Console {
 	public static int Geti(String osdvar)
     {
 		OSDCOMMAND var = Get(osdvar);
-		if(var != null)
+		if(var != null) {
 			return (int) var.value;
+		}
     	return 0;
     }
 
 	public static float Getf(String osdvar)
     {
 		OSDCOMMAND var = Get(osdvar);
-		if(var != null)
+		if(var != null) {
 			return var.value;
+		}
     	return 0;
     }
 
@@ -224,15 +228,19 @@ public class Console {
 
 	public static void Print(String text, int pal)
 	{
-		if(text == null || text.isEmpty())
+		if(text == null || text.isEmpty()) {
 			return;
+		}
 
-		if ((osdflags & OSD_INITIALIZED) == 0)
-	        Init();
+		if ((osdflags & OSD_INITIALIZED) == 0) {
+			Init();
+		}
 
-		if(pal == OSDTEXT_RED)
+		if(pal == OSDTEXT_RED) {
 			System.err.println(text);
-		else System.out.println(text);
+		} else {
+			System.out.println(text);
+		}
 
 		LogPrint(text);
 
@@ -255,22 +263,26 @@ public class Console {
 
 	        if (text.charAt(chp) == '\t')
 	        {
-	        	for(int i = 0; i < 2; i++)
-	        		osdtext[0][osdpos++] = ' ';
+	        	for(int i = 0; i < 2; i++) {
+					osdtext[0][osdpos++] = ' ';
+				}
 	            continue;
 	        }
 
 	        if(text.charAt(chp) == '^')
     		{
     			String number = "";
-    			if(chp+1 >= text.length()) continue;
+    			if(chp+1 >= text.length()) {
+					continue;
+				}
     			char num1 = text.charAt(chp+1);
     			if(isdigit(num1))
     			{
     				number += num1;
 					char num2 = ' ';
-					if(++chp+1 < text.length())
+					if(++chp+1 < text.length()) {
 						num2 = text.charAt(chp+1);
+					}
     				if(!isdigit(num2))
     				{
     					pal = Integer.parseInt(number, 10);
@@ -308,8 +320,9 @@ public class Console {
 	        if (osdpos == osdcols)
 	        {
 	            osdpos = 0;
-	            if(chp < text.length() - 1 && text.charAt(chp+1) != 0)
-	            	LineFeed();
+	            if(chp < text.length() - 1 && text.charAt(chp+1) != 0) {
+					LineFeed();
+				}
 	        }
 	    }
 	    while (++chp < text.length());
@@ -346,16 +359,21 @@ public class Console {
 
 	public static void SetLogFile(String fn)
 	{
-		if (logfile != null) logfile.close();
+		if (logfile != null) {
+			logfile.close();
+		}
 		logfile = null;
 
-		if (fn != null)
+		if (fn != null) {
 			logfile = BuildGdx.compat.open(toLowerCase(fn), Path.User, Mode.Write);
+		}
 	}
 
 	public static void CloseLogFile()
 	{
-		if (logfile != null) logfile.close();
+		if (logfile != null) {
+			logfile.close();
+		}
 		logfile = null;
 	}
 
@@ -462,18 +480,21 @@ public class Console {
 					for(int i = 0; i < foundText.size(); i ++)
 		            {
 						msg.append(foundText.get(i));
-						for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
+						for(int j = 0; j < maxwidth - foundText.get(i).length(); j++) {
 							msg.append(" ");
+						}
 		                if (msg.length() > (osdcols - maxwidth))
 		                {
 		                    msg.append("\n");
 		                    Print(msg.toString());
-		                    if (i < foundText.size())
-		                    	msg = new StringBuilder("  ");
+		                    if (i < foundText.size()) {
+								msg = new StringBuilder("  ");
+							}
 		                }
 		            }
-					if(msg.length() > 2)
-		        	  Println(msg.toString());
+					if(msg.length() > 2) {
+						Println(msg.toString());
+					}
 					Println("Found " + foundText.size() + " symbols", OSDTEXT_RED);
 				}
 			}
@@ -490,7 +511,9 @@ public class Console {
 					osdrows = osdmaxrows;
 					Set("osdrows", osdrows);
 				}
-	            if (osdrowscur!=-1) osdrowscur = osdrows;
+	            if (osdrowscur!=-1) {
+					osdrowscur = osdrows;
+				}
 			}
 		}, 0, MAXPALOOKUPS-1));
 
@@ -510,8 +533,12 @@ public class Console {
 							setTextScale((int) (value * 65536.0f));
 							osdtextscale = (int) (value * 65536.0f);
 							Console.ResizeDisplay(xdim, ydim);
-							if (osdrowscur!=-1) osdrowscur = osdrows;
-						} else Console.Println("osdtextscale: out of range");
+							if (osdrowscur!=-1) {
+								osdrowscur = osdrows;
+							}
+						} else {
+							Console.Println("osdtextscale: out of range");
+						}
 					}  catch(Exception e) {
 						Console.Println("osdtextscale: out of range");
 					}
@@ -523,11 +550,14 @@ public class Console {
 	{
 		boolean isFullscreen = osdrowscur == osdmaxrows;
 		osdtextscale = scale;
-		if(!Console.IsInited() || func == null) return;
+		if(!Console.IsInited() || func == null) {
+			return;
+		}
 
 		Console.ResizeDisplay(xdim, ydim);
-		if(isFullscreen)
+		if(isFullscreen) {
 			fullscreen(true);
+		}
 	}
 
 	public static int getTextScale()
@@ -551,24 +581,26 @@ public class Console {
 
 	    func.showosd(cap?1:0);
 
-	    if(getInput() != null)
-	    	getInput().initMessageInput(null);
+	    if(getInput() != null) {
+			getInput().initMessageInput(null);
+		}
 	}
 
 	private static final InputCallback osdcallback = new InputCallback() {
 		@Override
 		public int run(int ch) {
 			if (osdeditlen < OSD_EDITLENGTH && ch < 128) {
-				if((osdflags & OSD_SHIFT) != 0)
+				if((osdflags & OSD_SHIFT) != 0) {
 					ch=gdxscantoascwithshift[ch];
-				else
+				} else {
 					ch=gdxscantoasc[ch];
+				}
                 if (ch != 0) {
                 	 if (osdeditcursor <= osdeditlen-1)
                 	 {
-                		 if((osdflags & OSD_OVERTYPE) != 0)
-                			 osdeditbuf[osdeditcursor++]=(char)ch;
-                		 else {
+                		 if((osdflags & OSD_OVERTYPE) != 0) {
+							 osdeditbuf[osdeditcursor++]=(char)ch;
+						 } else {
                     		 System.arraycopy(osdeditbuf, osdeditcursor, osdeditbuf, osdeditcursor+1, osdeditlen-osdeditcursor);
                     		 osdeditbuf[osdeditcursor++]=(char)ch;
                     		 osdeditlen++;
@@ -586,10 +618,11 @@ public class Console {
 	public static void toggle()
 	{
 		osdscroll = -osdscroll;
-        if (osdrowscur == -1)
-            osdscroll = 1;
-        else if (osdrowscur == osdrows)
-            osdscroll = -1;
+        if (osdrowscur == -1) {
+			osdscroll = 1;
+		} else if (osdrowscur == osdrows) {
+			osdscroll = -1;
+		}
         osdrowscur += osdscroll;
         CaptureInput(osdscroll == 1);
         osdscrtime = func.getticksfunc();
@@ -597,21 +630,25 @@ public class Console {
 
 	public static void fullscreen(boolean show)
 	{
-		if(show)
+		if(show) {
 			osdrowscur = osdmaxrows;
-		else osdrowscur = -1;
+		} else {
+			osdrowscur = -1;
+		}
 
 		showDisplay(show?1:0);
-		if(func != null)
+		if(func != null) {
 			func.showosd(show?1:0);
+		}
 	}
 
 	static boolean lastmatch;
 	static int tabc;
 	public static void HandleScanCode()
 	{
-		if ((osdflags & OSD_INITIALIZED) == 0)
-	        return;
+		if ((osdflags & OSD_INITIALIZED) == 0) {
+			return;
+		}
 
 		for(int i = 0; i < 4; i++) {
 			if(getInput().keyStatusOnce(osdkey[i]))
@@ -621,8 +658,9 @@ public class Console {
 			}
 		}
 
-		if ((osdflags & OSD_CAPTURE) == 0)
+		if ((osdflags & OSD_CAPTURE) == 0) {
 			return;
+		}
 
 		keytime = func.gettime();
 
@@ -636,21 +674,23 @@ public class Console {
 
 		if(getInput().keyStatusOnce(Keys.PAGE_UP))
 		{
-			if (osdhead < osdlines-2)
-	            osdhead++;
+			if (osdhead < osdlines-2) {
+				osdhead++;
+			}
 		}
 
 		if(getInput().keyStatusOnce(Keys.PAGE_DOWN))
 		{
-			if (osdhead > 0)
-	            osdhead--;
+			if (osdhead > 0) {
+				osdhead--;
+			}
 		}
 
 		if(getInput().keyStatusOnce(Keys.HOME))
 		{
-			if ((osdflags & OSD_CTRL) != 0)
-	            osdhead = osdlines-2;
-	        else
+			if ((osdflags & OSD_CTRL) != 0) {
+				osdhead = osdlines-2;
+			} else
 	        {
 	            osdeditcursor = 0;
 	            osdeditwinstart = osdeditcursor;
@@ -660,9 +700,9 @@ public class Console {
 
 		if(getInput().keyStatusOnce(Keys.END))
 		{
-			if ((osdflags & OSD_CTRL) != 0)
-	            osdhead = 0;
-	        else
+			if ((osdflags & OSD_CTRL) != 0) {
+				osdhead = 0;
+			} else
 	        {
 	            osdeditcursor = osdeditlen;
 	            osdeditwinend = osdeditcursor;
@@ -688,18 +728,22 @@ public class Console {
 	            {
 	                while (osdeditcursor>0)
 	                {
-	                    if (osdeditbuf[osdeditcursor-1] != Keys.SPACE)
-	                        break;
+	                    if (osdeditbuf[osdeditcursor-1] != Keys.SPACE) {
+							break;
+						}
 	                    osdeditcursor--;
 	                }
 	                while (osdeditcursor>0)
 	                {
-	                    if (osdeditbuf[osdeditcursor-1] == Keys.SPACE)
-	                        break;
+	                    if (osdeditbuf[osdeditcursor-1] == Keys.SPACE) {
+							break;
+						}
 	                    osdeditcursor--;
 	                }
 	            }
-	            else osdeditcursor--;
+	            else {
+					osdeditcursor--;
+				}
 	        }
 	        if (osdeditcursor<osdeditwinstart)
 	        {
@@ -716,18 +760,22 @@ public class Console {
 	            {
 	                while (osdeditcursor<osdeditlen)
 	                {
-	                    if (osdeditbuf[osdeditcursor] == Keys.SPACE)
-	                        break;
+	                    if (osdeditbuf[osdeditcursor] == Keys.SPACE) {
+							break;
+						}
 	                    osdeditcursor++;
 	                }
 	                while (osdeditcursor<osdeditlen)
 	                {
-	                    if (osdeditbuf[osdeditcursor] != Keys.SPACE)
-	                        break;
+	                    if (osdeditbuf[osdeditcursor] != Keys.SPACE) {
+							break;
+						}
 	                    osdeditcursor++;
 	                }
 	            }
-	            else osdeditcursor++;
+	            else {
+					osdeditcursor++;
+				}
 	        }
 	        if (osdeditcursor>=osdeditwinend)
 	        {
@@ -748,11 +796,15 @@ public class Console {
 
 		if(getInput().keyStatus(Keys.SHIFT_LEFT) || getInput().keyStatus(Keys.SHIFT_RIGHT)) {
 			osdflags |= OSD_SHIFT;
-		} else osdflags &= ~OSD_SHIFT;
+		} else {
+			osdflags &= ~OSD_SHIFT;
+		}
 
 		if(getInput().keyStatus(Keys.CONTROL_LEFT) || getInput().keyStatus(Keys.CONTROL_RIGHT)) {
 			osdflags |= OSD_CTRL;
-		} else osdflags &= ~OSD_CTRL;
+		} else {
+			osdflags &= ~OSD_CTRL;
+		}
 
 		if(getInput().keyStatusOnce(KEY_CAPSLOCK))
 		{
@@ -761,10 +813,12 @@ public class Console {
 
 		if(getInput().keyStatusOnce(Keys.DEL)) //backspace
 		{
-			if (/*osdeditcursor == osdeditlen ||*/ osdeditcursor == 0 || osdeditlen == 0)
-	            return;
-	         if (osdeditcursor <= osdeditlen-1)
-	        	System.arraycopy(osdeditbuf, osdeditcursor, osdeditbuf, osdeditcursor-1, osdeditlen-osdeditcursor);
+			if (/*osdeditcursor == osdeditlen ||*/ osdeditcursor == 0 || osdeditlen == 0) {
+				return;
+			}
+	         if (osdeditcursor <= osdeditlen-1) {
+				 System.arraycopy(osdeditbuf, osdeditcursor, osdeditbuf, osdeditcursor-1, osdeditlen-osdeditcursor);
+			 }
 
 	         osdeditlen--;
 	         osdeditcursor--;
@@ -777,11 +831,14 @@ public class Console {
 	            osdeditbuf[osdeditlen] = 0;
 	            if (Bstrcmp(osdhistorybuf[0], osdeditbuf) != 0)
 	            {
-	            	for(int i = OSD_HISTORYDEPTH - 1; i >= 1; i--)
-	            		System.arraycopy( osdhistorybuf[i-1], 0, osdhistorybuf[i], 0, OSD_EDITLENGTH+1 );
+	            	for(int i = OSD_HISTORYDEPTH - 1; i >= 1; i--) {
+						System.arraycopy( osdhistorybuf[i-1], 0, osdhistorybuf[i], 0, OSD_EDITLENGTH+1 );
+					}
 	            	System.arraycopy( osdeditbuf, 0, osdhistorybuf[0], 0, OSD_EDITLENGTH+1 );
 
-	                if (osdhistorysize < OSD_HISTORYDEPTH) osdhistorysize++;
+	                if (osdhistorysize < OSD_HISTORYDEPTH) {
+						osdhistorysize++;
+					}
 	                osdhistorytotal++;
 				}
 				osdexeccount++;
@@ -805,19 +862,25 @@ public class Console {
 		if(getInput().keyStatusOnce(Keymap.ANYKEY)) {
 			if(getInput().keyStatusOnce(Keys.TAB)) {
 				ListCommands();
-			} else lastmatch = false;
+			} else {
+				lastmatch = false;
+			}
 		}
 	}
 
 	private static void HistoryPrev()
 	{
-	    if (osdhistorypos >= osdhistorysize-1) return;
+	    if (osdhistorypos >= osdhistorysize-1) {
+			return;
+		}
 
 	    osdhistorypos++;
 	    System.arraycopy( osdhistorybuf[osdhistorypos], 0, osdeditbuf, 0, OSD_EDITLENGTH+1 );
 
 	    osdeditcursor = 0;
-	    while (osdeditbuf[osdeditcursor] != 0) osdeditcursor++;
+	    while (osdeditbuf[osdeditcursor] != 0) {
+			osdeditcursor++;
+		}
 	    osdeditlen = osdeditcursor;
 
 	    if (osdeditcursor<osdeditwinstart)
@@ -835,7 +898,9 @@ public class Console {
 
 	private static void HistoryNext()
 	{
-	    if (osdhistorypos < 0) return;
+	    if (osdhistorypos < 0) {
+			return;
+		}
 
 	    if (osdhistorypos == 0)
 	    {
@@ -851,7 +916,9 @@ public class Console {
 	    System.arraycopy( osdhistorybuf[osdhistorypos], 0, osdeditbuf, 0, OSD_EDITLENGTH+1 );
 
 	    osdeditcursor = 0;
-	    while (osdeditbuf[osdeditcursor] != 0) osdeditcursor++;
+	    while (osdeditbuf[osdeditcursor] != 0) {
+			osdeditcursor++;
+		}
 	    osdeditlen = osdeditcursor;
 
 	    if (osdeditcursor<osdeditwinstart)
@@ -869,8 +936,9 @@ public class Console {
 
 	private static OSDCOMMAND Get(String osdvar)
 	{
-		if(osdvar == null || osdvar.isEmpty() || osdvars == null)
+		if(osdvar == null || osdvar.isEmpty() || osdvars == null) {
 			return null;
+		}
 
 		return osdvars.get(osdvar);
 	}
@@ -878,8 +946,9 @@ public class Console {
 	private static void TokenizeString(String text)
 	{
 		osd_argc = 0;
-		if(text == null || text.isEmpty())
+		if(text == null || text.isEmpty()) {
 			return;
+		}
 
 		osd_argc++;
 		Arrays.fill(osd_argv, null);
@@ -904,7 +973,9 @@ public class Console {
         osdfmt[0] = new short[osdcols];
 		Arrays.fill(  osdfmt[0], (short) ((int)(osdtextpal.value + osdtextshade.value)<<5));
 
-        if (osdlines < MAXLINES) osdlines++;
+        if (osdlines < MAXLINES) {
+			osdlines++;
+		}
 	}
 
 	private static final List<String> foundText = new ArrayList<String>();
@@ -915,8 +986,9 @@ public class Console {
 			int len = osdeditlen;
 			int maxwidth = 0;
 			String inputText = new String(buf, 0, len);
-			if(inputText.isEmpty())
+			if(inputText.isEmpty()) {
 				return;
+			}
 			foundText.clear();
 			for (String key : osdvars.keySet()) {
 				if(key.startsWith(inputText)) {
@@ -937,27 +1009,32 @@ public class Console {
 				for(int i = 0; i < foundText.size(); i ++)
 	            {
 					msg.append(foundText.get(i));
-					for(int j = 0; j < maxwidth - foundText.get(i).length(); j++)
+					for(int j = 0; j < maxwidth - foundText.get(i).length(); j++) {
 						msg.append(" ");
+					}
 	                if (msg.length() > (osdcols - maxwidth))
 	                {
 	                    msg.append("\n");
 	                    Print(msg.toString());
-	                    if (i < foundText.size() - 1)
-	                    	msg = new StringBuilder("  ");
+	                    if (i < foundText.size() - 1) {
+							msg = new StringBuilder("  ");
+						}
 	                }
 	            }
-				if(msg.length() > 2)
-	        	  Println(msg.toString());
+				if(msg.length() > 2) {
+					Println(msg.toString());
+				}
 				Println("Press TAB again to cycle through matches", OSDTEXT_RED);
 				tabc = 0;
 				lastmatch = true;
 			}
 		} else {
 			String msg = foundText.get(tabc);
-			if(tabc < foundText.size() - 1)
+			if(tabc < foundText.size() - 1) {
 				tabc++;
-			else tabc = 0;
+			} else {
+				tabc = 0;
+			}
 			osdeditlen = msg.length();
 			System.arraycopy(msg.toCharArray(), 0, osdeditbuf, 0, osdeditlen);
 			osdeditcursor = osdeditlen;
@@ -992,8 +1069,9 @@ public class Console {
 	        	}
         	}
         }
-		if(func.textHandler(text))
+		if(func.textHandler(text)) {
 			return 0;
+		}
 
 		return -1; //unknown command
 	}
@@ -1048,15 +1126,17 @@ public class Console {
 
 	public static void draw(Engine engine)
 	{
-	    if ((osdflags & OSD_INITIALIZED) == 0 || func == null)
-	        return;
+	    if ((osdflags & OSD_INITIALIZED) == 0 || func == null) {
+			return;
+		}
 
-	    if (osdrowscur == 0)
-	        showDisplay(((osdflags & OSD_DRAW) != 0) ? 0 : 1);
+	    if (osdrowscur == 0) {
+			showDisplay(((osdflags & OSD_DRAW) != 0) ? 0 : 1);
+		}
 
-	    if (osdrowscur == osdrows || osdrowscur == osdmaxrows)
-	        osdscroll = 0;
-	    else
+	    if (osdrowscur == osdrows || osdrowscur == osdmaxrows) {
+			osdscroll = 0;
+		} else
 	    {
 	        if ((osdrowscur < osdrows && osdscroll == 1) || osdrowscur < -1)
 	        {
@@ -1065,8 +1145,9 @@ public class Console {
 	            {
 	                osdrowscur++;
 	                j -= 200/osdrows;
-	                if (osdrowscur > osdrows-1)
-	                    break;
+	                if (osdrowscur > osdrows-1) {
+						break;
+					}
 	            }
 	        }
 	        if ((osdrowscur > -1 && osdscroll == -1) || osdrowscur > osdrows)
@@ -1076,14 +1157,17 @@ public class Console {
 	            {
 	                osdrowscur--;
 	                j -= 200/osdrows;
-	                if (osdrowscur < 1)
-	                    break;
+	                if (osdrowscur < 1) {
+						break;
+					}
 	            }
 	        }
 	        osdscrtime = func.getticksfunc();
 	    }
 
-	    if ((osdflags & OSD_DRAW) == 0 || osdrowscur <= 0) return;
+	    if ((osdflags & OSD_DRAW) == 0 || osdrowscur <= 0) {
+			return;
+		}
 
 	    int topoffs = osdhead;
 	    int row = osdrowscur-1;
@@ -1100,24 +1184,33 @@ public class Console {
 	        int offset = ((osdflags & (OSD_CAPS|OSD_SHIFT)) == (OSD_CAPS|OSD_SHIFT) && osdhead > 0)?1:0;
 	        int shade = ((int)osdpromptshade.value!=0)?(int)osdpromptshade.value:(EngineUtils.sin(totalclock<<4)>>11);
 
-	        if (osdhead == osdlines-1) func.drawchar(0,osdrowscur,'~',shade,(int)osdpromptpal.value, osdtextscale);
-	        else if (osdhead > 0) func.drawchar(0,osdrowscur,'^',shade,(int)osdpromptpal.value, osdtextscale);
-	        if ((osdflags & OSD_CAPS) != 0) func.drawchar((osdhead > 0)?1:0,osdrowscur,'C',shade,(int)osdpromptpal.value, osdtextscale);
-	        if ((osdflags & OSD_SHIFT) != 0) func.drawchar(1+(((osdflags & OSD_CAPS) != 0 && osdhead > 0)?1:0),osdrowscur,'H',shade,(int)osdpromptpal.value, osdtextscale);
+	        if (osdhead == osdlines-1) {
+				func.drawchar(0,osdrowscur,'~',shade,(int)osdpromptpal.value, osdtextscale);
+			} else if (osdhead > 0) {
+				func.drawchar(0,osdrowscur,'^',shade,(int)osdpromptpal.value, osdtextscale);
+			}
+	        if ((osdflags & OSD_CAPS) != 0) {
+				func.drawchar((osdhead > 0)?1:0,osdrowscur,'C',shade,(int)osdpromptpal.value, osdtextscale);
+			}
+	        if ((osdflags & OSD_SHIFT) != 0) {
+				func.drawchar(1+(((osdflags & OSD_CAPS) != 0 && osdhead > 0)?1:0),osdrowscur,'H',shade,(int)osdpromptpal.value, osdtextscale);
+			}
 
 	        func.drawchar(2+offset,osdrowscur,'>',shade,(int)osdpromptpal.value, osdtextscale);
 
 	        int len = Math.min(osdcols-1-3-offset, osdeditlen-osdeditwinstart);
-	        for (int x=len-1; x>=0; x--)
-	        	func.drawchar(3+x+offset,osdrowscur,osdeditbuf[x],(int)(osdeditshade.value)<<1,(int)osdeditpal.value, osdtextscale);
+	        for (int x=len-1; x>=0; x--) {
+				func.drawchar(3+x+offset,osdrowscur,osdeditbuf[x],(int)(osdeditshade.value)<<1,(int)osdeditpal.value, osdtextscale);
+			}
 
 	        offset += 3+osdeditcursor-osdeditwinstart;
 
 	        func.drawcursor(offset,osdrowscur,osdflags & OSD_OVERTYPE,keytime, osdtextscale);
 
-	        if (osdver != null)
-	        	func.drawstr(osdcols-osdverlen + 2, osdrowscur - ((offset >= osdcols-osdverlen+2)?1:0),
-	                      osdver ,osdverlen,(EngineUtils.sin(totalclock<<4)>>11),osdverpal, osdtextscale);
+	        if (osdver != null) {
+				func.drawstr(osdcols-osdverlen + 2, osdrowscur - ((offset >= osdcols-osdverlen+2)?1:0),
+						  osdver ,osdverlen,(EngineUtils.sin(totalclock<<4)>>11),osdverpal, osdtextscale);
+			}
 	     }
 	}
 }

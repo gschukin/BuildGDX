@@ -73,12 +73,14 @@ public abstract class TileData {
 		Pixmap pixmap = new Pixmap(width, height,
 				getPixelFormat() == PixelFormat.Rgba ? Format.RGBA8888 : Format.RGB888);
 		float[] color = new float[4];
-		if(bytes == 3)
+		if(bytes == 3) {
 			color[3] = 1.0f;
+		}
 
 		for (int i = 0; i < (width * height); i++) {
-			for (int c = 0; c < bytes; c++)
+			for (int c = 0; c < bytes; c++) {
 				color[c] = (pixels.get((i * bytes) + c) & 0xFF) / 255.f;
+			}
 
 			pixmap.setColor(color[0], color[1], color[2], color[3]);
 			int row = (int) Math.floor(i / width);
@@ -96,8 +98,9 @@ public abstract class TileData {
 	protected int calcSize(int size) {
 		int nsize = 1;
 		if (GLInfo.texnpot == 0) {
-			for (; nsize < size; nsize *= 2)
+			for (; nsize < size; nsize *= 2) {
 				;
+			}
 			return nsize;
 		}
 		return size == 0 ? 1 : size;

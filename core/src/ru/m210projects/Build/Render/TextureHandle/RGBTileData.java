@@ -25,15 +25,18 @@ public class RGBTileData extends TileData {
 		int tsizx = tile.getWidth();
 		int tsizy = tile.getHeight();
 
-		if (data != null && (data.length == 0 || tile.getSize() > data.length))
+		if (data != null && (data.length == 0 || tile.getSize() > data.length)) {
 			data = null;
+		}
 
 		int xsiz = tsizx;
 		int ysiz = tsizy;
-		if ((expflag & 1) != 0)
+		if ((expflag & 1) != 0) {
 			xsiz = calcSize(tsizx);
-		if ((expflag & 2) != 0)
+		}
+		if ((expflag & 2) != 0) {
 			ysiz = calcSize(tsizy);
+		}
 
 		ByteBuffer buffer = ByteBuffer.allocateDirect(data != null ? xsiz * ysiz * 4 : 4).order(ByteOrder.LITTLE_ENDIAN);
 		boolean hasalpha = false;
@@ -61,8 +64,9 @@ public class RGBTileData extends TileData {
 				for (int y = (ysiz - 1); y >= 0; y--) {
 					sptr = y >= tsizy ? 0 : tsizx;
 					dptr = (xsiz * y + (sptr - 1)) * pix_len;
-					for (int x = sptr; x < xsiz; x++)
+					for (int x = sptr; x < xsiz; x++) {
 						buffer.putInt(dptr += pix_len, 0);
+					}
 				}
 
 				sptr = 0;
@@ -82,16 +86,19 @@ public class RGBTileData extends TileData {
 					for (j = 0; j < ysiz; j++) {
 						buffer.putInt(dptr, getColor(data[sptr + p++], dapal, alpha));
 						dptr += xoffs;
-						if (p >= tsizy)
+						if (p >= tsizy) {
 							p = 0;
+						}
 					}
-					if ((sptr += tsizy) >= len)
+					if ((sptr += tsizy) >= len) {
 						sptr = 0;
+					}
 				}
 			}
 
-			if (data != null && hasalpha && !GLSettings.textureFilter.get().retro)
+			if (data != null && hasalpha && !GLSettings.textureFilter.get().retro) {
 				fixtransparency(buffer, tsizx, tsizy, xsiz, ysiz, clamped);
+			}
 		}
 
 		this.width = xsiz;
@@ -139,11 +146,13 @@ public class RGBTileData extends TileData {
 
 	protected int getColor(int dacol, int dapal, boolean alphaMode) {
 		dacol &= 0xFF;
-		if (alphaMode && dacol == 255)
+		if (alphaMode && dacol == 255) {
 			return curpalette.getRGBA(0, (byte) 0);
+		}
 
-		if (dacol >= palookup[dapal].length)
+		if (dacol >= palookup[dapal].length) {
 			return 0;
+		}
 
 		dacol = palookup[dapal][dacol] & 0xFF;
 		return curpalette.getRGBA(dacol, (byte) 0xFF);
@@ -172,8 +181,9 @@ public class RGBTileData extends TileData {
 			wpptr = y * daxsiz2 + dox;
 			for (x = dox; x >= 0; x--, wpptr--) {
 				wp = (wpptr << 2);
-				if (dapic.get(wp + 3) != 0)
+				if (dapic.get(wp + 3) != 0) {
 					continue;
+				}
 
 				r = g = b = j = 0;
 				index = wp - 4;

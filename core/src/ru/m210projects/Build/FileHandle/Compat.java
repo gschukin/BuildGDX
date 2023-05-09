@@ -78,13 +78,15 @@ public class Compat {
 	public Compat(String mainPath, String userPath) {
 		Path.Game.setPath(mainPath);
 		Path.User.setPath(userPath);
-		for (int i = 0; i < MAXOPENFILES; i++)
+		for (int i = 0; i < MAXOPENFILES; i++) {
 			list[i] = new FileResource();
+		}
 	}
 
 	protected CacheList getCacheList() {
-		if (cache == null)
+		if (cache == null) {
 			cache = new CacheList(Path.Game.getPath(), Path.User.getPath());
+		}
 		return cache;
 	}
 
@@ -97,10 +99,11 @@ public class Compat {
 	}
 
 	public DirectoryEntry getDirectory(Path folder) {
-		if (folder == Path.Game)
+		if (folder == Path.Game) {
 			return getCacheList().getDirectory();
-		else if (folder == Path.User)
+		} else if (folder == Path.User) {
 			return checkDirectory("<userdir>");
+		}
 
 		return null;
 	}
@@ -116,13 +119,15 @@ public class Compat {
 			break;
 		case Absolute:
 			File file = new File(toLowerCase(name));
-			if (file.exists())
+			if (file.exists()) {
 				return file;
+			}
 			break;
 		}
 
-		if (entry != null)
+		if (entry != null) {
 			return entry.getFile();
+		}
 
 		return null;
 	}
@@ -131,8 +136,9 @@ public class Compat {
 		FileResource res;
 		for (int i = 0; i < MAXOPENFILES; i++) {
 			res = list[(pos = (pos + 1) & (MAXOPENFILES - 1))];
-			if (res.isClosed())
+			if (res.isClosed()) {
 				return res;
+			}
 		}
 
 		Console.Println("TOO MANY FILES OPEN!", OSDTEXT_RED);
@@ -142,8 +148,9 @@ public class Compat {
 	public List<FileResource> getOpened() {
 		List<FileResource> out = new ArrayList<FileResource>();
 		for (int i = 0; i < MAXOPENFILES; i++) {
-			if (!list[i].isClosed())
+			if (!list[i].isClosed()) {
 				out.add(list[i]);
+			}
 		}
 
 		return out;
@@ -151,8 +158,9 @@ public class Compat {
 
 	public FileResource open(FileEntry fil) {
 		FileResource res = obtain();
-		if (res != null)
+		if (res != null) {
 			res = res.open(fil.getFile(), Mode.Read);
+		}
 
 		return res;
 	}
@@ -170,8 +178,9 @@ public class Compat {
 			fil = checkFile(name, folder);
 			if (fil != null) {
 				res = obtain();
-				if (res != null)
+				if (res != null) {
 					res = res.open(fil, mode);
+				}
 			}
 			break;
 		case Write:
@@ -179,27 +188,31 @@ public class Compat {
 				res = obtain();
 				if (res != null) {
 					fil = new File(Path.Game.getPath() + name);
-					if ((res = res.open(fil, mode)) != null)
+					if ((res = res.open(fil, mode)) != null) {
 						getCacheList().getDirectory().addFile(fil);
+					}
 				}
 			} else if (folder == Path.User) {
 				res = obtain();
 				if (res != null) {
 					fil = new File(Path.User.getPath() + name);
-					if ((res = res.open(fil, mode)) != null)
+					if ((res = res.open(fil, mode)) != null) {
 						getDirectory(Path.User).addFile(fil);
+					}
 				}
 			} else {
 				res = obtain();
-				if (res != null)
+				if (res != null) {
 					res = res.open(new File(name), mode);
+				}
 			}
 			break;
 		}
 
-		if (res != null && debug)
+		if (res != null && debug) {
 			System.out.println(
 					"Opening " + name + " [ " + ((pos - 1) & (MAXOPENFILES - 1)) + " / " + MAXOPENFILES + " ]");
+		}
 
 		return res;
 	}

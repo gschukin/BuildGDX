@@ -59,11 +59,13 @@ public class PolymostModelRenderer {
     public int voxdraw(GLVoxel m, Sprite tspr) {
         float f, g;
 
-        if (m == null)
+        if (m == null) {
             return 0;
+        }
 
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             return 0;
+        }
 
         int globalorientation = parent.globalorientation;
 
@@ -76,10 +78,12 @@ public class PolymostModelRenderer {
         modela0.x = modela0.y = modela0.z = 0;
 
         f = (tspr.getXrepeat()) * (256.0f / 320.0f) / 64.0f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16) {
             f *= 1.25f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
+        }
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             f *= 1.25f;
+        }
 
         dvoxm0.x *= f;
         modela0.x *= f;
@@ -95,16 +99,20 @@ public class PolymostModelRenderer {
         float xoff = tspr.getXoffset();
         float yoff = tspr.getYoffset();
 
-        if (yflip)
+        if (yflip) {
             yoff = -yoff;
+        }
 
         if ((globalorientation & 128) == 0)
             // k0 -= (engine.getTile(tspr.picnum).getHeight() * tspr.yrepeat) << 1; GDX this
             // more correct, but disabled for compatible with eduke
+        {
             k0 -= ((m.zsiz * tspr.getYrepeat()) << 1);
+        }
 
-        if (yflip && (globalorientation & 16) == 0)
+        if (yflip && (globalorientation & 16) == 0) {
             k0 += ((engine.getTile(tspr.getPicnum()).getHeight() * 0.5f) - m.zpiv) * tspr.getYrepeat() * 8.0f;
+        }
 
         f = (65536.0f * 512.0f) / (xdimen * viewingrange);
         g = 32.0f / (float) (xdimen * parent.gxyaspect);
@@ -113,24 +121,29 @@ public class PolymostModelRenderer {
         // k0 -= yoff * (tspr.yrepeat << 2);
 
         dvoxm0.y *= f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             dvoxm0.y *= -1;
+        }
         modela0.y = ((x0 - globalposx) / 1024.0f + modela0.y) * f;
         dvoxm0.x *= -f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32)
+        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             dvoxm0.x *= -1;
-        if (xflip)
+        }
+        if (xflip) {
             dvoxm0.x *= -1;
+        }
         modela0.x = ((tspr.getY() - globalposy) / -1024.0f + modela0.x) * -f;
         dvoxm0.z *= g;
-        if (yflip)
+        if (yflip) {
             dvoxm0.z *= -1;
+        }
         modela0.z = ((k0 - globalposz) / -16384.0f + modela0.z) * g;
 
-        if ((parent.grhalfxdown10x >= 0) ^ yflip ^ xflip)
+        if ((parent.grhalfxdown10x >= 0) ^ yflip ^ xflip) {
             gl.glFrontFace(GL_CW);
-        else
+        } else {
             gl.glFrontFace(GL_CCW);
+        }
 
         gl.glEnable(GL_CULL_FACE);
         gl.glCullFace(GL_BACK);
@@ -141,9 +154,9 @@ public class PolymostModelRenderer {
         boolean newmatrix = false;
 
         // ------------ Matrix
-        if (!newmatrix)
+        if (!newmatrix) {
             md3_vox_calcmat_common(tspr, modela0, f, matrix);
-        else {
+        } else {
             md3_vox_calcmat_common(tspr, modela0);
         }
 
@@ -156,8 +169,9 @@ public class PolymostModelRenderer {
         gl.glScalef(dvoxm0.x / 64.0f, dvoxm0.z / 64.0f, dvoxm0.y / 64.0f);
         gl.glTranslatef(-xoff, yoff, 0);
 
-        if (m.isRotating())
+        if (m.isRotating()) {
             gl.glRotatef(totalclock % 360, 0, 1, 0);
+        }
 
         // transform to Build coords
         if ((tspr.getCstat() & 48) == 32) {
@@ -182,12 +196,14 @@ public class PolymostModelRenderer {
         }
 
         if ((tspr.getCstat() & 2) != 0) {
-            if ((tspr.getCstat() & 512) == 0)
+            if ((tspr.getCstat() & 512) == 0) {
                 polyColor.a = TRANSLUSCENT1;
-            else
+            } else {
                 polyColor.a = TRANSLUSCENT2;
-        } else
+            }
+        } else {
             polyColor.a = 1.0f;
+        }
         m.setColor(polyColor.r, polyColor.g, polyColor.b, polyColor.a);
         boolean rendered = m.render(globalpal, globalshade, 0, (int) (parent.globalfog.combvis),
                 polyColor.a);
@@ -205,16 +221,18 @@ public class PolymostModelRenderer {
         float g = 1 - f;
         float mscale = 0.01f;
 
-        if (m.getType() == Type.Md2)
+        if (m.getType() == Type.Md2) {
             cScale.set(mscale, mscale, mscale);
-        else
+        } else {
             cScale.set(mscale, -mscale, mscale);
+        }
         cScale.scl(g, g, g);
 
-        if (m.getType() == Type.Md2)
+        if (m.getType() == Type.Md2) {
             nScale.set(mscale, mscale, mscale);
-        else
+        } else {
             nScale.set(mscale, -mscale, mscale);
+        }
         nScale.scl(f, f, f);
 
         int globalorientation = parent.globalorientation;
@@ -224,8 +242,9 @@ public class PolymostModelRenderer {
 
         float posx = tspr.getX();
         float posz = tspr.getZ();
-        if ((globalorientation & 128) != 0 && (globalorientation & 48) != 32)
+        if ((globalorientation & 128) != 0 && (globalorientation & 48) != 32) {
             posz += (pic.getHeight() * tspr.getYrepeat()) << 1;
+        }
 
         // Parkar: Changed to use the same method as centeroriented sprites
         if ((globalorientation & 8) != 0) // y-flipping
@@ -302,18 +321,21 @@ public class PolymostModelRenderer {
         gl.glLoadMatrixf(matrix);
         gl.glRotatef(-90, 0.0f, 1.0f, 0.0f);
 
-        if (m.isRotating())
+        if (m.isRotating()) {
             gl.glRotatef(totalclock % 360, 0, 1, 0);
+        }
 
-        if ((parent.grhalfxdown10x >= 0) ^ ((globalorientation & 8) != 0) ^ ((globalorientation & 4) != 0))
+        if ((parent.grhalfxdown10x >= 0) ^ ((globalorientation & 8) != 0) ^ ((globalorientation & 4) != 0)) {
             gl.glFrontFace(GL_CW);
-        else
+        } else {
             gl.glFrontFace(GL_CCW);
+        }
         gl.glEnable(GL_CULL_FACE);
-        if (m.getType() == Type.Md2)
+        if (m.getType() == Type.Md2) {
             gl.glCullFace(GL_FRONT);
-        else
+        } else {
             gl.glCullFace(GL_BACK);
+        }
 
         gl.glEnable(GL_TEXTURE_2D);
 
@@ -344,19 +366,22 @@ public class PolymostModelRenderer {
             } else {
                 polyColor.a = TRANSLUSCENT2;
             }
-        } else
+        } else {
             polyColor.a = 1.0f;
+        }
 
         if (m.usesalpha) // Sprites with alpha in texture
         {
             float al = 0.0f;
-            if (parent.alphahackarray[tspr.getPicnum()] != 0)
+            if (parent.alphahackarray[tspr.getPicnum()] != 0) {
                 al = parent.alphahackarray[tspr.getPicnum()];
+            }
             gl.glEnable(GL_BLEND);
             gl.glEnable(GL_ALPHA_TEST);
             gl.glAlphaFunc(GL_GREATER, al);
-        } else if ((tspr.getCstat() & 2) != 0)
+        } else if ((tspr.getCstat() & 2) != 0) {
             gl.glEnable(GL_BLEND);
+        }
 
         gl.glColor4f(polyColor.r, polyColor.g, polyColor.b, polyColor.a);
     }
@@ -377,14 +402,17 @@ public class PolymostModelRenderer {
     }
 
     public int mddraw(GLModel vm, Sprite tspr, int xoff, int yoff) {
-        if (vm == null)
+        if (vm == null) {
             return 0;
+        }
 
-        if (vm.getType() == Type.Voxel)
+        if (vm.getType() == Type.Voxel) {
             return voxdraw((GLVoxel) vm, tspr);
+        }
 
-        if (vm.getType() == Type.Md2 || vm.getType() == Type.Md3)
+        if (vm.getType() == Type.Md2 || vm.getType() == Type.Md3) {
             return mddraw((MDModel) vm, tspr) ? 1 : 0;
+        }
 
         return 0;
     }

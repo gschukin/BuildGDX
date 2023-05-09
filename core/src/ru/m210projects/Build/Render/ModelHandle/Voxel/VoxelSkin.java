@@ -23,8 +23,9 @@ public class VoxelSkin extends DummyTileData {
 					data.putInt(wp, curpalette.getRGB(dacol) + (255 << 24));
 				}
 			}
-		} else
+		} else {
 			data.put(tile.data, 0, width * height);
+		}
 	}
 
 	@Override

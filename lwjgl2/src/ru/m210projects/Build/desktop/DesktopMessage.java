@@ -42,11 +42,12 @@ public class DesktopMessage implements BuildMessage {
 
 	@Override
 	public boolean show(String header, String message, MessageType type) {
-		if(panel == null && (panel = InitPanel()) == null)
+		if(panel == null && (panel = InitPanel()) == null) {
 			return false;
+		}
 
 		BuildGdx.input.setCursorCatched(false);
-		if(message.length() >= 384)
+		if(message != null && message.length() >= 384)
 		{
 			message = message.substring(0, 384);
 			message += "...";
@@ -100,8 +101,9 @@ public class DesktopMessage implements BuildMessage {
 		panel.setMessage(message);
 		panel.setOptionType(optionType);
 		final JDialog dialog = panel.createDialog(header);
-		if(frame.icon != null)
+		if(frame.icon != null) {
 			dialog.setIconImage(Toolkit.getDefaultToolkit().getImage(frame.icon));
+		}
 		panel.setBackground(dialog.getBackground());
 		dialog.setLocation(frame.getX() + (BuildGdx.graphics.getWidth() - dialog.getWidth()) / 2,
 				frame.getY() + (BuildGdx.graphics.getHeight() - dialog.getHeight()) / 2);

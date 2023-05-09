@@ -86,13 +86,15 @@ public class WorldMesh {
 		BoardService service = engine.getBoardService();
 		for (short s = 0; s < service.getSectorCount(); s++) {
 			Sector sec = Engine.getSector(s);
-			if (sec.getFloorz() == sec.getCeilingz())
+			if (sec.getFloorz() == sec.getCeilingz()) {
 				continue;
+			}
 
 			tess.setSector(s, true);
 
-			if (tess.zoids.size() == 0)
+			if (tess.zoids.size() == 0) {
 				continue;
+			}
 
 			addFloor(vertices, s);
 			floorhash[s] = getFloorHash(s);
@@ -148,10 +150,12 @@ public class WorldMesh {
 			pol[CEILING2].set(wal2, ceilz.get(), 1, 0);
 
 			if (heinum == Heinum.Max) {
-				if (sec.isParallaxCeiling())
+				if (sec.isParallaxCeiling()) {
 					pol[CEILING1].z = pol[CEILING2].z = Integer.MIN_VALUE;
-				if (sec.isParallaxFloor())
+				}
+				if (sec.isParallaxFloor()) {
 					pol[FLOOR1].z = pol[FLOOR2].z = Integer.MAX_VALUE;
+				}
 			}
 			break;
 		case Lower:
@@ -160,8 +164,9 @@ public class WorldMesh {
 			fz2 = engine.getflorzofslope((short) sectnum, wal2.getX(), wal2.getY());
 			cz2 = engine.getflorzofslope((short) nextsector, wal2.getX(), wal2.getY());
 
-			if (fz1 < cz1 && fz2 < cz2)
+			if (fz1 < cz1 && fz2 < cz2) {
 				return null;
+			}
 
 			pol[CEILING1].set(wal, cz1, 0, 0);
 			pol[FLOOR1].set(wal, fz1, 0, 1);
@@ -192,8 +197,9 @@ public class WorldMesh {
 			fz2 = engine.getceilzofslope((short) sectnum, wal2.getX(), wal2.getY());
 			cz2 = engine.getceilzofslope((short) nextsector, wal2.getX(), wal2.getY());
 
-			if (fz1 >= cz1 && fz2 >= cz2)
+			if (fz1 >= cz1 && fz2 >= cz2) {
 				return null;
+			}
 
 			pol[CEILING1].set(wal, fz1, 0, 0);
 			pol[FLOOR1].set(wal, cz1, 0, 1);
@@ -263,8 +269,9 @@ public class WorldMesh {
 				return pointList; // 3
 			}
 		}
-		if (dz1 <= 0.0f)
+		if (dz1 <= 0.0f) {
 			return null; // do not include null case for rendering
+		}
 
 		float f = dz0 / (dz0 - dz1);
 		pol[CEILING1].x = (pol[CEILING2].x - pol[CEILING1].x) * f + pol[CEILING1].x;
@@ -288,8 +295,9 @@ public class WorldMesh {
 		final Sector sec = Engine.getSector(sectnum);
 
 		boolean isParallaxFloor = sec.isParallaxFloor();
-		if (!isParallaxFloor)
+		if (!isParallaxFloor) {
 			return setNull(lower_skies, wallnum);
+		}
 
 		int nextsector = wal.getNextsector();
 		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxFloor());
@@ -297,8 +305,9 @@ public class WorldMesh {
 		GLSurface surf = null;
 		if (isParallaxFloor && (nextsector == -1 || !isParallaxNext)) {
 			SurfaceInfo info = tess.getSurface(Type.Sky.setHeinum(Heinum.SkyLower), wallnum, vertices);
-			if (info == null)
+			if (info == null) {
 				return setNull(lower_skies, wallnum);
+			}
 
 			surf = getSurface(lower_skies, wallnum, info.getSize(), info.getLimit());
 			if (surf != null) {
@@ -310,8 +319,9 @@ public class WorldMesh {
 			}
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
@@ -321,8 +331,9 @@ public class WorldMesh {
 		final Sector sec = Engine.getSector(sectnum);
 
 		boolean isParallaxCeiling = sec.isParallaxCeiling();
-		if (!isParallaxCeiling)
+		if (!isParallaxCeiling) {
 			return setNull(upper_skies, wallnum);
+		}
 
 		int nextsector = wal.getNextsector();
 		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxCeiling());
@@ -331,8 +342,9 @@ public class WorldMesh {
 		if (isParallaxCeiling && (nextsector == -1 || !isParallaxNext)) {
 			SurfaceInfo info = tess.getSurface(Type.Sky.setHeinum(Heinum.SkyUpper), wallnum, vertices);
 
-			if (info == null)
+			if (info == null) {
 				return setNull(upper_skies, wallnum);
+			}
 
 			surf = getSurface(upper_skies, wallnum, info.getSize(), info.getLimit());
 			if (surf != null) {
@@ -344,8 +356,9 @@ public class WorldMesh {
 			}
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
@@ -353,12 +366,14 @@ public class WorldMesh {
 	private GLSurface addMiddle(FloatArray vertices, int sectnum, int wallnum) {
 		GLSurface surf = null;
 		final int nextsector = Engine.getWall(wallnum).getNextsector();
-		if (nextsector != -1)
+		if (nextsector != -1) {
 			return setNull(walls, wallnum);
+		}
 
 		SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.MaxWall), wallnum, vertices);
-		if (info == null)
+		if (info == null) {
 			return setNull(walls, wallnum);
+		}
 
 		surf = getSurface(walls, wallnum, info.getSize(), info.getLimit());
 		if (surf != null) {
@@ -370,20 +385,23 @@ public class WorldMesh {
 			surf.visflag = 0;
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
 
 	private GLSurface addUpper(FloatArray vertices, int sectnum, int wallnum) {
 		final int nextsector = Engine.getWall(wallnum).getNextsector();
-		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxCeiling() && Engine.getSector(sectnum).isParallaxCeiling()))
+		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxCeiling() && Engine.getSector(sectnum).isParallaxCeiling())) {
 			return setNull(upper_walls, wallnum);
+		}
 
 		SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Upper), wallnum, vertices);
-		if (info == null)
+		if (info == null) {
 			return setNull(upper_walls, wallnum);
+		}
 
 		GLSurface surf = getSurface(upper_walls, wallnum, info.getSize(), info.getLimit());
 		if (surf != null) {
@@ -395,20 +413,23 @@ public class WorldMesh {
 			surf.visflag = 2;
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
 
 	private GLSurface addLower(FloatArray vertices, int sectnum, int wallnum) {
 		final int nextsector = Engine.getWall(wallnum).getNextsector();
-		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxFloor() && Engine.getSector(sectnum).isParallaxFloor()))
+		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxFloor() && Engine.getSector(sectnum).isParallaxFloor())) {
 			return setNull(lower_walls, wallnum);
+		}
 
 		SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Lower), wallnum, vertices);
-		if (info == null)
+		if (info == null) {
 			return setNull(lower_walls, wallnum);
+		}
 
 		GLSurface surf = getSurface(lower_walls, wallnum, info.getSize(), info.getLimit());
 		if (surf != null) {
@@ -420,8 +441,9 @@ public class WorldMesh {
 			surf.visflag = 1;
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
@@ -432,8 +454,9 @@ public class WorldMesh {
 
 		if ((wal.isMasked() || wal.isOneWay()) && wal.getNextsector() != -1) {
 			SurfaceInfo info = tess.getSurface(Type.Wall.setHeinum(Heinum.Portal), wallnum, vertices);
-			if (info == null)
+			if (info == null) {
 				return setNull(maskwalls, wallnum);
+			}
 
 			surf = getSurface(maskwalls, wallnum, info.getSize(), info.getLimit());
 			if (surf != null) {
@@ -445,19 +468,22 @@ public class WorldMesh {
 			}
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
 
 	private GLSurface addFloor(FloatArray vertices, int sectnum) {
-		if (Engine.getSector(sectnum).isParallaxFloor())
+		if (Engine.getSector(sectnum).isParallaxFloor()) {
 			return setNull(floors, sectnum);
+		}
 
 		SurfaceInfo info = tess.getSurface(Type.Floor, sectnum, vertices);
-		if (info == null)
+		if (info == null) {
 			return setNull(floors, sectnum);
+		}
 
 		GLSurface surf = getSurface(floors, sectnum, info.getSize(), info.getLimit());
 		if (surf != null) {
@@ -467,8 +493,9 @@ public class WorldMesh {
 			surf.vis_ptr = sectnum;
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
@@ -485,12 +512,14 @@ public class WorldMesh {
 	}
 
 	private GLSurface addCeiling(FloatArray vertices, int sectnum) {
-		if (Engine.getSector(sectnum).isParallaxCeiling())
+		if (Engine.getSector(sectnum).isParallaxCeiling()) {
 			return setNull(ceilings, sectnum);
+		}
 
 		SurfaceInfo info = tess.getSurface(Type.Ceiling, sectnum, vertices);
-		if (info == null)
+		if (info == null) {
 			return setNull(ceilings, sectnum);
+		}
 
 		GLSurface surf = getSurface(ceilings, sectnum, info.getSize(), info.getLimit());
 		if (surf != null) {
@@ -500,8 +529,9 @@ public class WorldMesh {
 			surf.vis_ptr = sectnum;
 		}
 
-		if (surf != null && surf.count == 0)
+		if (surf != null && surf.count == 0) {
 			return null;
+		}
 
 		return surf;
 	}
@@ -529,33 +559,39 @@ public class WorldMesh {
 
 			vertices.clear();
 			GLSurface surf = addMiddle(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			vertices.clear();
 			surf = addUpper(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			vertices.clear();
 			surf = addLower(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			vertices.clear();
 			surf = addMaskedWall(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			vertices.clear();
 			surf = addParallaxCeiling(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			vertices.clear();
 			surf = addParallaxFloor(vertices, sectnum, wallnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			checkValidate();
 		}
@@ -567,8 +603,9 @@ public class WorldMesh {
 		if (validateMesh) {
 			FloatBuffer buffer = meshBuffer;
 			int newLimit = (meshOffset + tess.getMaxVertices()) * tess.getVertexSize();
-			if (newLimit > buffer.capacity())
+			if (newLimit > buffer.capacity()) {
 				newLimit = buffer.capacity();
+			}
 			buffer.limit(newLimit);
 			validateMesh = false;
 		}
@@ -626,8 +663,9 @@ public class WorldMesh {
 			tess.setSector(sectnum, true);
 			vertices.clear();
 			surf = addCeiling(vertices, sectnum);
-			if (surf != null)
+			if (surf != null) {
 				updateVertices(surf.offset * tess.getVertexSize(), vertices.items, 0, vertices.size);
+			}
 
 			checkValidate();
 		}
@@ -757,16 +795,18 @@ public class WorldMesh {
 
 	private GLSurface getSurface(GLSurface[] array, int num, int count, int limit) {
 		if (array[num] == null) {
-			if (count == 0)
+			if (count == 0) {
 				return null;
+			}
 
 			GLSurface surf = new GLSurface(meshOffset);
 			surf.count = count;
 			surf.limit = limit;
 			meshOffset += surf.limit;
 			array[num] = surf;
-			if (lastSurf != null)
+			if (lastSurf != null) {
 				lastSurf.next = surf;
+			}
 			lastSurf = surf;
 			validateMesh = true;
 
@@ -796,13 +836,15 @@ public class WorldMesh {
 
 	public void nextpage() {
 		tess.setSector(-1, false);
-		if (meshBuffer != null)
+		if (meshBuffer != null) {
 			lastLimit = meshBuffer.limit() * 4;
+		}
 	}
 
 	private void shiftFrom(GLSurface surf, int shift) {
-		if (surf == null)
+		if (surf == null) {
 			return;
+		}
 
 		int size = meshOffset;
 		int newSize = size - surf.offset;
@@ -866,10 +908,11 @@ public class WorldMesh {
 				if (wal.isMasked() && visflag == 4) {
 					method = 1;
 					if (!wal.isOneWay() && wal.isTransparent()) {
-						if (!wal.isTransparent2())
+						if (!wal.isTransparent2()) {
 							method = 2;
-						else
+						} else {
 							method = 3;
+						}
 					}
 				}
 				return method;

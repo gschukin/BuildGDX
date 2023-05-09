@@ -41,14 +41,18 @@ public class GrpGroup extends Group {
 			file.read(tmp, 0, 12);
 			String fullname = new String(tmp);
 			int eos = fullname.indexOf(0);
-			if(eos != -1) fullname = fullname.substring(0, eos);
+			if(eos != -1) {
+				fullname = fullname.substring(0, eos);
+			}
 
 			this.handleName(fullname);
 
 			this.size = file.readInt();
 			this.offset = offset;
 			
-			if(debug) System.out.println("\t" + filenamext + ", offset: " + offset + ", size: " +  size);
+			if(debug) {
+				System.out.println("\t" + filenamext + ", offset: " + offset + ", size: " +  size);
+			}
 		}
 		
 		@Override
@@ -83,14 +87,16 @@ public class GrpGroup extends Group {
 		@Override
 		public int read(byte[] buf, int offs, int len) {
 			synchronized(parent) {
-				if(pos >= size) 
-					return -1;
+				if(pos >= size) {
+                    return -1;
+                }
 				
 				len = Math.min(len, size - pos);
 				int i = offset + pos;
 				int groupfilpos = file.position();
-				if (i != groupfilpos) 
+				if (i != groupfilpos) {
 					file.seek(i, Whence.Set);
+				}
 	
 				len = file.read(buf,offs,len);
 				pos += len;
@@ -113,8 +119,9 @@ public class GrpGroup extends Group {
 				int p = 0;
 				while(len > 0)
 				{
-					if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1)
-						return p;
+					if((var = read(tmp, 0, Math.min(len, tmp.length))) == -1) {
+                        return p;
+                    }
 					bb.put(tmp, 0, var);
 					len -= var;
 					p += var;
@@ -127,17 +134,20 @@ public class GrpGroup extends Group {
 		public Byte readByte() {
 			synchronized(parent) {
 				int len = 1;
-				if(len > size - pos)
-					return null;
+				if(len > size - pos) {
+                    return null;
+                }
 				
 				int i = offset + pos;
 				int groupfilpos = file.position();
-				if (i != groupfilpos) 
+				if (i != groupfilpos) {
 					file.seek(i, Whence.Set);
+				}
 
 				Byte out;
-				if((out = file.readByte()) == null)
-					return null;
+				if((out = file.readByte()) == null) {
+                    return null;
+                }
 
 				pos += len;
 				return out;
@@ -147,8 +157,9 @@ public class GrpGroup extends Group {
 		@Override
 		public Boolean readBoolean() {
 			Byte var = readByte();
-			if(var != null)
-				return var == 1;
+			if(var != null) {
+                return var == 1;
+            }
 			return null;
 		}
 		
@@ -156,17 +167,20 @@ public class GrpGroup extends Group {
 		public Short readShort() {
 			synchronized(parent) {
 				int len = 2;
-				if(len > size - pos)
-					return null;
+				if(len > size - pos) {
+                    return null;
+                }
 				
 				int i = offset + pos;
 				int groupfilpos = file.position();
-				if (i != groupfilpos) 
+				if (i != groupfilpos) {
 					file.seek(i, Whence.Set);
+				}
 
 				Short out;
-				if((out = file.readShort()) == null)
-					return null;
+				if((out = file.readShort()) == null) {
+                    return null;
+                }
 
 				pos += len;
 				return out;
@@ -177,17 +191,20 @@ public class GrpGroup extends Group {
 		public Integer readInt() {
 			synchronized(parent) {
 				int len = 4;
-				if(len > size - pos)
-					return null;
+				if(len > size - pos) {
+                    return null;
+                }
 				
 				int i = offset + pos;
 				int groupfilpos = file.position();
-				if (i != groupfilpos) 
+				if (i != groupfilpos) {
 					file.seek(i, Whence.Set);
+				}
 
 				Integer out;
-				if((out = file.readInt()) == null)
-					return null;
+				if((out = file.readInt()) == null) {
+                    return null;
+                }
 
 				pos += len;
 				return out;
@@ -198,17 +215,20 @@ public class GrpGroup extends Group {
 		public Long readLong() {
 			synchronized(parent) {
 				int len = 8;
-				if(len > size - pos)
-					return null;
+				if(len > size - pos) {
+                    return null;
+                }
 				
 				int i = offset + pos;
 				int groupfilpos = file.position();
-				if (i != groupfilpos) 
+				if (i != groupfilpos) {
 					file.seek(i, Whence.Set);
+				}
 
 				Long out;
-				if((out = file.readLong()) == null)
-					return null;
+				if((out = file.readLong()) == null) {
+                    return null;
+                }
 
 				pos += len;
 				return out;
@@ -218,8 +238,9 @@ public class GrpGroup extends Group {
 		@Override
 		public Float readFloat() {
 			Integer i = readInt();
-			if(i != null)
+			if(i != null) {
 				return Float.intBitsToFloat( i );
+			}
 			return null;
 		}
 		
@@ -227,11 +248,14 @@ public class GrpGroup extends Group {
 		public String readString(int len) {
 			synchronized(parent) {
 				byte[] data;
-				if(len < tmp.length)
+				if(len < tmp.length) {
 					data = tmp;
-				else data = new byte[len];
-				if(read(data, 0, len) != len)
-					return null;
+				} else {
+                    data = new byte[len];
+                }
+				if(read(data, 0, len) != len) {
+                    return null;
+                }
 				
 				return new String(data, 0, len);
 			}
@@ -286,8 +310,9 @@ public class GrpGroup extends Group {
 		@Override
 		public boolean isClosed() {
 			synchronized(parent) {
-				if(file != null)
+				if(file != null) {
 					return file.isClosed();
+				}
 				return true;
 			}
 		}
@@ -307,14 +332,16 @@ public class GrpGroup extends Group {
 		this.file = groupFile;
 		this.type = type;
 		
-		if(type == PackageType.PackedGrp) 
+		if(type == PackageType.PackedGrp) {
 			file.toMemory();
+		}
 		
 		if(file.position() != 12) {
 			file.seek(0, Whence.Set);
     		file.read(tmp, 0, 12);
-			if(new String(tmp).compareTo("KenSilverman") != 0) 
+			if(new String(tmp).compareTo("KenSilverman") != 0) {
 				throw new Exception("GRP header corrupted");
+			}
 		} //else already checked
 		
 		this.numfiles = file.readInt();
@@ -332,7 +359,9 @@ public class GrpGroup extends Group {
 	
 	@Override
 	protected boolean open(GroupResource res) {
-		if(file == null) return false;
+		if(file == null) {
+            return false;
+        }
 		
 		GrpResource gres = (GrpResource) res;
 		if(gres != null) {
@@ -345,8 +374,9 @@ public class GrpGroup extends Group {
 
 	@Override
 	public int position() {
-		if(file != null)
+		if(file != null) {
 			return file.position();
+		}
 		
 		return -1;
 	}
@@ -354,8 +384,9 @@ public class GrpGroup extends Group {
 	@Override
 	public void dispose() {
 		super.dispose();
-		if(file != null && !file.isClosed())
+		if(file != null && !file.isClosed()) {
 			file.close();
+		}
 		file = null;
 	}
 }

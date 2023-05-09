@@ -34,8 +34,9 @@ public class Hicreplctyp {
     public Hicreplctyp(Hicreplctyp src)
     {
     	this.filename = src.filename;
-    	if(src.skybox != null)
-    		this.skybox = new Hicskybox(src.skybox);
+    	if(src.skybox != null) {
+			this.skybox = new Hicskybox(src.skybox);
+		}
     	this.palnum = src.palnum;
     	this.ignore = src.ignore;
     	this.flags = src.flags;

@@ -32,23 +32,29 @@ public class TextureHDInfo {
 
 	public TextureHDInfo() {
 		for (int i = 0; i < MAXPALOOKUPS; i++) // all tints should be 100%
+		{
 			tinting[i] = new Palette(0xff, 0xff, 0xff, 0);
+		}
 	}
 
 	public TextureHDInfo(TextureHDInfo src) {
-		for (int i = 0; i < MAXPALOOKUPS; i++)
+		for (int i = 0; i < MAXPALOOKUPS; i++) {
 			this.tinting[i] = new Palette(src.tinting[i]);
+		}
 		for (int i = 0; i < MAXTILES; i++) {
-			if (src.cache[i] == null)
+			if (src.cache[i] == null) {
 				continue;
-			for (Hicreplctyp hr = src.cache[i]; hr != null; hr = hr.next)
+			}
+			for (Hicreplctyp hr = src.cache[i]; hr != null; hr = hr.next) {
 				add(new Hicreplctyp(hr), i);
+			}
 		}
 	}
 
 	public void setPaletteTint(int palnum, int r, int g, int b, int effect) {
-		if (palnum >= MAXPALOOKUPS)
+		if (palnum >= MAXPALOOKUPS) {
 			return;
+		}
 		tinting[palnum].update(r, g, b, effect & 3);
 	}
 
@@ -64,8 +70,9 @@ public class TextureHDInfo {
 
 	private Hicreplctyp get(int picnum, int palnum) {
 		for (Hicreplctyp hr = cache[picnum]; hr != null; hr = hr.next) {
-			if (hr.palnum == palnum)
+			if (hr.palnum == palnum) {
 				return hr;
+			}
 		}
 
 		return null;
@@ -101,12 +108,15 @@ public class TextureHDInfo {
 
 	public boolean addTexture(int picnum, int palnum, String filen, float alphacut, float xscale, float yscale,
 			float specpower, float specfactor, int flags) {
-		if (filen == null || picnum >= MAXTILES || palnum >= MAXPALOOKUPS)
+		if (filen == null || picnum >= MAXTILES || palnum >= MAXPALOOKUPS) {
 			return false;
+		}
 
 		Hicreplctyp hr = get(picnum, palnum);
 		if (hr == null) // no replacement yet defined
+		{
 			add(hr = new Hicreplctyp(palnum), picnum);
+		}
 
 		// store into hicreplc the details for this replacement
 		hr.filename = filen;
@@ -122,16 +132,21 @@ public class TextureHDInfo {
 	}
 
 	public boolean addSkybox(int picnum, int palnum, String[] faces) {
-		if (picnum >= MAXTILES || palnum >= MAXPALOOKUPS)
+		if (picnum >= MAXTILES || palnum >= MAXPALOOKUPS) {
 			return false;
+		}
 
-		for (int i = 0; i < 6; i++)
-			if (faces[i] == null)
+		for (int i = 0; i < 6; i++) {
+			if (faces[i] == null) {
 				return false;
+			}
+		}
 
 		Hicreplctyp hr = get(picnum, palnum);
 		if (hr == null) // no replacement yet defined
+		{
 			add(hr = new Hicreplctyp(palnum, true), picnum);
+		}
 
 		System.arraycopy(faces, 0, hr.skybox.face, 0, 6);
 		hr.skybox.ignore = 0;
@@ -140,21 +155,25 @@ public class TextureHDInfo {
 	}
 
 	public Hicreplctyp findTexture(int picnum, int palnum, int skybox) {
-		if (picnum >= MAXTILES)
+		if (picnum >= MAXTILES) {
 			return null;
+		}
 
 		do {
 			Hicreplctyp hr = get(picnum, palnum);
 			if (hr != null) {
 				if (skybox != 0) {
-					if (hr.skybox != null && hr.skybox.ignore == 0)
+					if (hr.skybox != null && hr.skybox.ignore == 0) {
 						return hr;
-				} else if (hr.ignore == 0)
+					}
+				} else if (hr.ignore == 0) {
 					return hr;
+				}
 			}
 
-			if (palnum == 0 || palnum >= (MAXPALOOKUPS - RESERVEDPALS))
+			if (palnum == 0 || palnum >= (MAXPALOOKUPS - RESERVEDPALS)) {
 				break;
+			}
 			palnum = 0;
 		} while (true);
 

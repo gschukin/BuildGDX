@@ -45,16 +45,19 @@ public class GDXModelRenderer {
 	}
 
 	public boolean mddraw(GLModel m, Sprite tspr) {
-		if (m == null)
-			return false;
+		if (m == null) {
+            return false;
+        }
 
 		boolean isFloorAligned = (tspr.getCstat() & 48) == 32;
-		if (m.getType() == Type.Voxel && isFloorAligned)
-			return false;
+		if (m.getType() == Type.Voxel && isFloorAligned) {
+            return false;
+        }
 
 		Shader shader = Shader.RGBWorldShader;
-		if (m.getType() == Type.Voxel && parent.getTexFormat() == PixelFormat.Pal8)
-			shader = Shader.IndexedWorldShader;
+		if (m.getType() == Type.Voxel && parent.getTexFormat() == PixelFormat.Pal8) {
+            shader = Shader.IndexedWorldShader;
+        }
 		parent.switchShader(shader);
 
 		DefScript defs = parent.defs;
@@ -70,8 +73,9 @@ public class GDXModelRenderer {
 			}
 		} else if (m instanceof MDModel) {
 			((MDModel) m).updateanimation(defs.mdInfo, tspr);
-			if (m.getType() == Type.Md3)
-				transform.scale(1 / 64.0f, 1 / 64.0f, -1 / 64.0f);
+			if (m.getType() == Type.Md3) {
+                transform.scale(1 / 64.0f, 1 / 64.0f, -1 / 64.0f);
+            }
 		}
 
 		manager.transform(transport);
@@ -91,17 +95,19 @@ public class GDXModelRenderer {
 		}
 
 		if ((tspr.getCstat() & 2) != 0) {
-			if ((tspr.getCstat() & 512) == 0)
-				alpha = TRANSLUSCENT1;
-			else
-				alpha = TRANSLUSCENT2;
+			if ((tspr.getCstat() & 512) == 0) {
+                alpha = TRANSLUSCENT1;
+            } else {
+                alpha = TRANSLUSCENT2;
+            }
 		}
 
 		manager.color(r, g, b, alpha);
 		manager.textureTransform(parent.texture_transform.idt(), 0);
 		int vis = getVisibility(tspr);
-		if (m.getType() != Type.Voxel)
-			parent.calcFog(pal, shade, vis);
+		if (m.getType() != Type.Voxel) {
+            parent.calcFog(pal, shade, vis);
+        }
 
 		BuildGdx.gl.glEnable(GL_BLEND);
 		Tile2model t2m = defs.mdInfo.getParams(tspr.getPicnum());
@@ -114,8 +120,9 @@ public class GDXModelRenderer {
 
 	private int getVisibility(Sprite tspr) {
 		int vis = globalvisibility;
-		if (Engine.getSector(tspr.getSectnum()).getVisibility() != 0)
-			vis = mulscale(globalvisibility, (Engine.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
+		if (Engine.getSector(tspr.getSectnum()).getVisibility() != 0) {
+            vis = mulscale(globalvisibility, (Engine.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
+        }
 		return vis;
 	}
 
@@ -138,21 +145,26 @@ public class GDXModelRenderer {
 
 		if (m.getType() == Type.Voxel) {
 			GLVoxel vox = (GLVoxel) m;
-			if ((orientation & 128) == 0)
-				posz -= ((vox.zsiz * tspr.getYrepeat()) << 1);
-			if (yflip && (orientation & 16) == 0)
-				posz += ((pic.getHeight() * 0.5f) - vox.zpiv) * tspr.getYrepeat() * 8.0f;
+			if ((orientation & 128) == 0) {
+                posz -= ((vox.zsiz * tspr.getYrepeat()) << 1);
+            }
+			if (yflip && (orientation & 16) == 0) {
+                posz += ((pic.getHeight() * 0.5f) - vox.zpiv) * tspr.getYrepeat() * 8.0f;
+            }
 		} else {
-			if ((orientation & 128) != 0 && !isFloorAligned)
-				posz += (pic.getHeight() * tspr.getYrepeat()) << 1;
-			if (yflip)
-				posz -= (pic.getHeight() * tspr.getYrepeat()) << 2;
+			if ((orientation & 128) != 0 && !isFloorAligned) {
+                posz += (pic.getHeight() * tspr.getYrepeat()) << 1;
+            }
+			if (yflip) {
+                posz -= (pic.getHeight() * tspr.getYrepeat()) << 2;
+            }
 		}
 
 		float f = (tspr.getXrepeat() / 32.0f) * m.getScale();
 		float g = (tspr.getYrepeat() / 32.0f) * m.getScale();
-		if (!isWallAligned && !isFloorAligned)
-			f *= 0.8f;
+		if (!isWallAligned && !isFloorAligned) {
+            f *= 0.8f;
+        }
 
 		transform.setToTranslation(posx / cam.xscale, posy / cam.xscale, posz / cam.yscale);
 		float yoffset = 0;
@@ -167,21 +179,24 @@ public class GDXModelRenderer {
 		float ang = tspr.getAng() + (sprext != null ? sprext.angoff : 0);
 		transform.rotate(0, 0, 1, (float) Gameutils.AngleToDegrees(ang));
 		transform.scale(isFloorAligned ? -1.0f : 1.0f, xflip ^ isFloorAligned ? -1.0f : 1.0f, 1.0f);
-		if (m.getType() == Type.Voxel)
-			transform.rotate(0, 0, -1, 90.0f);
+		if (m.getType() == Type.Voxel) {
+            transform.rotate(0, 0, -1, 90.0f);
+        }
 		transform.translate(-xoff / 64.0f, 0, (-yoff / 64.0f) - yoffset);
-		if (m.isRotating())
-			transform.rotate(0, 0, -1, totalclock % 360);
+		if (m.isRotating()) {
+            transform.rotate(0, 0, -1, totalclock % 360);
+        }
 		if (m instanceof MDModel) {
 			transform.scale(0.01f, 0.01f, 0.01f);
 			transform.rotate(1, 0, 0, -90.0f);
 		}
 
 		BuildGdx.gl.glEnable(GL_CULL_FACE);
-		if (yflip ^ xflip)
-			BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CCW : GL_CW);
-		else
-			BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CW : GL_CCW);
+		if (yflip ^ xflip) {
+            BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CCW : GL_CW);
+        } else {
+            BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CW : GL_CCW);
+        }
 		return transform;
 	}
 

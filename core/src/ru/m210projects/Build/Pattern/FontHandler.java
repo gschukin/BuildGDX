@@ -14,11 +14,13 @@ public abstract class FontHandler {
 	protected abstract BuildFont init(int i);
 	
 	public BuildFont getFont(int i) {
-		if(i < 0 && i >= nFonts)
+		if(i < 0 && i >= nFonts) {
 			throw new IllegalArgumentException("Wrong font number");
+		}
 		
-		if(fonts[i] == null)
+		if(fonts[i] == null) {
 			fonts[i] = init(i);
+		}
 		return fonts[i];
 	}
 

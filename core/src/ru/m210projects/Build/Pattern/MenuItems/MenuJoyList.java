@@ -60,8 +60,9 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				pal = menupal;
 			} else {
 				text = keynames[i - cfg.joymap.length].getName();
-				if( i - cfg.joymap.length == GameKeys.Menu_Toggle.getNum() )
+				if( i - cfg.joymap.length == GameKeys.Menu_Toggle.getNum() ) {
 					pal = menupal;
+				}
 			}
 		
 			if(l_nMin < cfg.joymap.length && i == cfg.joymap.length) {
@@ -69,21 +70,25 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				offset = true;
 			}
 			
-			if(i == l_nFocus)
+			if(i == l_nFocus) {
 				pal2 = pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+			}
 
-			if(offset && i >= l_nMin + nListItems - 1)
+			if(offset && i >= l_nMin + nListItems - 1) {
 				break;
+			}
 				
 			if(i < cfg.joymap.length)
 			{
 				key = ButtonMap.buttonName(cfg.gJoyMenukeys[((MenuKeys)cfg.joymap[i]).getJoyNum()]);
 			} else {
-				if(cfg.keymap[i - cfg.joymap.length] instanceof MenuKeys)
+				if(cfg.keymap[i - cfg.joymap.length] instanceof MenuKeys) {
 					key = ButtonMap.buttonName(cfg.gJoyMenukeys[((MenuKeys)cfg.keymap[i - cfg.joymap.length]).getJoyNum()]);
-				else if(cfg.gpadkeys[i - cfg.joymap.length] >= 0)
+				} else if(cfg.gpadkeys[i - cfg.joymap.length] >= 0) {
 					key = ButtonMap.buttonName(cfg.gpadkeys[i - cfg.joymap.length]);
-				else key = "N/A";
+				} else {
+					key = "N/A";
+				}
 			}
 
 			if ( i == l_nFocus ) {
@@ -120,17 +125,20 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 			switch(opt)
 			{
 			case MWUP:
-				if(l_nMin > 0)
+				if(l_nMin > 0) {
 					l_nMin--;
+				}
 				return false;
 			case MWDW:
-				if(l_nMin < len - nListItems)
+				if(l_nMin < len - nListItems) {
 					l_nMin++;
+				}
 				return false;
 			case UP:
 				l_nFocus--;
-				if(l_nFocus >= 0 && l_nFocus < l_nMin)
+				if(l_nFocus >= 0 && l_nFocus < l_nMin) {
 					l_nMin--;
+				}
 				if(l_nFocus < 0) {
 					l_nFocus = len - 1;
 					l_nMin = len - nListItems;
@@ -139,8 +147,9 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				return false;
 			case DW:
 				l_nFocus++;
-				if(l_nFocus >= l_nMin + nListItems && l_nFocus < len)
+				if(l_nFocus >= l_nMin + nListItems && l_nFocus < len) {
 					l_nMin++;
+				}
 				if(l_nFocus >= len) {
 					l_nFocus = 0;
 					l_nMin = 0;
@@ -153,12 +162,15 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				return false;
 			case ENTER:
 			case LMB:
-				if ( (flags & 4) == 0 ) return false;
+				if ( (flags & 4) == 0 ) {
+					return false;
+				}
 				
 				if(opt == MenuOpt.LMB && isTouched)
 				{
-					if(len <= nListItems)
+					if(len <= nListItems) {
 						return false;
+					}
 
 					int nList = BClipLow(len - nListItems, 1);
 					int nRange = scrollerHeight;
@@ -170,17 +182,20 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 					return false;
 				}
 				
-				if(l_nFocus != -1 && callback != null) 
+				if(l_nFocus != -1 && callback != null) {
 					callback.run(handler, this);
+				}
 				
 				getInput().resetKeyStatus();
 				return false;
 			case DELETE:
-				if(l_nFocus == -1) return false;
+				if(l_nFocus == -1) {
+					return false;
+				}
 				
-				if(l_nFocus < cfg.joymap.length)
+				if(l_nFocus < cfg.joymap.length) {
 					cfg.gJoyMenukeys[((MenuKeys)cfg.joymap[l_nFocus]).getJoyNum()] = -1;
-				else
+				} else
 				{
 					int focus = l_nFocus - cfg.joymap.length;
 					cfg.gpadkeys[focus] = -1;
@@ -192,8 +207,11 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				return false;
 			case PGUP:
 				l_nFocus -= (nListItems - 1);
-				if(l_nFocus >= 0 && l_nFocus < l_nMin)
-					if(l_nMin > 0) l_nMin -= (nListItems - 1);
+				if(l_nFocus >= 0 && l_nFocus < l_nMin) {
+					if(l_nMin > 0) {
+						l_nMin -= (nListItems - 1);
+					}
+				}
 				if(l_nFocus < 0 || l_nMin < 0) {
 					l_nFocus = 0;
 					l_nMin = 0;
@@ -201,13 +219,16 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				return false;
 			case PGDW:
 				l_nFocus += (nListItems - 1);
-				if(l_nFocus >= l_nMin + nListItems && l_nFocus < len)
+				if(l_nFocus >= l_nMin + nListItems && l_nFocus < len) {
 					l_nMin += (nListItems - 1);
+				}
 				if(l_nFocus >= len || l_nMin > len - nListItems) {
 					l_nFocus = len - 1;
-					if(len >= nListItems)
+					if(len >= nListItems) {
 						l_nMin = len - nListItems;
-					else l_nMin = len - 1;
+					} else {
+						l_nMin = len - 1;
+					}
 				}
 				return false;
 			case HOME:
@@ -216,9 +237,11 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 				return false;
 			case END:
 				l_nFocus = len - 1;
-				if(len >= nListItems)
+				if(len >= nListItems) {
 					l_nMin = len - nListItems;
-				else l_nMin = len - 1;
+				} else {
+					l_nMin = len - 1;
+				}
 				return false;
 			default:
 				return m_pMenu.mNavigation(opt);
@@ -227,11 +250,13 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 		else
 		{
 			l_pressedId = opt;
-			if((flags & 4) != 0 && callback != null)
+			if((flags & 4) != 0 && callback != null) {
 				callback.run(handler, this);
+			}
 
-			if(l_nFocus == GameKeys.Menu_Toggle.getNum())
+			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) {
 				gpmanager.resetButtonStatus();
+			}
 
 			return false;
 		}
@@ -239,11 +264,13 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		if(l_set != 0)
+		if(l_set != 0) {
 			return false;
+		}
 		
-		if(!BuildGdx.input.isTouched()) 
+		if(!BuildGdx.input.isTouched()) {
 			isTouched = false;
+		}
 				
 		touchY = my;
 		if(mx > scrollerX && mx < scrollerX + slider.getScrollerWidth()) 
@@ -257,12 +284,14 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {	
 				if(my >= py && my < py + font.getHeight())
 				{
-					if(l_nMin < cfg.joymap.length && i == cfg.joymap.length) 
+					if(l_nMin < cfg.joymap.length && i == cfg.joymap.length) {
 						return false;
+					}
 	
 					l_nFocus = i;
-					if(l_nMin < cfg.joymap.length && i > cfg.joymap.length) 
+					if(l_nMin < cfg.joymap.length && i > cfg.joymap.length) {
 						l_nFocus--;
+					}
 	
 					return true;
 				}

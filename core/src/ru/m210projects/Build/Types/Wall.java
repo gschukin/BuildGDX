@@ -11,74 +11,90 @@ package ru.m210projects.Build.Types;
 
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.StreamUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import static ru.m210projects.Build.Engine.MAXSECTORS;
-import static ru.m210projects.Build.Engine.MAXWALLS;
-import static ru.m210projects.Build.Gameutils.isValidTile;
 
 public class Wall {
     private static final int sizeof = 32;
     private static final ByteBuffer buffer = ByteBuffer.allocate(getSizeof()).order(ByteOrder.LITTLE_ENDIAN);
 
     private int x;
-	private int y; //8
+    private int y; //8
     private short point2;
-	private short nextwall;
-	private short nextsector;
-	private short cstat; //8
+    private short nextwall;
+    private short nextsector;
+    private short cstat; //8
     private short picnum;
-	private short overpicnum; //4
+    private short overpicnum; //4
     private byte shade; //1
     private short pal;
-	private short xrepeat;
-	private short yrepeat;
-	private short xpanning;
-	private short ypanning; //5
+    private short xrepeat;
+    private short yrepeat;
+    private short xpanning;
+    private short ypanning; //5
     private short lotag;
-	private short hitag;
-	private short extra; //6
+    private short hitag;
+    private short extra; //6
+    private Wall wall2;
 
     public Wall() {
     }
 
     public Wall(byte[] data) {
-        buildWall(new DataResource(data));
+        readObject(new DataResource(data));
     }
 
     public Wall(Resource data) {
-        buildWall(data);
+        readObject(data);
     }
 
-	public static int getSizeof() {
-		return sizeof;
-	}
+    public static int getSizeof() {
+        return sizeof;
+    }
 
-	public void buildWall(Resource bb) {
+    public Wall readObject(Resource bb) {
         setX(bb.readInt());
         setY(bb.readInt());
         setPoint2(bb.readShort());
-        if (getPoint2() < 0 || getPoint2() >= MAXWALLS) setPoint2(0);
         setNextwall(bb.readShort());
-        if (getNextwall() < 0 || getNextwall() >= MAXWALLS) setNextwall(-1);
         setNextsector(bb.readShort());
-        if (getNextsector() < 0 || getNextsector() >= MAXSECTORS) setNextsector(-1);
         setCstat(bb.readShort());
         setPicnum(bb.readShort());
-        if (!isValidTile(getPicnum())) setPicnum(0);
         setOverpicnum(bb.readShort());
-        if (!isValidTile(getOverpicnum())) setOverpicnum(0);
         setShade(bb.readByte());
-        setPal((short) (bb.readByte() & 0xFF));
-        setXrepeat((short) (bb.readByte() & 0xFF));
-        setYrepeat((short) (bb.readByte() & 0xFF));
-        setXpanning((short) (bb.readByte() & 0xFF));
-        setYpanning((short) (bb.readByte() & 0xFF));
+        setPal(bb.readByte());
+        setXrepeat(bb.readByte());
+        setYrepeat(bb.readByte());
+        setXpanning(bb.readByte());
+        setYpanning(bb.readByte());
         setLotag(bb.readShort());
         setHitag(bb.readShort());
         setExtra(bb.readShort());
+        return this;
+    }
+
+    public void writeObject(OutputStream os) throws IOException {
+        StreamUtils.writeInt(os, getX());
+        StreamUtils.writeInt(os, getY());
+        StreamUtils.writeShort(os, getPoint2());
+        StreamUtils.writeShort(os, getNextwall());
+        StreamUtils.writeShort(os, getNextsector());
+        StreamUtils.writeShort(os, getCstat());
+        StreamUtils.writeShort(os, getPicnum());
+        StreamUtils.writeShort(os, getOverpicnum());
+        os.write(getShade());
+        os.write(getPal());
+        os.write(getXrepeat());
+        os.write(getYrepeat());
+        os.write(getXpanning());
+        os.write(getYpanning());
+        StreamUtils.writeShort(os, getLotag());
+        StreamUtils.writeShort(os, getHitag());
+        StreamUtils.writeShort(os, getExtra());
     }
 
     public void set(Wall src) {
@@ -180,139 +196,153 @@ public class Wall {
         return out;
     }
 
-	public int getX() {
-		return x;
-	}
+    public int getX() {
+        return x;
+    }
 
-	public void setX(int x) {
-		this.x = x;
-	}
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public int getY() {
-		return y;
-	}
+    public int getY() {
+        return y;
+    }
 
-	public void setY(int y) {
-		this.y = y;
-	}
+    public void setY(int y) {
+        this.y = y;
+    }
 
-	public short getPoint2() {
-		return point2;
-	}
+    public short getPoint2() {
+        return point2;
+    }
 
-	public void setPoint2(int point2) {
-		this.point2 = (short) point2;
-	}
+    public void setPoint2(int point2) {
+        this.point2 = (short) point2;
+    }
 
-	public short getNextwall() {
-		return nextwall;
-	}
+    public short getNextwall() {
+        return nextwall;
+    }
 
-	public void setNextwall(int nextwall) {
-		this.nextwall = (short) nextwall;
-	}
+    public void setNextwall(int nextwall) {
+        this.nextwall = (short) nextwall;
+    }
 
-	public short getNextsector() {
-		return nextsector;
-	}
+    public short getNextsector() {
+        return nextsector;
+    }
 
-	public void setNextsector(int nextsector) {
-		this.nextsector = (short) nextsector;
-	}
+    public void setNextsector(int nextsector) {
+        this.nextsector = (short) nextsector;
+    }
 
-	public short getCstat() {
-		return cstat;
-	}
+    public short getCstat() {
+        return cstat;
+    }
 
-	public void setCstat(int cstat) {
-		this.cstat = (short) cstat;
-	}
+    public void setCstat(int cstat) {
+        this.cstat = (short) cstat;
+    }
 
-	public short getPicnum() {
-		return picnum;
-	}
+    public short getPicnum() {
+        return picnum;
+    }
 
-	public void setPicnum(int picnum) {
-		this.picnum = (short) picnum;
-	}
+    public void setPicnum(int picnum) {
+        this.picnum = (short) picnum;
+    }
 
-	public short getOverpicnum() {
-		return overpicnum;
-	}
+    public short getOverpicnum() {
+        return overpicnum;
+    }
 
-	public void setOverpicnum(int overpicnum) {
-		this.overpicnum = (short) overpicnum;
-	}
+    public void setOverpicnum(int overpicnum) {
+        this.overpicnum = (short) overpicnum;
+    }
 
-	public byte getShade() {
-		return shade;
-	}
+    public byte getShade() {
+        return shade;
+    }
 
-	public void setShade(int shade) {
-		this.shade = (byte) shade;
-	}
+    public void setShade(int shade) {
+        this.shade = (byte) shade;
+    }
 
-	public short getPal() {
-		return pal;
-	}
+    public short getPal() {
+        return pal;
+    }
 
-	public void setPal(int pal) {
-		this.pal = (short) pal;
-	}
+    public void setPal(int pal) {
+        this.pal = (short) (pal & 0xFF);
+    }
 
-	public short getXrepeat() {
-		return xrepeat;
-	}
+    public short getXrepeat() {
+        return xrepeat;
+    }
 
-	public void setXrepeat(int xrepeat) {
-		this.xrepeat = (short) xrepeat;
-	}
+    public void setXrepeat(int xrepeat) {
+        this.xrepeat = (short) (xrepeat & 0xFF);
+    }
 
-	public short getYrepeat() {
-		return yrepeat;
-	}
+    public short getYrepeat() {
+        return yrepeat;
+    }
 
-	public void setYrepeat(int yrepeat) {
-		this.yrepeat = (short) yrepeat;
-	}
+    public void setYrepeat(int yrepeat) {
+        this.yrepeat = (short) (yrepeat & 0xFF);
+    }
 
-	public short getXpanning() {
-		return xpanning;
-	}
+    public short getXpanning() {
+        return xpanning;
+    }
 
-	public void setXpanning(int xpanning) {
-		this.xpanning = (short) xpanning;
-	}
+    public void setXpanning(int xpanning) {
+        this.xpanning = (short) (xpanning & 0xFF);
+    }
 
-	public short getYpanning() {
-		return ypanning;
-	}
+    public short getYpanning() {
+        return ypanning;
+    }
 
-	public void setYpanning(int ypanning) {
-		this.ypanning = (short) ypanning;
-	}
+    public void setYpanning(int ypanning) {
+        this.ypanning = (short) (ypanning & 0xFF);
+    }
 
-	public short getLotag() {
-		return lotag;
-	}
+    public short getLotag() {
+        return lotag;
+    }
 
-	public void setLotag(int lotag) {
-		this.lotag = (short) lotag;
-	}
+    public void setLotag(int lotag) {
+        this.lotag = (short) lotag;
+    }
 
-	public short getHitag() {
-		return hitag;
-	}
+    public short getHitag() {
+        return hitag;
+    }
 
-	public void setHitag(int hitag) {
-		this.hitag = (short) hitag;
-	}
+    public void setHitag(int hitag) {
+        this.hitag = (short) hitag;
+    }
 
-	public short getExtra() {
-		return extra;
-	}
+    public short getExtra() {
+        return extra;
+    }
 
-	public void setExtra(int extra) {
-		this.extra = (short) extra;
-	}
+    public void setExtra(int extra) {
+        this.extra = (short) extra;
+    }
+
+    /**
+     * Get point2 wall object
+     */
+    public Wall getWall2() {
+        return wall2;
+    }
+
+    /**
+     * Set point2 wall object
+     */
+    public void setWall2(Wall wall2) {
+        this.wall2 = wall2;
+    }
 }

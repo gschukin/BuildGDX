@@ -74,8 +74,9 @@ public class MD2Builder {
 		bb.seek(header.offsetGLCommands, Whence.Set);
 		int[] glcmds = new int[header.numGLCommands];
 
-		for (int i = 0; i < header.numGLCommands; i++)
+		for (int i = 0; i < header.numGLCommands; i++) {
 			glcmds[i] = bb.readInt();
+		}
 		return glcmds;
 	}
 
@@ -99,8 +100,9 @@ public class MD2Builder {
 		bb.read(buf);
 
 		for (int i = 0; i < buf.length; i++) {
-			if (buf[i] == 0)
+			if (buf[i] == 0) {
 				return new String(buf, 0, i);
+			}
 		}
 		return new String(buf);
 	}

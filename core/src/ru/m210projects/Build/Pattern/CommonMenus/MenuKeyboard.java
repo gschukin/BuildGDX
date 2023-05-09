@@ -84,8 +84,9 @@ public abstract class MenuKeyboard extends BuildMenu {
 						item.l_set = 0;
 						break;
 					case ESC:
-						if (item.l_nFocus == GameKeys.Menu_Toggle.getNum())
+						if (item.l_nFocus == GameKeys.Menu_Toggle.getNum()) {
 							cfg.setKey(item.l_nFocus, Keys.ESCAPE);
+						}
 						app.pInput.ctrlResetKeyStatus();
 						item.l_set = 0;
 						break;
@@ -98,8 +99,9 @@ public abstract class MenuKeyboard extends BuildMenu {
 						item.l_set = 0;
 						break;
 					case DELETE:
-						if (item.l_nFocus != GameKeys.Show_Console.getNum() && item.l_nFocus != GameKeys.Menu_Toggle.getNum())
+						if (item.l_nFocus != GameKeys.Show_Console.getNum() && item.l_nFocus != GameKeys.Menu_Toggle.getNum()) {
 							cfg.setKey(item.l_nFocus, Keys.FORWARD_DEL);
+						}
 						item.l_set = 0;
 						break;
 					case LMB:
@@ -161,8 +163,9 @@ public abstract class MenuKeyboard extends BuildMenu {
 									mousekeys[item.l_nFocus] = kb;
 
 									for (int i = 0; i < mousekeys.length; i++) {
-										if (i != item.l_nFocus && kb == mousekeys[i])
+										if (i != item.l_nFocus && kb == mousekeys[i]) {
 											mousekeys[i] = 0;
+										}
 									}
 
 									item.l_set = 0;

@@ -8,10 +8,15 @@ import ru.m210projects.Build.Types.Wall;
 import ru.m210projects.Build.Types.collections.LinkedMap;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.collections.SpriteMap;
+import ru.m210projects.Build.Types.collections.ValueSetter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static ru.m210projects.Build.Engine.MAXSPRITES;
+import static ru.m210projects.Build.Engine.MAXSTATUS;
 
 public class BoardService {
 
@@ -21,12 +26,16 @@ public class BoardService {
     protected final AtomicInteger floorz = new AtomicInteger();
     protected final AtomicInteger ceilingz = new AtomicInteger();
 
-    public boolean load(Resource entry) {
-        Board oldBoard = board;
+    protected void initSpriteLists(Board board) {
+        List<Sprite> sprites = board.getSprites();
+        this.spriteStatMap = createSpriteMap(MAXSTATUS, sprites, MAXSPRITES, Sprite::setStatnum);
+        this.spriteSectMap = createSpriteMap(board.getSectorCount(), sprites, MAXSPRITES, Sprite::setSectnum);
+    }
 
+    protected Board loadBoard(Resource entry) throws IOException {
         int version = entry.readInt();
         if (version != 7) {
-            return false;
+            throw new RuntimeException("Wrong version: " + version);
         }
 
         BuildPos startPos = new BuildPos(entry.readInt(),
@@ -37,124 +46,56 @@ public class BoardService {
 
         Sector[] sectors = new Sector[entry.readShort()];
         for (int i = 0; i < sectors.length; i++) {
-            Sector sec = new Sector();
-
-            sec.setWallptr(entry.readShort());
-            sec.setWallnum(entry.readShort());
-            sec.setCeilingz(entry.readInt());
-            sec.setFloorz(entry.readInt());
-            sec.setCeilingstat(entry.readShort());
-            sec.setFloorstat(entry.readShort());
-            sec.setCeilingpicnum(entry.readShort());
-            sec.setCeilingheinum(entry.readShort());
-            sec.setCeilingshade((byte) entry.readByte());
-            sec.setCeilingpal(entry.readByte());
-            sec.setCeilingxpanning(entry.readByte());
-            sec.setCeilingypanning(entry.readByte());
-            sec.setFloorpicnum(entry.readShort());
-            sec.setFloorheinum(entry.readShort());
-            sec.setFloorshade((byte) entry.readByte());
-            sec.setFloorpal(entry.readByte());
-            sec.setFloorxpanning(entry.readByte());
-            sec.setFloorypanning(entry.readByte());
-            sec.setVisibility(entry.readByte());
-            sec.setFiller(entry.readByte());
-            sec.setLotag(entry.readShort());
-            sec.setHitag(entry.readShort());
-            sec.setExtra(entry.readShort());
-
-            sectors[i] = sec;
+            sectors[i] = new Sector().readObject(entry);
         }
 
         Wall[] walls = new Wall[entry.readShort()];
         for (int i = 0; i < walls.length; i++) {
-            Wall wal = new Wall();
-
-            wal.setX(entry.readInt());
-            wal.setY(entry.readInt());
-            wal.setPoint2(entry.readShort());
-            wal.setNextwall(entry.readShort());
-            wal.setNextsector(entry.readShort());
-            wal.setCstat(entry.readShort());
-            wal.setPicnum(entry.readShort());
-            wal.setOverpicnum(entry.readShort());
-            wal.setShade((byte) entry.readByte());
-            wal.setPal(entry.readByte());
-            wal.setXrepeat(entry.readByte());
-            wal.setYrepeat(entry.readByte());
-            wal.setXpanning(entry.readByte());
-            wal.setYpanning(entry.readByte());
-            wal.setLotag(entry.readShort());
-            wal.setHitag(entry.readShort());
-            wal.setExtra(entry.readShort());
-
-            walls[i] = wal;
+            walls[i] = new Wall().readObject(entry);
         }
 
         int numSprites = entry.readShort();
         List<Sprite> sprites = new ArrayList<>(numSprites * 2);
 
         for (int i = 0; i < numSprites; i++) {
-            Sprite spr = new Sprite();
-            spr.setX(entry.readInt());
-            spr.setY(entry.readInt());
-            spr.setZ(entry.readInt());
-            spr.setCstat(entry.readShort());
-            spr.setPicnum(entry.readShort());
-            spr.setShade((byte) entry.readByte());
-            spr.setPal(entry.readByte());
-            spr.setClipdist(entry.readByte());
-            spr.setDetail(entry.readByte());
-            spr.setXrepeat(entry.readByte());
-            spr.setYrepeat(entry.readByte());
-            spr.setXoffset((byte) entry.readByte());
-            spr.setYoffset((byte) entry.readByte());
-            spr.setSectnum(entry.readShort());
-            spr.setStatnum(entry.readShort());
-            spr.setAng(entry.readShort());
-            spr.setOwner(entry.readShort());
-            spr.setXvel(entry.readShort());
-            spr.setYvel(entry.readShort());
-            spr.setZvel(entry.readShort());
-            spr.setLotag(entry.readShort());
-            spr.setHitag(entry.readShort());
-            spr.setExtra(entry.readShort());
-            sprites.add(spr);
+            sprites.add(new Sprite().readObject(entry));
         }
 
-        // sector wall array init with wall checking
-        for (int s = 0; s < sectors.length; s++) {
-            Sector sec = sectors[s];
+        return new Board(startPos, sectors, walls, sprites);
+    }
 
-            Wall[] sectorWalls = new Wall[sec.getWallnum()];
+    /**
+     * Set loaded board
+     */
+    public void setBoard(Board board) {
+        this.board = board;
+        initSpriteLists(board);
 
-            int w = 0;
-            int startWall = sec.getWallptr();
-            int endWall = startWall + sec.getWallnum() - 1;
-            for (int i = startWall; i <= endWall; i++) {
-                Wall wal = walls[i];
-                if (wal == null || wal.getPoint2() < 0 || wal.getPoint2() >= walls.length || walls[wal.getPoint2()] == null) {
-                    System.out.println(String.format("Sector %d has corrupt contour", s));
-                    sec.setWallnum(0);
-                    sec.setWallptr(0);
-                    sectorWalls = new Wall[0];
-                    break;
-                }
-                sectorWalls[w++] = wal;
-            }
-            sec.setWalls(sectorWalls);
+        List<Sprite> sprites = board.getSprites();
+        for (int i = 0; i < sprites.size(); i++) {
+            Sprite spr = sprites.get(i);
+            changespritestat(i, spr.getStatnum());
+            changespritesect(i, spr.getSectnum());
         }
+    }
 
-        this.board = new Board(startPos, sectors, walls, sprites);
+    /**
+     * Set new board
+     */
+    public void prepareBoard(Board board) {
+        Wall[] walls = board.getWalls();
+        Sector[] sectors = board.getSectors();
+        List<Sprite> sprites = board.getSprites();
 
-        this.spriteStatMap = new SpriteMap(1024, sprites, 1024, Sprite::setStatnum);
-        this.spriteSectMap = new SpriteMap(sectors.length, sprites, 1024, Sprite::setSectnum);
+        this.board = board;
+        initSpriteLists(board);
 
         // init maps for new board
-        for (int i = 0; i < numSprites; i++) {
-            Sprite spr = sprites.get(i);
+        for (Sprite spr : sprites) {
             insertsprite(spr.getSectnum(), spr.getStatnum());
         }
+
+        BuildPos startPos = board.getPos();
 
         // Must be after loading sectors, etc!
         int sectnum = updatesector(startPos.getX(), startPos.getY(), startPos.getSectnum());
@@ -163,16 +104,14 @@ public class BoardService {
             this.board = new Board(startPos, sectors, walls, sprites);
         }
 
-        Sector startSector = board.getSector(startPos.getSectnum());
-        if (startSector == null || !inside(startPos.getX(), startPos.getY(), startSector)) {
+        Sector startSector = this.board.getSector(startPos.getSectnum());
+        if (startSector == null || !startSector.inside(startPos.getX(), startPos.getY())) {
             throw new RuntimeException("Player should be in a sector!");
         }
+    }
 
-        return true;
-
-
-//        this.board = oldBoard;
-//        return false;
+    protected SpriteMap createSpriteMap(int listCount, List<Sprite> spriteList, int spriteCount, ValueSetter<Sprite> valueSetter) {
+        return new SpriteMap(listCount, spriteList, spriteCount, valueSetter);
     }
 
     public int insertspritesect(int sectnum) {
@@ -329,20 +268,22 @@ public class BoardService {
     public int updatesector(int x, int y, int sector) {
         Sector sec = board.getSector(sector);
         if (sec != null) {
-            if (inside(x, y, sec)) {
+            if (sec.inside(x, y)) {
                 return sector;
             }
 
             for (Wall wall : sec.getWalls()) {
                 sector = wall.getNextsector();
-                if (inside(x, y, board.getSector(sector))) {
+                sec = board.getSector(sector);
+                if (sec != null && sec.inside(x, y)) {
                     return sector;
                 }
             }
         }
 
-        for (int i = (board.getSectorCount() - 1); i >= 0; i--) {
-            if (inside(x, y, board.getSector(i))) {
+        Sector[] sectors = board.getSectors();
+        for (int i = sectors.length - 1; i >= 0; i--) {
+            if (sectors[i].inside(x, y)) {
                 return i;
             }
         }
@@ -375,38 +316,11 @@ public class BoardService {
     }
 
     public boolean getzsofslope(Sector sec, int dax, int day, AtomicInteger floorZ, AtomicInteger ceilingZ) {
-        int floorz = sec.getFloorz();
-        int ceilingz = sec.getCeilingz();
-        boolean floorSlope = sec.isFloorSlope() && floorZ != null;
-        boolean ceilingSlope = sec.isCeilingSlope() && ceilingZ != null;
-        if (floorSlope || ceilingSlope) {
-            Wall wal = board.getWall(sec.getWallptr());
-            Wall wal2 = board.getWall(wal.getPoint2());
-
-            int dx = wal2.getX() - wal.getX();
-            int dy = wal2.getY() - wal.getY();
-            int i = EngineUtils.sqrt(dx * dx + dy * dy) << 5;
-            if (i != 0) {
-                int j = dx * (day - wal.getY()) - (dy * (dax - wal.getX())) >> 3;
-                if (ceilingSlope) {
-                    ceilingz += ((long) sec.getCeilingheinum() * j / i);
-                }
-
-                if (floorSlope) {
-                    floorz += ((long) sec.getFloorheinum() * j / i);
-                }
-            }
+        if (sec != null) {
+            sec.getzsofslope(dax, day, floorZ, ceilingZ);
+            return true;
         }
-
-        if (floorZ != null) {
-            floorZ.set(floorz);
-        }
-
-        if (ceilingZ != null) {
-            ceilingZ.set(ceilingz);
-        }
-
-        return true;
+        return false;
     }
 
     public int getceilzofslope(Sector sec, int x, int y) {
@@ -457,7 +371,7 @@ public class BoardService {
                 && (z >= ceilingz.get()) && (z <= floorz.get())) {
             return inside(x, y, sector);
         }
-        return false;
+        return sector.inside(x, y, z);
     }
 
     public boolean inside(int x, int y, Sector sector) {

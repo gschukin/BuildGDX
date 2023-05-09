@@ -44,20 +44,23 @@ public abstract class MD2ModelGL10 extends MDModel {
 
 		int numTriangles = builder.header.numTriangles;
 		this.indices = BufferUtils.newShortBuffer(numTriangles * 3);
-		for (int i = 0; i < numTriangles; i++)
-			for (int j = 0; j < 3; j++)
+		for (int i = 0; i < numTriangles; i++) {
+			for (int j = 0; j < 3; j++) {
 				indices.put((short) (i * 3 + j));
+			}
+		}
 		indices.flip();
 
 		vertices = BufferUtils.newFloatBuffer(numTriangles * 3 * 3);
 		uv = BufferUtils.newFloatBuffer(numTriangles * 3 * 2);
 
-		for (int i = 0; i < numTriangles; i++)
+		for (int i = 0; i < numTriangles; i++) {
 			for (int j = 0; j < 3; j++) {
 				int idx = builder.triangles[i].texCoords[j];
 				uv.put(builder.texCoords[idx][0]);
 				uv.put(builder.texCoords[idx][1]);
 			}
+		}
 		uv.flip();
 	}
 
@@ -71,6 +74,7 @@ public abstract class MD2ModelGL10 extends MDModel {
 
 			vertices.clear();
 			for (int i = 0; i < tris.length; i++) // -60fps, but it's need for animation
+			{
 				for (int j = 0; j < 3; j++) {
 					int idx = tris[i].vertices[j];
 					float x = cframe.vertices[idx][0] * cScale.x + nframe.vertices[idx][0] * nScale.x;
@@ -80,6 +84,7 @@ public abstract class MD2ModelGL10 extends MDModel {
 					vertices.put(z);
 					vertices.put(y);
 				}
+			}
 			vertices.flip();
 
 			int l = GL_TEXTURE0;
@@ -109,8 +114,9 @@ public abstract class MD2ModelGL10 extends MDModel {
 			isRendered = true;
 		}
 
-		if (usesalpha)
+		if (usesalpha) {
 			BuildGdx.gl.glDisable(GL_ALPHA_TEST);
+		}
 		BuildGdx.gl.glDisable(GL_CULL_FACE);
 		BuildGdx.gl.glLoadIdentity();
 

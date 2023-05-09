@@ -86,8 +86,9 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		this.palnum = palnum;
 
 		alloc(pic);
-		if (useMipMaps)
+		if (useMipMaps) {
 			generateMipmap(pic, true);
+		}
 
 		setClamped(pic.isClamped());
 		setHasAlpha(pic.hasAlpha());
@@ -134,15 +135,17 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 				alloc(pic);
 			} else {
-				if (!isAllocated)
+				if (!isAllocated) {
 					alloc(pic);
-				else
+				} else {
 					BuildGdx.gl.glTexSubImage2D(glTarget, 0, 0, 0, pic.getWidth(), pic.getHeight(), pic.getGLFormat(),
 							GL_UNSIGNED_BYTE, pic.getPixels());
+				}
 			}
 
-			if (useMipMaps)
+			if (useMipMaps) {
 				generateMipmap(pic, false);
+			}
 
 			setClamped(pic.isClamped());
 			setHasAlpha(pic.hasAlpha());
@@ -155,8 +158,9 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 	protected int calcMipLevel(int xsiz, int ysiz, int maxsize) {
 		int mipLevel = 0;
-		while ((xsiz >> mipLevel) > (1 << maxsize) || (ysiz >> mipLevel) > (1 << maxsize))
+		while ((xsiz >> mipLevel) > (1 << maxsize) || (ysiz >> mipLevel) > (1 << maxsize)) {
 			mipLevel++;
+		}
 		return mipLevel;
 	}
 
@@ -283,17 +287,20 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	public float unsafeSetAnisotropicFilter(float level, boolean force) {
-		if (fmt == PixelFormat.Pal8)
+		if (fmt == PixelFormat.Pal8) {
 			return 1.0f;
+		}
 
 		// 1 if you want to disable anisotropy
 		float max = GLInfo.getMaxAnisotropicFilterLevel();
-		if (max == 1.0f)
+		if (max == 1.0f) {
 			return 1.0f;
+		}
 
 		level = Math.min(level, max);
-		if (!force && MathUtils.isEqual(level, anisotropicFilterLevel, 0.1f))
+		if (!force && MathUtils.isEqual(level, anisotropicFilterLevel, 0.1f)) {
 			return anisotropicFilterLevel;
+		}
 		BuildGdx.gl.glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
 		return anisotropicFilterLevel = level;
 	}
@@ -320,8 +327,9 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	@Override
 	public void delete() {
 		if (glHandle != 0) {
-			if (BuildGdx.gl != null)
+			if (BuildGdx.gl != null) {
 				BuildGdx.gl.glDeleteTexture(glHandle);
+			}
 			glHandle = 0;
 		}
 	}
@@ -354,8 +362,9 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 	public void setSkyboxFace(int facen) {
 		this.skyface = (byte) facen;
-		if (facen > 0)
+		if (facen > 0) {
 			setBit(true, FlagType.SkyboxFace);
+		}
 	}
 
 	public boolean hasAlpha() {
@@ -407,10 +416,11 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	private void setBit(boolean mode, FlagType bit) {
-		if (mode)
+		if (mode) {
 			flags |= bit.getBit();
-		else
+		} else {
 			flags &= ~bit.getBit();
+		}
 	}
 
 	@Override
@@ -424,8 +434,9 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 	@Override
 	public int compareTo(GLTile src) {
-		if (src == null)
+		if (src == null) {
 			return 0;
+		}
 
 		return this.palnum - src.palnum;
 	}

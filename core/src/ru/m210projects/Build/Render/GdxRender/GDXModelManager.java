@@ -52,8 +52,9 @@ public class GDXModelManager extends ModelManager {
 			@Override
 			public GLTile getSkin(int pal) {
 				PixelFormat fmt = parent.getTexFormat();
-				if (palookup[pal] == null || fmt == PixelFormat.Pal8)
+				if (palookup[pal] == null || fmt == PixelFormat.Pal8) {
 					pal = 0;
+				}
 
 				if (texid[pal] == null) {
 					long startticks = System.nanoTime();
@@ -134,8 +135,9 @@ public class GDXModelManager extends ModelManager {
 
 	protected GLTile loadMDTexture(MDModel m, String skinfile, int palnum) {
 		GLTile texidx = findLoadedMultitexture(skinfile, palnum);
-		if (texidx != null)
+		if (texidx != null) {
 			return texidx;
+		}
 
 		Resource res = BuildGdx.cache.open(skinfile, 0);
 		if (res == null) {
@@ -148,8 +150,9 @@ public class GDXModelManager extends ModelManager {
 			byte[] data = res.getBytes();
 			Pixmap pix = new Pixmap(data, 0, data.length);
 			texidx = parent.textureCache.newTile(new PixmapTileData(pix, true, 0), 0, true);
-			if (palnum == DETAILPAL || palnum == GLOWPAL)
+			if (palnum == DETAILPAL || palnum == GLOWPAL) {
 				texidx.setHighTile(new Hicreplctyp(palnum));
+			}
 			m.usesalpha = true;
 		} catch (Exception e) {
 			Console.Println("Couldn't load file: " + skinfile, Console.OSDTEXT_YELLOW);
@@ -219,10 +222,11 @@ public class GDXModelManager extends ModelManager {
 		if (palnum >= (MAXPALOOKUPS - RESERVEDPALS)) {
 			for (int i = MAXTILES - 1; i >= 0; i--) {
 				GLModel m = models[i];
-				if (!(m instanceof MDModel))
+				if (!(m instanceof MDModel)) {
 					continue;
+				}
 
-				for (MDSkinmap sk = ((MDModel) m).skinmap; sk != null; sk = sk.next)
+				for (MDSkinmap sk = ((MDModel) m).skinmap; sk != null; sk = sk.next) {
 					if (sk.fn.equalsIgnoreCase(skinfile) && sk.texid != null) {
 						if (sk.palette != palnum) {
 							GLTile texidx = sk.texid.clone();
@@ -235,6 +239,7 @@ public class GDXModelManager extends ModelManager {
 
 						return sk.texid;
 					}
+				}
 			}
 		}
 

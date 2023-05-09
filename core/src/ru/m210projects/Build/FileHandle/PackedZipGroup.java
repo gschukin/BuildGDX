@@ -43,7 +43,9 @@ public class PackedZipGroup extends Group {
 			}
 			this.size = (int) entry.getSize();
 
-			if(debug && size > 0) System.out.println("\t" + filenamext + ", size: " +  size);
+			if(debug && size > 0) {
+				System.out.println("\t" + filenamext + ", size: " +  size);
+			}
 		}
 		
 		@Override
@@ -111,8 +113,9 @@ public class PackedZipGroup extends Group {
 						res.buffer = ByteBuffer.allocateDirect(res.size);
 						res.buffer.order(ByteOrder.LITTLE_ENDIAN);
 						int len;
-						while((len = zis.read(data)) != -1) 
+						while((len = zis.read(data)) != -1) {
 							res.buffer.put(data, 0, len);
+						}
 						res.buffer.rewind();
 						return true;
 					}
@@ -129,7 +132,9 @@ public class PackedZipGroup extends Group {
 	protected String handleName(String fullname) //zips can handle folders, so we must add separators to replacer
 	{
 		String filenamext = toLowerCase(fullname).replaceAll("[^a-zA-Z0-9_. /-]", "");
-		if(filenamext.contains("/")) filenamext = filenamext.replace("/", File.separator);
+		if(filenamext.contains("/")) {
+			filenamext = filenamext.replace("/", File.separator);
+		}
 
 		return filenamext;
 	}
@@ -142,13 +147,16 @@ public class PackedZipGroup extends Group {
 		
 		for(GroupResource res : list) {
 			int index = res.filenamext.lastIndexOf(File.separator);
-			if(index != -1)
+			if(index != -1) {
 				res.filenamext = res.filenamext.substring(index + 1);
+			}
 			
 			int point = res.filenamext.lastIndexOf('.');
 			if(point != -1) {
 				res.filename = res.filenamext.substring(0, point);
-			} else res.filename = res.filenamext;
+			} else {
+				res.filename = res.filenamext;
+			}
 			
 			this.add(res);
 		}

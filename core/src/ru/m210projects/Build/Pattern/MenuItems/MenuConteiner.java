@@ -36,8 +36,9 @@ public class MenuConteiner extends MenuItem
 		if(list != null)
 		{
 			this.list = new char[list.length][];
-			for(int i = 0; i < list.length; i++)
+			for(int i = 0; i < list.length; i++) {
 				this.list[i] = list[i].toCharArray();
+			}
 		}
 
 		this.x = x;
@@ -59,8 +60,9 @@ public class MenuConteiner extends MenuItem
 		int px = x, py = y;
 		
 		char[] key = null;
-		if(list != null && num != -1 && num < list.length) 
-			key = list[num];	
+		if(list != null && num != -1 && num < list.length) {
+			key = list[num];
+		}
 
 		int pal = handler.getPal(font, this);
 		int shade = handler.getShade(this);
@@ -75,7 +77,9 @@ public class MenuConteiner extends MenuItem
 				int tx = px + w1 + bound;
 				int ty = py + (font.getHeight() - listFont.getHeight()) / 2;
 				brDrawText(listFont, key, tx + bound, ty, shade, handler.getPal(listFont, this), 0, px + width - 1);
-			} else listFont.drawText(x + width - 1 - listFont.getWidth(key), py + (font.getHeight() - listFont.getHeight()) / 2, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
+			} else {
+				listFont.drawText(x + width - 1 - listFont.getWidth(key), py + (font.getHeight() - listFont.getHeight()) / 2, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
+			}
 		}
 		handler.mPostDraw(this);
 	}
@@ -86,9 +90,11 @@ public class MenuConteiner extends MenuItem
 
 	    while(tptr < text.length && text[tptr] != 0)
 	    {
-        	if(x > x1 && x <= x2) 
-        		x += font.drawChar(x, y, text[tptr], shade, pal, 2, listShadow);
-        	else x += font.getWidth(text[tptr]);
+        	if(x > x1 && x <= x2) {
+				x += font.drawChar(x, y, text[tptr], shade, pal, 2, listShadow);
+			} else {
+				x += font.getWidth(text[tptr]);
+			}
         	
 	        tptr++;
 	    }
@@ -101,28 +107,45 @@ public class MenuConteiner extends MenuItem
 		{
 		case LEFT:
 		case MWDW:
-			if ( (flags & 4) == 0 ) return false;
-			if(num > 0) num--;
-			else num = 0;
-			if(callback != null)
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
+			if(num > 0) {
+				num--;
+			} else {
+				num = 0;
+			}
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			return false;
 		case RIGHT:
 		case MWUP:
-			if ( (flags & 4) == 0 ) return false;
-			if(num < list.length - 1) num++;
-			else num = list.length - 1;
-			if(callback != null)
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
+			if(num < list.length - 1) {
+				num++;
+			} else {
+				num = list.length - 1;
+			}
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			return false;
 		case ENTER:
 		case LMB:
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			if(num < list.length - 1) {
 				num++;
-			} else num = 0;
-			if(callback != null)
+			} else {
+				num = 0;
+			}
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			return false;
 		default:
 			return m_pMenu.mNavigation(opt);
@@ -133,20 +156,25 @@ public class MenuConteiner extends MenuItem
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text))
-				if(my > y && my < y + font.getHeight())
+			if(mx > x && mx < x + font.getWidth(text)) {
+				if(my > y && my < y + font.getHeight()) {
 					return true;
+				}
+			}
 		}
 		
-		if(list == null) return false;
+		if(list == null) {
+			return false;
+		}
 		
 		char[] key;
 		if(num != -1 && num < list.length) {
 			key = list[num];
 			int fontx =  listFont.getWidth(key);
 			int px = x + width - 1 - fontx;
-			if(mx > px && mx < px + fontx)
-                return my > y && my < y + font.getHeight();
+			if(mx > px && mx < px + fontx) {
+				return my > y && my < y + font.getHeight();
+			}
 		}
 		
 		return false;

@@ -82,13 +82,15 @@ public class DesktopFactory implements ApplicationFactory {
 	public Platform getPlatform() {
 		Platform platform;
 		final String osName = System.getProperty("os.name");
-		if ( osName.startsWith("Windows") )
+		if ( osName.startsWith("Windows") ) {
 			platform = Platform.Windows;
-		else if ( osName.startsWith("Linux") || osName.startsWith("FreeBSD") || osName.startsWith("OpenBSD") || osName.startsWith("SunOS") || osName.startsWith("Unix") || osName.indexOf("aix") > 0 )
+		} else if ( osName.startsWith("Linux") || osName.startsWith("FreeBSD") || osName.startsWith("OpenBSD") || osName.startsWith("SunOS") || osName.startsWith("Unix") || osName.indexOf("aix") > 0 ) {
 			platform = Platform.Linux;
-		else if ( osName.startsWith("Mac OS X") || osName.startsWith("Darwin") )
+		} else if ( osName.startsWith("Mac OS X") || osName.startsWith("Darwin") ) {
 			platform = Platform.MacOSX;
-		else platform = null;
+		} else {
+			platform = null;
+		}
 
 		return platform;
 	}
@@ -98,22 +100,26 @@ public class DesktopFactory implements ApplicationFactory {
 		return new BuildFrame(cfg) {
 			@Override
 			public BuildGraphics getGraphics(FrameType type) {
-				if(type == FrameType.GL)
+				if(type == FrameType.GL) {
 					return new LwjglGraphics(cfg);
+				}
 
-				if(type == FrameType.Canvas)
+				if(type == FrameType.Canvas) {
 					return new AWTGraphics(cfg);
+				}
 
 				throw new UnsupportedOperationException("Unsupported frame type: " + type);
 			}
 
 			@Override
 			public BuildInput getInput(FrameType type) {
-				if(type == FrameType.GL)
+				if(type == FrameType.GL) {
 					return new LwjglInput();
+				}
 
-				if(type == FrameType.Canvas)
+				if(type == FrameType.Canvas) {
 					return new AWTInput();
+				}
 
 				throw new UnsupportedOperationException("Unsupported frame type: " + type);
 			}

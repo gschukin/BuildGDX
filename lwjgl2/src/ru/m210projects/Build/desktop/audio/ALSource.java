@@ -46,81 +46,105 @@ public class ALSource extends Source {
 
 	@Override
 	public int dispose() {
-		if(!drv.isInited()) return -1;
+		if(!drv.isInited()) {
+			return -1;
+		}
 		drv.sourceManager.stopSound(this);
 		return sourceId;
 	}
 
 	@Override
 	public boolean isLooping() {
-		if(!drv.isInited()) return false;
+		if(!drv.isInited()) {
+			return false;
+		}
 		return al.alGetSourcei(sourceId, AL_LOOPING) == AL_TRUE;
 	}
 
 	@Override
 	public boolean isPlaying() {
-		if(!drv.isInited()) return false;
+		if(!drv.isInited()) {
+			return false;
+		}
 		return al.alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
 	}
 
 	@Override
 	public void setPosition(float x, float y, float z) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		al.alSource3f(sourceId, AL_POSITION, x, y, z);
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setPosition " + error + ", values: ["+ x + ", " + y + ", " + z + "]", OSDTEXT_RED);
+		}
 	}
 
 	@Override
 	public void setVolume(float volume) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		volume = Math.min(Math.max(volume, 0.0f), 1.0f);
 		volume *= drv.getVolume();
 		al.alSourcef(sourceId, AL_GAIN, volume);
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setVolume " + error + ", value is " + volume, OSDTEXT_RED);
+		}
 	}
 	
 	@Override
 	public float getVolume() {
-		if(!drv.isInited()) return 0;
+		if(!drv.isInited()) {
+			return 0;
+		}
 		return al.alGetSourcef(sourceId, AL_GAIN);
 	}
 	
 	@Override
 	public float getPitch() {
-		if(!drv.isInited()) return 0;
+		if(!drv.isInited()) {
+			return 0;
+		}
 		return al.alGetSourcef(sourceId, AL_PITCH);
 	}
 
 	@Override
 	public void setPitch(float pitch) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		pitch = Math.min(Math.max(pitch, 0.0f), 2.0f);
 		al.alSourcef(sourceId, AL_PITCH, pitch);
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setPitch " + error + ", value is " + pitch, OSDTEXT_RED);
+		}
 	}
 
 	@Override
 	public void setGlobal(int num) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		al.alSourcei(sourceId, AL_SOURCE_RELATIVE,  num);
 
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setGlobal " + error + ", value is " + num, OSDTEXT_RED);
+		}
 	}
 	
 	@Override
 	public boolean isGlobal() {
-		if(!drv.isInited()) return false;
+		if(!drv.isInited()) {
+			return false;
+		}
 		return al.alGetSourcei(sourceId, AL_SOURCE_RELATIVE) == 1;
 	}
 
@@ -131,23 +155,29 @@ public class ALSource extends Source {
 
 	@Override
 	public boolean isActive() {
-		if(!drv.isInited()) return false;
+		if(!drv.isInited()) {
+			return false;
+		}
 		return (isPlaying() || al.alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PAUSED) && priority != 0 && !free;
 	}
 
 	@Override
 	public void setLooping(boolean loop, int loopstart, int loopend) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		if(!loop)
 		{
 			al.alSourcei(sourceId, AL_LOOPING, AL_FALSE);
 			loopInfo.clear();
 		} else {
 			int start = 0, end = data.capacity();
-			if(loopstart >= 0 && loopstart < data.capacity()) 
+			if(loopstart >= 0 && loopstart < data.capacity()) {
 				start = loopstart;
-			if(loopend < data.capacity()) 
+			}
+			if(loopend < data.capacity()) {
 				end = loopend;
+			}
 			
 			int bufferID = drv.buffers.get(bufferId);
 			if(start > 0) {
@@ -157,45 +187,58 @@ public class ALSource extends Source {
 				drv.loopedSource.add(this);
 				loopInfo.set(data, start, end, format, rate);
 			} else {
-				if(end > 0) data.limit(end);
+				if(end > 0) {
+					data.limit(end);
+				}
 				al.alSourcei(sourceId, AL_LOOPING, AL_TRUE);
 				al.alSourcei(sourceId, AL_BUFFER,   bufferID );
 			}
 		}
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setLooping " + error, OSDTEXT_RED);
+		}
 	}
 
 	@Override
 	public void play(float volume) {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		setVolume(volume);
 		al.alSourcePlay(sourceId);
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error play " + error, OSDTEXT_RED);
+		}
 	}
 
 	@Override
 	public void stop() {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		al.alSourceStop(sourceId);
 	}
 
 	@Override
 	public void pause() {
-		if(!drv.isInited()) return;
+		if(!drv.isInited()) {
+			return;
+		}
 		al.alSourcePause(sourceId);
 	}
 
 	@Override
 	public void resume() {
-		if(!drv.isInited()) return;
-		if(al.alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PAUSED)
+		if(!drv.isInited()) {
+			return;
+		}
+		if(al.alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PAUSED) {
 			al.alSourcePlay(sourceId);
+		}
 	}
 
 	@Override

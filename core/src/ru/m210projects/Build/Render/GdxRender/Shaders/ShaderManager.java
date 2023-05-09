@@ -108,21 +108,28 @@ public class ShaderManager {
 	}
 
 	public void dispose() {
-		if (skyshader != null)
+		if (skyshader != null) {
 			skyshader.dispose();
-		if (skyshader32 != null)
+		}
+		if (skyshader32 != null) {
 			skyshader32.dispose();
-		if (texshader != null)
+		}
+		if (texshader != null) {
 			texshader.dispose();
-		if (texshader32 != null)
+		}
+		if (texshader32 != null) {
 			texshader32.dispose();
-		if (bitmapShader != null)
+		}
+		if (bitmapShader != null) {
 			bitmapShader.dispose();
-		if (fadeshader != null)
+		}
+		if (fadeshader != null) {
 			fadeshader.dispose();
+		}
 
-		for (Shader sh : Shader.values())
+		for (Shader sh : Shader.values()) {
 			sh.set(null);
+		}
 	}
 
 	public void fog(boolean enable, float start, float end, float r, float g, float b) {
@@ -290,8 +297,9 @@ public class ShaderManager {
 
 	public ShaderManager transform(Matrix4 transform) {
 		Shader shader = this.getShader();
-		if (shader == null)
+		if (shader == null) {
 			return this;
+		}
 
 		switch (shader) {
 		case IndexedWorldShader:
@@ -313,8 +321,9 @@ public class ShaderManager {
 
 	public ShaderManager textureTransform(Matrix3 transform, int unit) {
 		Shader shader = this.getShader();
-		if (shader == null)
+		if (shader == null) {
 			return this;
+		}
 
 		switch (shader) {
 		case IndexedWorldShader:
@@ -510,8 +519,9 @@ public class ShaderManager {
 	}
 
 	public ShaderProgram bind(Shader shader) {
-		if (currentShaderProgram != null)
+		if (currentShaderProgram != null) {
 			currentShaderProgram.end();
+		}
 
 		ShaderProgram sh = shader.get();
 		if (sh != null) {
@@ -539,8 +549,9 @@ public class ShaderManager {
 	}
 
 	public void unbind() {
-		if (currentShaderProgram != null)
+		if (currentShaderProgram != null) {
 			currentShaderProgram.end();
+		}
 		currentShaderProgram = null;
 		currentShader = null;
 	}
@@ -577,8 +588,9 @@ public class ShaderManager {
 				}
 			};
 
-			if (!skyshader.isCompiled())
+			if (!skyshader.isCompiled()) {
 				System.err.println("Shader compile error: " + skyshader.getLog());
+			}
 
 			return skyshader;
 		} catch (Exception e) {
@@ -597,8 +609,9 @@ public class ShaderManager {
 					currentShaderProgram = this;
 				}
 			};
-			if (!shader.isCompiled())
+			if (!shader.isCompiled()) {
 				throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+			}
 			return shader;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -657,8 +670,9 @@ public class ShaderManager {
 					currentShaderProgram = this;
 				}
 			};
-			if (!shader.isCompiled())
+			if (!shader.isCompiled()) {
 				throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+			}
 
 			this.world32_texture_transform = shader.getUniformLocation("u_texture_transform");
 			this.world32_color = shader.getUniformLocation("u_color");
@@ -678,8 +692,9 @@ public class ShaderManager {
 				currentShaderProgram = this;
 			}
 		};
-		if (!shader.isCompiled())
+		if (!shader.isCompiled()) {
 			throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+		}
 		return shader;
 	}
 
@@ -693,10 +708,11 @@ public class ShaderManager {
 				break;
 			}
 		}
-		if (current != null)
+		if (current != null) {
 			out += current.name();
-		else
+		} else {
 			out += "NULL";
+		}
 		return out;
 	}
 }

@@ -59,4 +59,13 @@ public class StreamUtils {
         out.write((int) ((v >>> 16) & 0xff));
         out.write((int) ((v >>> 24) & 0xff));
     }
+
+    public static void writeShort(OutputStream out, int v) throws IOException {
+        out.write(v & 0xff);
+        out.write((v >>> 8) & 0xff);
+    }
+
+    public static void writeString(OutputStream out, String v) throws IOException {
+        out.write(v.getBytes());
+    }
 }

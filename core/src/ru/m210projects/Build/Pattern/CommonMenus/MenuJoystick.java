@@ -243,19 +243,25 @@ public abstract class MenuJoystick extends BuildMenu {
 						item.l_set = 0;
 						for (int kb = 0; kb < gpmanager.getButtonCount(cfg.gJoyDevice); kb++) {
 							if (gpmanager.buttonPressed(cfg.gJoyDevice, kb)) {
-								if(item.l_nFocus < cfg.joymap.length)
+								if(item.l_nFocus < cfg.joymap.length) {
 									cfg.setButton(cfg.joymap[item.l_nFocus], kb);
-								else cfg.setButton(cfg.keymap[item.l_nFocus - cfg.joymap.length], kb);
+								} else {
+									cfg.setButton(cfg.keymap[item.l_nFocus - cfg.joymap.length], kb);
+								}
 							}
 						}
 						break;
 					default:
-						if(!gpmanager.isValidDevice(cfg.gJoyDevice)) break;
+						if(!gpmanager.isValidDevice(cfg.gJoyDevice)) {
+							break;
+						}
 						for (int kb = 0; kb < gpmanager.getButtonCount(cfg.gJoyDevice); kb++) {
 							if (gpmanager.buttonStatus(cfg.gJoyDevice, kb)) {
-								if(item.l_nFocus < cfg.joymap.length)
+								if(item.l_nFocus < cfg.joymap.length) {
 									cfg.setButton(cfg.joymap[item.l_nFocus], kb);
-								else cfg.setButton(cfg.keymap[item.l_nFocus - cfg.joymap.length], kb);
+								} else {
+									cfg.setButton(cfg.keymap[item.l_nFocus - cfg.joymap.length], kb);
+								}
 								item.l_set = 0;
 							}
 						}

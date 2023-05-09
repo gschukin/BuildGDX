@@ -249,11 +249,14 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public boolean isKeyPressed (int key) {
-		if (key == Input.Keys.ANY_KEY)
+		if (key == Input.Keys.ANY_KEY) {
 			return pressedKeys > 0;
+		}
 
 		int code;
-		if((code = getLwjglKeyCode(key)) == 0) return false;
+		if((code = getLwjglKeyCode(key)) == 0) {
+			return false;
+		}
 
 		return Keyboard.isCreated() && Keyboard.isKeyDown(code);
 	}
@@ -276,26 +279,29 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public int getX (int pointer) {
-		if (pointer > 0)
+		if (pointer > 0) {
 			return 0;
-		else
+		} else {
 			return getX();
+		}
 	}
 
 	@Override
 	public int getY (int pointer) {
-		if (pointer > 0)
+		if (pointer > 0) {
 			return 0;
-		else
+		} else {
 			return getY();
+		}
 	}
 
 	@Override
 	public boolean isTouched (int pointer) {
-		if (pointer > 0)
+		if (pointer > 0) {
 			return false;
-		else
+		} else {
 			return isTouched();
+		}
 	}
 
 	@Override
@@ -446,11 +452,21 @@ public class LwjglInput implements BuildInput {
 	}
 
 	private int toGdxButton (int button) {
-		if (button == 0) return Buttons.LEFT;
-		if (button == 1) return Buttons.RIGHT;
-		if (button == 2) return Buttons.MIDDLE;
-		if (button == 3) return Buttons.BACK;
-		if (button == 4) return Buttons.FORWARD;
+		if (button == 0) {
+			return Buttons.LEFT;
+		}
+		if (button == 1) {
+			return Buttons.RIGHT;
+		}
+		if (button == 2) {
+			return Buttons.MIDDLE;
+		}
+		if (button == 3) {
+			return Buttons.BACK;
+		}
+		if (button == 4) {
+			return Buttons.FORWARD;
+		}
 		return -1;
 	}
 
@@ -473,7 +489,9 @@ public class LwjglInput implements BuildInput {
 				int y = BuildGdx.graphics.getHeight() - (int)(Mouse.getEventY() * Display.getPixelScaleFactor()) - 1;
 				int button = Mouse.getEventButton();
 				int gdxButton = toGdxButton(button);
-				if (button != -1 && gdxButton == -1) continue; // Ignore unknown button.
+				if (button != -1 && gdxButton == -1) {
+					continue; // Ignore unknown button.
+				}
 
 				TouchEvent event = usedTouchEvents.obtain();
 				event.x = x;
@@ -589,8 +607,9 @@ public class LwjglInput implements BuildInput {
 					keyEvents.add(event);
 
 					pressedKeys--;
-					if(pressedKeys < 0)
+					if(pressedKeys < 0) {
 						pressedKeys = 0;
+					}
 					lastKeyCharPressed = 0;
 				}
 				BuildGdx.graphics.requestRendering();
@@ -619,14 +638,18 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public boolean isButtonPressed (int button) {
-		if(button >= 5) return false;
+		if(button >= 5) {
+			return false;
+		}
 
 		return Mouse.isButtonDown(button);
 	}
 
 	@Override
 	public boolean isButtonJustPressed(int button) {
-		if(button < 0 || button >= justPressedButtons.length) return false;
+		if(button < 0 || button >= justPressedButtons.length) {
+			return false;
+		}
 		return justPressedButtons[button];
 	}
 
@@ -687,10 +710,11 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public int getDeltaX (int pointer) {
-		if (pointer == 0)
+		if (pointer == 0) {
 			return getDeltaX();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	@Override
@@ -702,10 +726,11 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public int getDeltaY (int pointer) {
-		if (pointer == 0)
+		if (pointer == 0) {
 			return getDeltaY();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	@Override
@@ -729,12 +754,15 @@ public class LwjglInput implements BuildInput {
 	@Override
 	public boolean cursorHandler() {
 		try {
-			if(emptyCursor == null)
+			if(emptyCursor == null) {
 				emptyCursor = new Cursor(1, 1, 0, 0, 1, BufferUtils.createIntBuffer(1), null);
+			}
 
-			if (emptyCursor != null && Mouse.isInsideWindow() && Display.isActive())
+			if (emptyCursor != null && Mouse.isInsideWindow() && Display.isActive()) {
 				Mouse.setNativeCursor(emptyCursor);
-			else Mouse.setNativeCursor(defCursor);
+			} else {
+				Mouse.setNativeCursor(defCursor);
+			}
 		} catch (Exception e) {}
 
 		return false;

@@ -9,16 +9,16 @@
 
 package ru.m210projects.Build.Types;
 
-import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Gameutils.*;
-
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.StreamUtils;
 
 public class Sector {
 	public static final int sizeof = 40;
@@ -42,7 +42,6 @@ public class Sector {
 	private short ceilingpicnum;
 	private short ceilingheinum; // 4
 	private byte ceilingshade; // 1
-
 	private short ceilingpal;
 	private short ceilingxpanning;
 	private short ceilingypanning; // 3
@@ -62,15 +61,19 @@ public class Sector {
 	}
 
 	public Sector(byte[] data) {
-		buildSector(new DataResource(data));
+		readObject(new DataResource(data));
 	}
 
 	public Sector(Resource data) {
-		buildSector(data);
+		readObject(data);
 	}
 
 	public int getEndWall() {
 		return wallptr + wallnum - 1;
+	}
+
+	public static int getSizeof() {
+		return sizeof;
 	}
 
 	public boolean isParallaxCeiling() {
@@ -153,36 +156,58 @@ public class Sector {
 		return (getFloorstat() & (128 | 256)) != 0;
 	}
 
-	public void buildSector(Resource bb) {
+	public Sector readObject(Resource bb) {
 		setWallptr(bb.readShort());
-		if (getWallptr() < 0 || getWallptr() >= MAXWALLS)
-			setWallptr(0);
 		setWallnum(bb.readShort());
 		setCeilingz(bb.readInt());
 		setFloorz(bb.readInt());
 		setCeilingstat(bb.readShort());
 		setFloorstat(bb.readShort());
 		setCeilingpicnum(bb.readShort());
-		if (!isValidTile(getCeilingpicnum()))
-			setCeilingpicnum(0);
 		setCeilingheinum(bb.readShort());
 		setCeilingshade(bb.readByte());
-		setCeilingpal((short) (bb.readByte() & 0xFF));
-		setCeilingxpanning((short) (bb.readByte() & 0xFF));
-		setCeilingypanning((short) (bb.readByte() & 0xFF));
+		setCeilingpal(bb.readByte());
+		setCeilingxpanning(bb.readByte());
+		setCeilingypanning(bb.readByte());
 		setFloorpicnum(bb.readShort());
-		if (!isValidTile(getFloorpicnum()))
-			setFloorpicnum(0);
 		setFloorheinum(bb.readShort());
 		setFloorshade(bb.readByte());
-		setFloorpal((short) (bb.readByte() & 0xFF));
-		setFloorxpanning((short) (bb.readByte() & 0xFF));
-		setFloorypanning((short) (bb.readByte() & 0xFF));
-		setVisibility((short) (bb.readByte() & 0xFF));
+		setFloorpal(bb.readByte());
+		setFloorxpanning(bb.readByte());
+		setFloorypanning(bb.readByte());
+		setVisibility(bb.readByte());
 		setFiller(bb.readByte());
 		setLotag(bb.readShort());
 		setHitag(bb.readShort());
 		setExtra(bb.readShort());
+
+		return this;
+	}
+
+	public void writeObject(OutputStream os) throws IOException {
+		StreamUtils.writeShort(os, getWallptr());
+		StreamUtils.writeShort(os, getWallnum());
+		StreamUtils.writeInt(os, getCeilingz());
+		StreamUtils.writeInt(os, getFloorz());
+		StreamUtils.writeShort(os, getCeilingstat());
+		StreamUtils.writeShort(os, getFloorstat());
+		StreamUtils.writeShort(os, getCeilingpicnum());
+		StreamUtils.writeShort(os, getCeilingheinum());
+		os.write(getCeilingshade());
+		os.write(getCeilingpal());
+		os.write(getCeilingxpanning());
+		os.write(getCeilingypanning());
+		StreamUtils.writeShort(os, getFloorpicnum());
+		StreamUtils.writeShort(os, getFloorheinum());
+		os.write(getFloorshade());
+		os.write(getFloorpal());
+		os.write(getFloorxpanning());
+		os.write(getFloorypanning());
+		os.write(getVisibility());
+		os.write(getFiller());
+		StreamUtils.writeShort(os, getLotag());
+		StreamUtils.writeShort(os, getHitag());
+		StreamUtils.writeShort(os, getExtra());
 	}
 
 	public void set(Sector src) {
@@ -270,7 +295,92 @@ public class Sector {
 		return out;
 	}
 
-	private static SectorIterator it;
+	public boolean inside(int x, int y) {
+		int cnt = 0;
+		for (Wall wal : walls) {
+			Wall wal2 = wal.getWall2();
+			int y1 = wal.getY() - y;
+			int y2 = wal2.getY() - y;
+
+			if ((y1 ^ y2) < 0) {
+				int x1 = wal.getX() - x;
+				int x2 = wal2.getX() - x;
+				if ((x1 ^ x2) >= 0) {
+					cnt ^= x1;
+				} else {
+					cnt ^= (x1 * y2 - x2 * y1) ^ y2;
+				}
+			}
+		}
+
+		return (cnt >>> 31) != 0;
+	}
+
+	public boolean inside(int x, int y, int z) {
+		int i = 0, j = 0;
+		if (isFloorSlope() || isCeilingSlope()) {
+			Wall wal = walls[0];
+			Wall wal2 = wal.getWall2();
+
+			int dx = wal2.getX() - wal.getX();
+			int dy = wal2.getY() - wal.getY();
+			i = EngineUtils.sqrt(dx * dx + dy * dy) << 5;
+			if (i != 0) {
+				j = dx * (y - wal.getY()) - (dy * (x - wal.getX())) >> 3;
+			}
+		}
+
+		int cz = calcCeilingHeight(i, j);
+		int fz = calcFloorHeight(i, j);
+		if (z < cz || z > fz) {
+			return false;
+		}
+
+		return inside(x, y);
+	}
+
+	private int calcFloorHeight(int i, int j) {
+		int fz = floorz;
+		if (isFloorSlope() && i != 0) {
+			fz += ((long) floorheinum * j / i);
+		}
+		return fz;
+	}
+
+	private int calcCeilingHeight(int i, int j) {
+		int cz = ceilingz;
+		if (isCeilingSlope() && i != 0) {
+			cz += ((long) ceilingheinum * j / i);
+		}
+		return cz;
+	}
+
+	public void getzsofslope(int x, int y, AtomicInteger floorZ, AtomicInteger ceilingZ) {
+		boolean floorSlope = isFloorSlope() && floorZ != null;
+		boolean ceilingSlope = isCeilingSlope() && ceilingZ != null;
+		int i = 0, j = 0;
+		if (floorSlope || ceilingSlope) {
+			Wall wal = walls[0];
+			Wall wal2 = wal.getWall2();
+
+			int dx = wal2.getX() - wal.getX();
+			int dy = wal2.getY() - wal.getY();
+			i = EngineUtils.sqrt(dx * dx + dy * dy) << 5;
+			if (i != 0) {
+				j = dx * (y - wal.getY()) - (dy * (x - wal.getX())) >> 3;
+			}
+		}
+
+		if (floorZ != null) {
+			floorZ.set(calcFloorHeight(i, j));
+		}
+
+		if (ceilingZ != null) {
+			ceilingZ.set(calcCeilingHeight(i, j));
+		}
+	}
+
+	// GETTERS AND SETTERS
 
 	public short getWallptr() {
 		return wallptr;
@@ -349,7 +459,7 @@ public class Sector {
 	}
 
 	public void setCeilingpal(int ceilingpal) {
-		this.ceilingpal = (short) ceilingpal;
+		this.ceilingpal = (short) (ceilingpal & 0xFF);
 	}
 
 	public short getCeilingxpanning() {
@@ -357,7 +467,7 @@ public class Sector {
 	}
 
 	public void setCeilingxpanning(int ceilingxpanning) {
-		this.ceilingxpanning = (short) ceilingxpanning;
+		this.ceilingxpanning = (short) (ceilingxpanning & 0xFF);
 	}
 
 	public short getCeilingypanning() {
@@ -365,7 +475,7 @@ public class Sector {
 	}
 
 	public void setCeilingypanning(int ceilingypanning) {
-		this.ceilingypanning = (short) ceilingypanning;
+		this.ceilingypanning = (short) (ceilingypanning & 0xFF);
 	}
 
 	public short getFloorpicnum() {
@@ -397,7 +507,7 @@ public class Sector {
 	}
 
 	public void setFloorpal(int floorpal) {
-		this.floorpal = (short) floorpal;
+		this.floorpal = (short) (floorpal & 0xFF);
 	}
 
 	public short getFloorxpanning() {
@@ -405,7 +515,7 @@ public class Sector {
 	}
 
 	public void setFloorxpanning(int floorxpanning) {
-		this.floorxpanning = (short) floorxpanning;
+		this.floorxpanning = (short) (floorxpanning & 0xFF);
 	}
 
 	public short getFloorypanning() {
@@ -413,7 +523,7 @@ public class Sector {
 	}
 
 	public void setFloorypanning(int floorypanning) {
-		this.floorypanning = (short) floorypanning;
+		this.floorypanning = (short) (floorypanning & 0xFF);
 	}
 
 	public short getVisibility() {
@@ -421,7 +531,7 @@ public class Sector {
 	}
 
 	public void setVisibility(int visibility) {
-		this.visibility = (short) visibility;
+		this.visibility = (short) (visibility & 0xFF);
 	}
 
 	public short getFiller() {
@@ -456,42 +566,4 @@ public class Sector {
 		this.extra = (short) extra;
 	}
 
-	public static final class SectorIterator implements Iterator<Wall> {
-		private short i, startwall, endwall;
-
-		@Override
-		public boolean hasNext() {
-			return startwall < endwall;
-		}
-
-		@Override
-		public Wall next() {
-			return Engine.getWall(nexti());
-		}
-
-		public short nexti() {
-			return i = startwall++;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("remove");
-		}
-
-		public int getIndex() {
-			return i;
-		}
-
-		protected SectorIterator init(short wallptr, short wallnum) {
-			startwall = wallptr;
-			endwall = (short) (wallnum + startwall);
-			return this;
-		}
-	}
-
-	public SectorIterator iterator() {
-		if (it == null)
-			it = new SectorIterator();
-		return it.init(getWallptr(), getWallnum());
-	}
 }

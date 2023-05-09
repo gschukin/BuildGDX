@@ -31,9 +31,11 @@ public abstract class MD2ModelGL20 extends MDModel {
 		ShortArray indices = new ShortArray(numTriangles * 3);
 		FloatArray vertices = new FloatArray(numTriangles * 3 * 6);
 
-		for (int i = 0; i < numTriangles; i++)
-			for (int j = 0; j < 3; j++)
+		for (int i = 0; i < numTriangles; i++) {
+			for (int j = 0; j < 3; j++) {
 				indices.add((short) (i * 3 + j));
+			}
+		}
 
 		MD2Frame cframe = frames[this.cframe];
 		for (int i = 0; i < tris.length; i++) {

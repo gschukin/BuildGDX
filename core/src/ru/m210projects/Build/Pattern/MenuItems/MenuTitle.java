@@ -43,8 +43,9 @@ public class MenuTitle extends MenuItem {
 	public void draw(MenuHandler handler) {
 		if ( text != null )
 		{
-		    if(nTile != -1)
-		    	draw.rotatesprite(160 << 16, y << 16, 65536, 0, nTile, -128, 0, 78, 0, 0, xdim - 1, ydim - 1);
+		    if(nTile != -1) {
+				draw.rotatesprite(160 << 16, y << 16, 65536, 0, nTile, -128, 0, 78, 0, 0, xdim - 1, ydim - 1);
+			}
 		    font.drawText(x, y - font.getHeight() / 2, text, -128, pal, TextAlign.Center, 2, fontShadow);
 		}
 		handler.mPostDraw(this);

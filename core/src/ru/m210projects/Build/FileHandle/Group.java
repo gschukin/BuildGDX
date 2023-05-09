@@ -54,13 +54,17 @@ public abstract class Group {
 	
 	public void setFlags(boolean dynamic, boolean removable)
 	{
-		if(removable)
-			flags |= REMOVABLE;
-		else flags &= ~REMOVABLE;
+		if(removable) {
+            flags |= REMOVABLE;
+        } else {
+            flags &= ~REMOVABLE;
+        }
 		
-		if(dynamic)
-			flags |= DYNAMIC;
-		else flags &= ~DYNAMIC;
+		if(dynamic) {
+            flags |= DYNAMIC;
+        } else {
+            flags &= ~DYNAMIC;
+        }
 	}
 	
 	public boolean isRemovable()
@@ -87,12 +91,15 @@ public abstract class Group {
 	}
 	
 	public boolean contains(int fileid, String type) {
-		if(type == null) 
-			return false;
+		if(type == null) {
+            return false;
+        }
 
 		type =  toLowerCase(type);
 		
-		if(!containsType(type)) return false;
+		if(!containsType(type)) {
+            return false;
+        }
 		
 		for(GroupResource res : filelist)
 		{
@@ -111,8 +118,9 @@ public abstract class Group {
 			Integer out = lookup.get(toLowerCase(filename));
 			if(out != null) {
 				GroupResource res = filelist.get(out);
-				if(open(res))
-					return res;
+				if(open(res)) {
+                    return res;
+                }
 			}
 
 //			GroupResource res = filelist.get(toLowerCase(filename));
@@ -130,13 +138,16 @@ public abstract class Group {
 
 		type = toLowerCase(type);
 		
-		if(!containsType(type)) return null;
+		if(!containsType(type)) {
+            return null;
+        }
 		
 		for(GroupResource res : filelist)
 		{
 			if(type.equals(res.fileformat) && fileid == res.fileid) {
-				if(open(res))  
-					return res;
+				if(open(res)) {
+                    return res;
+                }
 			} 
 		}
 
@@ -151,7 +162,9 @@ public abstract class Group {
 	
 	public boolean containsType(String type)
 	{
-		if(type == null) return false;
+		if(type == null) {
+            return false;
+        }
 		return fmtlist.contains(toLowerCase(type));
 	}
 	
@@ -159,8 +172,9 @@ public abstract class Group {
 
 	public void dispose() {
 		for(GroupResource res : filelist) {
-			if(!res.isClosed())
-				res.close();
+			if(!res.isClosed()) {
+                res.close();
+            }
 		}
 		
 		filelist.clear();
@@ -168,7 +182,9 @@ public abstract class Group {
 	}
 	
 	public boolean add(String filename, byte[] data, int fileid) {
-		if(filename == null || data == null) return false;
+		if(filename == null || data == null) {
+            return false;
+        }
 		
 		DataResource file = new DataResource(this, filename, fileid, data);
 		add(file);
@@ -183,8 +199,9 @@ public abstract class Group {
 		txt.append("Num files: ").append(numfiles).append("\r\n");
 		txt.append("File list: \r\n");
 
-		for(GroupResource res : filelist)
-			txt.append(res.toString());
+		for(GroupResource res : filelist) {
+            txt.append(res.toString());
+        }
 		
 		return txt.toString();
 	}

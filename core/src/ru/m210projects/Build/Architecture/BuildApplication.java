@@ -58,11 +58,14 @@ public class BuildApplication implements Application {
 		this.listener = listener;
 		this.config = factory.getConfiguration();
 
-		if (config.title == null) config.title = listener.getClass().getSimpleName();
+		if (config.title == null) {
+			config.title = listener.getClass().getSimpleName();
+		}
 
 		frame = factory.getFrame();
-		if(config.getIconPaths().size > 0)
+		if(config.getIconPaths().size > 0) {
 			frame.icon = this.getClass().getResource("/" + config.getIconPaths().first());
+		}
 
 		Gdx.app = BuildGdx.app = this;
 		Gdx.files = BuildGdx.files = files = factory.getFiles();
@@ -95,9 +98,11 @@ public class BuildApplication implements Application {
 
 						destroyLoop();
 
-						if (t instanceof RuntimeException)
+						if (t instanceof RuntimeException) {
 							throw (RuntimeException)t;
-						else throw new GdxRuntimeException(t);
+						} else {
+							throw new GdxRuntimeException(t);
+						}
 					}
 				}
 			};
@@ -131,7 +136,9 @@ public class BuildApplication implements Application {
 			boolean shouldRender = executeRunnables();
 
             // If one of the runnables set running to false, for example after an exit().
-			if (!running) break;
+			if (!running) {
+				break;
+			}
 
 			if(frame.process(shouldRender)) {
 				listener.render();
@@ -142,16 +149,19 @@ public class BuildApplication implements Application {
 	}
 
 	private void destroyLoop() {
-		if(BuildGdx.input != null)
+		if(BuildGdx.input != null) {
 			BuildGdx.input.setCursorCatched(false);
+		}
 		if(listener != null) {
 			listener.pause();
 			listener.dispose();
 		}
-		if(BuildGdx.audio != null)
+		if(BuildGdx.audio != null) {
 			BuildGdx.audio.dispose();
-		if(BuildGdx.message != null)
+		}
+		if(BuildGdx.message != null) {
 			BuildGdx.message.dispose();
+		}
 		frame.dispose();
 	}
 
@@ -175,13 +185,17 @@ public class BuildApplication implements Application {
 
 	public boolean executeRunnables () {
 		synchronized (runnables) {
-			for (int i = runnables.size - 1; i >= 0; i--)
+			for (int i = runnables.size - 1; i >= 0; i--) {
 				executedRunnables.add(runnables.get(i));
+			}
 			runnables.clear();
 		}
-		if (executedRunnables.size == 0) return false;
-		do
+		if (executedRunnables.size == 0) {
+			return false;
+		}
+		do {
 			executedRunnables.pop().run();
+		}
 		while (executedRunnables.size > 0);
 		return true;
 	}

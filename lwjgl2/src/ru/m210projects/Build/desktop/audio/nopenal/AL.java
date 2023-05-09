@@ -76,7 +76,9 @@ public final class AL {
 	 */
 	private static void nCreate(String oalPath) throws LWJGLException
 	{
-		if(alnative != null) return;
+		if(alnative != null) {
+			return;
+		}
 		try {
 			alnative = Native.load(oalPath, SharedLibraryAL.class);
 		} catch (Throwable t) {
@@ -113,18 +115,20 @@ public final class AL {
 	public static void create(String deviceArguments, int contextFrequency, int contextRefresh, boolean contextSynchronized, boolean openDevice)
 		throws Exception {
 
-		if (created)
+		if (created) {
 			throw new IllegalStateException("Only one OpenAL context may be instantiated at any one time.");
+		}
 
 		SharedLibraryLoader loader = new SharedLibraryLoader();
 		File library = null;
 		try {
-			if (isWindows)
+			if (isWindows) {
 				library = loader.extractFile(is64Bit ? "nOpenAL.dll" : "nOpenAL32.dll", null);
-			else if (isMac)
+			} else if (isMac) {
 				library = loader.extractFile("nopenal.dylib", null);
-			else if (isLinux)
+			} else if (isLinux) {
 				library = loader.extractFile("nlibopenal.so", null);
+			}
 		} catch (Exception ex) {
 			throw new GdxRuntimeException("Unable to extract OAL natives.", ex);
 		}
@@ -137,8 +141,9 @@ public final class AL {
 			System.err.println("Failed to load " + library.getName() + ": " + e.getMessage());
 		}
 
-		if (!created)
+		if (!created) {
 			throw new Exception("Could not locate OpenAL library.");
+		}
 	}
 
 	private static void init(String deviceArguments, int contextFrequency, int contextRefresh, boolean contextSynchronized, boolean openDevice) throws LWJGLException {

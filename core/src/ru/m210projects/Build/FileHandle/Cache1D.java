@@ -48,8 +48,9 @@ public class Cache1D {
 
 	public Group getGroup(String groupname) {
 		for (Group gr : groupfil) {
-			if (gr.name.equalsIgnoreCase(groupname))
+			if (gr.name.equalsIgnoreCase(groupname)) {
 				return gr;
+			}
 		}
 
 		return null;
@@ -69,8 +70,9 @@ public class Cache1D {
 	}
 
 	public Group add(Group res) {
-		if (res != null && res.numfiles != 0)
+		if (res != null && res.numfiles != 0) {
 			groupfil.add(res);
+		}
 
 		return res;
 	}
@@ -80,8 +82,9 @@ public class Cache1D {
 
 		group.name = name;
 		group.type = PackageType.User;
-		if (dynamic)
+		if (dynamic) {
 			group.flags |= (DYNAMIC | REMOVABLE);
+		}
 		groupfil.add(group);
 
 		return group;
@@ -134,8 +137,9 @@ public class Cache1D {
 
 	public Group add(GroupResource res, boolean removable) {
 		Group out;
-		if (res.isClosed())
+		if (res.isClosed()) {
 			res.getParent().open(res);
+		}
 
 		out = add(res, res.getParent().type + ":" + res.getFullName());
 		out.setFlags(true, removable);
@@ -237,21 +241,25 @@ public class Cache1D {
 			// Search in dynamic groups first
 			for (int k = groupfil.size() - 1; k >= 0; k--) {
 				Group group = groupfil.get(k);
-				if ((group.flags & DYNAMIC) != 0 && group.contains(filename))
+				if ((group.flags & DYNAMIC) != 0 && group.contains(filename)) {
 					return true;
+				}
 			}
-			if (compat.checkFile(filename) != null)
+			if (compat.checkFile(filename) != null) {
 				return true;
+			}
 		case -1: // search in groups
 			for (int k = groupfil.size() - 1; k >= 0; k--) {
-				if (groupfil.get(k).contains(filename))
+				if (groupfil.get(k).contains(filename)) {
 					return true;
+				}
 			}
 			break;
 		default: // search in the group with index
 			int index = searchfirst - 1;
-			if (index < groupfil.size() && groupfil.get(index).contains(filename))
+			if (index < groupfil.size() && groupfil.get(index).contains(filename)) {
 				return true;
+			}
 			break;
 		}
 
@@ -260,8 +268,9 @@ public class Cache1D {
 
 	public boolean contains(int fileid, String type) {
 		for (int k = groupfil.size() - 1; k >= 0; k--) {
-			if (groupfil.get(k).contains(fileid, type))
+			if (groupfil.get(k).contains(fileid, type)) {
 				return true;
+			}
 		}
 
 		return false;
@@ -277,23 +286,27 @@ public class Cache1D {
 			for (int k = groupfil.size() - 1; k >= 0; k--) {
 				Group group = groupfil.get(k);
 				if ((group.flags & DYNAMIC) != 0) {
-					if ((res = group.open(filename)) != null)
+					if ((res = group.open(filename)) != null) {
 						return res;
+					}
 				}
 			}
 
-			if ((res = compat.open(filename)) != null)
+			if ((res = compat.open(filename)) != null) {
 				return res;
+			}
 		case -1: // search in groups
 			for (int k = groupfil.size() - 1; k >= 0; k--) {
-				if ((res = groupfil.get(k).open(filename)) != null)
+				if ((res = groupfil.get(k).open(filename)) != null) {
 					return res;
+				}
 			}
 			break;
 		default: // search in the group with index
 			int index = searchfirst - 1;
-			if (index < groupfil.size() && (res = groupfil.get(index).open(filename)) != null)
+			if (index < groupfil.size() && (res = groupfil.get(index).open(filename)) != null) {
 				return res;
+			}
 			break;
 		}
 
@@ -303,8 +316,9 @@ public class Cache1D {
 	public Resource open(int fileid, String type) {
 		Resource res;
 		for (int k = groupfil.size() - 1; k >= 0; k--) {
-			if ((res = groupfil.get(k).open(fileid, type)) != null)
+			if ((res = groupfil.get(k).open(fileid, type)) != null) {
 				return res;
+			}
 		}
 
 		return null;

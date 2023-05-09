@@ -96,8 +96,9 @@ public class TextureManager {
 				: null;
 
 		if (si == null) {
-			if (skybox != 0 || dapalnum >= (MAXPALOOKUPS - RESERVEDPALS))
+			if (skybox != 0 || dapalnum >= (MAXPALOOKUPS - RESERVEDPALS)) {
 				return null;
+			}
 		}
 
 		GLTile tile = cache.get(dapicnum, dapalnum, clamping, skybox);
@@ -121,40 +122,46 @@ public class TextureManager {
 //				cache.dispose(dapicnum); // old texture
 
 			if (si != null && dapalnum != 0 && info.findTexture(dapicnum, 0, skybox) == si
-					&& (tile = cache.get(dapicnum, 0, clamping, skybox)) != null)
+					&& (tile = cache.get(dapicnum, 0, clamping, skybox)) != null) {
 				return tile;
+			}
 
 			TileData data = loadPic(fmt, si, dapicnum, dapalnum, clamping, alpha, skybox);
-			if (data == null)
+			if (data == null) {
 				return null;
+			}
 
 			tile = allocTile(data, si, dapicnum, fmt == PixelFormat.Pal8 ? 0 : dapalnum, skybox, alpha, useMipMaps);
 		}
 
-		if (dapalnum >= (MAXPALOOKUPS - RESERVEDPALS))
+		if (dapalnum >= (MAXPALOOKUPS - RESERVEDPALS)) {
 			activateEffect();
+		}
 
 		return tile;
 	}
 
 	public PixelFormat getFmt(int dapicnum) {
 		GLTile tile = cache.get(dapicnum);
-		if (tile != null)
+		if (tile != null) {
 			return tile.getPixelFormat();
+		}
 		return null;
 	}
 
 	public boolean bind(GLTile tile) {
-		if (bindedTile == tile)
+		if (bindedTile == tile) {
 			return false;
+		}
 
 		tile.bind();
 		return true;
 	}
 
 	public void unbind() {
-		if (bindedTile != null)
+		if (bindedTile != null) {
 			bindedTile.unbind();
+		}
 		bindedTile = null;
 	}
 
@@ -179,36 +186,42 @@ public class TextureManager {
 					return new PixmapTileData(new Pixmap(data, 0, data.length), clamping, expand.get());
 				} catch (Throwable t) {
 					t.printStackTrace();
-					if (skybox != 0)
+					if (skybox != 0) {
 						return null;
+					}
 				}
 			}
 		}
 
-		if (fmt == PixelFormat.Pal8)
+		if (fmt == PixelFormat.Pal8) {
 			return new IndexedTileData(engine.getTile(dapicnum), clamping, alpha, expand.get());
+		}
 		return new RGBTileData(engine.getTile(dapicnum), dapalnum, clamping, alpha, expand.get());
 	}
 
 	protected String checkResource(Hicreplctyp hicr, int dapic, int facen) {
-		if (hicr == null)
+		if (hicr == null) {
 			return null;
+		}
 
 		String fn = null;
 		if (facen > 0) {
-			if (hicr.skybox == null || facen > 6 || hicr.skybox.face[facen - 1] == null)
+			if (hicr.skybox == null || facen > 6 || hicr.skybox.face[facen - 1] == null) {
 				return null;
+			}
 
 			fn = hicr.skybox.face[facen - 1];
-		} else
+		} else {
 			fn = hicr.filename;
+		}
 
 		if (!BuildGdx.cache.contains(fn, 0)) {
 			Console.Println("Hightile[" + dapic + "]: File \"" + fn + "\" not found");
-			if (facen > 0)
+			if (facen > 0) {
 				hicr.skybox.ignore = 1;
-			else
+			} else {
 				hicr.ignore = 1;
+			}
 			return null;
 		}
 
@@ -299,16 +312,19 @@ public class TextureManager {
 
 	public void invalidate(int dapicnum, int dapalnum, boolean clamped) {
 		GLTile tile = cache.get(dapicnum, dapalnum, clamped, 0);
-		if (tile == null)
+		if (tile == null) {
 			return;
+		}
 
-		if (!tile.isHighTile())
+		if (!tile.isHighTile()) {
 			tile.setInvalidated(true);
+		}
 	}
 
 	public void invalidateall() {
-		for (int j = MAXTILES - 1; j >= 0; j--)
+		for (int j = MAXTILES - 1; j >= 0; j--) {
 			cache.invalidate(j);
+		}
 	}
 
 	public boolean clampingMode(int dameth) {
@@ -336,16 +352,18 @@ public class TextureManager {
 	}
 
 	public void activateEffect() {
-		if (GLInfo.multisample == 0)
+		if (GLInfo.multisample == 0) {
 			return;
+		}
 
 		BuildGdx.gl.glActiveTexture(GL_TEXTURE0 + ++texunits);
 		BuildGdx.gl.glEnable(GL_TEXTURE_2D);
 	}
 
 	public void deactivateEffects() {
-		if (GLInfo.multisample == 0)
+		if (GLInfo.multisample == 0) {
 			return;
+		}
 
 		while (texunits >= 0) {
 			BuildGdx.gl.glActiveTexture(GL_TEXTURE0 + texunits);
@@ -413,8 +431,9 @@ public class TextureManager {
 			if (palookups[pal] != null) {
 				palookups[pal].setInvalidated(false);
 				palookups[pal].update(dat, 0, false);
-			} else
+			} else {
 				palookups[pal] = newTile(dat, 0, false);
+			}
 
 			palookups[pal].unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
 		}
@@ -435,16 +454,18 @@ public class TextureManager {
 
 	public void changePalette(byte[] pal) {
 		TileData dat = new PaletteData(pal);
-		if (palette != null)
+		if (palette != null) {
 			palette.update(dat, 0, false);
-		else
+		} else {
 			palette = newTile(dat, 0, false);
+		}
 
 		palette.unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
 	}
 
 	public void invalidatepalookup(int pal) {
-		if (palookups[pal] != null)
+		if (palookups[pal] != null) {
 			palookups[pal].setInvalidated(true);
+		}
 	}
 }

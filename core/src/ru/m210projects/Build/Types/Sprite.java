@@ -9,13 +9,17 @@
 
 package ru.m210projects.Build.Types;
 
-import static ru.m210projects.Build.Gameutils.*;
-
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
 import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.StreamUtils;
+import ru.m210projects.Build.StringUtils;
+
+import static ru.m210projects.Build.Engine.MAXSTATUS;
 
 public class Sprite {
 	public static final int sizeof = 44;
@@ -34,8 +38,8 @@ public class Sprite {
 	private short yrepeat = 32; //2
 	private short xoffset;
 	private short yoffset; //2
-	private short sectnum;
-	private short statnum; //4
+	private short sectnum = -1;
+	private short statnum = MAXSTATUS; //4
 	private short ang;
 	private short owner = -1;
 	private short xvel;
@@ -45,28 +49,21 @@ public class Sprite {
 	private short hitag;
 	private short extra = -1;
 
-	public Sprite() {
-	}
-
-	public void buildSprite(Resource bb)
-	{
+	public Sprite readObject(Resource bb) {
 		setX(bb.readInt());
     	setY(bb.readInt());
     	setZ(bb.readInt());
     	setCstat(bb.readShort());
     	setPicnum(bb.readShort());
-    	if(!isValidTile(getPicnum())) setPicnum(0);
     	setShade(bb.readByte());
-    	setPal((short) (bb.readByte() & 0xFF));
-    	setClipdist(bb.readByte() & 0xFF);
+    	setPal(bb.readByte());
+    	setClipdist(bb.readByte());
     	setDetail(bb.readByte());
-    	setXrepeat((short) (bb.readByte() & 0xFF));
-    	setYrepeat((short) (bb.readByte() & 0xFF));
+    	setXrepeat(bb.readByte());
+    	setYrepeat(bb.readByte());
     	setXoffset(bb.readByte());
     	setYoffset(bb.readByte());
     	setSectnum(bb.readShort());
-//    	if(sectnum < 0 || sectnum >= MAXSECTORS)
-//			sectnum = 0;
     	setStatnum(bb.readShort());
     	setAng(bb.readShort());
     	setOwner(bb.readShort());
@@ -76,6 +73,37 @@ public class Sprite {
     	setLotag(bb.readShort());
     	setHitag(bb.readShort());
     	setExtra(bb.readShort());
+		return this;
+	}
+
+	public void writeObject(OutputStream os) throws IOException {
+		StreamUtils.writeInt(os, getX());
+		StreamUtils.writeInt(os, getY());
+		StreamUtils.writeInt(os, getZ());
+		StreamUtils.writeShort(os, getCstat());
+		StreamUtils.writeShort(os, getPicnum());
+		os.write(getShade());
+		os.write(getPal());
+		os.write(getClipdist());
+		os.write(getDetail());
+		os.write(getXrepeat());
+		os.write(getYrepeat());
+		os.write(getXoffset());
+		os.write(getYoffset());
+		StreamUtils.writeShort(os, getSectnum());
+		StreamUtils.writeShort(os, getStatnum());
+		StreamUtils.writeShort(os, getAng());
+		StreamUtils.writeShort(os, getOwner());
+		StreamUtils.writeShort(os, getXvel());
+		StreamUtils.writeShort(os, getYvel());
+		StreamUtils.writeShort(os, getZvel());
+		StreamUtils.writeShort(os, getLotag());
+		StreamUtils.writeShort(os, getHitag());
+		StreamUtils.writeShort(os, getExtra());
+	}
+
+	public static int getSizeof() {
+		return sizeof;
 	}
 
 	public byte[] getBytes()
@@ -221,8 +249,12 @@ public class Sprite {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Sprite)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Sprite)) {
+			return false;
+		}
 		Sprite sprite = (Sprite) o;
 
 		boolean[] b = new boolean[23];
@@ -343,7 +375,7 @@ public class Sprite {
 	}
 
 	public void setPal(int pal) {
-		this.pal = (short) pal;
+		this.pal = (short) (pal & 0xFF);
 	}
 
 	public short getDetail() {
@@ -359,7 +391,7 @@ public class Sprite {
 	}
 
 	public void setClipdist(int clipdist) {
-		this.clipdist = clipdist;
+		this.clipdist = (clipdist & 0xFF);
 	}
 
 	public short getXrepeat() {
@@ -367,7 +399,7 @@ public class Sprite {
 	}
 
 	public void setXrepeat(int xrepeat) {
-		this.xrepeat = (short) xrepeat;
+		this.xrepeat = (short) (xrepeat & 0xFF);
 	}
 
 	public short getYrepeat() {
@@ -375,7 +407,7 @@ public class Sprite {
 	}
 
 	public void setYrepeat(int yrepeat) {
-		this.yrepeat = (short) yrepeat;
+		this.yrepeat = (short) (yrepeat & 0xFF);
 	}
 
 	public short getXoffset() {

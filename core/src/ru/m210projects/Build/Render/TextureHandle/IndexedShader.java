@@ -118,8 +118,9 @@ public abstract class IndexedShader extends ShaderProgram {
 	}
 
 	protected void init() throws Exception {
-		if (!isCompiled())
+		if (!isCompiled()) {
 			throw new Exception("Shader compile error: " + getLog());
+		}
 
 		this.paletteloc = getUniformLocation("u_palette");
 		this.numshadesloc = getUniformLocation("u_numshades");

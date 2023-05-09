@@ -43,21 +43,24 @@ public class BuildEngine extends Engine {
 	@Override
 	public void faketimerhandler() {
 		BuildNet net = game.pNet;
-		if (net == null)
+		if (net == null) {
 			return; // not initialized yet
+		}
 
 		Screen current = game.getScreen();
 		if (!(current instanceof GameAdapter) && !(current instanceof LoadingAdapter)
-				&& !(current instanceof InitScreen))
+				&& !(current instanceof InitScreen)) {
 			handleevents();
+		}
 
 //		if (totalclock < net.ototalclock + ticks || !net.ready2send)
 //			return;
 //
 //		net.ototalclock = totalclock;
 
-		if (totalclock < net.ototalclock || !net.ready2send)
+		if (totalclock < net.ototalclock || !net.ready2send) {
 			return;
+		}
 
 		net.ototalclock += ticks;
 		updatesmoothticks();
@@ -92,8 +95,9 @@ public class BuildEngine extends Engine {
 						game.pInt.setwallinterpolate(tempshort, Engine.getWall(tempshort));
 						Engine.getWall(tempshort).setX(dax);
 						Engine.getWall(tempshort).setY(day);
-					} else
+					} else {
 						break;
+					}
 
 					cnt--;
 				} while ((tempshort != pointhighlight) && (cnt > 0));
@@ -110,12 +114,15 @@ public class BuildEngine extends Engine {
 	}
 
 	protected void GetInput(BuildNet net) {
-		if (numplayers > 1)
+		if (numplayers > 1) {
 			net.GetPackets();
+		}
 
-		for (int i = connecthead; i >= 0; i = connectpoint2[i])
-			if (i != myconnectindex && net.gNetFifoHead[myconnectindex] - 200 > net.gNetFifoHead[i])
+		for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
+			if (i != myconnectindex && net.gNetFifoHead[myconnectindex] - 200 > net.gNetFifoHead[i]) {
 				return;
+			}
+		}
 
 		if (!game.pMenu.gShowMenu && !Console.IsShown()) {
 			game.pInput.ctrlMouseHandler();

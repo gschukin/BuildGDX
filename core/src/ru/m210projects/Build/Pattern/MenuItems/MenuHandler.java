@@ -93,17 +93,20 @@ public abstract class MenuHandler {
 	public abstract void mSound(MenuItem item, MenuOpt opt);
 
 	public MenuOpt mUpdateMouse(BuildControls input) {
-		if(BuildGdx.input.getDeltaX() != 0 || BuildGdx.input.getDeltaY() != 0)
+		if(BuildGdx.input.getDeltaX() != 0 || BuildGdx.input.getDeltaY() != 0) {
 			mUseMouse = true;
+		}
 
-		if(!mUseMouse)
+		if(!mUseMouse) {
 			return null;
+		}
 
 		int mx = BClipRange(BuildGdx.input.getX(), 0, xdim);
 		int my = BClipRange(BuildGdx.input.getY(), 0, ydim);
 
-		if(!input.ctrlMenuMouse())
+		if(!input.ctrlMenuMouse()) {
 			return null;
+		}
 		
 		BuildMenu pMenu = mMenuHistory[0];
 		
@@ -124,24 +127,30 @@ public abstract class MenuHandler {
 				|| (pMenu.m_pItems[pMenu.m_nFocus] instanceof MenuKeyboardList 
 						&& ((MenuKeyboardList)pMenu.m_pItems[pMenu.m_nFocus]).l_set == 0))
 			{
-				if(input.ctrlKeyStatus(MOUSE_LBUTTON)) 
+				if(input.ctrlKeyStatus(MOUSE_LBUTTON)) {
 					opt = MenuOpt.LMB;
+				}
 			} 
-			else if(input.ctrlKeyStatusOnce(MOUSE_LBUTTON)) 
+			else if(input.ctrlKeyStatusOnce(MOUSE_LBUTTON)) {
 				opt = MenuOpt.LMB;
+			}
 		}
 		
-		if(input.ctrlKeyStatusOnce(MOUSE_RBUTTON)) 
+		if(input.ctrlKeyStatusOnce(MOUSE_RBUTTON)) {
 			opt = MenuOpt.RMB;
-		if(input.ctrlKeyStatusOnce(MOUSE_WHELLUP)) 
+		}
+		if(input.ctrlKeyStatusOnce(MOUSE_WHELLUP)) {
 			opt = MenuOpt.MWUP;
-		if(input.ctrlKeyStatusOnce(MOUSE_WHELLDN)) 
+		}
+		if(input.ctrlKeyStatusOnce(MOUSE_WHELLDN)) {
 			opt = MenuOpt.MWDW;
+		}
 
 		short focus = mCheckButton(pMenu, input, mx, my);
 		if(focus != -1 && pMenu.mCheckItemsFlags(focus) && mUseMouse) {
-			if(pMenu.m_nFocus != focus)
+			if(pMenu.m_nFocus != focus) {
 				opt = MenuOpt.MCHANGE;
+			}
 			pMenu.m_nFocus = focus;
 		}
 
@@ -159,8 +168,9 @@ public abstract class MenuHandler {
 		for(short i = 0; i < pMenu.m_pItems.length; i++)
 		{
 			if(pMenu.mCheckMouseFlag(i) && 
-					pMenu.m_pItems[i].mouseAction(touchX, touchY) && !input.ctrlKeyStatus(MOUSE_LBUTTON))
+					pMenu.m_pItems[i].mouseAction(touchX, touchY) && !input.ctrlKeyStatus(MOUSE_LBUTTON)) {
 				return i;
+			}
 		}
 		return -1;
 	}
@@ -177,39 +187,57 @@ public abstract class MenuHandler {
 				return;
 			}
 
-			if(input.ctrlKeyStatusOnce(Keys.UP) || input.ctrlPadStatusOnce(MenuKeys.Menu_Up))
+			if(input.ctrlKeyStatusOnce(Keys.UP) || input.ctrlPadStatusOnce(MenuKeys.Menu_Up)) {
 				opt = MenuOpt.UP;
-			if(input.ctrlKeyStatusOnce(Keys.DOWN) || input.ctrlPadStatusOnce(MenuKeys.Menu_Down)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.DOWN) || input.ctrlPadStatusOnce(MenuKeys.Menu_Down)) {
 				opt = MenuOpt.DW;
-			if(input.ctrlKeyStatusOnce(Keys.LEFT) || input.ctrlPadStatusOnce(MenuKeys.Menu_Left)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.LEFT) || input.ctrlPadStatusOnce(MenuKeys.Menu_Left)) {
 				opt = MenuOpt.LEFT;
-			if(input.ctrlKeyStatusOnce(Keys.RIGHT) || input.ctrlPadStatusOnce(MenuKeys.Menu_Right)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.RIGHT) || input.ctrlPadStatusOnce(MenuKeys.Menu_Right)) {
 				opt = MenuOpt.RIGHT;
-			if(input.ctrlKeyStatusOnce(Keys.ENTER) || input.ctrlPadStatusOnce(MenuKeys.Menu_Enter)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.ENTER) || input.ctrlPadStatusOnce(MenuKeys.Menu_Enter)) {
 				opt = MenuOpt.ENTER;
-			if(input.ctrlGetInputKey(GameKeys.Menu_Toggle, true) || /*mCount > 1 && - Menu_cancel can close the menu now*/ input.ctrlPadStatusOnce(MenuKeys.Menu_Cancel)) 
+			}
+			if(input.ctrlGetInputKey(GameKeys.Menu_Toggle, true) || /*mCount > 1 && - Menu_cancel can close the menu now*/ input.ctrlPadStatusOnce(MenuKeys.Menu_Cancel)) {
 				opt = MenuOpt.ESC;
-			if(input.ctrlKeyStatusOnce(Keys.SPACE)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.SPACE)) {
 				opt = MenuOpt.SPACE;
-			if(input.ctrlKeyStatusOnce(Keys.BACKSPACE)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.BACKSPACE)) {
 				opt = MenuOpt.BSPACE;
-			if(input.ctrlKeyStatusOnce(Keys.FORWARD_DEL)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.FORWARD_DEL)) {
 				opt = MenuOpt.DELETE;
-			if(input.ctrlKeyStatusOnce(Keys.PAGE_UP)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.PAGE_UP)) {
 				opt = MenuOpt.PGUP;
-			if(input.ctrlKeyStatusOnce(Keys.PAGE_DOWN)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.PAGE_DOWN)) {
 				opt = MenuOpt.PGDW;
-			if(input.ctrlKeyStatusOnce(Keys.HOME)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.HOME)) {
 				opt = MenuOpt.HOME;
-			if(input.ctrlKeyStatusOnce(Keys.END)) 
+			}
+			if(input.ctrlKeyStatusOnce(Keys.END)) {
 				opt = MenuOpt.END;
+			}
 
-			if(opt != MenuOpt.ANY) mUseMouse = false;
+			if(opt != MenuOpt.ANY) {
+				mUseMouse = false;
+			}
 			MenuOpt mopt = mUpdateMouse(input);
-			if(mopt != null) opt = mopt;
+			if(mopt != null) {
+				opt = mopt;
+			}
 
-			if(pMenu.mLoadRes(this, opt)) 
+			if(pMenu.mLoadRes(this, opt)) {
 				mMenuBack();
+			}
 
 			if(!BuildGdx.input.isTouched() && input.ctrlKeyStatus(ANYKEY)
 					&& opt != MenuOpt.ENTER 
@@ -222,13 +250,17 @@ public abstract class MenuHandler {
 						keycount = hitTime;
 					}
 				}
-			} else keycount = 0;
+			} else {
+				keycount = 0;
+			}
 		}
 	}
 	
 	public void mOpen(BuildMenu pMenu, int nItem)
 	{
-		if(pMenu == null || mCount == 8) return;
+		if(pMenu == null || mCount == 8) {
+			return;
+		}
 
 		mMenuHistory[0] = pMenu;
 		mMenuHistory[++mCount] = pMenu;
@@ -246,8 +278,9 @@ public abstract class MenuHandler {
 		
 		gShowMenu = false;
 		
-		if(!BuildGdx.app.isActive())
+		if(!BuildGdx.app.isActive()) {
 			return;
+		}
 		
     	BuildGdx.input.setCursorCatched(true);
     	BuildGdx.input.setCursorPosition(xdim / 2, ydim / 2);
@@ -255,8 +288,9 @@ public abstract class MenuHandler {
 	
 	public void mMenuBack() {
 		if(mCount > 0) {
-			if(mMenuHistory[0] != null)
+			if(mMenuHistory[0] != null) {
 				mMenuHistory[0].mLoadRes(this, MenuOpt.Close);
+			}
 			mCount = BClipLow(mCount - 1, 0);
 			if(mCount > 0) {
 				mMenuHistory[0] = mMenuHistory[mCount];
@@ -268,8 +302,9 @@ public abstract class MenuHandler {
 	
 	public void mMenuBack(MenuOpt opt) {
 		if(mCount > 0) {
-			if(mMenuHistory[0] != null)
+			if(mMenuHistory[0] != null) {
 				mMenuHistory[0].mLoadRes(this, MenuOpt.Close);
+			}
 			mCount = BClipLow(mCount - 1, 0);
 			if(mCount > 0) {
 				mMenuHistory[0] = mMenuHistory[mCount];
@@ -287,8 +322,9 @@ public abstract class MenuHandler {
 	
 	public BuildMenu getLastMenu()
 	{
-		if(mCount > 0)
+		if(mCount > 0) {
 			return mMenuHistory[mCount - 1];
+		}
 		return getCurrentMenu();
 	}
 	
@@ -298,12 +334,14 @@ public abstract class MenuHandler {
 	}
 
 	public void mDrawMenu() {
-		if(mMenuHistory[0] != null) 
+		if(mMenuHistory[0] != null) {
 			mMenuHistory[0].mDraw(this);
+		}
 		
 		mDrawBackButton();
 		
-		if(mUseMouse)
+		if(mUseMouse) {
 			mDrawMouse(BuildGdx.input.getX(), BuildGdx.input.getY());
+		}
 	}
 }

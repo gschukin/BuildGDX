@@ -25,8 +25,9 @@ public class WAVLoader extends SoundData {
 
 	public WAVLoader(byte[] data) throws Exception
 	{
-		if(data.length <= 44)
+		if(data.length <= 44) {
 			throw new Exception("Wrong file size");
+		}
 
 		getInfo(data);
 		this.data = ByteBuffer.allocateDirect(data.length - 44);
@@ -39,24 +40,32 @@ public class WAVLoader extends SoundData {
 		int ptr = 0;
 		int riff_id = LittleEndian.getInt(data, ptr); ptr += 4;
 		if(riff_id != 0x46464952) //RIFF
+		{
 			throw new Exception("RIFF header not found");
+		}
 
 		ptr += 4; //chunk size
 		int format = LittleEndian.getInt(data, ptr); ptr += 4;
 		if(format != 0x45564157) //WAVE
+		{
 			throw new Exception("Invalid wave file header");
+		}
 		int fmt_id = LittleEndian.getInt(data, ptr); ptr += 4;
 		if(fmt_id != 0x20746d66) //fmt
+		{
 			throw new Exception("Invalid wave file header");
+		}
 
 		int pcm_id = LittleEndian.getInt(data, ptr); ptr += 4;
-		if(pcm_id != 16)
+		if(pcm_id != 16) {
 			throw new Exception("WAV files must be PCM: " + pcm_id);
+		}
 
 		ptr += 2; //audio format
 		channels = LittleEndian.getShort(data, ptr); ptr += 2;
-		if (channels != 1 && channels != 2)
+		if (channels != 1 && channels != 2) {
 			throw new Exception("WAV files must have 1 or 2 channels: " + channels);
+		}
 		rate = LittleEndian.getInt(data, ptr); ptr += 4;
 		ptr += 4; //byte rate
 		ptr += 2; //block align

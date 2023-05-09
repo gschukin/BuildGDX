@@ -76,16 +76,18 @@ public abstract class MenuVideoMode extends BuildMenu {
 
 		List<char[]> list = new ArrayList<char[]>();
 		if (strvmodes != null) {
-			for (int i = 0; i < strvmodes.length; i++)
+			for (int i = 0; i < strvmodes.length; i++) {
 				list.add(strvmodes[i].toCharArray());
+			}
 		}
 
 		MenuProc callback = new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				final MenuList item = (MenuList) pItem;
-				if (item.l_nFocus == -1)
+				if (item.l_nFocus == -1) {
 					return;
+				}
 
 				BuildGdx.app.postRunnable(new Runnable() {
 					@Override
@@ -164,19 +166,31 @@ public abstract class MenuVideoMode extends BuildMenu {
 				{
 				case LEFT:
 				case MWDW:
-					if(list == null) return false;
-					if(num > 0) num--;
-					else num = 0;
-					if(callback != null)
+					if(list == null) {
+						return false;
+					}
+					if(num > 0) {
+						num--;
+					} else {
+						num = 0;
+					}
+					if(callback != null) {
 						callback.run(handler, this);
+					}
 					return false;
 				case RIGHT:
 				case MWUP:
-					if(list == null) return false;
-					if(num < list.length - 1) num++;
-					else num = list.length - 1;
-					if(callback != null)
+					if(list == null) {
+						return false;
+					}
+					if(num < list.length - 1) {
+						num++;
+					} else {
+						num = list.length - 1;
+					}
+					if(callback != null) {
 						callback.run(handler, this);
+					}
 					return false;
 				case ENTER:
 				case LMB:
@@ -211,16 +225,19 @@ public abstract class MenuVideoMode extends BuildMenu {
 				int px = x, py = y;
 
 				char[] key;
-				if (num != -1 && list != null)
+				if (num != -1 && list != null) {
 					key = list[num];
-				else
+				} else {
 					key = toCharArray(cfg.ScreenWidth + " x " + cfg.ScreenHeight + " *");
+				}
 
 				int pal = handler.getPal(font, this);
 				int shade = handler.getShade(this);
 				font.drawText(px, py, text, shade, pal, TextAlign.Left, 2, fontShadow);
 
-				if(key == null) return;
+				if(key == null) {
+					return;
+				}
 
 				listFont.drawText(x + width - 1 - listFont.getWidth(key), py, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
 
@@ -287,9 +304,11 @@ public abstract class MenuVideoMode extends BuildMenu {
 
 			@Override
 			public void mCheckEnableItem(boolean nEnable) {
-				if (nEnable)
+				if (nEnable) {
 					flags = 3 | 4;
-				else flags = 3;
+				} else {
+					flags = 3;
+				}
 			}
 		};
 

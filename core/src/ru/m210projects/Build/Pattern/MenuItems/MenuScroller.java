@@ -67,21 +67,25 @@ public class MenuScroller extends MenuItem {
 	@Override
 	public boolean mouseAction(int mx, int my) {
 		touchY = my;
-		if(!BuildGdx.input.isTouched())
+		if(!BuildGdx.input.isTouched()) {
 			touchedObj = null;
+		}
 
 		if(mx >= x && mx < x + width)
 		{
 			if(my >= y && my < y + height) {
 				if(m_pMenu.m_pItems[m_pMenu.m_nFocus] != this)
 				{
-					for ( short i = 0; i < m_pMenu.m_nItems; ++i )
-						if(m_pMenu.m_pItems[i] == this)
+					for ( short i = 0; i < m_pMenu.m_nItems; ++i ) {
+						if(m_pMenu.m_pItems[i] == this) {
 							m_pMenu.m_nFocus = i; //autofocus to scroller
+						}
+					}
 				}
 				
-				if(BuildGdx.input.isTouched()) 
+				if(BuildGdx.input.isTouched()) {
 					touchedObj = this;
+				}
 			}
 		}
 

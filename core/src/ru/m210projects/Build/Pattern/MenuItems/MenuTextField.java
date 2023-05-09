@@ -62,32 +62,39 @@ public class MenuTextField extends MenuItem {
 		this.inputCallback = new InputCallback() {
 			@Override
 			public int run(int ch) {
-				if (ch == Keys.ESCAPE) 
-	                return -1;
+				if (ch == Keys.ESCAPE) {
+					return -1;
+				}
 
 				if (ch == Keys.BACKSPACE) { 
-	            	if (inputlen == 0)
-	            		return 0;
+	            	if (inputlen == 0) {
+						return 0;
+					}
 	            	inputlen--;
 	            	typingBuf[inputlen]=0;
 	            }
 				
-				if (ch == Keys.ENTER) 
+				if (ch == Keys.ENTER) {
 					return 1;
+				}
 
 				if(BuildGdx.input.isKeyPressed(Keys.CONTROL_LEFT) && ch == Keys.V)
 				{
 					if(BuildGdx.app.getClipboard() != null) {
 						String content = BuildGdx.app.getClipboard().getContents();
-						for(int i = 0; i < content.length(); i++)
+						for(int i = 0; i < content.length(); i++) {
 							type(content.charAt(i), charFlag);
+						}
 					}
 					return 0;
 				}
 
-				if(ch == KEY_NUMDECIMAL) ch = Keys.PERIOD;
-				if(ch >= Keys.NUMPAD_0 && ch <= Keys.NUMPAD_9)
+				if(ch == KEY_NUMDECIMAL) {
+					ch = Keys.PERIOD;
+				}
+				if(ch >= Keys.NUMPAD_0 && ch <= Keys.NUMPAD_9) {
 					ch = ch - Keys.NUMPAD_0 + Keys.NUM_0;
+				}
 				
 				type(getChar(ch), charFlag);
 				return 0;
@@ -107,15 +114,17 @@ public class MenuTextField extends MenuItem {
 					|| (!isdigit(ch) && !isalpha(ch)
 					&& ((charFlag & SYMBOLS) != 0 || (charFlag & POINT) != 0 && ch == '.'));
 
-        	if (canType) 
-        		typingBuf[inputlen++]= ch;
+        	if (canType) {
+				typingBuf[inputlen++]= ch;
+			}
     	}
 	}
 	
 	private char getChar(int ch)
 	{
-		if (ch < 128) 
+		if (ch < 128) {
 			return gdxscantoasc[ch];
+		}
 		return 0;
 	}
 	
@@ -125,8 +134,9 @@ public class MenuTextField extends MenuItem {
 		{
 			int pal = handler.getPal(font, this);
 			int shade = handler.getShade(this);
-		    if ( !m_pMenu.mGetFocusedItem(this) )
-		     	typing = false;
+		    if ( !m_pMenu.mGetFocusedItem(this) ) {
+				typing = false;
+			}
 
 		    font.drawText(x, y, text, shade, pal, TextAlign.Left, 2, fontShadow);
 
@@ -137,8 +147,9 @@ public class MenuTextField extends MenuItem {
 			}
 
 			font.drawText(px - font.getWidth(typingBuf), y, typingBuf, shade, pal, TextAlign.Left, 2, fontShadow);
-		    if(typing && (totalclock & 0x20) != 0) 
-		    	font.drawChar(px, y, '_', shade, pal, 2, false);
+		    if(typing && (totalclock & 0x20) != 0) {
+				font.drawChar(px, y, '_', shade, pal, 2, false);
+			}
 		}
 		handler.mPostDraw(this);
 	}
@@ -160,8 +171,9 @@ public class MenuTextField extends MenuItem {
 						return false;
 					}
 					
-					if(confirmCallback != null) 
-						confirmCallback.run(handler, this);	
+					if(confirmCallback != null) {
+						confirmCallback.run(handler, this);
+					}
 				}
 			} else {
 				System.arraycopy(otypingBuf, 0, typingBuf, 0, 16);
@@ -175,7 +187,9 @@ public class MenuTextField extends MenuItem {
 			{
 			case ENTER:
 			case LMB:
-				if ( (flags & 4) == 0 ) return false;
+				if ( (flags & 4) == 0 ) {
+					return false;
+				}
 				
 				getInput().initMessageInput(null);		
 				System.arraycopy(typingBuf, 0, otypingBuf, 0, 16);
@@ -203,12 +217,15 @@ public class MenuTextField extends MenuItem {
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text))
-				if(my > y && my < y + font.getHeight())
+			if(mx > x && mx < x + font.getWidth(text)) {
+				if(my > y && my < y + font.getHeight()) {
 					return true;
+				}
+			}
 
-			if(mx > x + width - font.getWidth(typingBuf) && mx < x + width - 1)
+			if(mx > x + width - font.getWidth(typingBuf) && mx < x + width - 1) {
 				return my > y && my < y + font.getHeight();
+			}
 		}
 
 		return false;

@@ -48,8 +48,12 @@ public abstract class Source implements Comparable<Source> {
 
 	@Override
 	public int compareTo(Source source) {
-		if((source.flags & Source.Locked) != 0) return -1;
-		if(source.free) return 1;
+		if((source.flags & Source.Locked) != 0) {
+			return -1;
+		}
+		if(source.free) {
+			return 1;
+		}
 		return (this.priority - source.priority);
 	}
 	

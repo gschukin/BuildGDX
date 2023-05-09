@@ -110,11 +110,13 @@ public abstract class BuildGame extends Game {
 		if(getScreen() instanceof InitScreen) {
 			getScreen().dispose();
 		}
-		if(numplayers > 1)
+		if(numplayers > 1) {
 			pNet.NetDisconnect(myconnectindex);
+		}
 
-		if(pEngine != null)
+		if(pEngine != null) {
 			pEngine.uninit();
+		}
 		System.out.println("disposed");
 	}
 
@@ -126,9 +128,11 @@ public abstract class BuildGame extends Game {
 	@Override
 	public void render() {
 		try {
-			if(!gExit)
+			if(!gExit) {
 				super.render();
-			else BuildGdx.app.exit();
+			} else {
+				BuildGdx.app.exit();
+			}
 		} catch (OutOfMemoryError me) {
 			System.gc();
 
@@ -157,30 +161,42 @@ public abstract class BuildGame extends Game {
 	}
 
 	private String exceptionHandler(Throwable e) {
-		if (e instanceof ArithmeticException)
+		if (e instanceof ArithmeticException) {
 			return "ArithmeticException";
-		if (e instanceof ArrayIndexOutOfBoundsException)
+		}
+		if (e instanceof ArrayIndexOutOfBoundsException) {
 			return "ArrayIndexOutOfBoundsException";
-		if (e instanceof ArrayStoreException)
+		}
+		if (e instanceof ArrayStoreException) {
 			return "ArrayStoreException";
-		if (e instanceof ClassCastException)
+		}
+		if (e instanceof ClassCastException) {
 			return "ClassCastException";
-		if (e instanceof IllegalMonitorStateException)
+		}
+		if (e instanceof IllegalMonitorStateException) {
 			return "IllegalMonitorStateException";
-		if (e instanceof IllegalStateException)
+		}
+		if (e instanceof IllegalStateException) {
 			return "IllegalStateException";
-		if (e instanceof IllegalThreadStateException)
+		}
+		if (e instanceof IllegalThreadStateException) {
 			return "IllegalThreadStateException";
-		if (e instanceof IndexOutOfBoundsException)
+		}
+		if (e instanceof IndexOutOfBoundsException) {
 			return "IndexOutOfBoundsException";
-		if (e instanceof NegativeArraySizeException)
+		}
+		if (e instanceof NegativeArraySizeException) {
 			return "NegativeArraySizeException";
-		if (e instanceof NullPointerException)
+		}
+		if (e instanceof NullPointerException) {
 			return "NullPointerException";
-		if (e instanceof NumberFormatException)
+		}
+		if (e instanceof NumberFormatException) {
 			return "NumberFormatException";
-		if (e instanceof SecurityException)
+		}
+		if (e instanceof SecurityException) {
 			return "SecurityException";
+		}
 
 		return "Application exception (" + e.toString() + ") \n\r";
 	}
@@ -205,11 +221,13 @@ public abstract class BuildGame extends Game {
 
 	public String getScrName()
 	{
-		if(gCurrScreen != null)
+		if(gCurrScreen != null) {
 			return gCurrScreen.getClass().getSimpleName();
+		}
 
-		if(BuildGdx.app != null)
+		if(BuildGdx.app != null) {
 			return "Create frame";
+		}
 
 		return "Init frame";
 	}
@@ -217,8 +235,9 @@ public abstract class BuildGame extends Game {
 	public boolean setDefs(DefScript script)
 	{
 		if(currentDef != script) {
-			if(currentDef != null)
+			if(currentDef != null) {
 				currentDef.dispose();
+			}
 			currentDef = script;
 			currentDef.apply();
 			pEngine.setDefs(script);
@@ -262,10 +281,12 @@ public abstract class BuildGame extends Game {
 				String currScreen = getScrName();
 				String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
 
-				if(nNetMode == NetMode.Multiplayer)
+				if(nNetMode == NetMode.Multiplayer) {
 					pNet.NetDisconnect(myconnectindex);
-				if (BuildGdx.message.show(msg, stack, MessageType.Crash))
+				}
+				if (BuildGdx.message.show(msg, stack, MessageType.Crash)) {
 					saveToFTP(currScreen, prevScreen);
+				}
 			} catch (Exception e) {
 			} finally {
 				this.dispose();
@@ -287,10 +308,12 @@ public abstract class BuildGame extends Game {
 			String currScreen = getScrName();
 			String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
 
-			if(nNetMode == NetMode.Multiplayer)
+			if(nNetMode == NetMode.Multiplayer) {
 				pNet.NetDisconnect(myconnectindex);
-			if (BuildGdx.message.show("FatalError", msg, MessageType.Crash))
+			}
+			if (BuildGdx.message.show("FatalError", msg, MessageType.Crash)) {
 				saveToFTP(currScreen, prevScreen);
+			}
 		} catch (Exception e) {
 		} finally {
 			this.dispose();
@@ -327,16 +350,18 @@ public abstract class BuildGame extends Game {
 	}
 
 	private byte[] decryptBuffer(byte[] buffer, int size, long key) {
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < size; i++) {
 			buffer[i] ^= key + i;
+		}
 
 		return buffer;
 	}
 
 	private void saveToFTP(String curr, String prev)
 	{
-		if(!release)
+		if(!release) {
 			return;
+		}
 
 		initFTP();
 
@@ -350,8 +375,9 @@ public abstract class BuildGame extends Game {
 			String text = Console.GetLog();
 			text += "\r\n";
 			text += "Screen: " + curr + "\r\n";
-			if(prev != null)
+			if(prev != null) {
 				text += "PrevScreen: " + prev + "\r\n";
+			}
 			if(pEngine.getrender() != null) {
 				text += "Renderer: " + pEngine.getrender().getType().getName() + "\r\n";
 				if(pEngine.getrender().getType() == RenderType.Software)
@@ -364,8 +390,9 @@ public abstract class BuildGame extends Game {
 			os.write(text.getBytes());
 			try {
 				byte[] report = reportData();
-				if(report != null)
+				if(report != null) {
 					os.write(report);
+				}
 			} catch (Exception e) { text = "Crash in reportData: " + e.getMessage() + "\r\n"; os.write(text.getBytes()); }
 
 			os.close();

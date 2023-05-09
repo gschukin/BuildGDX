@@ -75,10 +75,12 @@ public class RayCaster {
 		@Override
 		public int compare(EndPoint a, EndPoint b) {
 			// XXX Comparison method violates its general contract!
-			if (a.angle != b.angle)
+			if (a.angle != b.angle) {
 				return a.angle > b.angle ? 1 : -1;
-			if (a.begin != b.begin)
+			}
+			if (a.begin != b.begin) {
 				return !a.begin && b.begin ? 1 : -1;
+			}
 			return 0;
 		}
 	};
@@ -86,8 +88,9 @@ public class RayCaster {
 	protected Comparator<Segment> wallfront = new Comparator<Segment>() {
 		@Override
 		public int compare(Segment o1, Segment o2) {
-			if (!wallfront(o1, o2))
+			if (!wallfront(o1, o2)) {
 				return -1;
+			}
 			return 0;
 		}
 	};
@@ -160,7 +163,9 @@ public class RayCaster {
 				if (Math.abs(cross) < 0.00001 && Math.abs(cross1) < 0.00001 && Math.abs(cross3) < 0.00001
 						&& Math.abs(cross4) < 0.00001) {
 					if (a.isPortal() && !b.isPortal()) // e2l8
+					{
 						return false;
+					}
 				}
 			}
 
@@ -204,10 +209,12 @@ public class RayCaster {
 			segment.p2.angle = atan2((segment.p2.y - globalposy), (segment.p2.x - globalposx));
 
 			float dAngle = (segment.p2.angle - segment.p1.angle);
-			if ((dAngle <= -2))
+			if ((dAngle <= -2)) {
 				dAngle += 4;
-			if ((dAngle > 2))
+			}
+			if ((dAngle > 2)) {
 				dAngle -= 4;
+			}
 
 			segment.p1.begin = (dAngle > 0.0);
 			segment.p2.begin = !(segment.p1.begin);
@@ -218,13 +225,16 @@ public class RayCaster {
 
 	public float atan2(float dx, float dy) {
 		float len = (float) Math.sqrt(dx * dx + dy * dy);
-		if(len == 0)
+		if(len == 0) {
 			return 0;
+		}
 		dx /= len;
-		if (dy >= 0)
+		if (dy >= 0) {
 			return dx;
-		if (dx >= 0)
+		}
+		if (dx >= 0) {
 			return 2 - dx;
+		}
 		return -(2 + dx);
 	}
 
@@ -237,10 +247,11 @@ public class RayCaster {
 		} else {
 			WallFrustum2d f = frust;
 			do {
-				if (f.isGreater180())
+				if (f.isGreater180()) {
 					addSegment(z, wal.getX(), wal.getY(), wal2.getX(), wal2.getY());
-				else
+				} else {
 					addClippedSegment(f, z);
+				}
 				f = f.next;
 			} while (f != null);
 		}
@@ -270,7 +281,9 @@ public class RayCaster {
 
 				float dAngle = (angle2 - angle1);
 				if (dAngle >= 0.01f) // XXX E3L2 line wall bug fix
+				{
 					handled[z >> 3] |= pow2char[z & 7];
+				}
 				return;
 			}
 
@@ -293,8 +306,9 @@ public class RayCaster {
 	}
 
 	public boolean check(int z) {
-		if ((handled[z >> 3] & pow2char[z & 7]) == 0)
+		if ((handled[z >> 3] & pow2char[z & 7]) == 0) {
 			return true;
+		}
 
 		return (gotwall[z >> 3] & pow2char[z & 7]) != 0;
 	}
@@ -311,8 +325,9 @@ public class RayCaster {
 				Segment current_old = open.getFirst();
 
 				while (current_old != null && current_old.isPortal()) {
-					if (i == 1)
+					if (i == 1) {
 						gotwall[current_old.wallid >> 3] |= pow2char[current_old.wallid & 7];
+					}
 					open.remove(current_old);
 					current_old = open.getFirst();
 				}

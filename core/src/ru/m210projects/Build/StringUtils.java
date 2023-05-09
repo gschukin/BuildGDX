@@ -19,8 +19,9 @@ package ru.m210projects.Build;
 public class StringUtils {
 
 	public static String toUnicode(String t) {
-		if(t == null)
+		if(t == null) {
 			return null;
+		}
 		return t.replaceAll("[^\\p{L}\\p{Nd}\\W_]+|\0", ""); //return t.replaceAll("[^a-zA-Z0-9_. /-]", "");
 	}
 }

@@ -50,7 +50,9 @@ public class WallFrustum2d implements Poolable {
 		if (sinA == 0.0f) {
 			float cosA = -planes[0].normal.y * planes[1].normal.y - planes[0].normal.x * planes[1].normal.x;
 			if (cosA > 0.0f) // fov == 0
+			{
 				return null;
+			}
 		}
 		return this;
 	}
@@ -89,8 +91,9 @@ public class WallFrustum2d implements Poolable {
 	}
 
 	public boolean wallInFrustum(Wall wal) {
-		if (isFullAngle)
+		if (isFullAngle) {
 			return true;
+		}
 
 		int x1 = wal.getX() - globalposx;
 		int y1 = wal.getY() - globalposy;
@@ -104,25 +107,30 @@ public class WallFrustum2d implements Poolable {
 			for (int i = 0; i < 2; i++) {
 				Plane plane = planes[i];
 
-				if (plane.normal.dot(x1, y1, 0) >= 0)
+				if (plane.normal.dot(x1, y1, 0) >= 0) {
 					return true;
+				}
 
-				if (plane.normal.dot(x2, y2, 0) >= 0)
+				if (plane.normal.dot(x2, y2, 0) >= 0) {
 					return true;
+				}
 			}
 			return false;
 		}
 
-		if (!NearPlaneCheck(wal))
+		if (!NearPlaneCheck(wal)) {
 			return false;
+		}
 
 		for (int i = 0; i < 2; i++) {
 			Plane plane = planes[i];
-			if (plane.normal.dot(x1, y1, 0) >= 0)
+			if (plane.normal.dot(x1, y1, 0) >= 0) {
 				continue;
+			}
 
-			if (plane.normal.dot(x2, y2, 0) >= 0)
+			if (plane.normal.dot(x2, y2, 0) >= 0) {
 				continue;
+			}
 
 			return false;
 		}
@@ -136,8 +144,9 @@ public class WallFrustum2d implements Poolable {
 
 		int x1 = wal.getX() - globalposx;
 		int y1 = wal.getY() - globalposy;
-		if (tmp.dot(x1, y1) >= 0)
+		if (tmp.dot(x1, y1) >= 0) {
 			return true;
+		}
 
 		int x2 = Engine.getWall(wal.getPoint2()).getX() - globalposx;
 		int y2 = Engine.getWall(wal.getPoint2()).getY() - globalposy;
@@ -145,8 +154,9 @@ public class WallFrustum2d implements Poolable {
     }
 
 	public boolean fieldOfViewClipping(WallFrustum2d frustum) {
-		if (frustum.isFullAngle)
+		if (frustum.isFullAngle) {
 			return true;
+		}
 
 		final float precise = 0.00001f;
 
@@ -172,7 +182,9 @@ public class WallFrustum2d implements Poolable {
 						float frdiry = frustum.planes[0].normal.y + frustum.planes[1].normal.y;
 
 						if ((dirx * frdirx + diry * frdiry) < 0) // 180 vs 180
+						{
 							return false;
+						}
 					}
 
 					if (dot1 >= -precise && dot2 >= -precise) {
@@ -247,12 +259,14 @@ public class WallFrustum2d implements Poolable {
 
 		if (isGreater180) {
 			boolean point1InFrustum = dot3 >= -precise;
-			if (!point1InFrustum)
+			if (!point1InFrustum) {
 				point1InFrustum = dot1 >= -precise;
+			}
 
 			boolean point2InFrustum = dot2 >= -precise;
-			if (!point2InFrustum)
+			if (!point2InFrustum) {
 				point2InFrustum = dot4 >= -precise;
+			}
 
 			return point1InFrustum && point2InFrustum;
 		}
@@ -261,8 +275,9 @@ public class WallFrustum2d implements Poolable {
     }
 
 	public FrustumStatus isExpanded(WallFrustum2d frustum) {
-		if (isFullAngle)
+		if (isFullAngle) {
 			return FrustumStatus.Inside;
+		}
 
 		if (frustum.isFullAngle) {
 			setFullAngle();
@@ -294,7 +309,9 @@ public class WallFrustum2d implements Poolable {
 				float frdirx = frustum.planes[0].normal.x + frustum.planes[1].normal.x;
 				float frdiry = frustum.planes[0].normal.y + frustum.planes[1].normal.y;
 				if ((dirx * frdirx + diry * frdiry) >= 0) // 180 vs 180
+				{
 					return FrustumStatus.Inside;
+				}
 
 				if (dot1 >= -precise && dot2 >= -precise) {
 					setFullAngle();
@@ -365,8 +382,9 @@ public class WallFrustum2d implements Poolable {
 				return n;
 			}
 
-			if (stat == FrustumStatus.Inside)
+			if (stat == FrustumStatus.Inside) {
 				return null;
+			}
 
 			prev = n;
 			n = n.next;
@@ -380,10 +398,11 @@ public class WallFrustum2d implements Poolable {
 	// Debug operations
 
 	public Vector2 getPlane(int num) {
-		if (num == 0)
+		if (num == 0) {
 			tmp.set(planes[num].normal.y, -planes[num].normal.x);
-		else
+		} else {
 			tmp.set(-planes[num].normal.y, planes[num].normal.x);
+		}
 		return tmp;
 	}
 
@@ -393,13 +412,15 @@ public class WallFrustum2d implements Poolable {
 	}
 
 	public float getHFov() {
-		if (this.isFullAngle)
+		if (this.isFullAngle) {
 			return 360;
+		}
 
 		float lang = getPlane(0).angle();
 		float rang = getPlane(1).angle();
-		if (lang > rang)
+		if (lang > rang) {
 			lang -= 360;
+		}
 
 		return rang - lang;
 	}
@@ -417,8 +438,9 @@ public class WallFrustum2d implements Poolable {
 	public Vector2 getDirection(boolean normalized) {
 		tmp.set(planes[0].normal.x, planes[0].normal.y);
 		tmp.add(planes[1].normal.x, planes[1].normal.y);
-		if (normalized)
+		if (normalized) {
 			tmp.nor();
+		}
 		return tmp;
 	}
 

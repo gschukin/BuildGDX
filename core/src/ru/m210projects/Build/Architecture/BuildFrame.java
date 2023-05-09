@@ -111,30 +111,42 @@ public abstract class BuildFrame {
 		shouldRender |= graphics.shouldRender();
 		input.processEvents();
 
-		if (!isActive && getConfig().backgroundFPS == -1) shouldRender = false;
+		if (!isActive && getConfig().backgroundFPS == -1) {
+			shouldRender = false;
+		}
 		int frameRate = isActive ? getConfig().foregroundFPS : getConfig().backgroundFPS;
 
-		if(graphics.vsync)
+		if(graphics.vsync) {
 			frameRate = graphics.getRefreshRate();
+		}
 
 		if (shouldRender) {
 			graphics.updateTime();
 			graphics.frameId++;
 		} else {
 			// Sleeps to avoid wasting CPU in an empty loop.
-			if (frameRate == -1) frameRate = 10;
-			if (frameRate == 0) frameRate = getConfig().backgroundFPS;
-			if (frameRate == 0) frameRate = 30;
+			if (frameRate == -1) {
+				frameRate = 10;
+			}
+			if (frameRate == 0) {
+				frameRate = getConfig().backgroundFPS;
+			}
+			if (frameRate == 0) {
+				frameRate = 30;
+			}
 		}
-		if (frameRate > 0) graphics.sync(frameRate);
+		if (frameRate > 0) {
+			graphics.sync(frameRate);
+		}
 
 		return shouldRender;
 	}
 
 	public FrameStatus getStatus()
 	{
-		if(graphics.isCloseRequested() || !BuildGdx.app.running)
+		if(graphics.isCloseRequested() || !BuildGdx.app.running) {
 			return FrameStatus.Closed;
+		}
 
 		boolean isActive = graphics.isActive();
 		if (wasActive && !isActive) { // if it's just recently minimized from active state
@@ -147,8 +159,9 @@ public abstract class BuildFrame {
 			return FrameStatus.Resume;
 		}
 
-		if(isChanged())
+		if(isChanged()) {
 			return FrameStatus.Changed;
+		}
 
 		return FrameStatus.Running;
 	}

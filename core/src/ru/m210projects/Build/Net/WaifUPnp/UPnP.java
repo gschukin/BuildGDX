@@ -70,7 +70,9 @@ public class UPnP {
      * @return true if the operation was successful, false otherwise
      */
     public static boolean openPortTCP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.openPort(port, false);
     }
     
@@ -81,7 +83,9 @@ public class UPnP {
      * @return true if the operation was successful, false otherwise
      */
     public static boolean openPortUDP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.openPort(port, true);
     }
     
@@ -93,7 +97,9 @@ public class UPnP {
      * @return true if the operation was successful, false otherwise
      */
     public static boolean closePortTCP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.closePort(port, true);
     }
     
@@ -105,7 +111,9 @@ public class UPnP {
      * @return true if the operation was successful, false otherwise
      */
     public static boolean closePortUDP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.closePort(port, false);
     }
     
@@ -116,7 +124,9 @@ public class UPnP {
      * @return true if the port is mapped, false otherwise
      */
     public static boolean isMappedTCP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.isMapped(port, false);
     }
     
@@ -127,7 +137,9 @@ public class UPnP {
      * @return true if the port is mapped, false otherwise
      */
     public static boolean isMappedUDP(int port) {
-        if(!isUPnPAvailable()) return false;
+        if(!isUPnPAvailable()) {
+            return false;
+        }
         return defaultGW.isMapped(port, false);
     }
     
@@ -137,7 +149,9 @@ public class UPnP {
      * @return external IP address as string, or null if not available
      */
     public static String getExternalIP(){
-        if(!isUPnPAvailable()) return null;
+        if(!isUPnPAvailable()) {
+            return null;
+        }
         return defaultGW.getExternalIP();
     }
     
@@ -147,7 +161,9 @@ public class UPnP {
      * @return internal IP address as string, or null if not available
      */
     public static String getLocalIP(){
-        if(!isUPnPAvailable()) return null;
+        if(!isUPnPAvailable()) {
+            return null;
+        }
         return defaultGW.getLocalIP();
     }
 

@@ -126,21 +126,25 @@ public class GDXOrtho extends OrphoRenderer {
 	@Override
 	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
-		if(col < 0)
-			return;
+		if(col < 0) {
+            return;
+        }
 
 		if (font.type == FontType.Tilemap) {
-			if (palookup[col] == null)
-				col = 0;
+			if (palookup[col] == null) {
+                col = 0;
+            }
 
 			int nTile = (Integer) font.ptr;
-			if (!engine.getTile(nTile).isLoaded() && engine.loadtile(nTile) == null)
-				return;
+			if (!engine.getTile(nTile).isLoaded() && engine.loadtile(nTile) == null) {
+                return;
+            }
 		}
 
 		GLTile atlas = font.getGL(parent.textureCache, parent.getTexFormat(), col);
-		if (atlas == null)
-			return;
+		if (atlas == null) {
+            return;
+        }
 
 		xpos <<= 16;
 		ypos <<= 16;
@@ -150,26 +154,31 @@ public class GDXOrtho extends OrphoRenderer {
 		Shader shader = ((font.type == FontType.Tilemap)
 				? (atlas.getPixelFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader)
 				: Shader.BitmapShader);
-		if (!isDrawing())
-			begin(shader);
+		if (!isDrawing()) {
+            begin(shader);
+        }
 
 		setType(GL20.GL_TRIANGLES);
 		switchShader(shader);
 		if (font.type == FontType.Tilemap) {
 			float alpha = 1.0f;
-			if (bit == Transparent.Bit1)
-				alpha = TRANSLUSCENT1;
-			if (bit == Transparent.Bit2)
-				alpha = TRANSLUSCENT2;
+			if (bit == Transparent.Bit1) {
+                alpha = TRANSLUSCENT1;
+            }
+			if (bit == Transparent.Bit2) {
+                alpha = TRANSLUSCENT2;
+            }
 
 			if (atlas.getPixelFormat() != PixelFormat.Pal8) {
 				float sh = (numshades - min(max(shade, 0), numshades)) / (float) numshades;
 				setColor(sh, sh, sh, alpha);
-			} else
-				switchTextureParams(col, shade, alpha, false);
-		} else
-			setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f,
-					curpalette.getBlue(col) / 255.0f, 1.0f);
+			} else {
+                switchTextureParams(col, shade, alpha, false);
+            }
+		} else {
+            setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f,
+                    curpalette.getBlue(col) / 255.0f, 1.0f);
+        }
 		enableBlending();
 
 		int oxpos = xpos;
@@ -182,8 +191,9 @@ public class GDXOrtho extends OrphoRenderer {
 				line += 1;
 				xpos = oxpos - (int) (scale * font.charsizx);
 			}
-			if (text[c] == '\r')
-				text[c] = 0;
+			if (text[c] == '\r') {
+                text[c] = 0;
+            }
 			yoffs = (int) (scale * line * font.charsizy);
 
 			tx = (text[c] % font.cols) * df;
@@ -210,18 +220,21 @@ public class GDXOrtho extends OrphoRenderer {
 		float sx2 = x2 / 4096.0f;
 		float sy2 = y2 / 4096.0f;
 
-		if (sx1 < 0 && sx2 < 0 || sx1 > xdim && sx2 > xdim)
-			return;
+		if (sx1 < 0 && sx2 < 0 || sx1 > xdim && sx2 > xdim) {
+            return;
+        }
 
-		if (sy1 < 0 && sy2 < 0 || sy1 > ydim && sy2 > ydim)
-			return;
+		if (sy1 < 0 && sy2 < 0 || sy1 > ydim && sy2 > ydim) {
+            return;
+        }
 
 		col = palookup[0][col] & 0xFF;
 
 		Gdx.gl.glDisable(GL_CULL_FACE);
 		Gdx.gl.glDisable(GL_DEPTH_TEST);
-		if (!isDrawing())
-			begin(Shader.BitmapShader);
+		if (!isDrawing()) {
+            begin(Shader.BitmapShader);
+        }
 
 		setType(GL20.GL_LINES);
 		switchShader(Shader.BitmapShader);
@@ -229,8 +242,9 @@ public class GDXOrtho extends OrphoRenderer {
 		setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f, curpalette.getBlue(col) / 255.0f,
 				1.0f);
 		disableBlending();
-		if (idx >= 256)
-			flush();
+		if (idx >= 256) {
+            flush();
+        }
 
 		float color = this.color;
 		int idx = this.idx;
@@ -250,40 +264,48 @@ public class GDXOrtho extends OrphoRenderer {
 	@Override
 	public void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
 			int cy1, int cx2, int cy2) {
-		if (!Gameutils.isValidTile(picnum))
-			return;
-		if ((cx1 > cx2) || (cy1 > cy2))
-			return;
-		if (z <= 16)
-			return;
+		if (!Gameutils.isValidTile(picnum)) {
+            return;
+        }
+		if ((cx1 > cx2) || (cy1 > cy2)) {
+            return;
+        }
+		if (z <= 16) {
+            return;
+        }
 
 		if (GLSettings.useModels.get() && parent.defs != null && parent.defs.mdInfo.getHudInfo(picnum, dastat) != null
 				&& parent.defs.mdInfo.getHudInfo(picnum, dastat).angadd != 0) {
 			Tile2model entry = parent.defs != null ? parent.defs.mdInfo.getParams(picnum) : null;
 			if (entry != null && entry.model != null && entry.framenum >= 0) {
-				if(dorotatesprite3d(sx, sy, z, a, picnum, dashade, dapalnum, dastat, cx1, cy1, cx2, cy2))
-					return;
+				if(dorotatesprite3d(sx, sy, z, a, picnum, dashade, dapalnum, dastat, cx1, cy1, cx2, cy2)) {
+                    return;
+                }
 			}
 		}
 
-		if (engine.getTile(picnum).getType() != AnimType.None)
-			picnum += engine.animateoffs(picnum, 0xC000);
+		if (engine.getTile(picnum).getType() != AnimType.None) {
+            picnum += engine.animateoffs(picnum, 0xC000);
+        }
 
 		Tile pic = engine.getTile(picnum);
-		if (!pic.hasSize())
-			return;
+		if (!pic.hasSize()) {
+            return;
+        }
 
 		int method = 0;
 		if ((dastat & 64) == 0) {
 			method = 1;
 			if ((dastat & 1) != 0) {
-				if ((dastat & 32) == 0)
-					method = 2;
-				else
-					method = 3;
+				if ((dastat & 32) == 0) {
+                    method = 2;
+                } else {
+                    method = 3;
+                }
 			}
-		} else
-			method |= 256; // non-transparent 255 color
+		} else {
+            method |= 256; // non-transparent 255 color
+        }
 		method |= 4; // Use OpenGL clamping - dorotatesprite never repeats
 
 		int xsiz = pic.getWidth();
@@ -295,27 +317,33 @@ public class GDXOrtho extends OrphoRenderer {
 			yoff = pic.getOffsetY() + (ysiz >> 1);
 		}
 
-		if ((dastat & 4) != 0)
-			yoff = ysiz - yoff;
+		if ((dastat & 4) != 0) {
+            yoff = ysiz - yoff;
+        }
 
-		if (picnum >= MAXTILES)
-			picnum = 0;
-		if (palookup[dapalnum & 0xFF] == null)
-			dapalnum = 0;
+		if (picnum >= MAXTILES) {
+            picnum = 0;
+        }
+		if (palookup[dapalnum & 0xFF] == null) {
+            dapalnum = 0;
+        }
 
 		engine.setgotpic(picnum);
-		if (!pic.isLoaded())
-			engine.loadtile(picnum);
+		if (!pic.isLoaded()) {
+            engine.loadtile(picnum);
+        }
 
 		GLTile pth = parent.textureCache.get(parent.getTexFormat(), picnum, dapalnum, 0, method);
-		if (pth == null)
-			return;
+		if (pth == null) {
+            return;
+        }
 
 		pth.bind();
-		if (((method & 3) == 0))
-			disableBlending();
-		else
-			enableBlending();
+		if (((method & 3) == 0)) {
+            disableBlending();
+        } else {
+            enableBlending();
+        }
 
 		float alpha = 1.0f;
 		switch (method & 3) {
@@ -331,8 +359,9 @@ public class GDXOrtho extends OrphoRenderer {
 		Gdx.gl.glDisable(GL_DEPTH_TEST);
 
 		Shader shader = pth.getPixelFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader;
-		if (!isDrawing())
-			begin(shader);
+		if (!isDrawing()) {
+            begin(shader);
+        }
 
 		switchShader(shader);
 		setType(GL20.GL_TRIANGLES);
@@ -362,8 +391,9 @@ public class GDXOrtho extends OrphoRenderer {
 			}
 
 			setColor(r, g, b, alpha);
-		} else
-			switchTextureParams(dapalnum, dashade, alpha, blendingDisabled || (method & 256) != 0);
+		} else {
+            switchTextureParams(dapalnum, dashade, alpha, blendingDisabled || (method & 256) != 0);
+        }
 
 		draw(pth, sx, sy, xsiz, ysiz, xoff, yoff, a, z, dastat, cx1, cy1, cx2, cy2);
 	}
@@ -373,11 +403,13 @@ public class GDXOrtho extends OrphoRenderer {
 
 		Hudtyp hudInfo;
 		if (parent.defs == null
-				|| ((hudInfo = parent.defs.mdInfo.getHudInfo(picnum, dastat)) != null && (hudInfo.flags & 1) != 0))
-			return true; // "HIDE" is specified in DEF
+				|| ((hudInfo = parent.defs.mdInfo.getHudInfo(picnum, dastat)) != null && (hudInfo.flags & 1) != 0)) {
+            return true; // "HIDE" is specified in DEF
+        }
 
-		if (isDrawing())
-			end();
+		if (isDrawing()) {
+            end();
+        }
 
 		float yaw = (float) AngleToRadians(globalang);
 		float gcosang = MathUtils.cos(yaw);
@@ -427,8 +459,9 @@ public class GDXOrtho extends OrphoRenderer {
 			y1 = -y1;
 		}
 
-		if (hudsprite == null)
-			hudsprite = new Sprite();
+		if (hudsprite == null) {
+            hudsprite = new Sprite();
+        }
 		hudsprite.reset((byte) 0);
 
 		hudsprite.setAng((short) (hudInfo.angadd + globalang));
@@ -445,14 +478,16 @@ public class GDXOrtho extends OrphoRenderer {
 		hudsprite.setOwner((short) MAXSPRITES);
 		hudsprite.setCstat((short) ((dastat & 1) + ((dastat & 32) << 4) + (dastat & 4) << 1));
 
-		if ((dastat & 10) == 2)
-			parent.resizeglcheck();
-		else
-			parent.set2dview();
+		if ((dastat & 10) == 2) {
+            parent.resizeglcheck();
+        } else {
+            parent.set2dview();
+        }
 
 		if ((hudInfo.flags & 8) != 0) // NODEPTH flag
-			BuildGdx.gl.glDisable(GL_DEPTH_TEST);
-		else {
+        {
+            BuildGdx.gl.glDisable(GL_DEPTH_TEST);
+        } else {
 			BuildGdx.gl.glEnable(GL_DEPTH_TEST);
 			BuildGdx.gl.glClear(GL_DEPTH_BUFFER_BIT);
 		}
@@ -461,8 +496,9 @@ public class GDXOrtho extends OrphoRenderer {
 
 		float aspect = xdim / (float) (ydim);
 		float f = 1.0f;
-		if (hudInfo.fov != -1)
-			f = hudInfo.fov / 420.0f;
+		if (hudInfo.fov != -1) {
+            f = hudInfo.fov / 420.0f;
+        }
 		cam.projection.setToProjection(cam.near, cam.far, 90 * f, aspect);
 		cam.view.setToLookAt(cam.direction.set(gcosang, gsinang, 0), cam.up.set(0,0,(dastat & 4) != 0 ? 1 : -1)).translate(-cam.position.x, -cam.position.y, -cam.position.z);
 		cam.combined.set(cam.projection);
@@ -479,13 +515,15 @@ public class GDXOrtho extends OrphoRenderer {
 
 	@Override
 	public void nextpage() {
-		if (isDrawing())
-			end();
+		if (isDrawing()) {
+            end();
+        }
 	}
 
 	protected void drawoverheadline(int w, int cposx, int cposy, float cos, float sin, int col) {
-		if (col < 0)
-			return;
+		if (col < 0) {
+            return;
+        }
 
 		Wall wal = Engine.getWall(w);
 
@@ -510,32 +548,38 @@ public class GDXOrtho extends OrphoRenderer {
 
 		for (int i = 0; i < service.getSectorCount(); i++) {
 			if ((!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
-					|| !Gameutils.isValidSector(i))
-				continue;
+					|| !Gameutils.isValidSector(i)) {
+                continue;
+            }
 
 			Sector sec = Engine.getSector(i);
-			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
-				continue;
+			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3) {
+                continue;
+            }
 
 			int walnum = sec.getWallptr();
 			for (int j = 0; j < sec.getWallnum(); j++, walnum++) {
-				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(Engine.getWall(walnum).getPoint2()))
-					continue;
+				if (!Gameutils.isValidWall(walnum) || !Gameutils.isValidWall(Engine.getWall(walnum).getPoint2())) {
+                    continue;
+                }
 
 				Wall wal = Engine.getWall(walnum);
 				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
 					if (Gameutils.isValidSector(wal.getNextsector())) {
-						if (mapSettings.isWallVisible(walnum, i))
-							drawoverheadline(walnum, cposx, cposy, cos, sin, mapSettings.getWallColor(walnum, i));
+						if (mapSettings.isWallVisible(walnum, i)) {
+                            drawoverheadline(walnum, cposx, cposy, cos, sin, mapSettings.getWallColor(walnum, i));
+                        }
 					}
 				}
 
-				if (wal.getNextwall() >= 0)
-					continue;
+				if (wal.getNextwall() >= 0) {
+                    continue;
+                }
 
 				Tile pic = engine.getTile(wal.getPicnum());
-				if (!pic.hasSize())
-					continue;
+				if (!pic.hasSize()) {
+                    continue;
+                }
 
 				drawoverheadline(walnum, cposx, cposy, cos, sin, mapSettings.getWallColor(walnum, i));
 			}
@@ -544,16 +588,18 @@ public class GDXOrtho extends OrphoRenderer {
 		// Draw sprites
 		if (mapSettings.isShowSprites(MapView.Lines)) {
 			for (int i = 0; i < service.getSectorCount(); i++) {
-				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
-					continue;
+				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0) {
+                    continue;
+                }
 
 				for (MapNode<Sprite> node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = node.get();
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
-							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
-						continue;
+							|| !mapSettings.isSpriteVisible(MapView.Lines, j)) {
+                        continue;
+                    }
 
 					switch (spr.getCstat() & 48) {
 					case 0:
@@ -576,8 +622,9 @@ public class GDXOrtho extends OrphoRenderer {
 						int x1 = mapSettings.getSpriteX(j);
 						int y1 = mapSettings.getSpriteY(j);
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
-						if ((spr.getCstat() & 4) > 0)
-							xoff = (byte) -xoff;
+						if ((spr.getCstat() & 4) > 0) {
+                            xoff = (byte) -xoff;
+                        }
 
 						int dax = EngineUtils.cos(spr.getAng() - 512) * spr.getXrepeat();
 						int day = EngineUtils.sin(spr.getAng() - 512) * spr.getXrepeat();
@@ -598,8 +645,9 @@ public class GDXOrtho extends OrphoRenderer {
 						y2 = (int) (ox * sin + oy * cos) + (ydim << 11);
 
 						int col = mapSettings.getSpriteColor(j);
-						if (col < 0)
-							break;
+						if (col < 0) {
+                            break;
+                        }
 
 						drawline256(x1, y1, x2, y2, col);
 					}
@@ -608,10 +656,12 @@ public class GDXOrtho extends OrphoRenderer {
 						Tile pic = engine.getTile(spr.getPicnum());
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
 						byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
-						if ((spr.getCstat() & 4) > 0)
-							xoff = (byte) -xoff;
-						if ((spr.getCstat() & 8) > 0)
-							yoff = (byte) -yoff;
+						if ((spr.getCstat() & 4) > 0) {
+                            xoff = (byte) -xoff;
+                        }
+						if ((spr.getCstat() & 8) > 0) {
+                            yoff = (byte) -yoff;
+                        }
 
 						int cosang = EngineUtils.cos(spr.getAng());
 						int sinang = EngineUtils.sin(spr.getAng());
@@ -652,8 +702,9 @@ public class GDXOrtho extends OrphoRenderer {
 						y4 = (int) (ox * sin + oy * cos) + (ydim << 11);
 
 						int col = mapSettings.getSpriteColor(j);
-						if (col < 0)
-							break;
+						if (col < 0) {
+                            break;
+                        }
 
 						drawline256(x1, y1, x2, y2, col);
 						drawline256(x2, y2, x3, y3, col);
@@ -669,8 +720,9 @@ public class GDXOrtho extends OrphoRenderer {
 		// draw player
 		for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum()))
-				continue;
+			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum())) {
+                continue;
+            }
 
 			Sprite pPlayer = Engine.getSprite(spr);
 			int ox = cposx - mapSettings.getSpriteX(spr);
@@ -690,14 +742,15 @@ public class GDXOrtho extends OrphoRenderer {
 			if (i == viewindex || mapSettings.isShowAllPlayers()) {
 				int picnum = mapSettings.getPlayerPicnum(i);
 				if (picnum == -1) { // draw it with lines
-//					ox = (sintable[(pPlayer.ang + 512) & 2047] >> 7);
-//					oy = (sintable[(pPlayer.ang) & 2047] >> 7);
+//					ox = (EngineUtils.sin((pPlayer.ang + 512) & 2047) >> 7);
+//					oy = (EngineUtils.sin((pPlayer.ang) & 2047) >> 7);
 					int x2 = 0;
 					int y2 = -(mapSettings.getPlayerZoom(i, czoom) << 1);
 
 					int col = mapSettings.getSpriteColor(spr);
-					if (col < 0)
-						continue;
+					if (col < 0) {
+                        continue;
+                    }
 
 					int sx = (int) dx;
 					int sy = (int) dy;
@@ -727,8 +780,9 @@ public class GDXOrtho extends OrphoRenderer {
 
 		Arrays.fill(gotsector, (byte) 0);
 
-		if (isDrawing())
-			end();
+		if (isDrawing()) {
+            end();
+        }
 
 //		switchShader(parent.getTexFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader);
 
@@ -758,15 +812,18 @@ public class GDXOrtho extends OrphoRenderer {
 					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
 						if ((node.get().getCstat() & 48) == 32) {
-							if (sortnum >= MAXSPRITESONSCREEN)
-								break;
+							if (sortnum >= MAXSPRITESONSCREEN) {
+                                break;
+                            }
 
 							if ((Engine.getSprite(i).getCstat() & (64 + 8)) == (64 + 8)
-									|| !mapSettings.isSpriteVisible(MapView.Polygons, i))
-								continue;
+									|| !mapSettings.isSpriteVisible(MapView.Polygons, i)) {
+                                continue;
+                            }
 
-							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new TSprite();
+							if (tsprite[sortnum] == null) {
+                                tsprite[sortnum] = new TSprite();
+                            }
 							tsprite[sortnum].set(Engine.getSprite(i));
 							tsprite[sortnum++].setOwner((short) i);
 						}
@@ -776,21 +833,26 @@ public class GDXOrtho extends OrphoRenderer {
 				if ((showSprites & 2) != 0) {
 					for (MapNode<Sprite> node = service.getSectNode(s); node != null; node = node.getNext()) {
 						int i = node.getIndex();
-						if ((node.get().getCstat() & 48) == 32)
-							continue;
+						if ((node.get().getCstat() & 48) == 32) {
+                            continue;
+                        }
 
 						if ((show2dsprite[i >> 3] & pow2char[i & 7]) != 0) {
-							if (sortnum >= MAXSPRITESONSCREEN)
-								break;
+							if (sortnum >= MAXSPRITESONSCREEN) {
+                                break;
+                            }
 
-							if (!mapSettings.isSpriteVisible(MapView.Polygons, i))
-								continue;
+							if (!mapSettings.isSpriteVisible(MapView.Polygons, i)) {
+                                continue;
+                            }
 
-							if(i == mapSettings.getPlayerSprite(mapSettings.getViewPlayer()))
-								continue;
+							if(i == mapSettings.getPlayerSprite(mapSettings.getViewPlayer())) {
+                                continue;
+                            }
 
-							if (tsprite[sortnum] == null)
-								tsprite[sortnum] = new TSprite();
+							if (tsprite[sortnum] == null) {
+                                tsprite[sortnum] = new TSprite();
+                            }
 							tsprite[sortnum].set(Engine.getSprite(i));
 							tsprite[sortnum++].setOwner((short) i);
 						}
@@ -798,26 +860,30 @@ public class GDXOrtho extends OrphoRenderer {
 				}
 
 				gotsector[s >> 3] |= pow2char[s & 7];
-				if (sec.isParallaxFloor())
-					continue;
+				if (sec.isParallaxFloor()) {
+                    continue;
+                }
 				globalpal = sec.getFloorpal();
 
 				int globalpicnum = sec.getFloorpicnum();
-				if (globalpicnum >= MAXTILES)
-					globalpicnum = 0;
+				if (globalpicnum >= MAXTILES) {
+                    globalpicnum = 0;
+                }
 				engine.setgotpic(globalpicnum);
 				Tile pic = engine.getTile(globalpicnum);
 
-				if (!pic.hasSize())
-					continue;
+				if (!pic.hasSize()) {
+                    continue;
+                }
 
 				if (pic.getType() != AnimType.None) {
 					globalpicnum += engine.animateoffs(globalpicnum, s);
 					pic = engine.getTile(globalpicnum);
 				}
 
-				if (!pic.isLoaded())
-					engine.loadtile(globalpicnum);
+				if (!pic.isLoaded()) {
+                    engine.loadtile(globalpicnum);
+                }
 
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
@@ -837,25 +903,30 @@ public class GDXOrtho extends OrphoRenderer {
 
 			// Sort sprite list
 			int gap = 1;
-			while (gap < sortnum)
-				gap = (gap << 1) + 1;
-			for (gap >>= 1; gap > 0; gap >>= 1)
-				for (int i = 0; i < sortnum - gap; i++)
-					for (int j = i; j >= 0; j -= gap) {
-						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ())
-							break;
+			while (gap < sortnum) {
+                gap = (gap << 1) + 1;
+            }
+			for (gap >>= 1; gap > 0; gap >>= 1) {
+                for (int i = 0; i < sortnum - gap; i++) {
+                    for (int j = i; j >= 0; j -= gap) {
+                        if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ()) {
+                            break;
+                        }
 
-						short tmp = tsprite[j].getOwner();
-						tsprite[j].setOwner(tsprite[j + gap].getOwner());
-						tsprite[j + gap].setOwner(tmp);
-					}
+                        short tmp = tsprite[j].getOwner();
+                        tsprite[j].setOwner(tsprite[j + gap].getOwner());
+                        tsprite[j + gap].setOwner(tmp);
+                    }
+                }
+            }
 
 			for (int s = sortnum - 1; s >= 0; s--) {
 				int j = tsprite[s].getOwner();
 				Sprite spr = Engine.getSprite(j);
 				if ((spr.getCstat() & 32768) == 0) {
-					if (spr.getPicnum() >= MAXTILES)
-						spr.setPicnum(0);
+					if (spr.getPicnum() >= MAXTILES) {
+                        spr.setPicnum(0);
+                    }
 
 					int ox = dax - mapSettings.getSpriteX(j);
 					int oy = day - mapSettings.getSpriteY(j);
@@ -881,8 +952,9 @@ public class GDXOrtho extends OrphoRenderer {
 	}
 
 	protected void begin(Shader shader) {
-		if (drawing)
-			throw new IllegalStateException("GdxBatch.end must be called before begin.");
+		if (drawing) {
+            throw new IllegalStateException("GdxBatch.end must be called before begin.");
+        }
 
 		BuildGdx.gl20.glDepthMask(false);
 
@@ -893,10 +965,12 @@ public class GDXOrtho extends OrphoRenderer {
 	}
 
 	public void end() {
-		if (!drawing)
-			throw new IllegalStateException("GdxBatch.begin must be called before end.");
-		if (idx > 0)
-			flush();
+		if (!drawing) {
+            throw new IllegalStateException("GdxBatch.begin must be called before end.");
+        }
+		if (idx > 0) {
+            flush();
+        }
 
 		lastTexture = null;
 		cx1 = 0;
@@ -909,15 +983,17 @@ public class GDXOrtho extends OrphoRenderer {
 
 		GL20 gl = BuildGdx.gl20;
 		gl.glDepthMask(true);
-		if (isBlendingEnabled())
-			gl.glDisable(GL20.GL_BLEND);
+		if (isBlendingEnabled()) {
+            gl.glDisable(GL20.GL_BLEND);
+        }
 
 		manager.unbind();
 	}
 
 	protected void flush() {
-		if (idx == 0)
-			return;
+		if (idx == 0) {
+            return;
+        }
 
 		int count;
 		Mesh mesh;
@@ -953,17 +1029,20 @@ public class GDXOrtho extends OrphoRenderer {
 
 	public void draw(GLTile tex, int sx, int sy, int sizx, int sizy, int xoffset, int yoffset, float srcX, float srcY,
 			float srcWidth, float srcHeight, int angle, int z, int dastat, int cx1, int cy1, int cx2, int cy2) {
-		if (!drawing)
-			throw new IllegalStateException("GdxBatch.begin must be called before draw.");
+		if (!drawing) {
+            throw new IllegalStateException("GdxBatch.begin must be called before draw.");
+        }
 
 		switchTexture(tex);
-		if (idx == vertices.length)
-			flush();
+		if (idx == vertices.length) {
+            flush();
+        }
 
 		int ourxyaspect = xyaspect;
 		if ((dastat & 2) == 0) {
-			if ((dastat & 1024) == 0 && 4 * ydim <= 3 * xdim)
-				ourxyaspect = (10 << 16) / 12;
+			if ((dastat & 1024) == 0 && 4 * ydim <= 3 * xdim) {
+                ourxyaspect = (10 << 16) / 12;
+            }
 		} else {
 			// dastat&2: Auto window size scaling
 			int oxdim = xdim, zoomsc;
@@ -990,8 +1069,9 @@ public class GDXOrtho extends OrphoRenderer {
 				int xbord = 0;
 				if ((dastat & (256 | 512)) != 0) {
 					xbord = scale(oxdim - xdim, twice_midcx, oxdim);
-					if ((dastat & 512) == 0)
-						xbord = -xbord;
+					if ((dastat & 512) == 0) {
+                        xbord = -xbord;
+                    }
 				}
 
 				sx = ((twice_midcx + xbord) << 15) + scaledxofs;
@@ -1001,10 +1081,11 @@ public class GDXOrtho extends OrphoRenderer {
 				// If not clipping to startmosts, & auto-scaling on, as a
 				// hard-coded bonus, scale to full screen instead
 				sx = (xdim << 15) + scale(normxofs, xdim, 320);
-				if ((dastat & 512) != 0)
-					sx += (oxdim - xdim) << 16;
-				else if ((dastat & 256) == 0)
-					sx += (oxdim - xdim) << 15;
+				if ((dastat & 512) != 0) {
+                    sx += (oxdim - xdim) << 16;
+                } else if ((dastat & 256) == 0) {
+                    sx += (oxdim - xdim) << 15;
+                }
 
 				zoomsc = scale(xdim, ouryxaspect, 320);
 				sy = (ydim << 15) + mulscale(normyofs, zoomsc, 16);
@@ -1072,7 +1153,9 @@ public class GDXOrtho extends OrphoRenderer {
 //			srcHeight = sizy;
 //			invTexHeight = 1.0f / sizy;
 
-			for (sizy = 1; sizy < tex.getHeight(); sizy += sizy);
+			for (sizy = 1; sizy < tex.getHeight(); sizy += sizy) {
+                ;
+            }
 			float scaley = (float) sizy / tex.getHeight();
 			srcHeight = tex.getHeight() / scaley;
 		}
@@ -1127,16 +1210,18 @@ public class GDXOrtho extends OrphoRenderer {
 	protected void switchTextureParams(int pal, int shade, float alpha, boolean drawLastIndex) {
 		IndexedShader shader = (IndexedShader) manager.getProgram();
 		if (shader.getDrawLastIndex() == drawLastIndex && shader.getPal() == pal && shader.getShade() == shade
-				&& shader.getTransparent() == alpha)
-			return;
+				&& shader.getTransparent() == alpha) {
+            return;
+        }
 
 		flush();
 		manager.textureParams8(pal, shade, alpha, drawLastIndex);
 	}
 
 	protected void switchTexture(GLTile texture) {
-		if (texture == lastTexture)
-			return;
+		if (texture == lastTexture) {
+            return;
+        }
 
 		flush();
 		lastTexture = texture;
@@ -1158,25 +1243,29 @@ public class GDXOrtho extends OrphoRenderer {
 	}
 
 	protected void disableBlending() {
-		if (blendingDisabled)
-			return;
+		if (blendingDisabled) {
+            return;
+        }
 		flush();
 		blendingDisabled = true;
 	}
 
 	protected void enableBlending() {
-		if (!blendingDisabled)
-			return;
+		if (!blendingDisabled) {
+            return;
+        }
 		flush();
 		blendingDisabled = false;
 	}
 
 	protected void switchShader(Shader shader) {
-		if (shader == manager.getShader())
-			return;
+		if (shader == manager.getShader()) {
+            return;
+        }
 
-		if (isDrawing())
-			flush();
+		if (isDrawing()) {
+            flush();
+        }
 
 		manager.bind(shader);
 		setupMatrices();
@@ -1192,13 +1281,15 @@ public class GDXOrtho extends OrphoRenderer {
 			cx1 = cy1 = 0;
 			cx2 = xdim - 1;
 			cy2 = ydim - 1;
-		} else
-			manager.projection(projectionMatrix);
+		} else {
+            manager.projection(projectionMatrix);
+        }
 	}
 
 	protected void setType(int type) {
-		if (type == lastType)
-			return;
+		if (type == lastType) {
+            return;
+        }
 
 		flush();
 		lastType = type;
@@ -1213,8 +1304,9 @@ public class GDXOrtho extends OrphoRenderer {
 	}
 
 	protected void setViewport(int cx1, int cy1, int cx2, int cy2) {
-		if (cx1 == this.cx1 && cx2 == this.cx2 && cy1 == this.cy1 && cy2 == this.cy2)
-			return;
+		if (cx1 == this.cx1 && cx2 == this.cx2 && cy1 == this.cy1 && cy2 == this.cy2) {
+            return;
+        }
 
 		flush();
 

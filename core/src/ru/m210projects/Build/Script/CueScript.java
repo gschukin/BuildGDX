@@ -61,12 +61,14 @@ public class CueScript extends Scriptfile {
 
 	private int gettoken(Map<String , Integer> list) {
 		int tok;
-		if ((tok = gettoken()) == -2) 
+		if ((tok = gettoken()) == -2) {
 			return T_EOF;
+		}
 
 		Integer out = list.get(toLowerCase(textbuf.substring(tok, textptr)));
-		if (out != null)
+		if (out != null) {
 			return out;
+		}
 
 		errorptr = textptr;
 		return T_ERROR;
@@ -74,7 +76,9 @@ public class CueScript extends Scriptfile {
 	
 	private Integer getValue() {
 		String txt = getstring();
-		if(txt == null) return null;
+		if(txt == null) {
+			return null;
+		}
 		txt = txt.replaceAll("[^0-9]", "");
 
 		try {
@@ -87,15 +91,17 @@ public class CueScript extends Scriptfile {
 	private void process() {
 		while (!eof()) {
 			int line = getlinum(textptr);
-			if(textptr < lineoffs[0])
+			if(textptr < lineoffs[0]) {
 				line--; //it's NOT line2
+			}
 			
 			int tokn = gettoken(basetokens);
 			switch (tokn) {
 			case T_ERROR:
 				Console.Println("Error on line " + filename + ":" + line + ", skipping...", OSDTEXT_RED);
-				if (line < linenum)
+				if (line < linenum) {
 					textptr = lineoffs[line - 1];
+				}
 				break;
 			case T_EOF:
 				break;
@@ -107,14 +113,17 @@ public class CueScript extends Scriptfile {
 					nTracks++;
 					int nTrack = getValue();
 					int nTrackType = gettoken(basetokens);
-					if(nTrackType == T_AUDIO) 
+					if(nTrackType == T_AUDIO) {
 						pTrackList.put(nTrack, FileUtils.getCorrectPath(path));
+					}
 
 					int oldptr = textptr;
 					if(gettoken(basetokens) == T_INDEX) {
 						getstring(); // index num
 						getstring(); // index time
-					} else textptr = oldptr;
+					} else {
+						textptr = oldptr;
+					}
 				}
 				break;
 			}
@@ -123,8 +132,9 @@ public class CueScript extends Scriptfile {
 	
 	public String[] getTracks() {
 		String[] out = new String[nTracks];
-		for(int i = 1; i <= nTracks; i++)
+		for(int i = 1; i <= nTracks; i++) {
 			out[i - 1] = pTrackList.get(i);
+		}
 		return out;
 	}
 }

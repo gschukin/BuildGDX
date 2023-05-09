@@ -113,8 +113,9 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public void update() {
-		if(!frame.isActive())
+		if(!frame.isActive()) {
 			reset();
+		}
 
 		synchronized (this) {
 			if (keyJustPressed) {
@@ -159,8 +160,9 @@ public class AWTInput implements BuildInput, KeyListener {
 			keyEvents.clear();
 
 			long out = mouse.processEvents(processor);
-			if(out != -1)
+			if(out != -1) {
 				currentEventTimeStamp = out;
+			}
 		}
 	}
 
@@ -176,17 +178,21 @@ public class AWTInput implements BuildInput, KeyListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else LwjglNativesLoader.load(); //This also needs for Pixmap working
+		} else {
+			LwjglNativesLoader.load(); //This also needs for Pixmap working
+		}
 
-		if(this.mouse == null)
+		if(this.mouse == null) {
 			this.mouse = new AWTMouse(display);
+		}
 
 		this.setListeners(display.getCanvas());
 	}
 
 	public void setListeners (JCanvas canvas) {
-		if (this.canvas != null)
+		if (this.canvas != null) {
 			canvas.removeKeyListener(this);
+		}
 		canvas.addKeyListener(this);
 		canvas.setFocusTraversalKeysEnabled(false);
 		this.canvas = canvas;
@@ -305,10 +311,11 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public int getX (int pointer) {
-		if (pointer == 0)
+		if (pointer == 0) {
 			return getX();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	@Override
@@ -318,10 +325,11 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public int getY (int pointer) {
-		if (pointer == 0)
+		if (pointer == 0) {
 			return getY();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	@Override
@@ -353,10 +361,11 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public boolean isTouched (int pointer) {
-		if (pointer == 0)
+		if (pointer == 0) {
 			return isTouched();
-		else
+		} else {
 			return false;
+		}
 	}
 
 	@Override
@@ -539,8 +548,9 @@ public class AWTInput implements BuildInput, KeyListener {
 			return Keys.Z;
 		case java.awt.event.KeyEvent.VK_ALT:
 			ke.consume();
-			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT)
+			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT) {
 				return Keys.ALT_LEFT;
+			}
 			return Keys.ALT_RIGHT;
 		case java.awt.event.KeyEvent.VK_BACK_SLASH:
 			return Keys.BACKSLASH;
@@ -571,8 +581,9 @@ public class AWTInput implements BuildInput, KeyListener {
 		case java.awt.event.KeyEvent.VK_SEMICOLON:
 			return Keys.SEMICOLON;
 		case java.awt.event.KeyEvent.VK_SHIFT:
-			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT)
+			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT) {
 				return Keys.SHIFT_LEFT;
+			}
 			return Keys.SHIFT_RIGHT;
 		case java.awt.event.KeyEvent.VK_SLASH:
 		case java.awt.event.KeyEvent.VK_DIVIDE:
@@ -582,8 +593,9 @@ public class AWTInput implements BuildInput, KeyListener {
 		case java.awt.event.KeyEvent.VK_TAB:
 			return Keys.TAB;
 		case java.awt.event.KeyEvent.VK_CONTROL:
-			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT)
+			if(ke.getKeyLocation() == java.awt.event.KeyEvent.KEY_LOCATION_LEFT) {
 				return Keys.CONTROL_LEFT;
+			}
 			return Keys.CONTROL_RIGHT;
 		case java.awt.event.KeyEvent.VK_ESCAPE:
 			return Keys.ESCAPE;
@@ -717,7 +729,9 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public int getDeltaX (int pointer) {
-		if (pointer == 0) return getDeltaX();
+		if (pointer == 0) {
+			return getDeltaX();
+		}
 		return 0;
 	}
 
@@ -728,14 +742,17 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public int getDeltaY (int pointer) {
-		if (pointer == 0) return getDeltaY();
+		if (pointer == 0) {
+			return getDeltaY();
+		}
 		return 0;
 	}
 
 	@Override
 	public void setCursorPosition (int x, int y) {
-		if(!isInsideWindow() || !frame.isActive())
+		if(!isInsideWindow() || !frame.isActive()) {
 			return;
+		}
 
 		mouse.setCursorPosition(x, y);
 	}
@@ -769,11 +786,12 @@ public class AWTInput implements BuildInput, KeyListener {
 
 	@Override
 	public boolean cursorHandler() {
-		if (isInsideWindow() && frame.isActive())
+		if (isInsideWindow() && frame.isActive()) {
 			mouse.showCursor(false);
-		else {
-			if(frame.isActive())
+		} else {
+			if(frame.isActive()) {
 				mouse.reset();
+			}
 			mouse.showCursor(true);
 		}
 

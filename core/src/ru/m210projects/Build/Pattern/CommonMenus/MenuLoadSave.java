@@ -50,10 +50,11 @@ public abstract class MenuLoadSave extends BuildMenu {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				MenuSlotList pSlot = (MenuSlotList) pItem;
-				if (loadData(pSlot.FileName()))
+				if (loadData(pSlot.FileName())) {
 					picnum.nTile = SaveManager.Screenshot;
-				else
+				} else {
 					picnum.nTile = picnum.defTile;
+				}
 			}
 		};
 		

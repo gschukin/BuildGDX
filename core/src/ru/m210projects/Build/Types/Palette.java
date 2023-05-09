@@ -18,8 +18,9 @@ public class Palette {
 		System.arraycopy(palette, 0, bytes, 0, palette.length);
 		int p = 0;
 		int len = palette.length / 3;
-		for(int i = 0; i < len; i++) 
+		for(int i = 0; i < len; i++) {
 			values[i] = (bytes[p++] & 0xFF) | ( (bytes[p++] & 0xFF) << 8 ) | ( (bytes[p++] & 0xFF) << 16 ) | (255 << 24);
+		}
 		crc32 = CRC32.getChecksum(bytes);
 	}
 	

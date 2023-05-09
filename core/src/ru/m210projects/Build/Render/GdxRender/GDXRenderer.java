@@ -187,8 +187,9 @@ public class GDXRenderer implements GLRenderer {
 		Arrays.fill(mirrorTextures, false);
 		int[] mirrors = getMirrorTextures();
 		if (mirrors != null) {
-			for (int i = 0; i < mirrors.length; i++)
+			for (int i = 0; i < mirrors.length; i++) {
 				mirrorTextures[mirrors[i]] = true;
+			}
 		}
 
 		System.err.println("create");
@@ -197,8 +198,9 @@ public class GDXRenderer implements GLRenderer {
 	@Override
 	public void init() {
 		try {
-			if (BuildGdx.graphics.getFrameType() != FrameType.GL)
+			if (BuildGdx.graphics.getFrameType() != FrameType.GL) {
 				BuildGdx.app.setFrame(FrameType.GL);
+			}
 
 			GLInfo.init();
 			this.gl = BuildGdx.graphics.getGL20();
@@ -210,8 +212,9 @@ public class GDXRenderer implements GLRenderer {
 
 			this.cam = new BuildCamera(fov, xdim, ydim, 512, 8192);
 			this.manager.init(textureCache);
-			if (!this.manager.isInited())
+			if (!this.manager.isInited()) {
 				return;
+			}
 
 			this.textureCache.changePalette(curpalette.getBytes());
 
@@ -236,8 +239,9 @@ public class GDXRenderer implements GLRenderer {
 	public void uninit() {
 		System.err.println("uninit");
 		isInited = false;
-		if (world != null)
+		if (world != null) {
 			world.dispose();
+		}
 		orphoRen.uninit();
 		manager.dispose();
 		FadeEffect.uninit();
@@ -254,8 +258,9 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void drawrooms() {
-		if (orphoRen.isDrawing())
+		if (orphoRen.isDrawing()) {
 			orphoRen.end();
+		}
 
 		// Temporaly code (Tekwar issue)
 //		else if (!clearStatus) { // once at frame
@@ -292,8 +297,9 @@ public class GDXRenderer implements GLRenderer {
 		} else {
 			short i = globalcursectnum;
 			globalcursectnum = (short) engine.updatesectorz(globalposx, globalposy, globalposz, globalcursectnum);
-			if (globalcursectnum < 0)
+			if (globalcursectnum < 0) {
 				globalcursectnum = i;
+			}
 		}
 
 		sectors.clear();
@@ -301,10 +307,11 @@ public class GDXRenderer implements GLRenderer {
 		scanner.process(sectors, cam, world, globalcursectnum);
 
 		rendering = Rendering.Nothing;
-		if (inpreparemirror)
+		if (inpreparemirror) {
 			gl.glCullFace(GL_FRONT);
-		else
+		} else {
 			gl.glCullFace(GL_BACK);
+		}
 
 		prerender(sectors);
 		drawbackground();
@@ -353,9 +360,9 @@ public class GDXRenderer implements GLRenderer {
 
 		while ((spritesortcnt > 0) && (maskwallcnt > 0)) { // While BOTH > 0
 			int j = maskwalls[maskwallcnt - 1];
-			if (!spritewallfront(tsprite[spritesortcnt - 1], j))
+			if (!spritewallfront(tsprite[spritesortcnt - 1], j)) {
 				drawsprite(--spritesortcnt);
-			else {
+			} else {
 				// Check to see if any sprites behind the masked wall...
 				for (int i = spritesortcnt - 2; i >= 0; i--) {
 					if (!spritewallfront(tsprite[i], j)) {
@@ -375,8 +382,9 @@ public class GDXRenderer implements GLRenderer {
 			}
 		}
 
-		while (maskwallcnt > 0)
+		while (maskwallcnt > 0) {
 			drawmaskwall(--maskwallcnt);
+		}
 
 		renderDrunkEffect();
 		manager.unbind();
@@ -450,8 +458,9 @@ public class GDXRenderer implements GLRenderer {
 
 	public void drawsprite(int i) {
 		Sprite tspr = tsprite[i];
-		if (tspr == null || tspr.getOwner() == -1)
+		if (tspr == null || tspr.getOwner() == -1) {
 			return;
+		}
 
 		Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.getOwner());
 		while (sprext == null || !sprext.isNotModel()) {
@@ -461,13 +470,15 @@ public class GDXRenderer implements GLRenderer {
 				GLModel md = modelManager.getModel(tspr.getPicnum(), tspr.getPal());
 				if (md != null) {
 					if (tspr.getOwner() < 0 || tspr.getOwner() >= MAXSPRITES) {
-						if (mdR.mddraw(md, tspr))
+						if (mdR.mddraw(md, tspr)) {
 							return;
+						}
 						break; // else, render as flat sprite
 					}
 
-					if (mdR.mddraw(md, tspr))
+					if (mdR.mddraw(md, tspr)) {
 						return;
+					}
 					break; // else, render as flat sprite
 				}
 			}
@@ -484,8 +495,9 @@ public class GDXRenderer implements GLRenderer {
 					GLVoxel vox = (GLVoxel) modelManager.getVoxel(picnum);
 					if (vox != null) {
 						if ((tspr.getCstat() & 48) != 48) {
-							if (mdR.mddraw(vox, tspr))
+							if (mdR.mddraw(vox, tspr)) {
 								return;
+							}
 							break; // else, render as flat sprite
 						}
 
@@ -513,13 +525,15 @@ public class GDXRenderer implements GLRenderer {
 	protected void drawbackground() {
 		rendering = Rendering.Skybox;
 		drawSkyPlanes();
-		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++)
+		for (int i = inpreparemirror ? 1 : 0; i < sectors.size(); i++) {
 			drawSkySector(sectors.get(i));
+		}
 	}
 
 	private void prerender(ArrayList<VisibleSector> sectors) {
-		if (inpreparemirror)
+		if (inpreparemirror) {
 			return;
+		}
 
 		bunchfirst.clear();
 
@@ -527,21 +541,25 @@ public class GDXRenderer implements GLRenderer {
 			VisibleSector sec = sectors.get(i);
 
 			int sectnum = sec.index;
-			if ((sec.secflags & 1) != 0)
+			if ((sec.secflags & 1) != 0) {
 				checkMirror(world.getFloor(sectnum));
+			}
 
-			if ((sec.secflags & 2) != 0)
+			if ((sec.secflags & 2) != 0) {
 				checkMirror(world.getCeiling(sectnum));
+			}
 
 			for (int w = 0; w < sec.walls.size; w++) {
 				int z = sec.walls.get(w);
 				int flags = sec.wallflags.get(w);
 
 				checkMirror(world.getWall(z, sectnum));
-				if ((flags & 1) != 0)
+				if ((flags & 1) != 0) {
 					checkMirror(world.getLower(z, sectnum));
-				if ((flags & 2) != 0)
+				}
+				if ((flags & 2) != 0) {
 					checkMirror(world.getUpper(z, sectnum));
+				}
 				checkMirror(world.getMaskedWall(z));
 			}
 
@@ -558,8 +576,9 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	private void checkMirror(GLSurface surf) {
-		if (surf == null)
+		if (surf == null) {
 			return;
+		}
 
 		int picnum = surf.picnum;
 		if (mirrorTextures[picnum]) {
@@ -636,28 +655,34 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	private void drawSky(GLSurface surf, int picnum, int shade, int palnum, int method, Matrix4 worldTransform) {
-		if (surf.count == 0)
+		if (surf.count == 0) {
 			return;
+		}
 
-		if (engine.getTile(picnum).getType() != AnimType.None)
+		if (engine.getTile(picnum).getType() != AnimType.None) {
 			picnum += engine.animateoffs(picnum, 0);
+		}
 
 		Tile pic = engine.getTile(picnum);
-		if (!pic.isLoaded())
+		if (!pic.isLoaded()) {
 			engine.loadtile(picnum);
+		}
 
-		if (!pic.isLoaded())
+		if (!pic.isLoaded()) {
 			method = 1; // invalid data, HOM
+		}
 
 		engine.setgotpic(picnum);
-		if (palookup[palnum] == null)
+		if (palookup[palnum] == null) {
 			palnum = 0;
+		}
 
 		GLTile pth = bindSky(picnum, palnum, shade, method);
 		if (pth != null) {
 			Gdx.gl.glDisable(GL_BLEND);
-			if ((method & 3) != 0)
+			if ((method & 3) != 0) {
 				Gdx.gl.glEnable(GL_BLEND);
+			}
 
 			manager.fog(false, 0, 0, 0, 0, 0);
 			manager.transform(worldTransform);
@@ -668,18 +693,21 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected void drawSurf(GLSurface surf, int flags, Matrix4 worldTransform, Plane[] clipPlane) {
-		if (surf == null)
+		if (surf == null) {
 			return;
+		}
 
 		if (surf.count != 0 && (flags == 0 || (surf.visflag & flags) != 0)) {
 			int picnum = surf.picnum;
 
-			if (engine.getTile(picnum).getType() != AnimType.None)
+			if (engine.getTile(picnum).getType() != AnimType.None) {
 				picnum += engine.animateoffs(picnum, 0);
+			}
 
 			Tile pic = engine.getTile(picnum);
-			if (!pic.isLoaded())
+			if (!pic.isLoaded()) {
 				engine.loadtile(picnum);
+			}
 
 			int method = surf.getMethod();
 			if (!pic.isLoaded()) {
@@ -691,19 +719,22 @@ public class GDXRenderer implements GLRenderer {
 			if (pth != null) {
 				int combvis = globalvisibility;
 				int vis = surf.getVisibility();
-				if (vis != 0)
+				if (vis != 0) {
 					combvis = mulscale(globalvisibility, (vis + 16) & 0xFF, 4);
+				}
 
-				if (pth.getPixelFormat() == PixelFormat.Pal8)
+				if (pth.getPixelFormat() == PixelFormat.Pal8) {
 					((IndexedShader) manager.getProgram()).setVisibility((int) (-combvis / 64.0f));
-				else {
+				} else {
 					calcFog(surf.getPal(), surf.getShade(), combvis);
 				}
 
 				manager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				if (pth.isHighTile()) {
 					int tsizy = 1;
-					for (; tsizy < pic.getHeight(); tsizy += tsizy);
+					for (; tsizy < pic.getHeight(); tsizy += tsizy) {
+						;
+					}
 					if((pic.getWidth() / (float) pic.getHeight()) != (pth.getWidth() / (float) pth.getHeight())) {
 						texture_transform.scale(1.0f, (tsizy * pth.getYScale()) / pth.getHeight());
 					}
@@ -730,20 +761,23 @@ public class GDXRenderer implements GLRenderer {
 					}
 				}
 
-				if (worldTransform == null)
+				if (worldTransform == null) {
 					manager.transform(identity);
-				else
+				} else {
 					manager.transform(worldTransform);
+				}
 
-				if (clipPlane != null && !inpreparemirror)
+				if (clipPlane != null && !inpreparemirror) {
 					manager.frustum(clipPlane);
-				else
+				} else {
 					manager.frustum(null);
+				}
 
-				if ((method & 3) == 0)
+				if ((method & 3) == 0) {
 					Gdx.gl.glDisable(GL_BLEND);
-				else
+				} else {
 					Gdx.gl.glEnable(GL_BLEND);
+				}
 
 				surf.render(manager.getProgram());
 			}
@@ -786,8 +820,9 @@ public class GDXRenderer implements GLRenderer {
 	@Override
 	public void nextpage() {
 		clearStatus = false;
-		if (world != null)
+		if (world != null) {
 			world.nextpage();
+		}
 		orphoRen.nextpage();
 		manager.reset();
 		textureCache.unbind();
@@ -798,16 +833,19 @@ public class GDXRenderer implements GLRenderer {
 		for (int i = 0; i < MAXSPRITES; i++) {
 			if (mdpause != 0) {
 				SpriteAnim sprext = defs.mdInfo.getAnimParams(i);
-				if (sprext == null)
+				if (sprext == null) {
 					continue;
+				}
 
 				boolean isAnimationDisabled = false;
 				Spriteext inf = defs.mapInfo.getSpriteInfo(i);
-				if (inf != null)
+				if (inf != null) {
 					isAnimationDisabled = inf.isAnimationDisabled();
+				}
 
-				if ((mdpause != 0 && sprext.mdanimtims != 0) || isAnimationDisabled)
+				if ((mdpause != 0 && sprext.mdanimtims != 0) || isAnimationDisabled) {
 					sprext.mdanimtims += mdtims - omdtims;
+				}
 			}
 		}
 
@@ -859,8 +897,9 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz) {
-		if (pix32buffer != null)
+		if (pix32buffer != null) {
 			pix32buffer.clear();
+		}
 
 		boolean reverse = false;
 		if (ysiz < 0) {
@@ -875,8 +914,9 @@ public class GDXRenderer implements GLRenderer {
 			fmt = GL_RGBA;
 		}
 
-		if (pix32buffer == null || pix32buffer.capacity() < xsiz * ysiz * byteperpixel)
+		if (pix32buffer == null || pix32buffer.capacity() < xsiz * ysiz * byteperpixel) {
 			pix32buffer = BufferUtils.newByteBuffer(xsiz * ysiz * byteperpixel);
+		}
 		gl.glPixelStorei(GL_PACK_ALIGNMENT, 1);
 		gl.glReadPixels(0, ydim - ysiz, xsiz, ysiz, fmt, GL_UNSIGNED_BYTE, pix32buffer);
 
@@ -899,10 +939,12 @@ public class GDXRenderer implements GLRenderer {
 			pix32buffer.rewind();
 			return pix32buffer;
 		} else if (format == PixelFormat.Pal8) {
-			if (pix8buffer != null)
+			if (pix8buffer != null) {
 				pix8buffer.clear();
-			if (pix8buffer == null || pix8buffer.capacity() < xsiz * ysiz)
+			}
+			if (pix8buffer == null || pix8buffer.capacity() < xsiz * ysiz) {
 				pix8buffer = BufferUtils.newByteBuffer(xsiz * ysiz);
+			}
 
 			int base = 0, r, g, b;
 			if (reverse) {
@@ -920,8 +962,9 @@ public class GDXRenderer implements GLRenderer {
 					r = (pix32buffer.get(base++) & 0xFF) >> 2;
 					g = (pix32buffer.get(base++) & 0xFF) >> 2;
 					b = (pix32buffer.get(base++) & 0xFF) >> 2;
-					if (byteperpixel == 4)
+					if (byteperpixel == 4) {
 						base++; // Android
+					}
 					pix8buffer.put(engine.getclosestcol(palette, r, g, b));
 				}
 			}
@@ -943,8 +986,9 @@ public class GDXRenderer implements GLRenderer {
 		ByteBuffer frame = getFrame(PixelFormat.Rgb, xdim, -ydim);
 
 		int byteperpixel = 3;
-		if (BuildGdx.app.getType() == ApplicationType.Android)
+		if (BuildGdx.app.getType() == ApplicationType.Android) {
 			byteperpixel = 4;
+		}
 
 		int base;
 		for (int fx, fy = 0; fy < newheight; fy++) {
@@ -971,33 +1015,37 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void settiltang(int tilt) {
-		if (tilt == 0)
+		if (tilt == 0) {
 			gtang = 0.0f;
-		else
+		} else {
 			gtang = (float) Gameutils.AngleToDegrees(tilt);
+		}
 	}
 
 	@Override
 	public void setDefs(DefScript defs) {
 		this.textureCache.setTextureInfo(defs != null ? defs.texInfo : null);
 		this.modelManager.setModelsInfo(defs != null ? defs.mdInfo : null);
-		if (this.defs != null)
+		if (this.defs != null) {
 			gltexinvalidateall(GLInvalidateFlag.Uninit, GLInvalidateFlag.All);
+		}
 		this.defs = defs;
 	}
 
 	@Override
 	public TextureManager getTextureManager() {
-		if (textureCache == null)
+		if (textureCache == null) {
 			textureCache = new TextureManager(engine, ExpandTexture.Vertical);
+		}
 		return textureCache;
 	}
 
 	@Override
 	public void enableIndexedShader(boolean enable) {
 		if (isUseIndexedTextures != enable) {
-			if (isInited)
+			if (isInited) {
 				texturesUninit();
+			}
 
 			clearskins(false);
 			this.isUseIndexedTextures = enable;
@@ -1012,8 +1060,9 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void palfade(HashMap<String, FadeEffect> fades) { // TODO: to shader?
-		if (orphoRen.isDrawing())
+		if (orphoRen.isDrawing()) {
 			orphoRen.end();
+		}
 
 		gl.glDisable(GL_DEPTH_TEST);
 		gl.glDisable(GL_TEXTURE_2D);
@@ -1049,16 +1098,18 @@ public class GDXRenderer implements GLRenderer {
 				}
 				break;
 			case Other:
-				if (world != null)
+				if (world != null) {
 					world.dispose();
+				}
 				world = new WorldMesh(engine);
 				scanner.init();
 
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
 					Sprite spr = Engine.getSprite(i);
-					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS)
+					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS) {
 						continue;
+					}
 
 					addSpriteCorr(i);
 				}
@@ -1069,13 +1120,15 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void precache(int dapicnum, int dapalnum, int datype) {
-		if ((palookup[dapalnum] == null) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS)))
+		if ((palookup[dapalnum] == null) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
 			return;
+		}
 
 		textureCache.precache(getTexFormat(), dapicnum, dapalnum, datype);
 
-		if (datype == 0)
+		if (datype == 0) {
 			return;
+		}
 
 		modelManager.preload(dapicnum, dapalnum, true);
 	}
@@ -1145,8 +1198,9 @@ public class GDXRenderer implements GLRenderer {
 		int hp;
 
 		PixelFormat fmt = textureCache.getFmt(tilenume);
-		if (fmt == null)
+		if (fmt == null) {
 			return;
+		}
 
 		if (fmt == PixelFormat.Pal8) {
 			numpal = 1;
@@ -1162,8 +1216,9 @@ public class GDXRenderer implements GLRenderer {
 		}
 
 		for (hp = 0; hp < 8; hp += 4) {
-			if ((how & pow2long[hp]) == 0)
+			if ((how & pow2long[hp]) == 0) {
 				continue;
+			}
 
 			for (np = firstpal; np < firstpal + numpal; np++) {
 				textureCache.invalidate(tilenume, np, textureCache.clampingMode(hp));
@@ -1188,12 +1243,14 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bind(int dapicnum, int dapalnum, int dashade, int skybox, int method) {
-		if (palookup[dapalnum] == null)
+		if (palookup[dapalnum] == null) {
 			dapalnum = 0;
+		}
 
 		GLTile pth = textureCache.get(getTexFormat(), dapicnum, dapalnum, skybox, method);
-		if (pth == null)
+		if (pth == null) {
 			return null;
+		}
 
 		textureCache.bind(pth);
 		if (manager.getShader() == null || isSkyShader() || pth.getPixelFormat() != manager.getPixelFormat()) {
@@ -1205,12 +1262,14 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bindSky(int dapicnum, int dapalnum, int dashade, int method) {
-		if (palookup[dapalnum] == null)
+		if (palookup[dapalnum] == null) {
 			dapalnum = 0;
+		}
 
 		GLTile pth = getSkyTexture(getTexFormat(), dapicnum, dapalnum);
-		if (pth == null)
+		if (pth == null) {
 			return null;
+		}
 
 		textureCache.bind(pth);
 		if (manager.getShader() == null || !isSkyShader() || pth.getPixelFormat() != manager.getPixelFormat()) {
@@ -1231,8 +1290,9 @@ public class GDXRenderer implements GLRenderer {
 			break;
 		}
 
-		if (tilenum != -1 && !engine.getTile(tilenum).isLoaded())
+		if (tilenum != -1 && !engine.getTile(tilenum).isLoaded()) {
 			alpha = 0.01f; // Hack to update Z-buffer for invalid mirror textures
+		}
 
 		if (tile.getPixelFormat() == TileData.PixelFormat.Pal8) {
 			manager.textureTransform(texture_transform.idt(), 0);
@@ -1326,8 +1386,9 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	private boolean spritewallfront(Sprite s, int w) {
-		if (s == null)
+		if (s == null) {
 			return false;
+		}
 
 		Wall wal = Engine.getWall(w);
 		int x1 = wal.getX();
@@ -1393,8 +1454,9 @@ public class GDXRenderer implements GLRenderer {
 	protected final GLTileArray skycache = new GLTileArray(MAXTILES);
 
 	protected GLTile getSkyTexture(PixelFormat fmt, int picnum, int palnum) {
-		if (!engine.getTile(picnum).hasSize())
+		if (!engine.getTile(picnum).hasSize()) {
 			return textureCache.get(getTexFormat(), picnum, palnum, 0, 0);
+		}
 
 		GLTile tile = skycache.get(picnum, palnum, false, 0);
 		boolean useMipMaps = GLSettings.textureFilter.get().mipmaps;
@@ -1411,8 +1473,9 @@ public class GDXRenderer implements GLRenderer {
 //				skycache.dispose(picnum); // old texture
 
 			TileData data = loadPic(fmt, picnum, palnum);
-			if (data == null)
+			if (data == null) {
 				return null;
+			}
 
 			skycache.add(textureCache.newTile(data, fmt == PixelFormat.Pal8 ? 0 : palnum, useMipMaps), picnum);
 		}
@@ -1424,8 +1487,9 @@ public class GDXRenderer implements GLRenderer {
 		short[] dapskyoff = zeropskyoff;
 		int dapskybits = pskybits;
 
-		if (dapskybits < 0)
+		if (dapskybits < 0) {
 			dapskybits = 0;
+		}
 
 		Tile tile = engine.getTile(picnum);
 		TileAtlas sky = new TileAtlas(fmt, tile.getWidth() * (1 << dapskybits), tile.getHeight(), tile.getWidth(),
@@ -1433,10 +1497,11 @@ public class GDXRenderer implements GLRenderer {
 		for (int i = 0; i < (1 << dapskybits); i++) {
 			int pic = dapskyoff[i] + picnum;
 			TileData dat;
-			if (fmt == PixelFormat.Pal8)
+			if (fmt == PixelFormat.Pal8) {
 				dat = new IndexedTileData(engine.getTile(pic), false, false, 0);
-			else
+			} else {
 				dat = new RGBTileData(engine.getTile(pic), palnum, false, false, 0);
+			}
 			sky.addTile(pic, dat);
 		}
 

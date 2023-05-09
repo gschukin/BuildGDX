@@ -115,16 +115,19 @@ public abstract class GameAdapter extends ScreenAdapter {
 			@Override
 			public void run() {
 				if (prepareboard(map)) {
-					if (prestart != null)
+					if (prestart != null) {
 						prestart.run();
+					}
 
 					String mapname = map;
 					int index = toLowerCase(mapname).indexOf(".map");
-					if (index == -1)
+					if (index == -1) {
 						mapname = mapname + ".map";
+					}
 
-					if (game.currentDef.mapInfo.load(mapname))
+					if (game.currentDef.mapInfo.load(mapname)) {
 						System.err.println("Maphack loaded for map: " + mapname);
+					}
 
 					startboard(startboard);
 				} // do nothing, it's better to handle it in each game manualy
@@ -166,20 +169,25 @@ public abstract class GameAdapter extends ScreenAdapter {
 			pEngine.faketimerhandler();
 
 			pNet.GetPackets();
-			while (pNet.gPredictTail < pNet.gNetFifoHead[myconnectindex] && !game.gPaused)
+			while (pNet.gPredictTail < pNet.gNetFifoHead[myconnectindex] && !game.gPaused) {
 				pNet.UpdatePrediction(pNet.gFifoInput[pNet.gPredictTail & kFifoMask][myconnectindex]);
-		} else
+			}
+		} else {
 			pNet.bufferJitter = 0;
+		}
 
 		PreFrame(pNet);
 
 		int i;
 		while (pNet.gNetFifoHead[myconnectindex] - pNet.gNetFifoTail > pNet.bufferJitter && !game.gExit) {
-			for (i = connecthead; i >= 0; i = connectpoint2[i])
-				if (pNet.gNetFifoTail == pNet.gNetFifoHead[i])
+			for (i = connecthead; i >= 0; i = connectpoint2[i]) {
+				if (pNet.gNetFifoTail == pNet.gNetFifoHead[i]) {
 					break;
-			if (i >= 0)
+				}
+			}
+			if (i >= 0) {
 				break;
+			}
 
 			synchronized (GameAdapter.this) {
 				pEngine.faketimerhandler(); // game timer sync
@@ -209,13 +217,15 @@ public abstract class GameAdapter extends ScreenAdapter {
 		DrawHud(smoothratio);
 		game.pInt.restoreinterpolations();
 
-		if (pMenu.gShowMenu)
+		if (pMenu.gShowMenu) {
 			pMenu.mDrawMenu();
+		}
 
 		PostFrame(pNet);
 
-		if (pCfg.gShowFPS)
+		if (pCfg.gShowFPS) {
 			pEngine.printfps(pCfg.gFpsScale);
+		}
 
 		pEngine.sampletimer();
 		pEngine.nextpage();
@@ -242,8 +252,9 @@ public abstract class GameAdapter extends ScreenAdapter {
 			sndHandlePause(game.gPaused);
 		}
 
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL)
+		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
 			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+		}
 	}
 
 	@Override

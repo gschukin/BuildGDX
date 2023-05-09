@@ -22,8 +22,9 @@ public abstract class IndexedSkyShaderProgram extends IndexedShader {
 
 	@Override
 	protected void init() throws Exception {
-		if (!isCompiled())
+		if (!isCompiled()) {
 			throw new Exception("Shader compile error: " + getLog());
+		}
 
 		this.paletteloc = getUniformLocation("u_palette");
 		this.palookuploc = getUniformLocation("u_palookup");

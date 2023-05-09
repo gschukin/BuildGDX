@@ -152,8 +152,9 @@ public class Ac implements A {
 		try {
 			for (; cnt >= 0; cnt--) {
 				int index = bufoffs + (vplc >>> glogy);
-				if(index >= bufplc.length)
+				if(index >= bufplc.length) {
 					return;
+				}
 
 				int ch = (bufplc[index] & 0xFF) + shade;
 				drawpixel(p, pal[ch]);
@@ -176,12 +177,14 @@ public class Ac implements A {
 		try {
 			for (; cnt >= 0; cnt--) {
 				int index = bufoffs + (vplc >>> glogy);
-				if(index >= bufplc.length)
+				if(index >= bufplc.length) {
 					return;
+				}
 
 				int ch = bufplc[index] & 0xFF;
-				if (ch != 255)
+				if (ch != 255) {
 					drawpixel(p, pal[ch + shade]);
+				}
 				p += pl;
 				vplc += vinc;
 			}
@@ -260,8 +263,9 @@ public class Ac implements A {
 			for (cntup16 >>= 16; cntup16 > 0; cntup16--) {
 				int index = ((bx >>> shiftx) << glogy) + (by >>> shifty);
 				int ch = bufplc[index] & 0xFF;
-				if (ch != 255)
+				if (ch != 255) {
 					drawpixel(p, remap[ch + shade]);
+				}
 
 				bx += xinc;
 				by += yinc;
@@ -372,8 +376,9 @@ public class Ac implements A {
 				int index = bufoffs + (bx >> 16) * glogy + (by >> 16);
 
 				int ch = bufplc[index] & 0xFF;
-				if (ch != 255)
+				if (ch != 255) {
 					drawpixel(p, remap[ch + shade]);
+				}
 
 				bx += xinc;
 				by += yinc;
@@ -450,8 +455,9 @@ public class Ac implements A {
 		switch (transmode) {
 		case 0:
 			while (dy > 0) {
-				for (x = 0; x < dx; x++)
+				for (x = 0; x < dx; x++) {
 					drawpixel(p + x, remap[(data[(v >>> 16) + vptr] & 0xFF) + shade]);
+				}
 				p += pl;
 				v += vi;
 				dy--;

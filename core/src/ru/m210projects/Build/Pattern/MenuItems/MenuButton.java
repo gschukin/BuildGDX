@@ -53,10 +53,12 @@ public class MenuButton extends MenuItem
 		    int px = x;
 		    int pal = handler.getPal(font, this);
 		    
-		    if(align == 1) 
-		        px = width / 2 + x - font.getWidth(text) / 2;
-		    if(align == 2) 
-		        px = x + width - 1 - font.getWidth(text);
+		    if(align == 1) {
+				px = width / 2 + x - font.getWidth(text) / 2;
+			}
+		    if(align == 2) {
+				px = x + width - 1 - font.getWidth(text);
+			}
 
 		    font.drawText(px, y, text, shade, pal, TextAlign.Left, 2, fontShadow);
 		}
@@ -68,10 +70,12 @@ public class MenuButton extends MenuItem
 	public boolean callback(MenuHandler handler, MenuOpt opt) {
 		if ( (flags & 4) != 0 && (opt == MenuOpt.ENTER || opt == MenuOpt.LMB) )
 		{
-			if ( specialCall != null )
+			if ( specialCall != null ) {
 				specialCall.run(handler, this);
-		    if ( nextMenu != null )
-		    	handler.mOpen(nextMenu, nItem);
+			}
+		    if ( nextMenu != null ) {
+				handler.mOpen(nextMenu, nItem);
+			}
 		}
 		else {
 			return m_pMenu.mNavigation(opt);
@@ -95,14 +99,17 @@ public class MenuButton extends MenuItem
 		{
 			int wd = font.getWidth(text);
 			int px = x;
-			if(align == 1) 
-		        px = width / 2 + x - wd / 2;
+			if(align == 1) {
+				px = width / 2 + x - wd / 2;
+			}
 		    
-			if(align == 2) 
+			if(align == 2) {
 				px = x + width - 1 - wd;
+			}
 
-			if(mx > px && mx < px + wd)
-                return my > y && my < y + font.getHeight();
+			if(mx > px && mx < px + wd) {
+				return my > y && my < y + font.getHeight();
+			}
 		}
 		return false;
 	}

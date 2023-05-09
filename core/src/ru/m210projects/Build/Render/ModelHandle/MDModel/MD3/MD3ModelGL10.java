@@ -77,9 +77,11 @@ public abstract class MD3ModelGL10 extends MDModel {
 				vertices.flip();
 
 				indices.clear();
-				for (int i = s.numtris - 1; i >= 0; i--)
-					for (int j = 0; j < 3; j++)
+				for (int i = s.numtris - 1; i >= 0; i--) {
+					for (int j = 0; j < 3; j++) {
 						indices.put((short) s.tris[i][j]);
+					}
+				}
 				indices.flip();
 
 				int l = GL_TEXTURE0;
@@ -107,12 +109,14 @@ public abstract class MD3ModelGL10 extends MDModel {
 				}
 				BuildGdx.gl.glDisableClientState(GL_VERTEX_ARRAY);
 				isRendered = true;
-			} else
+			} else {
 				break;
+			}
 		}
 
-		if (usesalpha)
+		if (usesalpha) {
 			BuildGdx.gl.glDisable(GL_ALPHA_TEST);
+		}
 		BuildGdx.gl.glDisable(GL_CULL_FACE);
 		BuildGdx.gl.glLoadIdentity();
 
@@ -132,8 +136,9 @@ public abstract class MD3ModelGL10 extends MDModel {
 
 	@Override
 	public void loadSkins(int pal, int skinnum) {
-		for (int surfi = 0; surfi < numSurfaces; surfi++)
+		for (int surfi = 0; surfi < numSurfaces; surfi++) {
 			getSkin(pal, skinnum, surfi);
+		}
 	}
 
 	@Override

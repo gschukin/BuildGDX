@@ -105,14 +105,16 @@ public class JDisplay extends WindowAdapter
 	
 	public boolean setFullscreenMode(DisplayMode mode)
 	{
-		if(!device.isFullScreenSupported())
+		if(!device.isFullScreenSupported()) {
 			return false;
+		}
 
 		setUndecorated(true);
 		device.setFullScreenWindow(m_frame);
 		
-		if (device.isDisplayChangeSupported())
-            device.setDisplayMode(mode);
+		if (device.isDisplayChangeSupported()) {
+			device.setDisplayMode(mode);
+		}
 		
 		updateSize(mode.getWidth(), mode.getHeight());
 
@@ -126,8 +128,9 @@ public class JDisplay extends WindowAdapter
 		
 		device.setFullScreenWindow(null);
 		
-		if (device.isDisplayChangeSupported())
-            device.setDisplayMode(mode);
+		if (device.isDisplayChangeSupported()) {
+			device.setDisplayMode(mode);
+		}
 		
 		updateSize(mode.getWidth(), mode.getHeight());
 
@@ -144,8 +147,9 @@ public class JDisplay extends WindowAdapter
 	{
 		Dimension size = canvas.getSize();
 		if((size.width == width && size.height == height) && 
-				(canvas.getWidth() == width && canvas.getHeight() == height))
+				(canvas.getWidth() == width && canvas.getHeight() == height)) {
 			return;
+		}
 
 		wasResized = true;
 		size = new Dimension(width, height);
@@ -205,15 +209,17 @@ public class JDisplay extends WindowAdapter
 
 	public void setUndecorated(boolean undecorated)
 	{
-		if(m_frame.isUndecorated() == undecorated)
+		if(m_frame.isUndecorated() == undecorated) {
 			return;
+		}
 		
 		m_frame.dispose();
 		m_frame.setUndecorated(undecorated);
 		m_frame.setVisible(true);
 		
-		if(rebuildCallback != null)
+		if(rebuildCallback != null) {
 			rebuildCallback.run();
+		}
 	}
 	
 	public void setResizable(boolean resizable) {
@@ -221,8 +227,9 @@ public class JDisplay extends WindowAdapter
 	}
 
 	public void setLocation(int x, int y) {
-		if(x == - 1 && y == -1)
+		if(x == - 1 && y == -1) {
 			return;
+		}
 		
 		m_frame.setLocation(x, y);
 	}

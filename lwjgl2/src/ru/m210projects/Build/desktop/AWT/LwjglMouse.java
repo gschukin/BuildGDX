@@ -47,8 +47,9 @@ public class LwjglMouse extends AWTMouse {
 		LwjglNativesLoader.load(); //This also needs for Pixmap working
 		displayImpl = getImplementation.invoke(null, (Object[])null);
 		setWindowHandle();
-		if(handle == -1 || !IS_WINDOWS) 
-			throw new UnsupportedOperationException("not implemented"); 
+		if(handle == -1 || !IS_WINDOWS) {
+			throw new UnsupportedOperationException("not implemented");
+		}
 		
 		display.setRebuildCallback(new Runnable() {
 			@Override
@@ -86,8 +87,9 @@ public class LwjglMouse extends AWTMouse {
 	private long getWindowHandle(Canvas canvas) throws Exception {
 		boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
 		
-		if (IS_MAC)
+		if (IS_MAC) {
 			return 0;
+		}
 
 		Method gethwnd = displayImpl.getClass().getDeclaredMethod(IS_WINDOWS ? "getHwnd" : "getHandle", Canvas.class);
 		gethwnd.setAccessible(true);

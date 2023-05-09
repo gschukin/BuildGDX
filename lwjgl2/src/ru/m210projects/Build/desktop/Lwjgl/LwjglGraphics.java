@@ -167,8 +167,9 @@ public class LwjglGraphics extends BuildGraphics {
 		extensions = new Array<String>();
 		if (glVersion.isVersionEqualToOrHigher(3, 2)) {
 			int numExtensions = GL11.glGetInteger(GL30.GL_NUM_EXTENSIONS);
-			for (int i = 0; i < numExtensions; ++i)
+			for (int i = 0; i < numExtensions; ++i) {
 				extensions.add(org.lwjgl.opengl.GL30.glGetStringi(GL20.GL_EXTENSIONS, i));
+			}
 		} else {
 			extensions.addAll(org.lwjgl.opengl.GL11.glGetString(GL20.GL_EXTENSIONS).split(" "));
 		}
@@ -242,8 +243,9 @@ public class LwjglGraphics extends BuildGraphics {
 
 	@Override
 	protected void updateSize(int width, int height) {
-		if (BuildGdx.gl != null)
+		if (BuildGdx.gl != null) {
 			BuildGdx.gl.glViewport(0, 0, width, height);
+		}
 	}
 
 	@Override
@@ -395,7 +397,9 @@ public class LwjglGraphics extends BuildGraphics {
 			float scaleFactor = Display.getPixelScaleFactor();
 			config.width = (int)(mode.getWidth() * scaleFactor);
 			config.height = (int)(mode.getHeight() * scaleFactor);
-			if (BuildGdx.gl != null) BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+			if (BuildGdx.gl != null) {
+				BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+			}
 			resize = true;
 
 			rate = mode.getFrequency();
@@ -427,7 +431,9 @@ public class LwjglGraphics extends BuildGraphics {
 			float scaleFactor = Display.getPixelScaleFactor();
 			config.width = (int)(targetDisplayMode.getWidth() * scaleFactor);
 			config.height = (int)(targetDisplayMode.getHeight() * scaleFactor);
-			if (BuildGdx.gl != null) BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+			if (BuildGdx.gl != null) {
+				BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+			}
 			resize = true;
 
 			rate = Display.getDesktopDisplayMode().getFrequency();
@@ -439,8 +445,9 @@ public class LwjglGraphics extends BuildGraphics {
 
 	@Override
 	public void setTitle(String title) {
-		if (title == null)
+		if (title == null) {
 			title = "";
+		}
 		Display.setTitle(title);
 	}
 
@@ -483,8 +490,9 @@ public class LwjglGraphics extends BuildGraphics {
 
 	@Override
 	public void setCursor(Cursor cursor) {
-		if (SharedLibraryLoader.isMac)
+		if (SharedLibraryLoader.isMac) {
 			return;
+		}
 
 		try {
 			Mouse.setNativeCursor(((LwjglCursor)cursor).lwjglCursor);
@@ -495,8 +503,9 @@ public class LwjglGraphics extends BuildGraphics {
 
 	@Override
 	public void setSystemCursor(SystemCursor systemCursor) {
-		if (SharedLibraryLoader.isMac)
+		if (SharedLibraryLoader.isMac) {
 			return;
+		}
 
 		try {
 			Mouse.setNativeCursor(null);
@@ -515,8 +524,9 @@ public class LwjglGraphics extends BuildGraphics {
 		switch(opt)
 		{
 		case GLSetConfiguration:
-			if(obj.length < 3)
+			if(obj.length < 3) {
 				return false;
+			}
 			float gamma = (Float) obj[0];
 			float brightness = (Float) obj[1];
 			float contrast = (Float) obj[2];
@@ -530,7 +540,9 @@ public class LwjglGraphics extends BuildGraphics {
 	}
 
 	private boolean setDisplayConfiguration(float gamma, float brightness, float contrast) {
-		if( !Display.isCreated() || !Mouse.isCreated() || !Keyboard.isCreated()) return false;
+		if( !Display.isCreated() || !Mouse.isCreated() || !Keyboard.isCreated()) {
+			return false;
+		}
 		try {
 			Display.setDisplayConfiguration(gamma, brightness, contrast);
 		} catch (Exception e) { e.printStackTrace(); return false; }
@@ -542,8 +554,9 @@ public class LwjglGraphics extends BuildGraphics {
 		org.lwjgl.input.Cursor lwjglCursor = null;
 
 		public LwjglCursor (Pixmap pixmap, int xHotspot, int yHotspot) {
-			if (SharedLibraryLoader.isMac)
+			if (SharedLibraryLoader.isMac) {
 				return;
+			}
 
 			try {
 				if (pixmap == null) {

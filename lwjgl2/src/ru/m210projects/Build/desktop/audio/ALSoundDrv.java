@@ -140,7 +140,9 @@ public class ALSoundDrv implements Sound {
 			return false;
 		}
 		
-		if(maxChannels < 1) maxChannels = 1;
+		if(maxChannels < 1) {
+			maxChannels = 1;
+		}
 
 		al.alDistanceModel( AL_NONE );
 		orientation.put(deforientation).flip();
@@ -156,24 +158,30 @@ public class ALSoundDrv implements Sound {
 		Console.Println("\tOpenAL version: " + al.getVersion(), OSDTEXT_GOLD); 	
 		noDevice = false;
 		
-		if(al.alIsEFXSupport())
-			Console.Println("ALC_EXT_EFX enabled.");	
-		else Console.Println("ALC_EXT_EFX not supported!");	 
+		if(al.alIsEFXSupport()) {
+			Console.Println("ALC_EXT_EFX enabled.");
+		} else {
+			Console.Println("ALC_EXT_EFX not supported!");
+		}
 		
 		if(al.alIsSoftResamplerSupport()) {
 			Console.Println("AL_SOFT_Source_Resampler enabled. Using resampler: " + al.alGetSoftResamplerName(softResampler));	
 			setSoftResampler(softResampler);
 		}
-		else Console.Println("AL_SOFT_Source_Resampler not supported!");	 
+		else {
+			Console.Println("AL_SOFT_Source_Resampler not supported!");
+		}
 
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL init error " + error, OSDTEXT_RED);
+		}
 		
 		getDigitalMusic().init();
 		
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL digital music init error " + error, OSDTEXT_RED);
+		}
 		
 		loopedSource.clear();
 
@@ -188,19 +196,24 @@ public class ALSoundDrv implements Sound {
 	@Override
 	public void dispose() {
 		uninit();
-		if(al != null)
+		if(al != null) {
 			al.dispose();
+		}
 	}
 
 	@Override
 	public String getName() {
-		if(noDevice) return name;
+		if(noDevice) {
+			return name;
+		}
 		return "OpenAL" + al.getVersion();
 	}
 
 	@Override
 	public void setListener(int x, int y, int z, int ang) {
-		if (noDevice) return;
+		if (noDevice) {
+			return;
+		}
 		if(system != SystemType.Mono) 
 		{
 			al.alListener3f(AL_POSITION, x, y, z);
@@ -210,16 +223,21 @@ public class ALSoundDrv implements Sound {
 			orientation.put(2, (float)Math.sin(angle));
 			orientation.rewind();
 			al.alListener ( AL_ORIENTATION, orientation );
-		} else al.alListener (AL_POSITION, NULLVECTOR);
+		} else {
+			al.alListener (AL_POSITION, NULLVECTOR);
+		}
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error setListener " + error, OSDTEXT_RED);
+		}
 	}
 
 	@Override
 	public void resetListener() {
-		if (noDevice) return;
+		if (noDevice) {
+			return;
+		}
 		orientation.put(deforientation).flip();
 		al.alListener(AL_ORIENTATION, orientation);
 		al.alListener(AL_VELOCITY, NULLVECTOR);
@@ -238,13 +256,18 @@ public class ALSoundDrv implements Sound {
 	
 	@Override
 	public Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority) {
-		if(noDevice || data == null) return null;
+		if(noDevice || data == null) {
+			return null;
+		}
 		
 		Source source = sourceManager.obtainSource(priority);
-		if (source == null) return null;
+		if (source == null) {
+			return null;
+		}
 
-		if(loopedSource.size() > 0 && source.loopInfo.looped)
+		if(loopedSource.size() > 0 && source.loopInfo.looped) {
 			loopedSource.remove(source);
+		}
 		source.loopInfo.clear();
 		
 		int sourceId = source.sourceId;
@@ -271,15 +294,17 @@ public class ALSoundDrv implements Sound {
 		al.alSourcei(sourceId, AL_BUFFER,   bufferID );
 		
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error newSound " + error, OSDTEXT_RED);
+		}
 		
 		return source;
 	}
 	
 	public SoundData decodeSound(byte[] data) {
-		if(data == null)
+		if(data == null) {
 			return null;
+		}
 		
 		if(data[0] == 0x52 && data[1] == 0x49 && data[2] == 0x46 && data[3] == 0x46) { //RIFF
 			try {
@@ -294,7 +319,9 @@ public class ALSoundDrv implements Sound {
 					byte[] buffer = new byte[2048];
 					while (!input.atEnd()) {
 						int length = input.read(buffer);
-						if (length == -1) break;
+						if (length == -1) {
+							break;
+						}
 						output.write(buffer, 0, length);
 					}
 					SoundData ogg = new SoundData();
@@ -316,7 +343,9 @@ public class ALSoundDrv implements Sound {
 
 	@Override
 	public void stopAllSounds() {
-		if (noDevice) return;
+		if (noDevice) {
+			return;
+		}
 		sourceManager.stopAllSounds();
 		loopedSource.clear();
 	}
@@ -328,23 +357,31 @@ public class ALSoundDrv implements Sound {
 
 	@Override
 	public void setReverb(boolean enable, float delay) {
-		if(noDevice) return;
+		if(noDevice) {
+			return;
+		}
 		alReverbEnable = enable;
-		if(enable) 
+		if(enable) {
 			alReverbDelay = BClipRange(delay, 0.0f, 10.0f);
-		else alReverbDelay = 0;
+		} else {
+			alReverbDelay = 0;
+		}
 
 		Iterator<Source> it = sourceManager.iterator();
 	    while(it.hasNext()) {
 	    	Source s = it.next();
 	    	if(s.flags != Source.Locked) //Don't set reverb for music
-	    		al.setSourceReverb(s.sourceId, alReverbEnable, alReverbDelay);
+			{
+				al.setSourceReverb(s.sourceId, alReverbEnable, alReverbDelay);
+			}
 	    }
 	}
 	
 	@Override
 	public String getSoftResamplerName(int num) {
-		if(noDevice) return "Not supported";
+		if(noDevice) {
+			return "Not supported";
+		}
 		return al.alGetSoftResamplerName(num);
 	}
 
@@ -355,13 +392,17 @@ public class ALSoundDrv implements Sound {
 	
 	@Override
 	public int getNumResamplers() {
-		if(noDevice) return 1;
+		if(noDevice) {
+			return 1;
+		}
 		return al.alGetNumResamplers();
 	}
 
 	@Override
 	public void setSoftResampler(int num) {
-		if(noDevice) return;
+		if(noDevice) {
+			return;
+		}
 		
 		alCurrentSoftResampler = num;
 		Iterator<Source> it = sourceManager.iterator();
@@ -377,15 +418,17 @@ public class ALSoundDrv implements Sound {
 
 	   	switch (bits) {
 	    	case 16:
-                if (stereo)
-                	return AL_FORMAT_STEREO16;
-                else
-                	return AL_FORMAT_MONO16;
+                if (stereo) {
+					return AL_FORMAT_STEREO16;
+				} else {
+					return AL_FORMAT_MONO16;
+				}
 	        case 8:
-                if (stereo)
-                	return AL_FORMAT_STEREO8;
-                else
-                	return AL_FORMAT_MONO8;
+                if (stereo) {
+					return AL_FORMAT_STEREO8;
+				} else {
+					return AL_FORMAT_MONO8;
+				}
 	        default:
 	        	return -1;
 		}
@@ -402,7 +445,9 @@ public class ALSoundDrv implements Sound {
 			clear();
 			for (int i = 0; i < maxSources; i++) {
 				int sourceId = al.alGenSources();
-				if (al.alGetError() != AL_NO_ERROR) break;
+				if (al.alGetError() != AL_NO_ERROR) {
+					break;
+				}
 				allSources[i] = new ALSource(ALSoundDrv.this, i, sourceId);
 
 				// set default values for AL sources
@@ -445,8 +490,9 @@ public class ALSoundDrv implements Sound {
 		protected void update()
 		{
 			for(int i = 0; i < allSources.length; i++) {
-				if(allSources[i] != null && !allSources[i].free && !allSources[i].isActive() && allSources[i].flags != Source.Locked)
+				if(allSources[i] != null && !allSources[i].free && !allSources[i].isActive() && allSources[i].flags != Source.Locked) {
 					freeSource(allSources[i]);
+				}
 			}
 		}
 
@@ -475,13 +521,15 @@ public class ALSoundDrv implements Sound {
 				add(source);
 				
 				return source;
-			} else 
+			} else {
 				return null;
+			}
 		}
 
 		public int stopSound(Source source) {
-			if(source.flags == Source.Locked) 
+			if(source.flags == Source.Locked) {
 				return -1;
+			}
 			
 			al.alSourceStop(source.sourceId);
 			al.alSourcei(source.sourceId, AL_BUFFER, 0);
@@ -492,14 +540,18 @@ public class ALSoundDrv implements Sound {
 		public void stopAllSounds() {
 			for (int i = 0, n = allSources.length; i < n; i++) {
 				Source source = allSources[i];
-				if(source == null) break; //max sources
+				if(source == null) {
+					break; //max sources
+				}
 				stopSound(source);
 			}
 		}
 		
 		public void dispose() {
 			for (int i = 0, n = allSources.length; i < n; i++) {
-				if(allSources[i] == null) break; //max sources
+				if(allSources[i] == null) {
+					break; //max sources
+				}
 				allSources[i].dispose();
 				al.alDeleteSources(allSources[i].sourceId);
 				allSources[i].sourceId = -1;
@@ -521,7 +573,9 @@ public class ALSoundDrv implements Sound {
 	
 	@Override
 	public void update() {
-		if(noDevice) return;
+		if(noDevice) {
+			return;
+		}
 		
 //		System.out.println("update()");
 //		printSources(this.sourceManager);
@@ -529,8 +583,9 @@ public class ALSoundDrv implements Sound {
 		mus.update();
 
 		int error = al.alGetError();
-		if(error != AL_NO_ERROR) 
+		if(error != AL_NO_ERROR) {
 			Console.Println("OpenAL Error " + error, OSDTEXT_RED);
+		}
 
 		if(loopedSource.size() > 0) {
 			Iterator<Source> i = loopedSource.iterator();
@@ -557,13 +612,17 @@ public class ALSoundDrv implements Sound {
 
 	@Override
 	public boolean isAvailable(int priority) {
-		if(noDevice) return false;
+		if(noDevice) {
+			return false;
+		}
 		return sourceManager.element().priority < priority || !sourceManager.element().isPlaying();
 	}
 
 	@Override
 	public void uninit() {
-		if(noDevice) return;
+		if(noDevice) {
+			return;
+		}
 		
 		sourceManager.dispose();
 		al.alDeleteBuffers(buffers);

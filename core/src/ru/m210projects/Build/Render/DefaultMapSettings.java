@@ -35,8 +35,9 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 
 	@Override
 	public boolean isSpriteVisible(MapView view, int index) {
-		if (view == MapView.Polygons)
+		if (view == MapView.Polygons) {
 			return false;
+		}
 
 		switch (Engine.getSprite(index).getCstat() & 48) {
 		case 0:
@@ -54,10 +55,12 @@ public class DefaultMapSettings implements IOverheadMapSettings {
 		Wall wal = Engine.getWall(w);
 		Sector sec = Engine.getSector(s);
 		if (wal.getNextsector() != 0) // red wall
+		{
 			return (wal.getNextwall() <= w && ((Engine.getSector(wal.getNextsector()).getCeilingz() != sec.getCeilingz() //
 					|| Engine.getSector(wal.getNextsector()).getFloorz() != sec.getFloorz() //
 					|| ((wal.getCstat() | Engine.getWall(wal.getNextwall()).getCstat()) & (16 + 32)) != 0) //
 					|| (!isFullMap() && (show2dsector[wal.getNextsector() >> 3] & 1 << (wal.getNextsector() & 7)) == 0)));
+		}
 		return true;
 	}
 

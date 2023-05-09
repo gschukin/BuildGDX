@@ -15,8 +15,9 @@ public class PixmapTileData extends TileData {
 
 	public PixmapTileData(Pixmap pixmap, boolean clamped, int expflag) {
 		if (pixmap.getFormat() == Format.Alpha || pixmap.getFormat() == Format.Intensity
-				|| pixmap.getFormat() == Format.LuminanceAlpha)
+				|| pixmap.getFormat() == Format.LuminanceAlpha) {
 			pixmap = convert(pixmap);
+		}
 
 		this.pixmap = pixmap;
 		this.clamped = clamped;
@@ -25,10 +26,12 @@ public class PixmapTileData extends TileData {
 
 		int xsiz = width;
 		int ysiz = height;
-		if ((expflag & 1) != 0)
+		if ((expflag & 1) != 0) {
 			xsiz = calcSize(width);
-		if ((expflag & 2) != 0)
+		}
+		if ((expflag & 2) != 0) {
 			ysiz = calcSize(height);
+		}
 
 		if (xsiz != width || ysiz != height) {
 			Pixmap npix = new Pixmap(xsiz, ysiz, !clamped ? pixmap.getFormat() : Format.RGBA8888);
@@ -40,8 +43,9 @@ public class PixmapTileData extends TileData {
 						npix.drawPixmap(pixmap, x, y);
 					}
 				}
-			} else
+			} else {
 				npix.drawPixmap(pixmap, 0, 0);
+			}
 
 			pixmap.dispose();
 			this.pixmap = npix;
@@ -59,8 +63,9 @@ public class PixmapTileData extends TileData {
 		for (int i = 0; i < (width * height); i++) {
 			float c = (pixels.get() & 0xFF) / 255.f;
 			float a = 1.0f;
-			if(bytes2)
+			if(bytes2) {
 				a = (pixels.get() & 0xFF) / 255.f;
+			}
 			npix.setColor(c, c, c, a);
 			int row = (int) Math.floor(i / width);
 			int col = i % width;

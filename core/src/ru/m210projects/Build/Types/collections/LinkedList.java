@@ -39,33 +39,39 @@ public class LinkedList<T> implements Iterable<T> {
 
 		public final Node<T> unlink() {
 			Node<T> t = next;
-			if (prev != null)
+			if (prev != null) {
 				prev.next = next;
-			if (next != null)
+			}
+			if (next != null) {
 				next.prev = prev;
+			}
 			next = prev = null;
 			return t;
 		}
 
 		protected final void insertAfter(Node<T> node) {
-			if (node.equals(this))
+			if (node.equals(this)) {
 				return;
+			}
 
 			node.next = next;
 			node.prev = this;
-			if (next != null)
+			if (next != null) {
 				next.prev = node;
+			}
 			next = node;
 		}
 
 		protected final void insertBefore(Node<T> node) {
-			if (node.equals(this))
+			if (node.equals(this)) {
 				return;
+			}
 
 			node.next = this;
 			node.prev = prev;
-			if (prev != null)
+			if (prev != null) {
 				prev.next = node;
+			}
 			prev = node;
 		}
 
@@ -102,8 +108,9 @@ public class LinkedList<T> implements Iterable<T> {
 	}
 
 	public boolean remove(Node<T> item) {
-		if (size == 0)
+		if (size == 0) {
 			return false;
+		}
 
 		if (item.equals(tail)) {
 			removeLast();
@@ -127,33 +134,38 @@ public class LinkedList<T> implements Iterable<T> {
 
 	public void removeFirst() {
 		head = head.unlink();
-		if (--size == 0)
+		if (--size == 0) {
 			tail = null;
+		}
 	}
 
 	public void removeLast() {
 		final Node<T> prev = tail.prev;
 		tail.unlink();
 		tail = prev;
-		if (--size == 0)
+		if (--size == 0) {
 			head = null;
+		}
 	}
 
 	public void add(Node<T> item, Comparator<T> c) {
-		if(item.next != null || item.prev != null)
+		if(item.next != null || item.prev != null) {
 			return; //already in the list
+		}
 		insertBefore(compare(item, c), item);
 	}
 
 	public void add(Node<T> node) {
-		if (node == null || node.equals(tail) || node.equals(head))
+		if (node == null || node.equals(tail) || node.equals(head)) {
 			return;
+		}
 
 		if (tail != null) {
 			tail.next = node;
 			node.prev = tail;
-		} else
+		} else {
 			head = node;
+		}
 		tail = node;
 		size++;
 	}
@@ -161,8 +173,9 @@ public class LinkedList<T> implements Iterable<T> {
 	public Node<T> compare(Node<T> item, Comparator<T> c) {
 		Node<T> node = head;
 		while (node != null) {
-			if (c.compare(item.getValue(), node.getValue()) < 0)
+			if (c.compare(item.getValue(), node.getValue()) < 0) {
 				break;
+			}
 			node = node.next();
 		}
 		return node;
@@ -175,8 +188,9 @@ public class LinkedList<T> implements Iterable<T> {
 		}
 
 		node.insertBefore(item);
-		if (node.equals(head))
+		if (node.equals(head)) {
 			head = item;
+		}
 		size++;
 	}
 
@@ -187,58 +201,66 @@ public class LinkedList<T> implements Iterable<T> {
 		}
 
 		node.insertAfter(item);
-		if (node.equals(tail))
+		if (node.equals(tail)) {
 			tail = item;
+		}
 		size++;
 	}
 
 	public T next(Node<T> node) {
-		if (node.next != null)
+		if (node.next != null) {
 			return node.next.getValue();
+		}
 
 		return null;
 	}
 
 	public T prev(Node<T> node) {
-		if (node.prev != null)
+		if (node.prev != null) {
 			return node.prev.getValue();
+		}
 
 		return null;
 	}
 
 	public T getFirst() {
-		if (head != null)
+		if (head != null) {
 			return head.getValue();
+		}
 
 		return null;
 	}
 
 	public T getLast() {
-		if (tail != null)
+		if (tail != null) {
 			return tail.getValue();
+		}
 
 		return null;
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		if (it == null)
+		if (it == null) {
 			it = new LinkedListIterator();
+		}
 		return it.init();
 	}
 
 	public Object[] toArray() {
 		Object[] result = new Object[size];
 		int i = 0;
-		for (Node<T> x = head; x != null; x = x.next)
+		for (Node<T> x = head; x != null; x = x.next) {
 			result[i++] = x;
+		}
 		return result;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void sort(Comparator<T> c) {
-		if (size == 0)
+		if (size == 0) {
 			return;
+		}
 
 		Object[] a = this.toArray();
 		Arrays.sort(a, (Comparator) c);
@@ -261,16 +283,18 @@ public class LinkedList<T> implements Iterable<T> {
 	@Override
 	public String toString() {
 		Iterator<T> it = iterator();
-		if (!it.hasNext())
+		if (!it.hasNext()) {
 			return "[]";
+		}
 
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
 		for (;;) {
 			T e = it.next();
 			sb.append(e);
-			if (!it.hasNext())
+			if (!it.hasNext()) {
 				return sb.append(']').toString();
+			}
 			sb.append(',').append(' ');
 		}
 	}

@@ -172,15 +172,17 @@ public class InitScreen extends ScreenAdapter {
 			cfg.renderType = RenderType.Software;
 		}
 
-		if (!engine.setgamemode(cfg.fullscreen, cfg.ScreenWidth, cfg.ScreenHeight))
+		if (!engine.setgamemode(cfg.fullscreen, cfg.ScreenWidth, cfg.ScreenHeight)) {
 			cfg.fullscreen = 0;
+		}
 
 		if(cfg.autoloadFolder) {
 			DirectoryEntry autoloadDir = BuildGdx.compat.checkDirectory("autoload");
 			if(autoloadDir == null) { // not found
 				File f = new File(Path.Game.getPath() + File.separator + "autoload");
-				if(!f.exists() && !f.mkdirs() && !f.isDirectory())
+				if(!f.exists() && !f.mkdirs() && !f.isDirectory()) {
 					Console.Println("Can't create autoload folder", OSDTEXT_RED);
+				}
 			}
 		}
 
@@ -190,8 +192,9 @@ public class InitScreen extends ScreenAdapter {
 				try {
 					BuildConfig cfg = game.pCfg;
 					cfg.InitKeymap();
-					if (!cfg.isInited)
+					if (!cfg.isInited) {
 						cfg.isInited = cfg.InitConfig(!cfg.isExist());
+					}
 
 					game.pNet = factory.net();
 					game.pInput = factory.input(BuildGdx.controllers.init());
@@ -253,8 +256,9 @@ public class InitScreen extends ScreenAdapter {
 	}
 
 	public void start() {
-		if (thread != null)
+		if (thread != null) {
 			thread.start();
+		}
 	}
 
 	@Override
@@ -276,9 +280,9 @@ public class InitScreen extends ScreenAdapter {
 
 				if (frames++ > 3) {
 					if (!thread.isAlive()) {
-						if (gameInitialized)
+						if (gameInitialized) {
 							game.show();
-						else {
+						} else {
 							game.GameMessage("InitScreen unknown error!");
 							BuildGdx.app.exit();
 						}

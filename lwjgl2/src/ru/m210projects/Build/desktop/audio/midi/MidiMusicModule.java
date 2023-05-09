@@ -50,9 +50,11 @@ public class MidiMusicModule implements Music {
 		try {
 			devices = getDevices();
 			this.nDevice = nDevice;
-			if(soundbank != null)
+			if(soundbank != null) {
 				this.soundbank = MidiSystem.getSoundbank(soundbank);
-			else this.soundbank = null;
+			} else {
+				this.soundbank = null;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -60,7 +62,9 @@ public class MidiMusicModule implements Music {
 
 	public static List<MidiDevice> getDevices()
 	{
-		if(devices != null) return devices;
+		if(devices != null) {
+			return devices;
+		}
 		
 		devices = new ArrayList<MidiDevice>();
 		Info[] dInfos = MidiSystem.getMidiDeviceInfo();
@@ -68,8 +72,9 @@ public class MidiMusicModule implements Music {
 			for(Info dInfo : dInfos)
 			{
 				MidiDevice dev = MidiSystem.getMidiDevice(dInfo);
-	            if (dev.getMaxReceivers() != 0)
-	            	devices.add(dev);
+	            if (dev.getMaxReceivers() != 0) {
+					devices.add(dev);
+				}
 			}
 		} catch (Exception e) {
         	e.printStackTrace();
@@ -92,7 +97,9 @@ public class MidiMusicModule implements Music {
 	@Override
 	public MusicSource newMusic(String name) {
 		Resource res = BuildGdx.cache.open(name, 0);
-		if(res == null) return null;
+		if(res == null) {
+			return null;
+		}
 		
 		byte[] data = res.getBytes();
 		res.close();
@@ -103,12 +110,14 @@ public class MidiMusicModule implements Music {
 	public boolean init() {
 		try {
 			sequencer = new MidiSequencer();
-			if(device != null)
-	    		device.close();
+			if(device != null) {
+				device.close();
+			}
 			
 			inited = false;
-			if(devices == null) 
+			if(devices == null) {
 				return false;
+			}
 
 			if(soundbank != null) {
 				Console.Println("Soundbank initializing...");
@@ -142,8 +151,9 @@ public class MidiMusicModule implements Music {
 
 	@Override
 	public String getName() {
-		if(soundbank != null) 
+		if(soundbank != null) {
 			return soundbank.getName();
+		}
 		return name;
 	}
 
@@ -154,10 +164,12 @@ public class MidiMusicModule implements Music {
 
 	@Override
 	public void dispose() {
-    	if(sequencer != null)
+    	if(sequencer != null) {
 			sequencer.dispose();
-    	if( device != null)
-    		device.close();
+		}
+    	if( device != null) {
+			device.close();
+		}
 //    	devices = null;
 	}
 

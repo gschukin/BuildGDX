@@ -47,8 +47,9 @@ public class HMIMIDIP {
 			TRACK_OFFSET = HMP_TRACK_OFFSET_1;
 		} else if (signature.equals("HMIMIDIP")) {
 			TRACK_OFFSET = HMP_TRACK_OFFSET_0;
-		} else
+		} else {
 			return null;
+		}
 
 		int nChunks = bb.getInt(HMP_TRACK_COUNT_OFFSET);
 		int nBPM = bb.getInt(HMP_DIVISION_OFFSET);
@@ -83,19 +84,23 @@ public class HMIMIDIP {
 		for (int i = 0; i < size; i++) {
 			// MIDI Delta (Little -> Big) Endian Byte
 			int n1 = 0;
-			for (; ((bytes[n1] = hmp.get()) & 0x80) == 0; n1++);
+			for (; ((bytes[n1] = hmp.get()) & 0x80) == 0; n1++) {
+				;
+			}
 			
 			for (int n2 = 0; n2 <= n1; n2++) {
 				byte out = (byte) (bytes[n1 - n2] & 0x7F);
-				if (n2 != n1)
+				if (n2 != n1) {
 					(out) |= 0x80;
+				}
 				mid.put(out);
 			}
 
 			// MIDI Event
 			int sbyte = hmp.get() & 0xFF;
-			if (sbyte == 0)
+			if (sbyte == 0) {
 				break;
+			}
 
 			if (sbyte == 0xFF) // Meta Message
 			{
@@ -113,8 +118,9 @@ public class HMIMIDIP {
 				case POLY_PRESSURE:
 				case CONTROL_CHANGE:
 				case PITCH_BEND:
-					if (sbyte != runningStatus)
+					if (sbyte != runningStatus) {
 						mid.put((byte) sbyte);
+					}
 
 					byte d1 = hmp.get();
 					byte d2 = hmp.get();
@@ -136,8 +142,9 @@ public class HMIMIDIP {
 					break;
 				case PROGRAM_CHANGE:
 				case CHANNEL_PRESSURE:
-					if (sbyte != runningStatus)
+					if (sbyte != runningStatus) {
 						mid.put((byte) sbyte);
+					}
 					mid.put(hmp.get());
 					break;
 				default:

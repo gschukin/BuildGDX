@@ -49,8 +49,9 @@ public class RuntimeArray<E> extends AbstractList<E> {
 		E oldValue = elementData[index];
 
 		int numMoved = size - index - 1;
-		if (numMoved > 0)
+		if (numMoved > 0) {
 			System.arraycopy(elementData, index + 1, elementData, index, numMoved);
+		}
 		elementData[--size] = null; // clear to let GC do its work
 
 		return oldValue;
@@ -64,13 +65,17 @@ public class RuntimeArray<E> extends AbstractList<E> {
 	@Override
 	public int indexOf(Object o) {
 		if (o == null) {
-			for (int i = 0; i < size; i++)
-				if (elementData[i] == null)
+			for (int i = 0; i < size; i++) {
+				if (elementData[i] == null) {
 					return i;
+				}
+			}
 		} else {
-			for (int i = 0; i < size; i++)
-				if (o.equals(elementData[i]))
+			for (int i = 0; i < size; i++) {
+				if (o.equals(elementData[i])) {
 					return i;
+				}
+			}
 		}
 		return -1;
 	}
@@ -78,13 +83,17 @@ public class RuntimeArray<E> extends AbstractList<E> {
 	@Override
 	public int lastIndexOf(Object o) {
 		if (o == null) {
-			for (int i = size - 1; i >= 0; i--)
-				if (elementData[i] == null)
+			for (int i = size - 1; i >= 0; i--) {
+				if (elementData[i] == null) {
 					return i;
+				}
+			}
 		} else {
-			for (int i = size - 1; i >= 0; i--)
-				if (o.equals(elementData[i]))
+			for (int i = size - 1; i >= 0; i--) {
+				if (o.equals(elementData[i])) {
 					return i;
+				}
+			}
 		}
 		return -1;
 	}
@@ -109,15 +118,17 @@ public class RuntimeArray<E> extends AbstractList<E> {
 	}
 
 	private void ensureExplicitCapacity(int minCapacity) {
-		if (minCapacity - elementData.length > 0)
+		if (minCapacity - elementData.length > 0) {
 			grow(minCapacity);
+		}
 	}
 
 	private void grow(int minCapacity) {
 		int oldCapacity = elementData.length;
 		int newCapacity = oldCapacity + (oldCapacity >> 1);
-		if (newCapacity - minCapacity < 0)
+		if (newCapacity - minCapacity < 0) {
 			newCapacity = minCapacity;
+		}
 		elementData = Arrays.copyOf(elementData, newCapacity);
 	}
 

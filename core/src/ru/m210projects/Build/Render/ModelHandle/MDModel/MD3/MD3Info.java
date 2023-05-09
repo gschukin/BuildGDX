@@ -12,8 +12,9 @@ public class MD3Info extends MDInfo {
 		super(file, Type.Md3);
 
 		this.header = loadHeader(res);
-		if ((header.ident != 0x33504449) || (header.version != 15))
+		if ((header.ident != 0x33504449) || (header.version != 15)) {
 			throw new Exception(); //"IDP3"
+		}
 
 		res.seek(header.offsetFrames, Whence.Set);
 		this.frames = new String[header.numFrames];

@@ -167,8 +167,9 @@ public class RenderService {
             shortbuf[1] = (byte) ((nInfo >>> 8) & 0xFF);
 
             clock = (totalclocklock + CRC32.getChecksum(shortbuf)) >> speed;
-        } else
+        } else {
             clock = totalclocklock >> speed;
+        }
 
         int frames = tile.getFrames();
 
@@ -176,8 +177,9 @@ public class RenderService {
             switch (tile.getType()) {
                 case Oscil:
                     index = clock % (frames * 2L);
-                    if (index >= frames)
+                    if (index >= frames) {
                         index = frames * 2L - index;
+                    }
                     break;
                 case Forward:
                     index = clock % (frames + 1);
@@ -213,10 +215,11 @@ public class RenderService {
             int b = palette[pal1 + 2] & 0xFF;
             j = (r >> 3) * FASTPALGRIDSIZ * FASTPALGRIDSIZ + (g >> 3) * FASTPALGRIDSIZ + (b >> 3)
                     + FASTPALGRIDSIZ * FASTPALGRIDSIZ + FASTPALGRIDSIZ + 1;
-            if ((colhere[j >> 3] & pow2char[j & 7]) != 0)
+            if ((colhere[j >> 3] & pow2char[j & 7]) != 0) {
                 colnext[i] = (short) (colhead[j] & 0xFF);
-            else
+            } else {
                 colnext[i] = -1;
+            }
 
             colhead[j] = (byte) i;
             colhere[j >> 3] |= pow2char[j & 7];
@@ -224,10 +227,13 @@ public class RenderService {
 
         i = 0;
         for (x = -FASTPALGRIDSIZ * FASTPALGRIDSIZ; x <= FASTPALGRIDSIZ * FASTPALGRIDSIZ; x += FASTPALGRIDSIZ
-                * FASTPALGRIDSIZ)
-            for (y = -FASTPALGRIDSIZ; y <= FASTPALGRIDSIZ; y += FASTPALGRIDSIZ)
-                for (z = -1; z <= 1; z++)
+                * FASTPALGRIDSIZ) {
+            for (y = -FASTPALGRIDSIZ; y <= FASTPALGRIDSIZ; y += FASTPALGRIDSIZ) {
+                for (z = -1; z <= 1; z++) {
                     colscan[i++] = x + y + z;
+                }
+            }
+        }
         i = colscan[13];
         colscan[13] = colscan[26];
         colscan[26] = i;
@@ -248,8 +254,9 @@ public class RenderService {
         mindist++;
 
         Byte out = palcache[rgb & (palcache.length - 1)];
-        if (out != null)
+        if (out != null) {
             return out;
+        }
 
         r = 64 - r;
         g = 64 - g;
@@ -258,8 +265,9 @@ public class RenderService {
         retcol = -1;
         for (k = 26; k >= 0; k--) {
             i = colscan[k] + j;
-            if ((colhere[i >> 3] & pow2char[i & 7]) == 0)
+            if ((colhere[i >> 3] & pow2char[i & 7]) == 0) {
                 continue;
+            }
 
             i = colhead[i] & 0xFF;
             do {
@@ -287,16 +295,19 @@ public class RenderService {
         for (i = 255; i >= 0; i--) {
             pal1 = i * 3;
             dist = gdist[(palette[pal1 + 1] & 0xFF) + g];
-            if (dist >= mindist)
+            if (dist >= mindist) {
                 continue;
+            }
 
             dist += rdist[(palette[pal1] & 0xFF) + r];
-            if (dist >= mindist)
+            if (dist >= mindist) {
                 continue;
+            }
 
             dist += bdist[(palette[pal1 + 2] & 0xFF) + b];
-            if (dist >= mindist)
+            if (dist >= mindist) {
                 continue;
+            }
 
             mindist = dist;
             retcol = (byte) i;
@@ -360,8 +371,9 @@ public class RenderService {
         if (render.isInited()
                 && ((davidoption == (BuildGdx.graphics.isFullscreen() ? 1 : 0))
                 && (BuildGdx.graphics.getWidth() == daxdim) && (BuildGdx.graphics.getHeight() == daydim))
-                && xdim == daxdim && ydim == daydim)
+                && xdim == daxdim && ydim == daydim) {
             return true;
+        }
 
         xdim = daxdim;
         ydim = daydim;
@@ -373,49 +385,56 @@ public class RenderService {
 
         if (render instanceof Software) {
             // Software renderer must be reinitialize when resolution is changed
-            if (render.isInited())
+            if (render.isInited()) {
                 render.uninit();
+            }
             render.init();
         }
 
         if (davidoption == 1) {
             Graphics.DisplayMode m = null;
             for (Graphics.DisplayMode mode : BuildGdx.graphics.getDisplayModes()) {
-                if (mode.width == daxdim && mode.height == daydim)
+                if (mode.width == daxdim && mode.height == daydim) {
                     if (m == null || m.refreshRate < mode.refreshRate) {
                         m = mode;
                     }
+                }
             }
 
             if (m == null) {
                 Console.Println("Warning: " + daxdim + "x" + daydim + " fullscreen not supported", OSDTEXT_YELLOW);
                 BuildGdx.graphics.setWindowedMode(daxdim, daydim);
                 return false;
-            } else
+            } else {
                 BuildGdx.graphics.setFullscreenMode(m);
-        } else
+            }
+        } else {
             BuildGdx.graphics.setWindowedMode(daxdim, daydim);
+        }
 
         return true;
     }
 
     public void registerFade(String fadename, FadeEffect effect) { // gdxBuild
-        if (fades == null)
+        if (fades == null) {
             fades = new HashMap<String, FadeEffect>();
+        }
         fades.put(fadename, effect);
     }
 
     public void updateFade(String fadename, int intensive) // gdxBuild
     {
         FadeEffect effect = fades.get(fadename);
-        if (effect != null)
+        if (effect != null) {
             effect.update(intensive);
+        }
     }
 
     public void showfade() { // gdxBuild
         GLRenderer gl = glrender();
-        if (gl != null)
+        if (gl != null) {
             gl.palfade(fades);
+        }
     }
 
     public void nextpage() {
@@ -434,8 +453,9 @@ public class RenderService {
             int vr = divscale(xd * 3, yd * 4, 16);
 
             setaspect(vr, yx);
-        } else
+        } else {
             setaspect(65536, divscale(ydim * 320, xdim * 200, 16));
+        }
     }
 
     public void setview(int x1, int y1, int x2, int y2) { // jfBuild
@@ -468,8 +488,9 @@ public class RenderService {
 
         if (render.getType() == Renderer.RenderType.PolyGDX) {
             int w = 320;
-            if ((4 * xdim / 5) == ydim)
+            if ((4 * xdim / 5) == ydim) {
                 w = 300;
+            }
             float k = daxrange / (float) divscale(xdim * 240, ydim * w, 16);
             ((GDXRenderer) render)
                     .setFieldOfView(offscreenrendering ? 110 : (float) Math.toDegrees(2 * Math.atan(k * fovFactor)));
@@ -503,13 +524,15 @@ public class RenderService {
         curbrightness = BClipRange(dabrightness, 0, 15);
 
         if ((gl == null || gl.getType().getFrameType() != BuildFrame.FrameType.GL) && curbrightness != 0) {
-            for (int i = 0; i < dapal.length; i++)
+            for (int i = 0; i < dapal.length; i++) {
                 temppal[i] = britable[curbrightness][(dapal[i] & 0xFF) << 2];
+            }
         } else {
 //			if (gl.getTexFormat() == PixelFormat.Rgb) { // Polymost
             System.arraycopy(dapal, 0, temppal, 0, dapal.length);
-            for (int i = 0; i < dapal.length; i++)
+            for (int i = 0; i < dapal.length; i++) {
                 temppal[i] <<= 2;
+            }
 //			} else {
 //				for (int i = 0; i < dapal.length; i++)
 //					temppal[i] = britable[curbrightness][(dapal[i] & 0xFF) << 2];
@@ -517,8 +540,9 @@ public class RenderService {
         }
 
         if (changepalette(temppal)) {
-            if (gl != null)
+            if (gl != null) {
                 gl.gltexinvalidateall(flags);
+            }
 
             palfadergb.r = palfadergb.g = palfadergb.b = 0;
             palfadergb.a = 0;
@@ -526,8 +550,9 @@ public class RenderService {
     }
 
     public boolean changepalette(final byte[] palette) {
-        if (render.getType() != Renderer.RenderType.Software && CRC32.getChecksum(palette) == curpalette.getCrc32())
+        if (render.getType() != Renderer.RenderType.Software && CRC32.getChecksum(palette) == curpalette.getCrc32()) {
             return false;
+        }
 
         curpalette.update(palette);
         Arrays.fill(palcache, null);
@@ -581,8 +606,9 @@ public class RenderService {
         bakwindowx2[setviewcnt] = windowx2;
         bakwindowy2[setviewcnt] = windowy2;
 
-        if (setviewcnt == 0)
+        if (setviewcnt == 0) {
             baktile = tilenume;
+        }
 
         offscreenrendering = true;
 
@@ -593,8 +619,9 @@ public class RenderService {
 
     public void setviewback() // jfBuild
     {
-        if (setviewcnt <= 0)
+        if (setviewcnt <= 0) {
             return;
+        }
         setviewcnt--;
 
         offscreenrendering = (setviewcnt > 0);
@@ -606,8 +633,9 @@ public class RenderService {
 
         setview(bakwindowx1[setviewcnt], bakwindowy1[setviewcnt], bakwindowx2[setviewcnt], bakwindowy2[setviewcnt]);
 
-        if (render.getType() == Renderer.RenderType.Software)
+        if (render.getType() == Renderer.RenderType.Software) {
             ((Software) render).setviewback();
+        }
     }
 
     public void preparemirror(int dax, int day, int daz, float daang, float dahoriz, int dawall, int dasector) { // jfBuild
@@ -616,8 +644,9 @@ public class RenderService {
         int y = Engine.getWall(dawall).getY();
         int dy = getWall(Engine.getWall(dawall).getPoint2()).getY() - y;
         int j = dx * dx + dy * dy;
-        if (j == 0)
+        if (j == 0) {
             return;
+        }
         int i = (((dax - x) * dx + (day - y) * dy) << 1);
         mirrorx = (x << 1) + scale(dx, i, j) - dax;
         mirrory = (y << 1) + scale(dy, i, j) - day;
@@ -644,16 +673,18 @@ public class RenderService {
 
         int capturecount = 0;
         do { // JBF 2004022: So we don't overwrite existing screenshots
-            if (capturecount > 9999)
+            if (capturecount > 9999) {
                 return null;
+            }
 
             a = ((capturecount / 1000) % 10);
             b = ((capturecount / 100) % 10);
             c = ((capturecount / 10) % 10);
             d = (capturecount % 10);
 
-            if (userdir.checkFile(fn + a + b + c + d + ".png") == null)
+            if (userdir.checkFile(fn + a + b + c + d + ".png") == null) {
                 break;
+            }
             capturecount++;
         } while (true);
 
@@ -670,8 +701,9 @@ public class RenderService {
             capture.dispose();
             return fn + a + b + c + d + ".png";
         } catch (Throwable e) {
-            if (capture != null)
+            if (capture != null) {
                 capture.dispose();
+            }
             return null;
         }
     }
@@ -682,8 +714,9 @@ public class RenderService {
         int width = pic.getWidth();
         int heigth = pic.getHeight();
         byte[] data = pic.data;
-        if (data == null || data.length < width * heigth)
+        if (data == null || data.length < width * heigth) {
             data = new byte[width * heigth];
+        }
 
         ByteBuffer frame = render.getFrame(TileData.PixelFormat.Pal8, width, heigth);
 
@@ -713,8 +746,9 @@ public class RenderService {
     }
 
     public GLRenderer glrender() {
-        if (render != null && getrender().getType().getFrameType() == BuildFrame.FrameType.GL)
+        if (render != null && getrender().getType().getFrameType() == BuildFrame.FrameType.GL) {
             return (GLRenderer) render;
+        }
 
         return null;
     }
@@ -738,8 +772,9 @@ public class RenderService {
 
     public void uninit() {
         try {
-            if (render != null && render.isInited())
+            if (render != null && render.isInited()) {
                 render.uninit();
+            }
         } catch (Exception ignored) {
         }
     }

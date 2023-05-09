@@ -74,8 +74,9 @@ public class DEFOSDFUNC implements OSDFunc {
 	@Override
 	public void drawcursor(int x, int y, int type, int lastkeypress, int scale) {
 		char ch = '_';
-		if(type != 0)
+		if(type != 0) {
 			ch = '#';
+		}
 
 		if ((lastkeypress & 0x40l) == 0) {
 			charbuf[0] = ch;
@@ -107,17 +108,20 @@ public class DEFOSDFUNC implements OSDFunc {
 		xsiz = pic.getWidth();
 		ysiz = pic.getHeight();
 
-		if (!pic.hasSize())
+		if (!pic.hasSize()) {
 			return;
+		}
 
 		tx2 = xdim / xsiz;
 		ty2 = daydim / ysiz;
 
-		for (x = tx2; x >= 0; x--)
-			for (y = ty2; y >= 0; y--)
+		for (x = tx2; x >= 0; x--) {
+			for (y = ty2; y >= 0; y--) {
 				engine.rotatesprite(x * xsiz << 16, y * ysiz << 16,
 						65536, 0, BGTILE, SHADE, PALETTE, bits, 0,
 						0, xdim, daydim);
+			}
+		}
 
 		drawlogo(daydim);
 
@@ -127,10 +131,11 @@ public class DEFOSDFUNC implements OSDFunc {
 			{
 				tx2 = xdim / xsiz;
 
-				for (x = tx2; x >= 0; x--)
+				for (x = tx2; x >= 0; x--) {
 					engine.rotatesprite(x * xsiz << 16, (daydim - 1) << 16,
 							65536, BORDERANG, BORDTILE, SHADE + 12, PALETTE, BITS,
 							0, 0, xdim, daydim + 1);
+				}
 			}
 		}
 	}
@@ -142,8 +147,9 @@ public class DEFOSDFUNC implements OSDFunc {
 		// most of this is copied from my dummytile stuff in defs.c
 
 		Tile pic = engine.getTile(BGTILE);
-		if (pic.getWidth() == 0 || pic.getHeight() == 0)
+		if (pic.getWidth() == 0 || pic.getHeight() == 0) {
 			engine.allocatepermanenttile(BGTILE, BGTILE_SIZEX, BGTILE_SIZEY);
+		}
 	}
 
 	@Override

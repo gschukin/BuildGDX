@@ -57,8 +57,9 @@ public class TestController implements BuildController {
 		float nlm = 0.0f;
 		if (mag > deadZone)
 		{
-			if (mag > 1.0f)
+			if (mag > 1.0f) {
 				mag = 1.0f;
+			}
 
 			mag -= deadZone;
 			nlm = mag / (1.0f - deadZone);
@@ -95,29 +96,35 @@ public class TestController implements BuildController {
 	
 	private boolean getTestButton(int i)
 	{
-		if(i == 0 && BuildGdx.input.isKeyPressed(Keys.K))
+		if(i == 0 && BuildGdx.input.isKeyPressed(Keys.K)) {
 			return true;
+		}
 		return i == 1 && BuildGdx.input.isKeyPressed(Keys.L);
 	}
 	
 	private float getAxis(int value) {
-		if(BuildGdx.input.isKeyPressed(Keys.SHIFT_LEFT))
+		if(BuildGdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
 			value -= 2;
+		}
 		
 		if(value == 0) {
-			if(BuildGdx.input.isKeyPressed(Keys.UP))
+			if(BuildGdx.input.isKeyPressed(Keys.UP)) {
 				return -1.0f;
+			}
 			
-			if(BuildGdx.input.isKeyPressed(Keys.DOWN))
+			if(BuildGdx.input.isKeyPressed(Keys.DOWN)) {
 				return 1.0f;
+			}
 		}
 		
 		if(value == 1) {
-			if(BuildGdx.input.isKeyPressed(Keys.LEFT))
+			if(BuildGdx.input.isKeyPressed(Keys.LEFT)) {
 				return -1.0f;
+			}
 			
-			if(BuildGdx.input.isKeyPressed(Keys.RIGHT))
+			if(BuildGdx.input.isKeyPressed(Keys.RIGHT)) {
 				return 1.0f;
+			}
 		}
 		
 		return 0;
@@ -144,8 +151,9 @@ public class TestController implements BuildController {
 	@Override
 	public boolean buttonPressed(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount)
+		if(buttonCode >= 0 && buttonCode < allButtonsCount) {
 			return hitButton[buttonCode];
+		}
 		
 		return false;
 	}

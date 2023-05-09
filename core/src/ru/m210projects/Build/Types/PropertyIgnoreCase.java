@@ -31,16 +31,18 @@ public class PropertyIgnoreCase extends Properties {
 
 	public String getPropertyIgnoreCase(String key, String defaultV) {
 		String value = getProperty(key);
-	 	if (value != null)
-	 		return value;
+	 	if (value != null) {
+			return value;
+		}
 
 	 	// Not matching with the actual key then
 		Set<Entry<Object, Object>> s = entrySet();
 		Iterator<Entry<Object, Object>> it = s.iterator();
 		while (it.hasNext()) {
 			Entry<Object, Object> entry = it.next();
-			if (key.equalsIgnoreCase((String) entry.getKey()))
+			if (key.equalsIgnoreCase((String) entry.getKey())) {
 				return (String) entry.getValue();
+			}
 		}
 		return defaultV;
 	}

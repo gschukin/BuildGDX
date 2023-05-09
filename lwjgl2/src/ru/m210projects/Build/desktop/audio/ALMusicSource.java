@@ -44,8 +44,9 @@ public class ALMusicSource extends MusicSource {
 
 	@Override
 	public void resume() {
-		if(!isPlaying())
+		if(!isPlaying()) {
 			play(isLooping());
+		}
 	}
 
 	@Override

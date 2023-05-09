@@ -85,8 +85,9 @@ public class GdxController implements BuildController {
 	@Override
 	public boolean buttonPressed(int buttonCode)
 	{
-		if(buttonCode >= 0 && buttonCode < allButtonsCount)
+		if(buttonCode >= 0 && buttonCode < allButtonsCount) {
 			return hitButton[buttonCode];
+		}
 		
 		return false;
 	}
@@ -136,8 +137,9 @@ public class GdxController implements BuildController {
 		float nlm;
 		if (mag > deadZone)
 		{
-			if (mag > 1.0f)
+			if (mag > 1.0f) {
 				mag = 1.0f;
+			}
 
 			mag -= deadZone;
 			nlm = mag / (1.0f - deadZone);
@@ -158,7 +160,9 @@ public class GdxController implements BuildController {
 	
 	private void TriggerHandler()
 	{
-		if(axisNum < 4) return;
+		if(axisNum < 4) {
+			return;
+		}
 		
 		float value = controller.getAxis(4);
 		int num = buttonsNum + (4 * povNum);

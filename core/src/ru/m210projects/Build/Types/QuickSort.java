@@ -20,25 +20,29 @@ public class QuickSort {
 
 		if (comp.compare(elementData[a], elementData[b]) > 0) {
 			if (comp.compare(elementData[a], elementData[c]) > 0) {
-				if (comp.compare(elementData[b], elementData[c]) > 0)
+				if (comp.compare(elementData[b], elementData[c]) > 0) {
 					return (b);
+				}
 				return (c);
 			}
 			return (a);
 		}
 
-		if (comp.compare(elementData[a], elementData[c]) >= 0)
+		if (comp.compare(elementData[a], elementData[c]) >= 0) {
 			return (a);
+		}
 
-		if (comp.compare(elementData[b], elementData[c]) > 0)
+		if (comp.compare(elementData[b], elementData[c]) > 0) {
 			return (c);
+		}
 
 		return (b);
 	}
 
 	public static <E> void sort(E[] elementData, int size, Comparator<? super E> c) {
-		if(size == 0)
+		if(size == 0) {
 			return;
+		}
 
 		int n = size;
 
@@ -91,8 +95,9 @@ public class QuickSort {
 							pc--;
 						}
 
-						if (pb > pc)
+						if (pb > pc) {
 							break;
+						}
 
 						swap(elementData, pb, pc);
 						pb++;
@@ -119,8 +124,9 @@ public class QuickSort {
 						n_stack[sp] = s;
 						n = r;
 					} else {
-						if (r <= 1)
+						if (r <= 1) {
 							break;
+						}
 						base_stack[sp] = base;
 						n_stack[sp] = r;
 						base = pn - s;
@@ -130,8 +136,9 @@ public class QuickSort {
 				}
 			}
 
-			if (sp-- == 0)
+			if (sp-- == 0) {
 				break;
+			}
 
 			base = base_stack[sp];
 			n = n_stack[sp];
@@ -151,25 +158,29 @@ public class QuickSort {
 	private static int med3(int[] elementData, IntComparator comp, int a, int b, int c) {
 		if (comp.compare(elementData[a], elementData[b]) > 0) {
 			if (comp.compare(elementData[a], elementData[c]) > 0) {
-				if (comp.compare(elementData[b], elementData[c]) > 0)
+				if (comp.compare(elementData[b], elementData[c]) > 0) {
 					return (b);
+				}
 				return (c);
 			}
 			return (a);
 		}
 
-		if (comp.compare(elementData[a], elementData[c]) >= 0)
+		if (comp.compare(elementData[a], elementData[c]) >= 0) {
 			return (a);
+		}
 
-		if (comp.compare(elementData[b], elementData[c]) > 0)
+		if (comp.compare(elementData[b], elementData[c]) > 0) {
 			return (c);
+		}
 
 		return (b);
 	}
 
 	public static void sort(int[] elementData, int size, IntComparator c) {
-		if(size == 0)
+		if(size == 0) {
 			return;
+		}
 
 		int n = size;
 
@@ -222,8 +233,9 @@ public class QuickSort {
 							pc--;
 						}
 
-						if (pb > pc)
+						if (pb > pc) {
 							break;
+						}
 
 						swap(elementData, pb, pc);
 						pb++;
@@ -250,8 +262,9 @@ public class QuickSort {
 						n_stack[sp] = s;
 						n = r;
 					} else {
-						if (r <= 1)
+						if (r <= 1) {
 							break;
+						}
 						base_stack[sp] = base;
 						n_stack[sp] = r;
 						base = pn - s;
@@ -261,8 +274,9 @@ public class QuickSort {
 				}
 			}
 
-			if (sp-- == 0)
+			if (sp-- == 0) {
 				break;
+			}
 
 			base = base_stack[sp];
 			n = n_stack[sp];

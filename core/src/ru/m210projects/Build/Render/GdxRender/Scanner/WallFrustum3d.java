@@ -39,8 +39,9 @@ public class WallFrustum3d implements Poolable {
 	public WallFrustum3d set(BuildCamera cam, int sectnum) {
 		this.sectnum = sectnum;
 		this.cam = cam;
-		for (int i = 0, j = 2; i < 4; i++)
+		for (int i = 0, j = 2; i < 4; i++) {
 			planes[i].set(cam.frustum.planes[j++]);
+		}
 		setBounds(0, 0, windowx2 + 1, windowy2 + 1);
 		return this;
 	}
@@ -57,9 +58,11 @@ public class WallFrustum3d implements Poolable {
 
 		Plane: for (int i = 0; i < planes.length; i++) {
 			Plane plane = planes[i];
-			for (int p = 0; p < len; p++)
-				if (plane.testPoint(points[p]) != PlaneSide.Back)
+			for (int p = 0; p < len; p++) {
+				if (plane.testPoint(points[p]) != PlaneSide.Back) {
 					continue Plane;
+				}
+			}
 
 			return false;
 		}
@@ -68,16 +71,19 @@ public class WallFrustum3d implements Poolable {
 	}
 
 	public boolean wallInFrustum(ArrayList<? extends Vector3> points) {
-		if (points == null)
+		if (points == null) {
 			return false;
+		}
 
 		rebuild();
 		final int len = points.size();
 		Plane: for (int i = 0; i < planes.length; i++) {
 			Plane plane = planes[i];
-			for (int p = 0; p < len; p++)
-				if (plane.testPoint(points.get(p)) != PlaneSide.Back)
+			for (int p = 0; p < len; p++) {
+				if (plane.testPoint(points.get(p)) != PlaneSide.Back) {
 					continue Plane;
+				}
+			}
 
 			return false;
 		}
@@ -88,10 +94,12 @@ public class WallFrustum3d implements Poolable {
 	public WallFrustum3d clone(Pool<WallFrustum3d> pool) {
 		WallFrustum3d frustum = pool.obtain();
 		frustum.sectnum = sectnum;
-		for (int i = 0; i < planes.length; i++)
+		for (int i = 0; i < planes.length; i++) {
 			frustum.planes[i].set(planes[i]);
-		for (int i = 0; i < bounds.length; i++)
+		}
+		for (int i = 0; i < bounds.length; i++) {
 			frustum.bounds[i].set(bounds[i]);
+		}
 		frustum.rebuildRequest = rebuildRequest;
 		frustum.cam = cam;
 		return frustum;
@@ -99,23 +107,27 @@ public class WallFrustum3d implements Poolable {
 
 	public WallFrustum3d build(BuildCamera cam, Pool<WallFrustum3d> pool, ArrayList<? extends Vector3> coords,
 			int sectnum) {
-		if (coords == null)
+		if (coords == null) {
 			return null;
+		}
 
 		if (!Engine.getSector(sectnum).isParallaxCeiling() && !Engine.getSector(sectnum).isParallaxFloor()) {
-			if (!wallInFrustum(coords))
+			if (!wallInFrustum(coords)) {
 				return null;
+			}
 		}
 
 		WallFrustum3d frustum = pool.obtain();
 		// Calc AABB of the new frustum
-		for (int i = 0; i < coords.size(); i++)
+		for (int i = 0; i < coords.size(); i++) {
 			cam.project(coords.get(i));
+		}
 
 		frustum.sectnum = sectnum;
 		frustum.calcBounds(coords);
-		if (!frustum.clipBounds(this))
+		if (!frustum.clipBounds(this)) {
 			return null;
+		}
 
 		frustum.rebuildRequest = true;
 		frustum.cam = cam;
@@ -155,14 +167,18 @@ public class WallFrustum3d implements Poolable {
 				float miny = n.bounds[0].y;
 				float maxy = n.bounds[1].y;
 
-				if (bminx < minx)
+				if (bminx < minx) {
 					minx = bminx;
-				if (bmaxx > maxx)
+				}
+				if (bmaxx > maxx) {
 					maxx = bmaxx;
-				if (bminy < miny)
+				}
+				if (bminy < miny) {
 					miny = bminy;
-				if (bmaxy > maxy)
+				}
+				if (bmaxy > maxy) {
 					maxy = bmaxy;
+				}
 
 				if (minx < n.bounds[0].x || maxx > n.bounds[1].x || miny < n.bounds[0].y || maxy > n.bounds[1].y) {
 					n.handled = false;
@@ -202,15 +218,19 @@ public class WallFrustum3d implements Poolable {
 
 		for (int i = 1; i < points.size(); i++) {
 			Vector3 v = points.get(i);
-			if (v.x < bounds[0].x)
+			if (v.x < bounds[0].x) {
 				bounds[0].x = v.x;
-			if (v.y < bounds[0].y)
+			}
+			if (v.y < bounds[0].y) {
 				bounds[0].y = v.y;
+			}
 
-			if (v.x > bounds[1].x)
+			if (v.x > bounds[1].x) {
 				bounds[1].x = v.x;
-			if (v.y > bounds[1].y)
+			}
+			if (v.y > bounds[1].y) {
 				bounds[1].y = v.y;
+			}
 		}
 
 		bounds[0].x = (float) Math.floor(bounds[0].x);
@@ -265,14 +285,18 @@ public class WallFrustum3d implements Poolable {
 
 		WallFrustum3d n = this.next;
 		while (n != null) {
-			if (n.bounds[0].x < minx)
+			if (n.bounds[0].x < minx) {
 				minx = n.bounds[0].x;
-			if (n.bounds[1].x > maxx)
+			}
+			if (n.bounds[1].x > maxx) {
 				maxx = n.bounds[1].x;
-			if (n.bounds[0].y < miny)
+			}
+			if (n.bounds[0].y < miny) {
 				miny = n.bounds[0].y;
-			if (n.bounds[1].y > maxy)
+			}
+			if (n.bounds[1].y > maxy) {
 				maxy = n.bounds[1].y;
+			}
 			n = n.next;
 		}
 

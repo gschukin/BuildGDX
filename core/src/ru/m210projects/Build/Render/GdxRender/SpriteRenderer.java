@@ -38,22 +38,27 @@ public class SpriteRenderer {
 	public class SpriteComparator implements Comparator<Sprite> {
 		@Override
 		public int compare(Sprite o1, Sprite o2) {
-			if (o1 == null || o2 == null)
+			if (o1 == null || o2 == null) {
 				return 0;
+			}
 
-			if(o1.getOwner() == o2.getOwner() || o1.getOwner() == -1 || o2.getOwner() == -1)
+			if(o1.getOwner() == o2.getOwner() || o1.getOwner() == -1 || o2.getOwner() == -1) {
 				return 0;
+			}
 
 			int len1 = getDist(o1);
 			int len2 = getDist(o2);
-			if(len1 != len2)
+			if(len1 != len2) {
 				return len1 < len2 ? -1 : 1;
+			}
 
-			if ((o1.getCstat() & 2) != 0)
+			if ((o1.getCstat() & 2) != 0) {
 				return -1;
+			}
 
-			if ((o2.getCstat() & 2) != 0)
+			if ((o2.getCstat() & 2) != 0) {
 				return 1;
+			}
 
 			return (o1.getStatnum() <= o2.getStatnum()) ? -1 : 0;
 		}
@@ -78,22 +83,26 @@ public class SpriteRenderer {
 		for(int i = 0; i < len; i++) {
 			Sprite spr = array[i];
 			int s = spr.getOwner();
-			if(s == -1)
+			if(s == -1) {
 				continue;
+			}
 
 			spritesz[s] = spr.getZ();
-			if(!Gameutils.isValidTile(spr.getPicnum()))
+			if(!Gameutils.isValidTile(spr.getPicnum())) {
 				continue;
+			}
 
 			if ((spr.getCstat() & 48) != 32) {
 				Tile pic = engine.getTile(spr.getPicnum());
 				byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
 				spritesz[s] -= ((yoff * spr.getYrepeat()) << 2);
 				int yspan = (pic.getHeight() * spr.getYrepeat() << 2);
-				if ((spr.getCstat() & 128) == 0)
+				if ((spr.getCstat() & 128) == 0) {
 					spritesz[s] -= (yspan >> 1);
-				if (klabs(spritesz[s] - globalposz) < (yspan >> 1))
+				}
+				if (klabs(spritesz[s] - globalposz) < (yspan >> 1)) {
 					spritesz[s] = globalposz;
+				}
 			}
 		}
 
@@ -126,8 +135,9 @@ public class SpriteRenderer {
 		int tsizx = pic.getWidth();
 		int tsizy = pic.getHeight();
 
-		if (tsizx <= 0 || tsizy <= 0)
+		if (tsizx <= 0 || tsizy <= 0) {
 			return null;
+		}
 
 		boolean xflip = (orientation & 4) != 0;
 		boolean yflip = (orientation & 8) != 0;
@@ -170,7 +180,7 @@ public class SpriteRenderer {
 //				yoff = -yoff;
 //			int wang = (int) Gameutils.AngleToDegrees((tspr.ang + ((xflip ^ yflip) ? 1536 : 512)) & 0x7FF);
 //			if ((orientation & 64) == 0) {
-//				int dang = (((tspr.ang - engine.getangle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
+//				int dang = (((tspr.ang - EngineUtils.getAngle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
 //				if (dang > 512 || dang < -512) {
 //					xflip = !xflip;
 //				}
@@ -226,10 +236,12 @@ public class SpriteRenderer {
 			int ang = ((int) globalang - 512) & 0x7FF;
 			if (xflip ^ yflip) {
 				ang += 1024;
-				if (!xflip)
+				if (!xflip) {
 					xoff = -xoff;
-				if (yflip)
+				}
+				if (yflip) {
 					xspans = -xspans;
+				}
 			} else if (xflip) {
 				xoff = -xoff;
 				xspans = -xspans;
@@ -239,27 +251,31 @@ public class SpriteRenderer {
 			transform.rotate(0, 0, 1, (int) Gameutils.AngleToDegrees(ang));
 			transform.translate((tspr.getXrepeat() * xoff) / (5.0f), 0, -((yoff * tspr.getYrepeat()) << 2));
 
-			if ((tsizx & 1) == 0)
+			if ((tsizx & 1) == 0) {
 				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
+			}
 
 			if ((orientation & 128) != 0) {
 				float zoffs = ((tsizy * tspr.getYrepeat()) << 1);
-				if ((tsizy & 1) != 0)
+				if ((tsizy & 1) != 0) {
 					zoffs += (tspr.getYrepeat() << 1); // Odd yspans
+				}
 				transform.translate(0, 0, zoffs);
 			}
 
 			if (yflip) {
 				transform.rotate(0, 1, 0, 180);
 				transform.translate(0, 0, (tspr.getYrepeat() * texy) * 4.0f);
-			} else
+			} else {
 				transform.translate(0, 0, (tspr.getYrepeat() * (texy - tsizy)) * 4.0f);
+			}
 
 			transform.scale((tspr.getXrepeat() * texx) / 5.0f, 0, 4 * tspr.getYrepeat() * texy);
 			break;
 		case 1: // Wall sprite
-			if (yflip)
+			if (yflip) {
 				yoff = -yoff;
+			}
 			int wang = (int) Gameutils.AngleToDegrees((tspr.getAng() + ((xflip ^ yflip) ? 1536 : 512)) & 0x7FF);
 			if ((orientation & 64) == 0) {
 				int dang = (((tspr.getAng() - EngineUtils.getAngle(tspr.getX() - globalposx, tspr.getY() - globalposy)) & 0x7FF) - 1024);
@@ -270,10 +286,12 @@ public class SpriteRenderer {
 
 			xspans = 4.0f;
 			if (xflip ^ yflip) {
-				if (!xflip)
+				if (!xflip) {
 					xoff = -xoff;
-				if (yflip)
+				}
+				if (yflip) {
 					xspans = -xspans;
+				}
 			} else if (xflip) {
 				xoff = -xoff;
 				xspans = -xspans;
@@ -282,43 +300,51 @@ public class SpriteRenderer {
 			transform.translate(0, 0, (tspr.getYrepeat() * texy * (yflip ? 2.0f : -2.0f)));
 			transform.rotate(0, 0, 1, wang);
 			transform.translate((tspr.getXrepeat() * xoff) / 4.0f, 0, -(tspr.getYrepeat() * yoff) * 4.0f);
-			if ((orientation & 128) != 0)
+			if ((orientation & 128) != 0) {
 				transform.translate(0, 0, (tspr.getYrepeat() * tsizy) * 2.0f);
+			}
 
-			if ((tsizx & 1) == 0)
+			if ((tsizx & 1) == 0) {
 				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
+			}
 
 			if (yflip) {
 				transform.rotate(0, 1, 0, 180);
 				transform.translate(0, 0, (tspr.getYrepeat() * texy) * 4.0f);
-			} else
+			} else {
 				transform.translate(0, 0, (tspr.getYrepeat() * (texy - tsizy)) * 4.0f);
+			}
 
 			transform.scale((tspr.getXrepeat() * texx) / 4.0f, 0, (tspr.getYrepeat() * texy) * 4.0f);
 			break;
 		case 2: // Floor sprite
-			if (yflip)
+			if (yflip) {
 				yoff = -yoff;
+			}
 
 			if ((orientation & 64) == 0) {
 				if (tspr.getZ() < globalposz) {
 					yflip = true;
-				} else if (yflip)
+				} else if (yflip) {
 					yflip = !yflip;
+				}
 			}
 
 			xspans = 4.0f;
 			if (xflip ^ yflip) {
-				if (yflip)
+				if (yflip) {
 					xspans = -xspans;
-			} else if (xflip)
+				}
+			} else if (xflip) {
 				xspans = -xspans;
+			}
 
 			transform.rotate(0, 0, 1, (int) Gameutils.AngleToDegrees((tspr.getAng() + (xflip ? 512 : 1536)) & 0x7FF));
 			transform.rotate(1, 0, 0, xflip ? -90 : 90);
 
-			if ((tsizx & 1) == 0)
+			if ((tsizx & 1) == 0) {
 				transform.translate((tspr.getXrepeat() >> 1) / xspans, 0, 0);
+			}
 
 			transform.translate((tspr.getXrepeat() * xoff) / 4.0f, 0, -(tspr.getYrepeat() * yoff) / 4.0f);
 			transform.scale((tspr.getXrepeat() * texx) / 4.0f, 0, (tspr.getYrepeat() * texy) / 4.0f);
@@ -329,8 +355,9 @@ public class SpriteRenderer {
 	}
 
 	public boolean draw(Sprite tspr) {
-		if (tspr.getOwner() < 0 || !Gameutils.isValidTile(tspr.getPicnum()) || !Gameutils.isValidSector(tspr.getSectnum()))
+		if (tspr.getOwner() < 0 || !Gameutils.isValidTile(tspr.getPicnum()) || !Gameutils.isValidSector(tspr.getSectnum())) {
 			return false;
+		}
 
 //		ShaderManager manager = parent.manager;
 //
@@ -439,7 +466,7 @@ public class SpriteRenderer {
 //				yoff = -yoff;
 //			int wang = (int) Gameutils.AngleToDegrees((tspr.ang + ((xflip ^ yflip) ? 1536 : 512)) & 0x7FF);
 //			if ((orientation & 64) == 0) {
-//				int dang = (((tspr.ang - engine.getangle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
+//				int dang = (((tspr.ang - EngineUtils.getAngle(tspr.x - globalposx, tspr.y - globalposy)) & 0x7FF) - 1024);
 //				if (dang > 512 || dang < -512) {
 //					xflip = !xflip;
 //				}
@@ -553,29 +580,35 @@ public class SpriteRenderer {
 			}
 		}
 
-		if (!pic.isLoaded())
+		if (!pic.isLoaded()) {
 			engine.loadtile(picnum);
+		}
 
 		int tsizx = pic.getWidth();
 		int tsizy = pic.getHeight();
 
-		if (tsizx <= 0 || tsizy <= 0)
+		if (tsizx <= 0 || tsizy <= 0) {
 			return false;
+		}
 
 		int method = 1 + 4;
 		if ((orientation & 2) != 0) {
-			if ((orientation & 512) == 0)
+			if ((orientation & 512) == 0) {
 				method = 2 + 4;
-			else
+			} else {
 				method = 3 + 4;
+			}
 		}
 
 		GLTile tex = parent.bind(picnum, pal, shade, 0, method);
-		if (tex == null)
+		if (tex == null) {
 			return false;
+		}
 
 		if (tex.isHighTile()) {
-			for (tsizy = 1; tsizy < tex.getHeight(); tsizy += tsizy);
+			for (tsizy = 1; tsizy < tex.getHeight(); tsizy += tsizy) {
+				;
+			}
 			tsizy /= tex.getYScale();
 		} else {
 			tsizx = tex.getWidth();
@@ -583,12 +616,15 @@ public class SpriteRenderer {
 		}
 
 		int vis = globalvisibility;
-		if (getSector(tspr.getSectnum()).getVisibility() != 0)
+		if (getSector(tspr.getSectnum()).getVisibility() != 0) {
 			vis = mulscale(globalvisibility, (getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
+		}
 
-		if (tex.getPixelFormat() == PixelFormat.Pal8)
+		if (tex.getPixelFormat() == PixelFormat.Pal8) {
 			((IndexedShader) manager.getProgram()).setVisibility((int) (-vis / 64.0f));
-		else parent.calcFog(pal, shade, vis);
+		} else {
+			parent.calcFog(pal, shade, vis);
+		}
 
 		boolean xflip = (orientation & 4) != 0;
 		boolean yflip = (orientation & 8) != 0;
@@ -606,21 +642,24 @@ public class SpriteRenderer {
 			if ((orientation & 64) == 0) {
 				if (tspr.getZ() < globalposz) {
 					yflip = true;
-				} else if (yflip)
+				} else if (yflip) {
 					yflip = !yflip;
+				}
 			}
 			break;
 		}
 
-		if ((method & 3) == 0)
+		if ((method & 3) == 0) {
 			BuildGdx.gl.glDisable(GL_BLEND);
-		else
+		} else {
 			BuildGdx.gl.glEnable(GL_BLEND);
+		}
 
-		if (xflip ^ yflip)
+		if (xflip ^ yflip) {
 			BuildGdx.gl.glFrontFace(GL_CCW);
-		else
+		} else {
 			BuildGdx.gl.glFrontFace(GL_CW);
+		}
 
 		Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
 		Gdx.gl.glDepthRangef(0.0f, 0.99999f);

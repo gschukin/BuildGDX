@@ -51,8 +51,9 @@ public abstract class MenuAdapter extends ScreenAdapter {
 
 	@Override
 	public void render(float delta) {
-		if(!engine.getrender().isInited())
+		if(!engine.getrender().isInited()) {
 			return;
+		}
 
 		engine.clearview(0);
 		engine.sampletimer();
@@ -65,22 +66,25 @@ public abstract class MenuAdapter extends ScreenAdapter {
 			menu.mKeyHandler(game.pInput, delta);
 			menu.mDrawMenu();
 		} else {
-			if (game.pInput.ctrlGetInputKey(GameKeys.Menu_Toggle, true))
+			if (game.pInput.ctrlGetInputKey(GameKeys.Menu_Toggle, true)) {
 				menu.mOpen(mainMenu, -1);
+			}
 		}
 
 		process(delta);
 
-		if (cfg.gShowFPS)
+		if (cfg.gShowFPS) {
 			engine.printfps(cfg.gFpsScale);
+		}
 
 		engine.nextpage();
 	}
 
 	@Override
 	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL)
+		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
 			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+		}
 	}
 
 	@Override

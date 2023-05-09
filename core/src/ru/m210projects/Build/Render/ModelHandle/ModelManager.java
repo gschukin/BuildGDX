@@ -42,15 +42,17 @@ public abstract class ModelManager {
 	}
 
 	public void setTextureFilter(GLFilter filter, int anisotropy) {
-		if (mdInfo == null)
+		if (mdInfo == null) {
 			return;
+		}
 
 		Iterator<GLModel> it = tile2model.values().iterator();
 		while (it.hasNext()) {
 			GLModel model = it.next();
 
-			if (model == null || model.getType() == Type.Voxel)
+			if (model == null || model.getType() == Type.Voxel) {
 				continue;
+			}
 
 			Iterator<GLTile> sk = model.getSkins();
 			while (sk.hasNext()) {
@@ -71,33 +73,38 @@ public abstract class ModelManager {
 			while (param.next != null) {
 				param = param.next;
 				model = tile2model.get(param.model);
-				if (model != null)
+				if (model != null) {
 					model.clearSkins();
+				}
 			}
 		}
 	}
 
 	public boolean hasModelInfo(int tile) {
-		if (mdInfo == null)
+		if (mdInfo == null) {
 			return false;
+		}
 
 		return mdInfo.getModelInfo(tile) != null;
 	}
 
 	public boolean hasVoxelInfo(int tile) {
-		if (mdInfo == null)
+		if (mdInfo == null) {
 			return false;
+		}
 
 		return mdInfo.getVoxelInfo(tile) != null;
 	}
 
 	public GLModel getModel(int tile, int pal) {
-		if (mdInfo == null)
+		if (mdInfo == null) {
 			return null;
+		}
 
 		Tile2model param = mdInfo.getParams(tile);
-		if (param == null)
+		if (param == null) {
 			return null;
+		}
 
 		ModelInfo model;
 		if ((model = param.model) != null && model.getType() != Type.Voxel) {
@@ -109,16 +116,18 @@ public abstract class ModelManager {
 						model = param.model;
 
 						GLModel glmodel;
-						if ((glmodel = tile2model.get(model)) != null && glmodel.getType() != Type.Voxel)
+						if ((glmodel = tile2model.get(model)) != null && glmodel.getType() != Type.Voxel) {
 							return glmodel;
+						}
 						return loadModel(model);
 					}
 				}
 			}
 
 			GLModel glmodel = models[tile];
-			if (glmodel != null && glmodel.getType() != Type.Voxel)
+			if (glmodel != null && glmodel.getType() != Type.Voxel) {
 				return glmodel;
+			}
 
 			if ((glmodel = tile2model.get(model)) != null && glmodel.getType() != Type.Voxel) {
 				models[tile] = glmodel;
@@ -126,9 +135,9 @@ public abstract class ModelManager {
 			}
 
 			GLModel out = loadModel(model);
-			if (out != null)
+			if (out != null) {
 				return models[tile] = out;
-			else {
+			} else {
 				Console.Println("Removing model of tile " + tile + " due to errors.", OSDTEXT_RED);
 				mdInfo.removeModelInfo(model);
 			}
@@ -156,14 +165,16 @@ public abstract class ModelManager {
 	}
 
 	public GLModel getVoxel(int tile) {
-		if (mdInfo == null)
+		if (mdInfo == null) {
 			return null;
+		}
 
 		VoxelInfo model;
 		if ((model = mdInfo.getVoxelInfo(tile)) != null) {
 			GLModel glmodel = models[tile];
-			if (glmodel != null && glmodel.getType() == Type.Voxel)
+			if (glmodel != null && glmodel.getType() == Type.Voxel) {
 				return glmodel;
+			}
 
 			if ((glmodel = tile2model.get(model)) != null && glmodel.getType() == Type.Voxel) {
 				models[tile] = glmodel;
@@ -206,8 +217,9 @@ public abstract class ModelManager {
 	protected int getTile(GLModel model) {
 		for (int i = MAXTILES - 1; i >= 0; i--) {
 			GLModel glmodel = models[i];
-			if (glmodel == null)
+			if (glmodel == null) {
 				continue;
+			}
 
 			if (glmodel == model) {
 				return i;

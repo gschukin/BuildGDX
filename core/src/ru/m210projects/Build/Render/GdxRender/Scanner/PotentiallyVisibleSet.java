@@ -46,8 +46,9 @@ public class PotentiallyVisibleSet {
 	}
 
 	public void process(BuildCamera cam, WorldMesh mesh, int sectnum) {
-		if (!Gameutils.isValidSector(sectnum))
+		if (!Gameutils.isValidSector(sectnum)) {
 			return;
+		}
 
 		Arrays.fill(gotviewport, null);
 		Gameutils.fill(gotwall, (byte) 0);
@@ -73,8 +74,9 @@ public class PotentiallyVisibleSet {
 					int startwall = Engine.getSector(sectnum).getWallptr();
 					int endwall = Engine.getSector(sectnum).getWallnum() + startwall;
 					for (int z = startwall; z < endwall; z++) {
-						if (!WallFacingCheck(Engine.getWall(z)))
+						if (!WallFacingCheck(Engine.getWall(z))) {
 							continue;
+						}
 						ray.add(z, null);
 					}
 					ray.update();
@@ -86,15 +88,18 @@ public class PotentiallyVisibleSet {
 					Wall wal = Engine.getWall(z);
 					int nextsectnum = wal.getNextsector();
 
-					if (!WallFacingCheck(wal))
+					if (!WallFacingCheck(wal)) {
 						continue;
+					}
 
-					if (!cam.polyInCamera(mesh.getPoints(Heinum.Max, sectnum, z)))
+					if (!cam.polyInCamera(mesh.getPoints(Heinum.Max, sectnum, z))) {
 						continue;
+					}
 
 					if (pFrustum.wallInFrustum(wal)) {
-						if (info.hasOccluders(sectnum) && !ray.check(z))
+						if (info.hasOccluders(sectnum) && !ray.check(z)) {
 							continue;
+						}
 
 						if (nextsectnum != -1) {
 							WallFrustum2d wallFrustum = pWallFrustumPool.obtain().set(wal);
@@ -117,13 +122,15 @@ public class PotentiallyVisibleSet {
 				}
 			}
 
-			if (pFrustum.next != null)
+			if (pFrustum.next != null) {
 				pFrustum = pFrustum.next;
-			else
+			} else {
 				pFrustum = portqueue[(++pqhead) & queuemask];
+			}
 
-			if ((handled[sectnum >> 3] & pow2char[sectnum & 7]) == 0)
+			if ((handled[sectnum >> 3] & pow2char[sectnum & 7]) == 0) {
 				sectorqueue[secindex++] = sectnum;
+			}
 			handled[sectnum >> 3] |= pow2char[sectnum & 7];
 		}
 
@@ -168,8 +175,9 @@ public class PotentiallyVisibleSet {
 									dy = Math.abs(py - globalposy);
 
 									// closest to camera portals should be rendered
-									if (dx + dy < 128)
+									if (dx + dy < 128) {
 										continue;
+									}
 								}
 							}
 //							}
@@ -185,8 +193,9 @@ public class PotentiallyVisibleSet {
 	}
 
 	public boolean checkWall(int z) {
-		if ((gotwall[z >> 3] & pow2char[z & 7]) != 0)
+		if ((gotwall[z >> 3] & pow2char[z & 7]) != 0) {
 			return ray.check(z);
+		}
 		return false; // (gotwall[z >> 3] & pow2char[z & 7]) != 0;
 
 //		return (gotwall[z >> 3] & pow2char[z & 7]) != 0;

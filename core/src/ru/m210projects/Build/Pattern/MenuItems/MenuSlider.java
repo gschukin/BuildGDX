@@ -74,17 +74,18 @@ public class MenuSlider extends MenuItem {
 	public void draw(MenuHandler handler) {
 		int shade = handler.getShade(this);
 		
-		if ( text != null )
+		if ( text != null ) {
 			font.drawText(x, y, text, shade, handler.getPal(font, this), TextAlign.Left, 2, fontShadow);
+		}
 
 		slider.drawSliderBackground(x + width - slider.getSliderRange(), y, shade, handler.getPal(null, this));
 
 		if(digital)
 		{
 			Arrays.fill(dbuff, (char)0);
-			if(digitalMax == 0)
+			if(digitalMax == 0) {
 				Bitoa(value, dbuff);
-			else {
+			} else {
 				String val = Float.toString(value / digitalMax);
 				int index = val.indexOf('.');
 				buildString(dbuff, 0, val);
@@ -115,20 +116,24 @@ public class MenuSlider extends MenuItem {
 			break;
 		case LEFT:
 		case MWDW:
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			
 			if(value <= 0) {
 				int dv = (value - step) % -step;
 		        val = value - step - dv;
-		        if ( dv < 0 )
-		        	val += step;
+		        if ( dv < 0 ) {
+					val += step;
+				}
 			}
 			else 
 			{
 		        int dv = (value - 1) % step;
 		        val = value - 1 - dv;
-		        if ( dv < 0 )
-		        	val -= step;
+		        if ( dv < 0 ) {
+					val -= step;
+				}
 			}
 			value = BClipRange(val, min, max);
 			if(callback != null) {
@@ -137,41 +142,52 @@ public class MenuSlider extends MenuItem {
 			break;
 		case RIGHT:
 		case MWUP:
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			
 			if ( value < 0 )
 		    {
 		        int dv = (value - 1) % -step;
 		        val = value - 1 - dv;
-		        if ( dv < 0 )
-		        	val += step;
+		        if ( dv < 0 ) {
+					val += step;
+				}
 		    } else
 		    {
 		        int dv = (value + step) % step;
 		        val = value + step - dv;
-		        if ( dv < 0 )
-		        	val -= step;
+		        if ( dv < 0 ) {
+					val -= step;
+				}
 		    }
 			value = BClipRange(val, min, max);
-			if(callback != null) 
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			break;
 		case ENTER:
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			
-			if(callback != null) 
+			if(callback != null) {
 				callback.run(handler, this);
+			}
 			break;
 		case LMB:
-			if ( (flags & 4) == 0 ) return false;
+			if ( (flags & 4) == 0 ) {
+				return false;
+			}
 			
 			if(touchedObj == this)
 			{
 				int startx = x + width - slider.getSliderRange() + slider.getSliderWidth() / 2;
 				float dr = (float)(touchX - startx) / (slider.getSliderRange() - slider.getSliderWidth() - 1);
 				value = BClipRange((int) (dr * (max - min) + min), min, max);
-				if(callback != null) 
+				if(callback != null) {
 					callback.run(handler, this);
+				}
 			} 
 			break;
 		default:
@@ -185,23 +201,28 @@ public class MenuSlider extends MenuItem {
 	public boolean mouseAction(int mx, int my) {
 		touchX = mx;
 		isTouched = false;
-		if(!BuildGdx.input.isTouched() /*&& touchedObj != this*/)
+		if(!BuildGdx.input.isTouched() /*&& touchedObj != this*/) {
 			touchedObj = null;
+		}
 		
 		if(text != null) {
-			if(mx > x && mx < x + font.getWidth(text))
-				if(my > y && my < y + font.getHeight()) 
+			if(mx > x && mx < x + font.getWidth(text)) {
+				if(my > y && my < y + font.getHeight()) {
 					return true;
+				}
+			}
 		}
 
 		if(touchedObj == null) {
 			int cx = x + width - slider.getSliderRange();
-			if(mx > cx && mx < cx + slider.getSliderRange())
+			if(mx > cx && mx < cx + slider.getSliderRange()) {
 				if(my > y && my < y + font.getHeight()) {
 					isTouched = true;
-					if(BuildGdx.input.isTouched())
+					if(BuildGdx.input.isTouched()) {
 						touchedObj = this;
+					}
 				}
+			}
 		}
 		
 		return isTouched;

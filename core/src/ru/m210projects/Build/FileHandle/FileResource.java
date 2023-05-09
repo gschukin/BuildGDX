@@ -88,8 +88,9 @@ public class FileResource implements Resource {
 	}
 
 	public String getPath() {
-		if (isClosed())
+		if (isClosed()) {
 			return null;
+		}
 
 //		try {
 //			Field path = raf.getClass().getDeclaredField("path");
@@ -113,12 +114,14 @@ public class FileResource implements Resource {
 
 	@Override
 	public void close() {
-		if (isClosed())
+		if (isClosed()) {
 			return;
+		}
 
 		try {
-			if (fbuf != null)
+			if (fbuf != null) {
 				fbuf = null;
+			}
 			raf.close();
 			raf = null;
 			path = null;
@@ -154,23 +157,26 @@ public class FileResource implements Resource {
 	@Override
 	public int seek(long offset, Whence whence) {
 		int var = -1;
-		if (isClosed())
+		if (isClosed()) {
 			return var;
+		}
 
 		try {
 			if (whence == Whence.Set) {
-				if (offset < 0)
+				if (offset < 0) {
 					return -1;
+				}
 			} else if (whence == Whence.Current) {
 				offset += position();
 			} else if (whence == Whence.End) {
 				offset += size();
 			}
 
-			if (fbuf != null)
+			if (fbuf != null) {
 				fbuf.position((int) offset);
-			else
+			} else {
 				raf.getChannel().position(offset);
+			}
 
 			var = position();
 		} catch (Exception e) {
@@ -183,8 +189,9 @@ public class FileResource implements Resource {
 	@Override
 	public int read(byte[] buf, int offset, int len) {
 		int var = -1;
-		if (isClosed())
+		if (isClosed()) {
 			return var;
+		}
 
 		try {
 			if (fbuf != null) {
@@ -196,8 +203,9 @@ public class FileResource implements Resource {
 					fbuf.get(buf, offset, len);
 					var = len;
 				}
-			} else
+			} else {
 				var = raf.read(buf, offset, len);
+			}
 		} catch (EOFException e) {
 			return -1;
 		} catch (Exception e) {
@@ -220,12 +228,14 @@ public class FileResource implements Resource {
 			while (len > 0) {
 				if (fbuf != null) {
 					var = Math.min(len, tmpbuf.length);
-					if (var > fbuf.remaining())
+					if (var > fbuf.remaining()) {
 						return p;
+					}
 					fbuf.get(tmpbuf, 0, var);
 				} else {
-					if ((var = raf.read(tmpbuf, 0, Math.min(len, tmpbuf.length))) == -1)
+					if ((var = raf.read(tmpbuf, 0, Math.min(len, tmpbuf.length))) == -1) {
 						return p;
+					}
 				}
 				bb.put(tmpbuf, 0, var);
 				len -= var;
@@ -242,57 +252,65 @@ public class FileResource implements Resource {
 	@Override
 	public String readString(int len) {
 		byte[] data;
-		if (len < tmpbuf.length)
+		if (len < tmpbuf.length) {
 			data = tmpbuf;
-		else
+		} else {
 			data = new byte[len];
-		if (read(data, 0, len) != len)
+		}
+		if (read(data, 0, len) != len) {
 			return null;
+		}
 
 		return new String(data, 0, len);
 	}
 
 	@Override
 	public Integer readInt() {
-		if (read(tmpbuf, 0, 4) == 4)
+		if (read(tmpbuf, 0, 4) == 4) {
 			return ((tmpbuf[3] & 0xFF) << 24) + ((tmpbuf[2] & 0xFF) << 16) + ((tmpbuf[1] & 0xFF) << 8)
 					+ (tmpbuf[0] & 0xFF);
+		}
 		return null;
 	}
 
 	@Override
 	public Long readLong() {
-		if (read(tmpbuf, 0, 8) == 8)
+		if (read(tmpbuf, 0, 8) == 8) {
 			return (((long) tmpbuf[7] & 0xFF) << 56) + (((long) tmpbuf[6] & 0xFF) << 48)
 					+ (((long) tmpbuf[5] & 0xFF) << 40) + (((long) tmpbuf[4] & 0xFF) << 32)
 					+ (((long) tmpbuf[3] & 0xFF) << 24) + (((long) tmpbuf[2] & 0xFF) << 16)
 					+ (((long) tmpbuf[1] & 0xFF) << 8) + (((long) tmpbuf[0] & 0xFF));
+		}
 		return null;
 	}
 
 	@Override
 	public Float readFloat() {
 		Integer i = readInt();
-		if (i != null)
+		if (i != null) {
 			return Float.intBitsToFloat(i);
+		}
 		return null;
 	}
 
 	@Override
 	public Short readShort() {
-		if (read(tmpbuf, 0, 2) == 2)
+		if (read(tmpbuf, 0, 2) == 2) {
 			return (short) (((tmpbuf[1] & 0xFF) << 8) + (tmpbuf[0] & 0xFF));
+		}
 		return null;
 	}
 
 	@Override
 	public Byte readByte() {
-		if (isClosed())
+		if (isClosed()) {
 			return null;
+		}
 
 		try {
-			if (fbuf != null)
+			if (fbuf != null) {
 				return fbuf.get();
+			}
 			return raf.readByte();
 		} catch (EOFException e) {
 			return null;
@@ -304,8 +322,9 @@ public class FileResource implements Resource {
 	@Override
 	public Boolean readBoolean() {
 		Byte var = readByte();
-		if (var != null)
+		if (var != null) {
 			return var == 1;
+		}
 		return null;
 	}
 
@@ -330,31 +349,34 @@ public class FileResource implements Resource {
 
 	public int writeBytes(Object array) {
 		int len;
-		if (array instanceof byte[])
+		if (array instanceof byte[]) {
 			len = ((byte[]) array).length;
-		else if (array instanceof ByteBuffer)
+		} else if (array instanceof ByteBuffer) {
 			len = ((ByteBuffer) array).capacity();
-		else if (array instanceof short[])
+		} else if (array instanceof short[]) {
 			len = ((short[]) array).length;
-		else if (array instanceof int[])
+		} else if (array instanceof int[]) {
 			len = ((int[]) array).length;
-		else if (array instanceof char[])
+		} else if (array instanceof char[]) {
 			len = ((char[]) array).length;
-		else if (array instanceof String)
+		} else if (array instanceof String) {
 			len = ((String) array).getBytes().length;
-		else
+		} else {
 			throw new UnsupportedOperationException("Couldn't write to file. \r\n + Not implemented!");
+		}
 
-		if (len != 0)
+		if (len != 0) {
 			return writeBytes(array, len);
+		}
 
 		return -1;
 	}
 
 	public int writeBytes(Object obj, int len) {
 		int var = -1;
-		if (isClosed() || getMode() != Mode.Write)
+		if (isClosed() || getMode() != Mode.Write) {
 			return var;
+		}
 
 		try {
 			byte[] data = null;
@@ -367,19 +389,20 @@ public class FileResource implements Resource {
 					rem -= l;
 				}
 				return len;
-			} else if (obj instanceof byte[])
+			} else if (obj instanceof byte[]) {
 				data = (byte[]) obj;
-			else if (obj instanceof char[]) {
+			} else if (obj instanceof char[]) {
 				data = new byte[len];
 				char[] src = (char[]) obj;
-				for (int i = 0; i < Math.min(len, src.length); i++)
+				for (int i = 0; i < Math.min(len, src.length); i++) {
 					data[i] = (byte) src[i];
+				}
 			} else if (obj instanceof ByteBuffer) {
 				ByteBuffer buf = (ByteBuffer) obj;
 				buf.rewind();
-				if (!buf.isDirect())
+				if (!buf.isDirect()) {
 					data = buf.array();
-				else {
+				} else {
 					data = new byte[Math.min(len, buf.capacity())];
 					buf.get(data);
 				}
@@ -387,18 +410,21 @@ public class FileResource implements Resource {
 				var = 0;
 				short[] shortArr = (short[]) obj;
 				len = Math.min(len, shortArr.length);
-				for (int i = 0; i < len; i++)
+				for (int i = 0; i < len; i++) {
 					var += writeShort(shortArr[i]);
+				}
 			} else if (obj instanceof int[]) {
 				var = 0;
 				int[] intArr = (int[]) obj;
 				len = Math.min(len, intArr.length);
-				for (int i = 0; i < len; i++)
+				for (int i = 0; i < len; i++) {
 					var += writeInt(intArr[i]);
+				}
 			} else if (obj instanceof String) {
 				data = ((String) obj).getBytes();
-			} else
+			} else {
 				throw new UnsupportedOperationException("Couldn't write to file. \r\n + Not implemented!");
+			}
 
 			if (data != null) {
 				len = Math.min(len, data.length);
@@ -413,8 +439,9 @@ public class FileResource implements Resource {
 	}
 
 	public int writeByte(int value) {
-		if (isClosed() || getMode() != Mode.Write)
+		if (isClosed() || getMode() != Mode.Write) {
 			return -1;
+		}
 
 		tmpbuf[0] = (byte) value;
 		try {
@@ -426,8 +453,9 @@ public class FileResource implements Resource {
 	}
 
 	public int writeShort(int value) {
-		if (isClosed() || getMode() != Mode.Write)
+		if (isClosed() || getMode() != Mode.Write) {
 			return -1;
+		}
 
 		tmpbuf[0] = (byte) (value & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
@@ -442,8 +470,9 @@ public class FileResource implements Resource {
 
 	public int writeInt(int value) {
 		int var = -1;
-		if (isClosed() || getMode() != Mode.Write)
+		if (isClosed() || getMode() != Mode.Write) {
 			return var;
+		}
 
 		tmpbuf[0] = (byte) (value & 0xFF);
 		tmpbuf[1] = (byte) ((value >>> 8) & 0xFF);
@@ -463,14 +492,16 @@ public class FileResource implements Resource {
 	@Override
 	public int size() {
 		int var = -1;
-		if (isClosed())
+		if (isClosed()) {
 			return var;
+		}
 
 		try {
-			if (fbuf != null)
+			if (fbuf != null) {
 				var = fbuf.capacity();
-			else
+			} else {
 				var = (int) raf.length();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -480,14 +511,16 @@ public class FileResource implements Resource {
 	@Override
 	public int position() {
 		int var = -1;
-		if (isClosed())
+		if (isClosed()) {
 			return var;
+		}
 
 		try {
-			if (fbuf != null)
+			if (fbuf != null) {
 				var = fbuf.position();
-			else
+			} else {
 				var = (int) raf.getChannel().position();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -503,8 +536,9 @@ public class FileResource implements Resource {
 		int size = this.size();
 		if (size > 0) {
 			byte[] data = new byte[size];
-			if (this.read(data) != -1)
+			if (this.read(data) != -1) {
 				return data;
+			}
 		}
 		return null;
 	}

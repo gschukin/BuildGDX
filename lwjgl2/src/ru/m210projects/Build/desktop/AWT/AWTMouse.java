@@ -107,8 +107,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 
 	private void setMousePosition(int x, int y)
 	{
-		if(robot != null)
+		if(robot != null) {
 			robot.mouseMove(x, y);
+		}
 	}
 
 	@Override
@@ -257,8 +258,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 	}
 
 	private void checkCatched (MouseEvent e) {
-		if(!display.isActive())
+		if(!display.isActive()) {
 			return;
+		}
 
 		Canvas canvas = display.getCanvas();
 		if (catched && canvas.isShowing()) {
@@ -271,7 +273,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 
 	@Override
 	public void showCursor (boolean visible) {
-		if(display == null) return;
+		if(display == null) {
+			return;
+		}
 
 		if (!visible) {
 			if(noCursor == null) {
@@ -285,8 +289,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 				display.m_frame.getContentPane().setCursor(noCursor);
 			}
 		} else {
-			if(display.m_frame.getContentPane().getCursor() != defCursor)
+			if(display.m_frame.getContentPane().getCursor() != defCursor) {
 				display.m_frame.getContentPane().setCursor(defCursor);
+			}
 		}
 	}
 
@@ -312,11 +317,21 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 	}
 
 	private int toGdxButton (int button) {
-		if (button == 1) return Buttons.LEFT;
-		if (button == 2) return Buttons.MIDDLE;
-		if (button == 3) return Buttons.RIGHT;
-		if (button == 4) return Buttons.BACK;
-		if (button == 5) return Buttons.FORWARD;
+		if (button == 1) {
+			return Buttons.LEFT;
+		}
+		if (button == 2) {
+			return Buttons.MIDDLE;
+		}
+		if (button == 3) {
+			return Buttons.RIGHT;
+		}
+		if (button == 4) {
+			return Buttons.BACK;
+		}
+		if (button == 5) {
+			return Buttons.FORWARD;
+		}
 		return -1;
 	}
 
@@ -337,7 +352,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 			x = event.x;
 			y = event.y;
 			pressedButtons.remove(event.button);
-			if (pressedButtons.size == 0) touchDown = false;
+			if (pressedButtons.size == 0) {
+				touchDown = false;
+			}
 		}
 	}
 
@@ -361,8 +378,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 		showCursor(!catched);
 
 		Canvas canvas = display.getCanvas();
-		if(catched)
+		if(catched) {
 			setCursorPosition(canvas.getWidth() / 2, canvas.getHeight() / 2);
+		}
 	}
 
 	@Override
@@ -406,7 +424,9 @@ public class AWTMouse implements MouseMotionListener, MouseListener, MouseWheelL
 
 	@Override
 	public boolean isButtonJustPressed(int button) {
-		if(button < 0 || button >= justPressedButtons.length) return false;
+		if(button < 0 || button >= justPressedButtons.length) {
+			return false;
+		}
 		return justPressedButtons[button];
 	}
 

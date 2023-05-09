@@ -49,10 +49,11 @@ public abstract class OrphoRenderer {
 
 	public OrphoRenderer(Engine engine, IOverheadMapSettings mapSettings) {
 		this.engine = engine;
-		if (mapSettings != null)
+		if (mapSettings != null) {
 			this.mapSettings = mapSettings;
-		else
+		} else {
 			this.mapSettings = new DefaultMapSettings();
+		}
 	}
 
 	public abstract void init();
@@ -102,22 +103,26 @@ public abstract class OrphoRenderer {
 		// Draw red lines
 		for (i = 0; i < numsectors; i++) {
 			if ((!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
-					|| !Gameutils.isValidSector(i))
+					|| !Gameutils.isValidSector(i)) {
 				continue;
+			}
 
 			Sector sec = Engine.getSector(i);
-			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3)
+			if (!Gameutils.isValidWall(sec.getWallptr()) || sec.getWallnum() < 3) {
 				continue;
+			}
 
 			startwall = sec.getWallptr();
 			endwall = sec.getWallptr() + sec.getWallnum();
 
-			if (startwall < 0 || endwall < 0)
+			if (startwall < 0 || endwall < 0) {
 				continue;
+			}
 
 			for (int j = startwall; j < endwall; j++) {
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2()))
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2())) {
 					continue;
+				}
 
 				wal = Engine.getWall(j);
 				if (mapSettings.isShowRedWalls() && Gameutils.isValidWall(wal.getNextwall())) {
@@ -134,8 +139,9 @@ public abstract class OrphoRenderer {
 							y2 = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 
 							int col = mapSettings.getWallColor(j, i);
-							if (col < 0)
+							if (col < 0) {
 								continue;
+							}
 
 							drawline256(x1, y1, x2, y2, col);
 						}
@@ -147,16 +153,18 @@ public abstract class OrphoRenderer {
 		// Draw sprites
 		if (mapSettings.isShowSprites(MapView.Lines)) {
 			for (i = 0; i < numsectors; i++) {
-				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
+				if (!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0) {
 					continue;
+				}
 
 				for (MapNode<Sprite> node = service.getSectNode(i); node != null; node = node.getNext()) {
 					int j = node.getIndex();
 					Sprite spr = node.get();
 
 					if ((spr.getCstat() & 0x8000) != 0 || spr.getXrepeat() == 0 || spr.getYrepeat() == 0
-							|| !mapSettings.isSpriteVisible(MapView.Lines, j))
+							|| !mapSettings.isSpriteVisible(MapView.Lines, j)) {
 						continue;
+					}
 
 					switch (spr.getCstat() & 48) {
 					case 0:
@@ -178,8 +186,9 @@ public abstract class OrphoRenderer {
 						x1 = mapSettings.getSpriteX(j);
 						y1 = mapSettings.getSpriteY(j);
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
-						if ((spr.getCstat() & 4) > 0)
+						if ((spr.getCstat() & 4) > 0) {
 							xoff = (byte) -xoff;
+						}
 						k = spr.getAng();
 						int l = spr.getXrepeat();
 						int dax = EngineUtils.cos(k - 512) * l;
@@ -202,8 +211,9 @@ public abstract class OrphoRenderer {
 						y2 = dmulscale(oy, xvect2, ox, yvect2, 16);
 
 						int col = mapSettings.getSpriteColor(j);
-						if (col < 0)
+						if (col < 0) {
 							break;
+						}
 
 						drawline256(x1 + (xdim << 11), y1 + (ydim << 11), x2 + (xdim << 11), y2 + (ydim << 11), col);
 					}
@@ -213,10 +223,12 @@ public abstract class OrphoRenderer {
 
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
 						byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
-						if ((spr.getCstat() & 4) > 0)
+						if ((spr.getCstat() & 4) > 0) {
 							xoff = (byte) -xoff;
-						if ((spr.getCstat() & 8) > 0)
+						}
+						if ((spr.getCstat() & 8) > 0) {
 							yoff = (byte) -yoff;
+						}
 
 						k = spr.getAng();
 						int cosang = EngineUtils.cos(k);
@@ -262,8 +274,9 @@ public abstract class OrphoRenderer {
 						y4 = dmulscale(oy, xvect2, ox, yvect2, 16);
 
 						int col = mapSettings.getSpriteColor(j);
-						if (col < 0)
+						if (col < 0) {
 							break;
+						}
 
 						drawline256(x1 + (xdim << 11), y1 + (ydim << 11), x2 + (xdim << 11), y2 + (ydim << 11), col);
 
@@ -283,26 +296,31 @@ public abstract class OrphoRenderer {
 		for (i = 0; i < numsectors; i++) {
 
 			if ((!mapSettings.isFullMap() && (show2dsector[i >> 3] & (1 << (i & 7))) == 0)
-					|| !Gameutils.isValidSector(i))
+					|| !Gameutils.isValidSector(i)) {
 				continue;
+			}
 
 			startwall = Engine.getSector(i).getWallptr();
 			endwall = Engine.getSector(i).getWallptr() + Engine.getSector(i).getWallnum();
 
-			if (startwall < 0 || endwall < 0)
+			if (startwall < 0 || endwall < 0) {
 				continue;
+			}
 
 			k = -1;
 			for (int j = startwall; j < endwall; j++) {
 				wal = Engine.getWall(j);
-				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2()))
+				if (!Gameutils.isValidWall(j) || !Gameutils.isValidWall(Engine.getWall(j).getPoint2())) {
 					continue;
+				}
 
-				if (wal.getNextwall() >= 0)
+				if (wal.getNextwall() >= 0) {
 					continue;
+				}
 				Tile pic = engine.getTile(wal.getPicnum());
-				if (!pic.hasSize())
+				if (!pic.hasSize()) {
 					continue;
+				}
 
 				if (j == k) {
 					x1 = x2;
@@ -315,8 +333,9 @@ public abstract class OrphoRenderer {
 				}
 
 				k = wal.getPoint2();
-				if (Engine.getWall(k) == null)
+				if (Engine.getWall(k) == null) {
 					continue;
+				}
 
 				ox = mapSettings.getWallX(k) - cposx;
 				oy = mapSettings.getWallY(k) - cposy;
@@ -324,8 +343,9 @@ public abstract class OrphoRenderer {
 				y2 = dmulscale(oy, xvect2, ox, yvect2, 16) + (ydim << 11);
 
 				int col = mapSettings.getWallColor(j, i);
-				if (col < 0)
+				if (col < 0) {
 					continue;
+				}
 
 				drawline256(x1, y1, x2, y2, col);
 			}
@@ -334,8 +354,9 @@ public abstract class OrphoRenderer {
 		// draw player
 		for (i = connecthead; i >= 0; i = connectpoint2[i]) {
 			int spr = mapSettings.getPlayerSprite(i);
-			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum()))
+			if (spr == -1 || !isValidSector(Engine.getSprite(spr).getSectnum())) {
 				continue;
+			}
 
 			Sprite pPlayer = Engine.getSprite(spr);
 			ox = mapSettings.getSpriteX(spr) - cposx;
@@ -355,8 +376,8 @@ public abstract class OrphoRenderer {
 			if (i == viewindex || mapSettings.isShowAllPlayers()) {
 				int picnum = mapSettings.getPlayerPicnum(i);
 				if (picnum == -1) { // draw it with lines
-//					ox = (sintable[(pPlayer.ang + 512) & 2047] >> 7);
-//					oy = (sintable[(pPlayer.ang) & 2047] >> 7);
+//					ox = (EngineUtils.sin((pPlayer.ang + 512) & 2047) >> 7);
+//					oy = (EngineUtils.sin((pPlayer.ang) & 2047) >> 7);
 					x2 = 0;
 					y2 = -(mapSettings.getPlayerZoom(i, czoom) << 1);
 
@@ -364,8 +385,9 @@ public abstract class OrphoRenderer {
 					int y3 = mulscale(y2, yxaspect, 16);
 
 					int col = mapSettings.getSpriteColor(spr);
-					if (col < 0)
+					if (col < 0) {
 						continue;
+					}
 
 					drawline256(dx - x2 + (xdim << 11), dy - y3 + (ydim << 11), dx + x2 + (xdim << 11),
 							dy + y3 + (ydim << 11), col);

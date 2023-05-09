@@ -110,7 +110,9 @@ public class LwjglAL implements ALAudio {
 
 	@Override
 	public void setSourceReverb(int sourceId, boolean enable, float delay) {
-		if(!alIsEFXSupport()) return;
+		if(!alIsEFXSupport()) {
+			return;
+		}
 		
 		if(enable)
 		{

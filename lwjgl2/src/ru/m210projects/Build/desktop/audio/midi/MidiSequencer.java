@@ -41,12 +41,14 @@ public class MidiSequencer {
 			public void controlChange(ShortMessage message) {
 				if(isLooping()) {
 					if((message.getData1() == 116 || message.getData1() == 118) && message.getData2() == 0) {
-						if(message.getChannel() == 0 && sequencer.getLoopStartPoint() == 0) 
+						if(message.getChannel() == 0 && sequencer.getLoopStartPoint() == 0) {
 							sequencer.setLoopStartPoint(sequencer.getTickPosition());
+						}
 					}
 					if((message.getData1() == 117 || message.getData1() == 119) && message.getData2() == 127/*&& loop_pos != 0*/) {
-						if(message.getChannel() == 0) 
-						sequencer.setTickPosition(sequencer.getLoopStartPoint());
+						if(message.getChannel() == 0) {
+							sequencer.setTickPosition(sequencer.getLoopStartPoint());
+						}
 					}
 				}
 			}
@@ -55,10 +57,12 @@ public class MidiSequencer {
 
 	public void setReceiver(MidiReceiver receiver) throws MidiUnavailableException
 	{
-		if(transmitter != null)
+		if(transmitter != null) {
 			transmitter.close();
-		if(this.receiver != null)
+		}
+		if(this.receiver != null) {
 			this.receiver.close();
+		}
 		
 		transmitter = sequencer.getTransmitter();
 		transmitter.setReceiver(receiver);
@@ -88,13 +92,15 @@ public class MidiSequencer {
 	
 	public void stop()
 	{
-		if(isOpen())
+		if(isOpen()) {
 			sequencer.stop();
+		}
 	}
 	
 	public void resume() {
-		if(isOpen())
+		if(isOpen()) {
 			sequencer.start();
+		}
 	}
 	
 	public long getPosition()
@@ -104,10 +110,11 @@ public class MidiSequencer {
 
 	public void setLooping(boolean looping)
 	{
-		if (looping)
-        	sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
-        else
-        	sequencer.setLoopCount(0);
+		if (looping) {
+			sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
+		} else {
+			sequencer.setLoopCount(0);
+		}
 	}
 	
 	public boolean isLooping()
@@ -124,8 +131,9 @@ public class MidiSequencer {
 		if(sequencer.getSequence() != source.data)
 		{
 			try {
-				if(currentSource != null)
+				if(currentSource != null) {
 					currentSource.pause();
+				}
 				sequencer.setSequence(source.data);
 				this.currentSource = source;
 			} catch (InvalidMidiDataException e) {}
@@ -144,9 +152,11 @@ public class MidiSequencer {
 			stop();
 			sequencer.close();
     	}
-    	if(transmitter != null)
-    		transmitter.close();
-    	if(receiver != null) 
-    		receiver.close();
+    	if(transmitter != null) {
+			transmitter.close();
+		}
+    	if(receiver != null) {
+			receiver.close();
+		}
 	}
 }

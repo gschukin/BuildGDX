@@ -30,13 +30,15 @@ public class GLTileArray {
 	public GLTile get(int picnum, int palnum, boolean clamped, int surfnum) {
 		for (GLTile pth = array[picnum]; pth != null && pth.palnum <= palnum; pth = pth.next) {
 			if (pth.getPixelFormat() == PixelFormat.Pal8) {
-				if (pth.isClamped() == clamped)
+				if (pth.isClamped() == clamped) {
 					return pth;
+				}
 				continue;
 			}
 
-			if (pth.palnum == palnum && pth.isClamped() == clamped && pth.skyface == surfnum)
+			if (pth.palnum == palnum && pth.isClamped() == clamped && pth.skyface == surfnum) {
 				return pth;
+			}
 		}
 		return null;
 	}
@@ -57,8 +59,9 @@ public class GLTileArray {
 			do {
 				if (newNode.compareTo(pth) < 0) {
 					newNode.next = pth;
-					if (prev != null)
+					if (prev != null) {
 						prev.next = newNode;
+					}
 					return;
 				}
 
@@ -86,8 +89,9 @@ public class GLTileArray {
 
 			pth.bind();
 			pth.setupTextureFilter(filter, anisotropy);
-			if (!filter.retro)
+			if (!filter.retro) {
 				pth.setInvalidated(true);
+			}
 			pth = next;
 		}
 	}
@@ -96,8 +100,9 @@ public class GLTileArray {
 		for (GLTile pth = array[tilenum]; pth != null;) {
 			GLTile next = pth.next;
 
-			if (pth.hicr == null && pth.getPixelFormat() != PixelFormat.Pal8)
+			if (pth.hicr == null && pth.getPixelFormat() != PixelFormat.Pal8) {
 				pth.setInvalidated(true);
+			}
 			pth = next;
 		}
 	}

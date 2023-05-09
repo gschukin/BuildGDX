@@ -30,8 +30,9 @@ public class GdxAL implements ALAudio {
 	
 	public GdxAL() throws Throwable
 	{
-		if(!init())
+		if(!init()) {
 			throw new Throwable();
+		}
 	}
 	
 	public boolean init()
@@ -43,15 +44,17 @@ public class GdxAL implements ALAudio {
 			version = AL10.alGetString(AL10.AL_VERSION);
 
 	        boolean makeCurrentFailed = EXTThreadLocalContext.alcSetThreadContext(AL.getContext());
-	        if (!makeCurrentFailed) 
-	        	return false;
+	        if (!makeCurrentFailed) {
+				return false;
+			}
 	        
 	        if(alResamplerSupport = AL10.alIsExtensionPresent("AL_SOFT_source_resampler"))
 	        {
 		    	alNumResamplers = AL10.alGetInteger(SOFTSourceResampler.AL_NUM_RESAMPLERS_SOFT);
 		    	alResamplerNames = new String[alNumResamplers];
-		    	for(int i = 0; i < alNumResamplers; i++) 
-		    		alResamplerNames[i] = SOFTSourceResampler.alGetStringiSOFT(SOFTSourceResampler.AL_RESAMPLER_NAME_SOFT, i);
+		    	for(int i = 0; i < alNumResamplers; i++) {
+					alResamplerNames[i] = SOFTSourceResampler.alGetStringiSOFT(SOFTSourceResampler.AL_RESAMPLER_NAME_SOFT, i);
+				}
 	        }
 	
 	        if (alEfxSupport = ALC10.alcIsExtensionPresent(device, "ALC_EXT_EFX")) 
@@ -122,7 +125,9 @@ public class GdxAL implements ALAudio {
 	
 	@Override
 	public void setSourceReverb(int sourceId, boolean enable, float delay) {
-		if(!alIsEFXSupport()) return;
+		if(!alIsEFXSupport()) {
+			return;
+		}
 		
 		if(enable)
 		{
@@ -194,7 +199,9 @@ public class GdxAL implements ALAudio {
 
 	@Override
 	public void setSourceSoftResampler(int sourceId, int value) {
-		if(!alIsSoftResamplerSupport() || value < 0 || value > alNumResamplers) return;
+		if(!alIsSoftResamplerSupport() || value < 0 || value > alNumResamplers) {
+			return;
+		}
 		alSourcei(sourceId, SOFTSourceResampler.AL_SOURCE_RESAMPLER_SOFT, value);
 	}
 

@@ -42,8 +42,9 @@ public class VideoMode {
 	}
 	
 	public static void initVideoModes(DisplayMode[] modes, DisplayMode DesktopDisplayMode) {
-		if(strvmodes != null)
+		if(strvmodes != null) {
 			return;
+		}
 
 		for (int i = 0; i < modes.length; i++) {
 			VideoMode mode = new VideoMode(modes[i]);
@@ -54,18 +55,22 @@ public class VideoMode {
 					break;
 				}
 			}
-			if(exist)
+			if(exist) {
 				continue;
-			if(mode.xdim > MAXXDIM)
+			}
+			if(mode.xdim > MAXXDIM) {
 				continue;
-			if(mode.ydim > MAXYDIM)
+			}
+			if(mode.ydim > MAXYDIM) {
 				continue;
+			}
 
 			validmodes.add(mode);
 		}
 		
-		if(validmodes.size() == 0)
+		if(validmodes.size() == 0) {
 			validmodes.add(new VideoMode(DesktopDisplayMode));
+		}
 
 		Collections.sort(validmodes, new Comparator<VideoMode>() {
             public int compare(VideoMode lhs, VideoMode rhs) {
@@ -81,9 +86,11 @@ public class VideoMode {
 		strvmodes = new String[validmodes.size()];
 		for (int i = 0; i < validmodes.size(); i++) {
 			VideoMode mode = validmodes.get(i);
-			if(mode.xdim == DesktopDisplayMode.width && mode.ydim == DesktopDisplayMode.height)
+			if(mode.xdim == DesktopDisplayMode.width && mode.ydim == DesktopDisplayMode.height) {
 				strvmodes[i] = "* " + mode.xdim + " x " + mode.ydim;
-			else strvmodes[i] = mode.xdim + " x " + mode.ydim;
+			} else {
+				strvmodes[i] = mode.xdim + " x " + mode.ydim;
+			}
 		}
 	}
 	
@@ -103,15 +110,17 @@ public class VideoMode {
 	
 	public static boolean setFullscreen(int xdim, int ydim, boolean fullscreen)
 	{
-		if(!fullscreen)
+		if(!fullscreen) {
 			return false;
-		else
+		} else {
 			return getmodeindex(xdim, ydim) != -1;
+		}
 	}
 	
 	public static DisplayMode getmode(int index) {
-		if(index >= 0 && index < validmodes.size())
+		if(index >= 0 && index < validmodes.size()) {
 			return validmodes.get(index).mode;
+		}
 		
 		return null;
 	}

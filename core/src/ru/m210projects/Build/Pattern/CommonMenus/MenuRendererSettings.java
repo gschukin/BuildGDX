@@ -71,16 +71,18 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 
 	@Override
 	public void mDraw(MenuHandler handler) {
-		if (currentFormat != app.pEngine.getrender().getTexFormat())
+		if (currentFormat != app.pEngine.getrender().getTexFormat()) {
 			rebuild();
+		}
 		super.mDraw(handler);
 	}
 
 	@Override
 	public boolean mLoadRes(MenuHandler handler, MenuOpt opt) {
 		if (opt == MenuOpt.Open && (currentRenderer != app.pEngine.getrender()
-				|| currentFormat != app.pEngine.getrender().getTexFormat()))
+				|| currentFormat != app.pEngine.getrender().getTexFormat())) {
 			rebuild();
+		}
 		return super.mLoadRes(handler, opt);
 	}
 
@@ -88,8 +90,9 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 		this.clear();
 		currentRenderer = app.pEngine.getrender();
 		currentFormat = app.pEngine.getrender().getTexFormat();
-		if (title != null)
+		if (title != null) {
 			title.text = (app.pEngine.getrender().getType().getName() + " settings").toCharArray();
+		}
 
 		BuildRenderParameters();
 		if (currentRenderer instanceof GLRenderer) {
@@ -139,9 +142,11 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 			@Override
 			public void draw(MenuHandler handler) {
 				this.num = -1;
-				for (int i = 0; i < values.length; i++)
-					if (var.get().equals(values[i]))
+				for (int i = 0; i < values.length; i++) {
+					if (var.get().equals(values[i])) {
 						this.num = i;
+					}
+				}
 
 				super.draw(handler);
 			}
@@ -168,8 +173,9 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 			}
 		};
 		slider.fontShadow = fontShadow;
-		if (digmax != null)
+		if (digmax != null) {
 			slider.digitalMax = digmax;
+		}
 
 		return slider;
 	}
@@ -200,15 +206,17 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 	}
 
 	protected void BuildGLRenderParameters() {
-		if (GLRenderParamBuilt)
+		if (GLRenderParamBuilt) {
 			return;
+		}
 
 		GLGamma = BuildSlider("Gamma", GLSettings.gamma, 0, 4096, 64, 4096);
 		int ogamma = GLSettings.gamma.get();
-		if (GLSettings.gamma.set(64) == RespondType.Fail)
+		if (GLSettings.gamma.set(64) == RespondType.Fail) {
 			GLGamma.mCheckEnableItem(false);
-		else
+		} else {
 			GLSettings.gamma.set(ogamma);
+		}
 
 //		GLBrightness = BuildSlider("Brightness", GLSettings.brightness, -4096, 4096, 64, 4096);
 //		GLContrast = BuildSlider("Contrast", GLSettings.contrast, 0, 8192, 64, 4096);
@@ -240,14 +248,16 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 			};
 
 			String[] filters = new String[GLSettings.glfiltermodes.length];
-			for (int i = 0; i < filters.length; i++)
+			for (int i = 0; i < filters.length; i++) {
 				filters[i] = GLSettings.glfiltermodes[i].name;
+			}
 			GLTextureFilter = BuildConteiner("Texture filtering", GLSettings.textureFilter, filters,
 					GLSettings.glfiltermodes);
 
 			int anisotropysize = 0;
-			for (int s = (int) maxanisotropy; s > 1; s >>= 1)
+			for (int s = (int) maxanisotropy; s > 1; s >>= 1) {
 				anisotropysize++;
+			}
 			Integer[] list = new Integer[anisotropysize + 1];
 			String[] anisotropies = new String[anisotropysize + 1];
 			for (int i = 0; i < list.length; i++) {
@@ -268,16 +278,18 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 	}
 
 	protected void BuildRenderParameters() {
-		if (RenderParamBuilt)
+		if (RenderParamBuilt) {
 			return;
+		}
 
 		separator = new DummyItem();
 		palettedGamma = BuildSlider("Gamma", BuildSettings.paletteGamma, 0, 15, 1, null);
 		fovSlider = BuildSlider("Field of view", BuildSettings.fov, BuildConfig.MINFOV, BuildConfig.MAXFOV, 5, null);
 		vSync = BuildSwitch("Vsync", BuildSettings.vsync);
 		String[] limits = new String[BuildSettings.fpslimits.length];
-		for (int i = 0; i < limits.length; i++)
+		for (int i = 0; i < limits.length; i++) {
 			limits[i] = i == 0 ? "None" : BuildSettings.fpslimits[i] + " fps";
+		}
 		fpsLimits = BuildConteiner("Framerate limit", BuildSettings.fpsLimit, limits, BuildSettings.fpslimits);
 		useVoxels = BuildSwitch("Voxels", BuildSettings.useVoxels);
 

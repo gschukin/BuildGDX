@@ -77,18 +77,24 @@ public abstract class MenuSlotList extends MenuList
 	public String FileName()
 	{
 		int ptr = l_nFocus;
-		if(saveList) ptr--;
-		if(ptr == -1 || displayed.size() == 0)
+		if(saveList) {
+			ptr--;
+		}
+		if(ptr == -1 || displayed.size() == 0) {
 			return "Empty slot";
+		}
 		return displayed.get(ptr).filename;
 	}
 
 	public String SaveName()
 	{
 		int ptr = l_nFocus;
-		if(saveList) ptr--;
-		if(ptr == -1 || displayed.size() == 0)
+		if(saveList) {
+			ptr--;
+		}
+		if(ptr == -1 || displayed.size() == 0) {
 			return "Empty slot";
+		}
 		return displayed.get(ptr).name;
 	}
 
@@ -100,22 +106,30 @@ public abstract class MenuSlotList extends MenuList
 
 		if(displayed.size() > 0) {
 			int py = y, pal;
-			if(saveList) len += 1;
+			if(saveList) {
+				len += 1;
+			}
 
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
 				int ptr = i;
-				if(saveList) ptr -= 1;
+				if(saveList) {
+					ptr -= 1;
+				}
 
 				int shade = handler.getShade(i == l_nFocus && !deleteQuestion? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
 				char[] rtext;
-				if(i == 0 && saveList)
+				if(i == 0 && saveList) {
 					rtext = toCharArray("New savegame");
-				else rtext = toCharArray(displayed.get(ptr).name);
+				} else {
+					rtext = toCharArray(displayed.get(ptr).name);
+				}
 
 				if(ptr >= 0 && (displayed.get(ptr).filename.equals("autosave.sav")
-						|| displayed.get(ptr).filename.startsWith("quicksav")))
+						|| displayed.get(ptr).filename.startsWith("quicksav"))) {
 					pal = specPal;
-				else pal = listPal;
+				} else {
+					pal = listPal;
+				}
 
 				if ( i == l_nFocus ) {
 					if(m_pMenu.mGetFocusedItem(this)) {
@@ -123,8 +137,9 @@ public abstract class MenuSlotList extends MenuList
 							Arrays.fill(typingBuf, (char) 0);
 							char[] buf = getInput().getMessageBuffer();
 							int messlen = getInput().getMessageLength();
-							if(!owncursor)
+							if(!owncursor) {
 								messlen += 1;
+							}
 							System.arraycopy(buf, 0, typingBuf, 0, Math.min(messlen, typingBuf.length));
 							rtext = typingBuf;
 							shade = -128;
@@ -148,13 +163,16 @@ public abstract class MenuSlotList extends MenuList
 					Arrays.fill(typingBuf, (char) 0);
 					char[] buf = getInput().getMessageBuffer();
 					int messlen = getInput().getMessageLength();
-					if(!owncursor)
+					if(!owncursor) {
 						messlen += 1;
+					}
 					System.arraycopy(buf, 0, typingBuf, 0, Math.min(messlen, typingBuf.length));
 					rtext = typingBuf;
 					shade = -128;
 				}
-			} else rtext = toCharArray("List is empty");
+			} else {
+				rtext = toCharArray("List is empty");
+			}
 
 			font.drawText(x + width / 2 + nListOffset, py, rtext,shade, listPal, TextAlign.Left, 2, fontShadow);
 		}
@@ -171,10 +189,11 @@ public abstract class MenuSlotList extends MenuList
 			float kt = xdim / (float) ydim;
 			float kv = pic.getWidth() / (float) pic.getHeight();
 			float scale;
-			if (kv >= kt)
+			if (kv >= kt) {
 				scale = (ydim + 1) / (float) pic.getHeight();
-			else
+			} else {
 				scale = (xdim + 1) / (float) pic.getWidth();
+			}
 
 			draw.rotatesprite(0, 0, (int) (scale * 65536), 0, tile, 127, 4, 8 | 16 | transparent, 0, 0, xdim - 1, ydim - 1);
 
@@ -205,13 +224,18 @@ public abstract class MenuSlotList extends MenuList
 			    getInput().setKey(Keys.Y, 0);
 			    if(l_nFocus >= displayed.size()) {
 			    	int len = displayed.size();
-			    	if(saveList) len += 1;
+			    	if(saveList) {
+						len += 1;
+					}
 			    	l_nFocus = len - 1;
 			    	l_nMin = len - nListItems;
-					if(l_nMin < 0) l_nMin = 0;
+					if(l_nMin < 0) {
+						l_nMin = 0;
+					}
 			    }
-			    if(updateCallback != null)
+			    if(updateCallback != null) {
 					updateCallback.run(handler, this);
+				}
 			    deleteQuestion = false;
 			}
 			if(getInput().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
@@ -236,56 +260,69 @@ public abstract class MenuSlotList extends MenuList
 				{
 					typed = new String(getInput().getMessageBuffer(), 0, getInput().getMessageLength());
 					typing = false;
-					if(confirmCallback != null)
+					if(confirmCallback != null) {
 						confirmCallback.run(handler, this);
+					}
 				}
-			} else typing = false;
+			} else {
+				typing = false;
+			}
 		} else {
 			switch(opt)
 			{
 				case DELETE:
-					if((!saveList && (displayed.size() > 0 && l_nFocus != -1)) || saveList && l_nFocus != 0)
+					if((!saveList && (displayed.size() > 0 && l_nFocus != -1)) || saveList && l_nFocus != 0) {
 						deleteQuestion = true;
+					}
 					return false;
 				case MWUP:
 					ListMouseWheelUp(handler);
 					return false;
 				case MWDW:
-					if(text != null)
+					if(text != null) {
 						ListMouseWheelDown(handler, len);
+					}
 					return false;
 				case UP:
 					ListUp(handler, len);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case DW:
 					ListDown(handler, len);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case LEFT:
 					ListLeft(handler);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case RIGHT:
 					ListRight(handler);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case ENTER:
 				case LMB:
 					if(l_nFocus != -1 && len > 0) {
 						if(saveList) {
-							if(l_nFocus == 0) getInput().initMessageInput(null);
-							else getInput().initMessageInput(displayed.get(focus).name);
+							if(l_nFocus == 0) {
+								getInput().initMessageInput(null);
+							} else {
+								getInput().initMessageInput(displayed.get(focus).name);
+							}
 				        	typing = true;
 
 							return false;
 						}
-						if(confirmCallback != null)
+						if(confirmCallback != null) {
 							confirmCallback.run(handler, this);
+						}
 						getInput().resetKeyStatus();
 					}
 
@@ -296,23 +333,27 @@ public abstract class MenuSlotList extends MenuList
 					return true;
 				case PGUP:
 					ListPGUp(handler);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case PGDW:
 					ListPGDown(handler, len);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case HOME:
 					ListHome(handler);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				case END:
 					ListEnd(handler, len);
-					if(updateCallback != null)
+					if(updateCallback != null) {
 						updateCallback.run(handler, this);
+					}
 					return false;
 				default:
 					return false;
@@ -328,8 +369,9 @@ public abstract class MenuSlotList extends MenuList
 		Iterator<SaveInfo> i = text.iterator();
 		while (i.hasNext()) {
 			SaveInfo s = i.next();
-			if(!checkFile(s.filename))
+			if(!checkFile(s.filename)) {
 				i.remove();
+			}
 
 //			File file = new File(Path.User.getPath() + s.filename);
 //			if(!file.exists())
@@ -338,8 +380,9 @@ public abstract class MenuSlotList extends MenuList
 
 		updateList();
 
-		if(updateCallback != null)
+		if(updateCallback != null) {
 			updateCallback.run(null, this);
+		}
 	}
 
 	public abstract boolean checkFile(String filename);
@@ -353,8 +396,9 @@ public abstract class MenuSlotList extends MenuList
 			while (i.hasNext()) {
 				SaveInfo s = i.next();
 				if(s.filename.equals("autosave.sav")
-						|| s.filename.startsWith("quicksav"))
+						|| s.filename.startsWith("quicksav")) {
 					i.remove();
+				}
 			}
 		}
 	}
@@ -367,25 +411,30 @@ public abstract class MenuSlotList extends MenuList
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		if(deleteQuestion || typing)
+		if(deleteQuestion || typing) {
 			return false;
+		}
 
 		if(displayed.size() > 0) {
 			int px = x, py = y;
 			int len = displayed.size();
-			if(saveList) len += 1;
+			if(saveList) {
+				len += 1;
+			}
 
 			int ol_nFocus = l_nFocus;
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
 
-				if(mx > px && mx < px + width - 14)
+				if(mx > px && mx < px + width - 14) {
 					if(my > py && my < py + font.getHeight())
 					{
 						l_nFocus = i;
-						if(ol_nFocus != i && updateCallback != null)
+						if(ol_nFocus != i && updateCallback != null) {
 							updateCallback.run(null, this);
+						}
 						return true;
 					}
+				}
 
 				py += mFontOffset();
 			}

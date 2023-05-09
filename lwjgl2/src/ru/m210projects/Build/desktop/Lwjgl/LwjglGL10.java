@@ -41,8 +41,9 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glActiveTexture(int texture) {
-		if (BuildGdx.graphics.getGLVersion().isVersionEqualToOrHigher(1, 3))
+		if (BuildGdx.graphics.getGLVersion().isVersionEqualToOrHigher(1, 3)) {
 			GL13.glActiveTexture(texture);
+		}
 	}
 
 	@Override
@@ -87,34 +88,38 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glBufferData(int target, int size, Buffer data, int usage) {
-		if (data == null)
+		if (data == null) {
 			GL15.glBufferData(target, size, usage);
-		else if (data instanceof ByteBuffer)
+		} else if (data instanceof ByteBuffer) {
 			GL15.glBufferData(target, (ByteBuffer) data, usage);
-		else if (data instanceof IntBuffer)
+		} else if (data instanceof IntBuffer) {
 			GL15.glBufferData(target, (IntBuffer) data, usage);
-		else if (data instanceof FloatBuffer)
+		} else if (data instanceof FloatBuffer) {
 			GL15.glBufferData(target, (FloatBuffer) data, usage);
-		else if (data instanceof DoubleBuffer)
+		} else if (data instanceof DoubleBuffer) {
 			GL15.glBufferData(target, (DoubleBuffer) data, usage);
-		else if (data instanceof ShortBuffer) //
+		} else if (data instanceof ShortBuffer) //
+		{
 			GL15.glBufferData(target, (ShortBuffer) data, usage);
+		}
 	}
 
 	@Override
 	public void glBufferSubData(int target, int offset, int size, Buffer data) {
-		if (data == null)
+		if (data == null) {
 			throw new GdxRuntimeException("Using null for the data not possible, blame LWJGL");
-		else if (data instanceof ByteBuffer)
+		} else if (data instanceof ByteBuffer) {
 			GL15.glBufferSubData(target, offset, (ByteBuffer) data);
-		else if (data instanceof IntBuffer)
+		} else if (data instanceof IntBuffer) {
 			GL15.glBufferSubData(target, offset, (IntBuffer) data);
-		else if (data instanceof FloatBuffer)
+		} else if (data instanceof FloatBuffer) {
 			GL15.glBufferSubData(target, offset, (FloatBuffer) data);
-		else if (data instanceof DoubleBuffer)
+		} else if (data instanceof DoubleBuffer) {
 			GL15.glBufferSubData(target, offset, (DoubleBuffer) data);
-		else if (data instanceof ShortBuffer) //
+		} else if (data instanceof ShortBuffer) //
+		{
 			GL15.glBufferSubData(target, offset, (ShortBuffer) data);
+		}
 	}
 
 	@Override
@@ -161,9 +166,10 @@ public class LwjglGL10 extends GL10 {
 	@Override
 	public final void glCompressedTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height,
 			int format, int imageSize, Buffer data) {
-		if (!(data instanceof ByteBuffer))
+		if (!(data instanceof ByteBuffer)) {
 			throw new GdxRuntimeException(
 					"Can't use " + data.getClass().getName() + " with this method. Use ByteBuffer. Blame LWJGL");
+		}
 		GL13.glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, (ByteBuffer) data);
 	}
 
@@ -251,15 +257,16 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glDrawElements(int mode, int count, int type, Buffer indices) {
-		if (indices instanceof ShortBuffer && type == GL11.GL_UNSIGNED_SHORT)
+		if (indices instanceof ShortBuffer && type == GL11.GL_UNSIGNED_SHORT) {
 			GL11.glDrawElements(mode, (ShortBuffer) indices);
-		else if (indices instanceof ByteBuffer && type == GL11.GL_UNSIGNED_SHORT)
+		} else if (indices instanceof ByteBuffer && type == GL11.GL_UNSIGNED_SHORT) {
 			GL11.glDrawElements(mode, ((ByteBuffer) indices).asShortBuffer());
-		else if (indices instanceof ByteBuffer && type == GL11.GL_UNSIGNED_BYTE)
+		} else if (indices instanceof ByteBuffer && type == GL11.GL_UNSIGNED_BYTE) {
 			GL11.glDrawElements(mode, (ByteBuffer) indices);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + indices.getClass().getName()
 					+ " with this method. Use ShortBuffer or ByteBuffer instead. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -439,17 +446,18 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glReadPixels(int x, int y, int width, int height, int format, int type, Buffer pixels) {
-		if (pixels instanceof ByteBuffer)
+		if (pixels instanceof ByteBuffer) {
 			GL11.glReadPixels(x, y, width, height, format, type, (ByteBuffer) pixels);
-		else if (pixels instanceof ShortBuffer)
+		} else if (pixels instanceof ShortBuffer) {
 			GL11.glReadPixels(x, y, width, height, format, type, (ShortBuffer) pixels);
-		else if (pixels instanceof IntBuffer)
+		} else if (pixels instanceof IntBuffer) {
 			GL11.glReadPixels(x, y, width, height, format, type, (IntBuffer) pixels);
-		else if (pixels instanceof FloatBuffer)
+		} else if (pixels instanceof FloatBuffer) {
 			GL11.glReadPixels(x, y, width, height, format, type, (FloatBuffer) pixels);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pixels.getClass().getName()
 					+ " with this method. Use ByteBuffer, ShortBuffer, IntBuffer or FloatBuffer instead. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -490,29 +498,31 @@ public class LwjglGL10 extends GL10 {
 	@Override
 	public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format,
 			int type, Buffer pixels) {
-		if (pixels == null)
+		if (pixels == null) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, (ByteBuffer) null);
-		else if (pixels instanceof ByteBuffer)
+		} else if (pixels instanceof ByteBuffer) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, (ByteBuffer) pixels);
-		else if (pixels instanceof ShortBuffer)
+		} else if (pixels instanceof ShortBuffer) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, (ShortBuffer) pixels);
-		else if (pixels instanceof IntBuffer)
+		} else if (pixels instanceof IntBuffer) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, (IntBuffer) pixels);
-		else if (pixels instanceof FloatBuffer)
+		} else if (pixels instanceof FloatBuffer) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, (FloatBuffer) pixels);
-		else if (pixels instanceof DoubleBuffer)
+		} else if (pixels instanceof DoubleBuffer) {
 			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type,
 					(DoubleBuffer) pixels);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pixels.getClass().getName()
 					+ " with this method. Use ByteBuffer, ShortBuffer, IntBuffer, FloatBuffer or DoubleBuffer instead. Blame LWJGL");
+		}
 	}
 
 	@Override
 	public void glTexParameterf(int target, int pname, float param) {
 		// LwjglGraphics.major is should to be 1 if we are in LwjglGL10.
-		if (BuildGdx.graphics.getGLVersion().getMinorVersion() < 2 && param == GL12.GL_CLAMP_TO_EDGE)
+		if (BuildGdx.graphics.getGLVersion().getMinorVersion() < 2 && param == GL12.GL_CLAMP_TO_EDGE) {
 			param = GL11.GL_CLAMP;
+		}
 		GL11.glTexParameterf(target, pname, param);
 	}
 
@@ -534,19 +544,20 @@ public class LwjglGL10 extends GL10 {
 	@Override
 	public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, int format,
 			int type, Buffer pixels) {
-		if (pixels instanceof ByteBuffer)
+		if (pixels instanceof ByteBuffer) {
 			GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (ByteBuffer) pixels);
-		else if (pixels instanceof ShortBuffer)
+		} else if (pixels instanceof ShortBuffer) {
 			GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (ShortBuffer) pixels);
-		else if (pixels instanceof IntBuffer)
+		} else if (pixels instanceof IntBuffer) {
 			GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (IntBuffer) pixels);
-		else if (pixels instanceof FloatBuffer)
+		} else if (pixels instanceof FloatBuffer) {
 			GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (FloatBuffer) pixels);
-		else if (pixels instanceof DoubleBuffer)
+		} else if (pixels instanceof DoubleBuffer) {
 			GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (DoubleBuffer) pixels);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pixels.getClass().getName()
 					+ " with this method. Use ByteBuffer, ShortBuffer, IntBuffer, FloatBuffer or DoubleBuffer instead. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -575,15 +586,16 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glColorPointer(int size, int type, int stride, Buffer pointer) {
-		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT)
+		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT) {
 			GL11.glColorPointer(size, stride, (FloatBuffer) pointer);
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT) {
 			GL11.glColorPointer(size, stride, ((ByteBuffer) pointer).asFloatBuffer());
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_UNSIGNED_BYTE)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_UNSIGNED_BYTE) {
 			GL11.glColorPointer(size, true, stride, (ByteBuffer) pointer);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pointer.getClass().getName()
 					+ " with this method, use FloatBuffer or ByteBuffer. blame LWJGL");
+		}
 	}
 
 	@Override
@@ -678,15 +690,16 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glNormalPointer(int type, int stride, Buffer pointer) {
-		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT)
+		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT) {
 			GL11.glNormalPointer(stride, (FloatBuffer) pointer);
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT) {
 			GL11.glNormalPointer(stride, ((ByteBuffer) pointer).asFloatBuffer());
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_BYTE)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_BYTE) {
 			GL11.glNormalPointer(stride, (ByteBuffer) pointer);
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pointer.getClass().getName()
 					+ " with this method. GL10.GL_SHORT not supported. Use FloatBuffer instead. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -726,17 +739,18 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glTexCoordPointer(int size, int type, int stride, Buffer pointer) {
-		if (pointer instanceof ShortBuffer && type == GL11.GL_SHORT)
+		if (pointer instanceof ShortBuffer && type == GL11.GL_SHORT) {
 			GL11.glTexCoordPointer(size, stride, (ShortBuffer) pointer);
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_SHORT)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_SHORT) {
 			GL11.glTexCoordPointer(size, stride, ((ByteBuffer) pointer).asShortBuffer());
-		else if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT)
+		} else if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT) {
 			GL11.glTexCoordPointer(size, stride, (FloatBuffer) pointer);
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT) {
 			GL11.glTexCoordPointer(size, stride, ((ByteBuffer) pointer).asFloatBuffer());
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pointer.getClass().getName()
 					+ " with this method. Use ShortBuffer or FloatBuffer or ByteBuffer instead with GL_FLOAT or GL_SHORT. GL_BYTE is not supported. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -756,13 +770,14 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glVertexPointer(int size, int type, int stride, Buffer pointer) {
-		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT)
+		if (pointer instanceof FloatBuffer && type == GL11.GL_FLOAT) {
 			GL11.glVertexPointer(size, stride, ((FloatBuffer) pointer));
-		else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT)
+		} else if (pointer instanceof ByteBuffer && type == GL11.GL_FLOAT) {
 			GL11.glVertexPointer(size, stride, ((ByteBuffer) pointer).asFloatBuffer());
-		else
+		} else {
 			throw new GdxRuntimeException("Can't use " + pointer.getClass().getName()
 					+ " with this method. Use FloatBuffer or ByteBuffers with GL10.GL_FLOAT instead. Blame LWJGL");
+		}
 	}
 
 	@Override
@@ -782,8 +797,9 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glGenTextures(int n, int[] textures, int offset) {
-		for (int i = offset; i < offset + n; i++)
+		for (int i = offset; i < offset + n; i++) {
 			textures[i] = GL11.glGenTextures();
+		}
 	}
 
 	IntBuffer getBuffer = BufferUtils.createIntBuffer(100);
@@ -793,8 +809,9 @@ public class LwjglGL10 extends GL10 {
 		GL11.glGetInteger(pname, getBuffer);
 		// FIXME Yeah, so. This sucks as well :D LWJGL does not set pos/lim.
 		for (int i = offset, j = 0; i < params.length; i++, j++) {
-			if (j == getBuffer.capacity())
+			if (j == getBuffer.capacity()) {
 				return;
+			}
 			params[i] = getBuffer.get(j);
 		}
 	}
@@ -841,8 +858,9 @@ public class LwjglGL10 extends GL10 {
 
 	@Override
 	public void glGenBuffers(int n, int[] buffers, int offset) {
-		for (int i = offset; i < offset + n; i++)
+		for (int i = offset; i < offset + n; i++) {
 			buffers[i] = GL15.glGenBuffers();
+		}
 	}
 
 	@Override
@@ -940,8 +958,9 @@ public class LwjglGL10 extends GL10 {
 	@Override
 	public void glLoadMatrixf(float[][] m) {
 		matrixBuffer.clear();
-		for (int i = 0; i < m.length; i++)
+		for (int i = 0; i < m.length; i++) {
 			matrixBuffer.put(m[i]);
+		}
 		matrixBuffer.rewind();
 		GL11.glLoadMatrix(matrixBuffer);
 	}

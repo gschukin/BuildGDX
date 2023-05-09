@@ -46,8 +46,9 @@ public class JControllers extends BuildControllers {
 		for (int i = 0; i < inputs.length; i++) {
 			Controller.Type type = inputs[i].getType();
 			if (type == Controller.Type.STICK || type == Controller.Type.GAMEPAD || type == Controller.Type.WHEEL
-					|| type == Controller.Type.FINGERSTICK)
+					|| type == Controller.Type.FINGERSTICK) {
 				gamepads.add(new JController(inputs[i]));
+			}
 		}
 
 		if (gamepads.size() == 0) {
@@ -62,8 +63,9 @@ public class JControllers extends BuildControllers {
 	}
 
 	private void load() {
-		if (load)
+		if (load) {
 			return;
+		}
 
 		SharedLibraryLoader loader = new SharedLibraryLoader();
 		File nativesDir = null;
@@ -84,7 +86,9 @@ public class JControllers extends BuildControllers {
 		}
 		
 		if(nativesDir != null) //FreeBSD not supported
+		{
 			System.setProperty("net.java.games.input.librarypath", nativesDir.getAbsolutePath());
+		}
 		load = true;
 	}
 

@@ -66,10 +66,13 @@ public class ALMusicDrv implements Music {
 
 	@Override
 	public MusicSource newMusic(byte[] data) {
-		if(drv.noDevice || data == null) return null;
+		if(drv.noDevice || data == null) {
+			return null;
+		}
 		if(music != null) {
-			if(music.isPlaying())
+			if(music.isPlaying()) {
 				music.stop();
+			}
 			music = null;
 		}
 		
@@ -87,7 +90,9 @@ public class ALMusicDrv implements Music {
 
 	@Override
 	public MusicSource newMusic(String name) {
-		if(drv.noDevice || !inited) return null;
+		if(drv.noDevice || !inited) {
+			return null;
+		}
 		
 		Resource res = BuildGdx.cache.open(name, 0);
 		if(res == null) {
@@ -107,13 +112,16 @@ public class ALMusicDrv implements Music {
 	
 	@Override
 	public void dispose() {
-		if(inited)
-			al.alDeleteBuffers(musicBuffers); 
+		if(inited) {
+			al.alDeleteBuffers(musicBuffers);
+		}
 	}
 
 	@Override
 	public synchronized boolean init() {
-		if(!drv.isInited()) return false;
+		if(!drv.isInited()) {
+			return false;
+		}
 		inited = false;
 		musicBuffers = BufferUtils.newIntBuffer(musicBufferCount);
 		al.alGenBuffers(musicBuffers);
@@ -134,15 +142,17 @@ public class ALMusicDrv implements Music {
 
 	@Override
 	public void update() {
-		if(music != null)
+		if(music != null) {
 			music.update();
+		}
 	}
 
 	@Override
 	public void setVolume(float volume) {
 		musicVolume = volume;
-		if(music != null)
+		if(music != null) {
 			((ALMusicSource) music).setVolume(volume);
+		}
 	}
 }
 
@@ -186,13 +196,17 @@ abstract class OpenALMusic {
 	public void play() {
 		if (source == null) {
 			source = sourceManager.obtainSource(Integer.MAX_VALUE);
-			if (source == null) return;
+			if (source == null) {
+				return;
+			}
 			al.alSourcei(source.sourceId, AL_LOOPING, AL_FALSE);
 			setVolume(musicVolume);
 			source.flags |= Source.Locked;
 			for (int i = 0; i < musicBuffers.capacity(); i++) {
 				int bufferID = musicBuffers.get(i);
-				if (!fill(bufferID)) break;
+				if (!fill(bufferID)) {
+					break;
+				}
 				renderedSeconds = 0;
 				al.alSourceQueueBuffers(source.sourceId, bufferID);
 			}
@@ -206,25 +220,32 @@ abstract class OpenALMusic {
 	}
 
 	public void stop() {
-		if (source == null) return;
+		if (source == null) {
+			return;
+		}
 		reset();
 		source.flags &= ~Source.Locked;
-		if(drv.isInited())
+		if(drv.isInited()) {
 			sourceManager.stopSound(source);
-		else if(source.flags != Source.Locked) 
+		} else if(source.flags != Source.Locked) {
 			sourceManager.freeSource(source);
+		}
 		source = null;
 		renderedSeconds = 0;
 		isPlaying = false;
 	}
 
 	public void pause() {
-		if (source != null && drv.isInited()) al.alSourcePause(source.sourceId);
+		if (source != null && drv.isInited()) {
+			al.alSourcePause(source.sourceId);
+		}
 		isPlaying = false;
 	}
 
 	public boolean isPlaying() {
-		if (source == null) return false;
+		if (source == null) {
+			return false;
+		}
 		return isPlaying;
 	}
 
@@ -238,8 +259,9 @@ abstract class OpenALMusic {
 
 	public void setVolume(float volume) {
 		this.musicVolume = volume;
-		if (source != null && drv.isInited()) 
+		if (source != null && drv.isInited()) {
 			al.alSourcef(source.sourceId, AL_GAIN, volume);
+		}
 	}
 
 	public float getVolume() {
@@ -247,7 +269,9 @@ abstract class OpenALMusic {
 	}
 
 	public float getPosition() {
-		if (source == null || !drv.isInited()) return 0;
+		if (source == null || !drv.isInited()) {
+			return 0;
+		}
 		return renderedSeconds + al.alGetSourcef(source.sourceId, AL_SEC_OFFSET);
 	}
 	
@@ -260,24 +284,34 @@ abstract class OpenALMusic {
 	}
 
 	public void update() {
-		if (source == null || !drv.isInited()) return;
+		if (source == null || !drv.isInited()) {
+			return;
+		}
 		boolean end = false;
 		int buffers = al.alGetSourcei(source.sourceId, AL_BUFFERS_PROCESSED);
 		while (buffers-- > 0) {
 			int bufferID = al.alSourceUnqueueBuffers(source.sourceId);
-			if (bufferID == AL_INVALID_VALUE) break;
+			if (bufferID == AL_INVALID_VALUE) {
+				break;
+			}
 			renderedSeconds += secondsPerBuffer;
-			if (end) continue;
-			if (fill(bufferID)) 
+			if (end) {
+				continue;
+			}
+			if (fill(bufferID)) {
 				al.alSourceQueueBuffers(source.sourceId, bufferID);
-			else end = true;
+			} else {
+				end = true;
+			}
 		}
 		if (end && al.alGetSourcei(source.sourceId, AL_BUFFERS_QUEUED) == 0) {
 			stop();
 		}
 		
 		// A buffer underflow will cause the source to stop.
-		if (isPlaying && al.alGetSourcei(source.sourceId, AL_SOURCE_STATE) != AL_PLAYING) al.alSourcePlay(source.sourceId);
+		if (isPlaying && al.alGetSourcei(source.sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
+			al.alSourcePlay(source.sourceId);
+		}
 	}
 
 	private boolean fill (int bufferID) {
@@ -288,9 +322,12 @@ abstract class OpenALMusic {
 				reset();
 				renderedSeconds = 0;
 				length = read(tempBytes);
-				if (length <= 0) return false;
-			} else
+				if (length <= 0) {
+					return false;
+				}
+			} else {
 				return false;
+			}
 		}
 		tempBuffer.put(tempBytes, 0, length).flip();
 		al.alBufferData(bufferID, format, tempBuffer, sampleRate);
