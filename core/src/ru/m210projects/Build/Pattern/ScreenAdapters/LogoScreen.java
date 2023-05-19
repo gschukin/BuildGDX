@@ -64,7 +64,7 @@ public class LogoScreen extends SkippableAdapter {
 		}
 
 		engine.clearview(0);
-		engine.rotatesprite(160 << 16, 100 << 16, 65536, 0, nTile, 0, 0, 10 | 64, 0, 0, xdim - 1, ydim - 1);
+		engine.rotatesprite(160 << 16, 100 << 16, 65536, 0, nTile, 0, 0, 10 | 64);
 	}
 	
 	@Override

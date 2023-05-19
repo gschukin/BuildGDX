@@ -274,7 +274,7 @@ public class InitScreen extends ScreenAdapter {
 			if (!disposing && engine.getrender().isInited()) { // don't draw anything after disposed
 				engine.clearview(0);
 
-//				engine.rotatesprite(0, 0, 65536, 0, factory.getInitTile(), -128, 0, 10 | 16, 0, 0, xdim - 1, ydim - 1);
+//				engine.rotatesprite(0, 0, 65536, 0, factory.getInitTile(), -128, 0, 10 | 16);
 
 				factory.drawInitScreen();
 

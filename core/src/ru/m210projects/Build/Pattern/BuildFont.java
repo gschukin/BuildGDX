@@ -121,10 +121,10 @@ public class BuildFont {
 		if (charInfo[ch].nTile != nSpace && (pic = draw.getTile(charInfo[ch].nTile)) != null && pic.hasSize()) {
 			if (shadow) {
 				draw.rotatesprite((x + charInfo[ch].xOffset + 1) << 16, (y + charInfo[ch].yOffset + 1) << 16, nScale, 0,
-						charInfo[ch].nTile, 127, 0, nFlags | nBits, 0, 0, xdim - 1, ydim - 1);
+						charInfo[ch].nTile, 127, 0, nFlags | nBits);
 			}
 			draw.rotatesprite((x + charInfo[ch].xOffset) << 16, (y + charInfo[ch].yOffset) << 16, nScale, 0,
-					charInfo[ch].nTile, shade, pal, nFlags | nBits, 0, 0, xdim - 1, ydim - 1);
+					charInfo[ch].nTile, shade, pal, nFlags | nBits);
 		}
 		return charInfo[ch].nWidth;
 	}
@@ -199,10 +199,10 @@ public class BuildFont {
 		if (charInfo[ch].nTile != nSpace && (pic = draw.getTile(charInfo[ch].nTile)) != null && pic.hasSize()) {
 			if (shadow) {
 				draw.rotatesprite((x + charInfo[ch].xOffset + 1) << 16, (y + charInfo[ch].yOffset + 1) << 16, zoom, 0,
-						charInfo[ch].nTile, 127, 0, nFlags | nBits, 0, 0, xdim - 1, ydim - 1);
+						charInfo[ch].nTile, 127, 0, nFlags | nBits);
 			}
 			draw.rotatesprite((x + charInfo[ch].xOffset) << 16, (y + charInfo[ch].yOffset) << 16, zoom, 0,
-					charInfo[ch].nTile, shade, pal, nFlags | nBits, 0, 0, xdim - 1, ydim - 1);
+					charInfo[ch].nTile, shade, pal, nFlags | nBits);
 		}
 		return scale(charInfo[ch].nWidth, scale, 0x10000);
 	}

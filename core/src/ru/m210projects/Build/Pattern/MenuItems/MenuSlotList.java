@@ -195,7 +195,7 @@ public abstract class MenuSlotList extends MenuList
 				scale = (xdim + 1) / (float) pic.getWidth();
 			}
 
-			draw.rotatesprite(0, 0, (int) (scale * 65536), 0, tile, 127, 4, 8 | 16 | transparent, 0, 0, xdim - 1, ydim - 1);
+			draw.rotatesprite(0, 0, (int) (scale * 65536), 0, tile, 127, 4, 8 | 16 | transparent);
 
 			int shade = handler.getShade(m_pMenu.m_pItems[m_pMenu.m_nFocus]);
 

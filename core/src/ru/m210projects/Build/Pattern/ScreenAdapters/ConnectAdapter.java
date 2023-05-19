@@ -74,7 +74,7 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 	@Override
 	public void render(float delta) {
 		game.pEngine.clearview(0);
-		game.pEngine.rotatesprite(160 << 16, 100 << 16, 65536, 0, nTile, 0, 0, 2 | 8 | 64, 0, 0, xdim - 1, ydim - 1);
+		game.pEngine.rotatesprite(160 << 16, 100 << 16, 65536, 0, nTile, 0, 0, 2 | 8 | 64);
 
 		switch (gNetFlag) {
 		case Create:

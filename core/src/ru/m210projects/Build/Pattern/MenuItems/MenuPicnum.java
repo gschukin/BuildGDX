@@ -43,7 +43,7 @@ public class MenuPicnum extends MenuItem
 	
 	@Override
 	public void draw(MenuHandler handler) {
-		draw.rotatesprite(x << 16, y << 16, nScale, 0, nTile, 0, 0, 10 | 16, 0, 0, xdim - 1, ydim - 1);
+		draw.rotatesprite(x << 16, y << 16, nScale, 0, nTile, 0, 0, 10 | 16);
 		
 		handler.mPostDraw(this);
 	}

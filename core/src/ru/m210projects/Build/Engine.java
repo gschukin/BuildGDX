@@ -1128,17 +1128,12 @@ public abstract class Engine {
 
     ////////// BOARD MANIPULATION FUNCTIONS //////////
 
-    public Board loadboard(String filename) throws FileNotFoundException {
-        Resource fil = BuildGdx.cache.open(filename, 0);
-        if (fil == null) {
-            throw new FileNotFoundException("Map " + filename + " not found!");
-        }
-
+    public Board loadboard(Resource fil) {
         Board board;
         try {
             board = boardService.loadBoard(fil);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load the map: " + filename + ". Cause: " + e.getMessage());
+            throw new RuntimeException("Failed to load the map: " + fil.getFullName() + ". Cause: " + e);
         } finally {
             fil.close();
         }
@@ -1150,6 +1145,14 @@ public abstract class Engine {
         Arrays.fill(show2dwall, (byte) 0);
 
         return board;
+    }
+
+    public Board loadboard(String filename) throws FileNotFoundException {
+        Resource fil = BuildGdx.cache.open(filename, 0);
+        if (fil == null) {
+            throw new FileNotFoundException("Map " + filename + " not found!");
+        }
+        return loadboard(fil);
     }
 
     public BoardService getBoardService() {
