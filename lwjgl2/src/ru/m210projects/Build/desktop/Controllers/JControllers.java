@@ -31,7 +31,8 @@ import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import ru.m210projects.Build.Architecture.BuildController;
 import ru.m210projects.Build.Input.BuildControllers;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class JControllers extends BuildControllers {
 
@@ -81,8 +82,8 @@ public class JControllers extends BuildControllers {
 				loader.extractFileTo(is64Bit ? "libjinput-linux64.so" : "libjinput-linux.so", nativesDir);
 			}
 		} catch (Throwable ex) {
-			Console.Println("Unable to extract JInput natives.", Console.OSDTEXT_RED);
-			Console.Println(ex.getMessage(), Console.OSDTEXT_RED);
+			Console.out.println("Unable to extract JInput natives.", OsdColor.RED);
+			Console.out.println(ex.getMessage(), OsdColor.RED);
 		}
 		
 		if(nativesDir != null) //FreeBSD not supported

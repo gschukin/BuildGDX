@@ -17,7 +17,6 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
 import static ru.m210projects.Build.Engine.getInput;
-import static ru.m210projects.Build.Engine.totalclock;
 import static ru.m210projects.Build.Input.KeyInput.*;
 import static ru.m210projects.Build.Input.Keymap.*;
 import static ru.m210projects.Build.Strhandler.isalpha;
@@ -147,9 +146,9 @@ public class MenuTextField extends MenuItem {
 			}
 
 			font.drawText(px - font.getWidth(typingBuf), y, typingBuf, shade, pal, TextAlign.Left, 2, fontShadow);
-		    if(typing && (totalclock & 0x20) != 0) {
+//		    if(typing && (totalclock & 0x20) != 0) {
 				font.drawChar(px, y, '_', shade, pal, 2, false);
-			}
+//			}
 		}
 		handler.mPostDraw(this);
 	}

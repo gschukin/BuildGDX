@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.FileHandle;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 import static ru.m210projects.Build.Strhandler.*;
 
 import java.io.File;
@@ -24,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.m210projects.Build.FileHandle.FileResource.Mode;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class Compat {
 
@@ -141,7 +141,7 @@ public class Compat {
 			}
 		}
 
-		Console.Println("TOO MANY FILES OPEN!", OSDTEXT_RED);
+		Console.out.println("TOO MANY FILES OPEN!", OsdColor.RED);
 		return null;
 	}
 

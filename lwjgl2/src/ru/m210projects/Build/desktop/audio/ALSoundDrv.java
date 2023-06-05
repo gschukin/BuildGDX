@@ -18,8 +18,7 @@
 package ru.m210projects.Build.desktop.audio;
 
 import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
+import ru.m210projects.Build.osd.OsdColor;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFER;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_FALSE;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_FORMAT_MONO16;
@@ -53,8 +52,7 @@ import ru.m210projects.Build.Audio.SoundData;
 import ru.m210projects.Build.Audio.Source;
 import ru.m210projects.Build.Audio.SourceCallback;
 import ru.m210projects.Build.Loader.WAVLoader;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-
+import ru.m210projects.Build.osd.Console;
 import com.badlogic.gdx.backends.lwjgl.audio.OggInputStream;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.StreamUtils;
@@ -125,7 +123,7 @@ public class ALSoundDrv implements Sound {
 				this.al = driverCallback.InitDriver();
 			} catch (Throwable e) {
 				e.printStackTrace();
-				Console.Println("Unable to initialize OpenAL! - " + e.getLocalizedMessage(), OSDTEXT_RED);
+				Console.out.println("Unable to initialize OpenAL! - " + e.getLocalizedMessage(), OsdColor.RED);
 			}
 			driverCallback = null;
 		}
@@ -153,34 +151,34 @@ public class ALSoundDrv implements Sound {
 		resetListener();
 		this.system = system;
 
-		Console.Println(al.getName() + " initialized", OSDTEXT_GOLD);
-		Console.Println("\twith max voices: " + sourceManager.getSourcesNum(), OSDTEXT_GOLD);
-		Console.Println("\tOpenAL version: " + al.getVersion(), OSDTEXT_GOLD); 	
+		Console.out.println(al.getName() + " initialized", OsdColor.YELLOW);
+		Console.out.println("\twith max voices: " + sourceManager.getSourcesNum(), OsdColor.YELLOW);
+		Console.out.println("\tOpenAL version: " + al.getVersion(), OsdColor.YELLOW); 	
 		noDevice = false;
 		
 		if(al.alIsEFXSupport()) {
-			Console.Println("ALC_EXT_EFX enabled.");
+			Console.out.println("ALC_EXT_EFX enabled.");
 		} else {
-			Console.Println("ALC_EXT_EFX not supported!");
+			Console.out.println("ALC_EXT_EFX not supported!");
 		}
 		
 		if(al.alIsSoftResamplerSupport()) {
-			Console.Println("AL_SOFT_Source_Resampler enabled. Using resampler: " + al.alGetSoftResamplerName(softResampler));	
+			Console.out.println("AL_SOFT_Source_Resampler enabled. Using resampler: " + al.alGetSoftResamplerName(softResampler));	
 			setSoftResampler(softResampler);
 		}
 		else {
-			Console.Println("AL_SOFT_Source_Resampler not supported!");
+			Console.out.println("AL_SOFT_Source_Resampler not supported!");
 		}
 
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) {
-			Console.Println("OpenAL init error " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL init error " + error, OsdColor.RED);
 		}
 		
 		getDigitalMusic().init();
 		
 		if(error != AL_NO_ERROR) {
-			Console.Println("OpenAL digital music init error " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL digital music init error " + error, OsdColor.RED);
 		}
 		
 		loopedSource.clear();
@@ -229,7 +227,7 @@ public class ALSoundDrv implements Sound {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) {
-			Console.Println("OpenAL Error setListener " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL Error setListener " + error, OsdColor.RED);
 		}
 	}
 
@@ -280,7 +278,7 @@ public class ALSoundDrv implements Sound {
 
 		int format = toALFormat(channels, bits);
 		if(format == -1) {
-			Console.Println("OpenAL Error wrong bits: " + bits, OSDTEXT_RED);
+			Console.out.println("OpenAL Error wrong bits: " + bits, OsdColor.RED);
 			source.dispose();
 			return null;
 		}
@@ -295,7 +293,7 @@ public class ALSoundDrv implements Sound {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) {
-			Console.Println("OpenAL Error newSound " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL Error newSound " + error, OsdColor.RED);
 		}
 		
 		return source;
@@ -584,7 +582,7 @@ public class ALSoundDrv implements Sound {
 
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) {
-			Console.Println("OpenAL Error " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL Error " + error, OsdColor.RED);
 		}
 
 		if(loopedSource.size() > 0) {

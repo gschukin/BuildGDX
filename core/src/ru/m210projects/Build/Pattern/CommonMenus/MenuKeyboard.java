@@ -24,8 +24,7 @@ import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLUP;
 
 import com.badlogic.gdx.Input.Keys;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
@@ -181,9 +180,9 @@ public abstract class MenuKeyboard extends BuildMenu {
 
 				if (item.l_nFocus == GameKeys.Show_Console.getNum()) {
 					app.pInput.ctrlResetKeyStatus();
-					Console.setCaptureKey(cfg.primarykeys[item.l_nFocus], 0);
-					Console.setCaptureKey(cfg.secondkeys[item.l_nFocus], 1);
-					Console.setCaptureKey(cfg.mousekeys[item.l_nFocus], 2);
+//	FIXME				Console.setCaptureKey(cfg.primarykeys[item.l_nFocus], 0);
+//					Console.setCaptureKey(cfg.secondkeys[item.l_nFocus], 1);
+//					Console.setCaptureKey(cfg.mousekeys[item.l_nFocus], 2);
 				}
 			}
 		};

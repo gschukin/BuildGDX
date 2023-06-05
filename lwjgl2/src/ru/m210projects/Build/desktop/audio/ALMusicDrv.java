@@ -18,7 +18,7 @@
 
 package ru.m210projects.Build.desktop.audio;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
+import ru.m210projects.Build.osd.OsdColor;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFERS_PROCESSED;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFERS_QUEUED;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_FALSE;
@@ -45,8 +45,7 @@ import ru.m210projects.Build.Audio.Music;
 import ru.m210projects.Build.Audio.MusicSource;
 import ru.m210projects.Build.Audio.Source;
 import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.desktop.audio.ALSoundDrv.SourceManager;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.desktop.audio.ALSoundDrv.SourceManager;
 
 public class ALMusicDrv implements Music {
 
@@ -80,7 +79,7 @@ public class ALMusicDrv implements Music {
 			music = new ALMusicSource(new Ogg.Music(drv, musicBuffers, data));
 		} catch (Throwable e) {
 			e.printStackTrace();
-			Console.Println("Can't load ogg file", OSDTEXT_RED);
+			Console.out.println("Can't load ogg file", OsdColor.RED);
 			return null;
 		}
 		
@@ -96,7 +95,7 @@ public class ALMusicDrv implements Music {
 		
 		Resource res = BuildGdx.cache.open(name, 0);
 		if(res == null) {
-			Console.Println("OpenAL Music: Unable to load " + name, OSDTEXT_RED);
+			Console.out.println("OpenAL Music: Unable to load " + name, OsdColor.RED);
 			return null;
 		}
 		
@@ -127,7 +126,7 @@ public class ALMusicDrv implements Music {
 		al.alGenBuffers(musicBuffers);
 		
 		if (al.alGetError() != AL_NO_ERROR) {
-			Console.Println("OpenAL Music: Unabe to allocate audio buffers.", OSDTEXT_RED);
+			Console.out.println("OpenAL Music: Unabe to allocate audio buffers.", OsdColor.RED);
 			return false;
 		}
 		

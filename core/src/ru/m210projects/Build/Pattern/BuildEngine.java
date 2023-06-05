@@ -6,8 +6,7 @@ import com.badlogic.gdx.Screen;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildGame.NetMode;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildGame.NetMode;
 import ru.m210projects.Build.Pattern.ScreenAdapters.GameAdapter;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
 import ru.m210projects.Build.Pattern.ScreenAdapters.LoadingAdapter;
@@ -15,7 +14,7 @@ import ru.m210projects.Build.Pattern.ScreenAdapters.LoadingAdapter;
 public class BuildEngine extends Engine {
 
 	protected int ticks;
-	protected long timerskipticks;
+	protected int timerskipticks;
 	protected float frametime;
 
 	private final BuildGame game;
@@ -23,14 +22,14 @@ public class BuildEngine extends Engine {
 	public BuildEngine(BuildGame game, int ticks) throws Exception {
 		super();
 		this.game = game;
-		this.ticks = ticks;
+		this.ticks = ticks; // == 4
 	}
 
 	@Override
-	public void inittimer(int tickspersecond) {
+	public void inittimer(int tickspersecond) { // == 120
 		super.inittimer(tickspersecond);
 
-		timerskipticks = (timerfreq / timerticspersec) * ticks;
+		timerskipticks = (timer.getFreq() / timer.getTicsPerSecond()) * ticks;
 		updatesmoothticks();
 	}
 
@@ -58,7 +57,7 @@ public class BuildEngine extends Engine {
 //
 //		net.ototalclock = totalclock;
 
-		if (totalclock < net.ototalclock || !net.ready2send) {
+		if (timer.getTotalClock() < net.ototalclock || !net.ready2send) {
 			return;
 		}
 
@@ -75,26 +74,26 @@ public class BuildEngine extends Engine {
 
 	@Override
 	public void dragpoint(int pointhighlight, int dax, int day) {
-		game.pInt.setwallinterpolate(pointhighlight, Engine.getWall(pointhighlight));
-		Engine.getWall(pointhighlight).setX(dax);
-		Engine.getWall(pointhighlight).setY(day);
+		game.pInt.setwallinterpolate(pointhighlight, boardService.getWall(pointhighlight));
+		boardService.getWall(pointhighlight).setX(dax);
+		boardService.getWall(pointhighlight).setY(day);
 
 		int cnt = MAXWALLS;
 		int tempshort = pointhighlight; // search points CCW
 		do {
-			if (Engine.getWall(tempshort).getNextwall() >= 0) {
-				tempshort = Engine.getWall(Engine.getWall(tempshort).getNextwall()).getPoint2();
-				game.pInt.setwallinterpolate(tempshort, Engine.getWall(tempshort));
-				Engine.getWall(tempshort).setX(dax);
-				Engine.getWall(tempshort).setY(day);
+			if (boardService.getWall(tempshort).getNextwall() >= 0) {
+				tempshort = boardService.getWall(boardService.getWall(tempshort).getNextwall()).getPoint2();
+				game.pInt.setwallinterpolate(tempshort, boardService.getWall(tempshort));
+				boardService.getWall(tempshort).setX(dax);
+				boardService.getWall(tempshort).setY(day);
 			} else {
 				tempshort = pointhighlight; // search points CW if not searched all the way around
 				do {
-					if (Engine.getWall(lastwall(tempshort)).getNextwall() >= 0) {
-						tempshort = Engine.getWall(lastwall(tempshort)).getNextwall();
-						game.pInt.setwallinterpolate(tempshort, Engine.getWall(tempshort));
-						Engine.getWall(tempshort).setX(dax);
-						Engine.getWall(tempshort).setY(day);
+					if (boardService.getWall(lastwall(tempshort)).getNextwall() >= 0) {
+						tempshort = boardService.getWall(lastwall(tempshort)).getNextwall();
+						game.pInt.setwallinterpolate(tempshort, boardService.getWall(tempshort));
+						boardService.getWall(tempshort).setX(dax);
+						boardService.getWall(tempshort).setY(day);
 					} else {
 						break;
 					}
@@ -124,7 +123,7 @@ public class BuildEngine extends Engine {
 			}
 		}
 
-		if (!game.pMenu.gShowMenu && !Console.IsShown()) {
+		if (!game.pMenu.gShowMenu && !Console.out.isShowing()) {
 			game.pInput.ctrlMouseHandler();
 			game.pInput.ctrlJoyHandler();
 		}

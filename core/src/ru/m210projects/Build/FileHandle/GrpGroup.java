@@ -16,8 +16,7 @@
 
 package ru.m210projects.Build.FileHandle;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-
+import ru.m210projects.Build.osd.Console;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -273,7 +272,7 @@ public class GrpGroup extends Group {
 			synchronized(parent) {
 				if(buffer == null) {
 					if(file.seek(offset, Whence.Set) == -1) {
-						Console.Println("Error seeking to resource!");
+						Console.out.println("Error seeking to resource!");
 						return;
 					}
 					
@@ -292,13 +291,13 @@ public class GrpGroup extends Group {
 				int size = this.size();
 				if(size > 0) {
 					if(file.seek(offset, Whence.Set) == -1) {
-						Console.Println("Error seeking to resource!");
+						Console.out.println("Error seeking to resource!");
 						return null;
 					}
 					
 					byte[] data = new byte[size];
 					if(file.read(data) == -1) {
-						Console.Println("Error loading resource!");
+						Console.out.println("Error loading resource!");
 						return null;
 					}
 					return data;

@@ -23,6 +23,7 @@ import ru.m210projects.Build.Render.Renderer.RenderType;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
+import ru.m210projects.Build.osd.OsdFunc;
 
 public abstract class BuildFactory {
 
@@ -46,6 +47,8 @@ public abstract class BuildFactory {
 	public abstract BuildControls input(BuildControllers gpmanager);
 
 	public abstract OSDFunc console();
+
+	public abstract OsdFunc getOsdFunc();
 
 	public abstract MenuHandler menus();
 

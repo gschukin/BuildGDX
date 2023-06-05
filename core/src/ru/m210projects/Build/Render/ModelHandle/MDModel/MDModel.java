@@ -12,7 +12,6 @@ import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
 import static ru.m210projects.Build.Engine.MAXSPRITES;
 import static ru.m210projects.Build.Engine.MAXUNIQHUDID;
 import static ru.m210projects.Build.Engine.RESERVEDPALS;
-import static ru.m210projects.Build.Engine.timerticspersec;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation.MDANIM_ONESHOT;
 import static ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation.mdpause;
@@ -24,8 +23,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector3;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.ModelHandle.MDInfo;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.ModelHandle.MDInfo;
 import ru.m210projects.Build.Render.ModelHandle.GLModel;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Script.ModelsInfo;
@@ -33,6 +31,7 @@ import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Script.ModelsInfo.Spritesmooth;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.Sprite;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class MDModel implements GLModel {
 
@@ -77,7 +76,7 @@ public abstract class MDModel implements GLModel {
 			if (sk.palette == pal && sk.skinnum == skinnum && sk.surfnum == surfnum) {
 				skinfile = sk.fn;
 				texptr = sk.texid;
-//				Console.Println("Using exact match skin (pal=" + pal + ",skinnum=" + skinnum + ",surfnum=" + surfnum
+//				Console.out.println("Using exact match skin (pal=" + pal + ",skinnum=" + skinnum + ",surfnum=" + surfnum
 //						+ ") " + skinfile);
 				break;
 			}
@@ -113,9 +112,9 @@ public abstract class MDModel implements GLModel {
 				sk = skzero;
 				skinfile = skzero.fn;
 				texptr = skzero.texid;
-//				Console.Println("Using def skin 0,0 as fallback, pal = " + pal, Console.OSDTEXT_YELLOW);
+//				Console.out.println("Using def skin 0,0 as fallback, pal = " + pal, OsdColor.YELLOW);
 			} else {
-				Console.Println("Couldn't load skin", Console.OSDTEXT_YELLOW);
+				Console.out.println("Couldn't load skin", OsdColor.YELLOW);
 				return null;
 			}
 		}
@@ -156,7 +155,7 @@ public abstract class MDModel implements GLModel {
 		return (flags & 1) == 0;
 	}
 
-	public void updateanimation(ModelsInfo mdInfo, Sprite tspr) {
+	public void updateanimation(ModelsInfo mdInfo, Sprite tspr, int timerticspersec) {
 		if (numframes < 2) {
 			interpol = 0;
 			return;

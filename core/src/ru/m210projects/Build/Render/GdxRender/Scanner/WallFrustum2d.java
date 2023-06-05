@@ -40,7 +40,7 @@ public class WallFrustum2d implements Poolable {
 
 		float x1 = wal.getX() - globalposx;
 		float y1 = wal.getY() - globalposy;
-		Wall wal2 = Engine.getWall(wal.getPoint2());
+		Wall wal2 = wal.getWall2();
 		float x2 = wal2.getX() - globalposx;
 		float y2 = wal2.getY() - globalposy;
 
@@ -97,7 +97,7 @@ public class WallFrustum2d implements Poolable {
 
 		int x1 = wal.getX() - globalposx;
 		int y1 = wal.getY() - globalposy;
-		Wall wal2 = Engine.getWall(wal.getPoint2());
+		Wall wal2 = wal.getWall2();
 		int x2 = wal2.getX() - globalposx;
 		int y2 = wal2.getY() - globalposy;
 
@@ -148,8 +148,8 @@ public class WallFrustum2d implements Poolable {
 			return true;
 		}
 
-		int x2 = Engine.getWall(wal.getPoint2()).getX() - globalposx;
-		int y2 = Engine.getWall(wal.getPoint2()).getY() - globalposy;
+		int x2 = wal.getWall2().getX() - globalposx;
+		int y2 = wal.getWall2().getY() - globalposy;
         return tmp.dot(x2, y2) >= 0;
     }
 

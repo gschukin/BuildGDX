@@ -251,11 +251,11 @@ public class KeyInput {
 			}
     	}
     	if(cursor) {
-	    	if ( (totalclock & 0x20) != 0 ) {
+//	    	if ( (engine.getTotalClock() & 0x20) != 0 ) {
 	    		lockeybuf[locmessagelen]= '_';
-	    	} else {
-				lockeybuf[locmessagelen] = 0;
-			}
+//	    	} else {
+//				lockeybuf[locmessagelen] = 0;
+//			}
     	}
     	return 0;
 	}
@@ -272,11 +272,11 @@ public class KeyInput {
 			}
     	}
     	if(cursor) {
-	    	if ( (totalclock & 0x20) != 0 ) {
+//	    	if ( (totalclock & 0x20) != 0 ) {
 	    		lockeybuf[locmessagelen]= '_';
-	    	} else {
-				lockeybuf[locmessagelen] = 0;
-			}
+//	    	} else {
+//				lockeybuf[locmessagelen] = 0;
+//			}
     	}
     	return 0;
 	}

@@ -3,16 +3,16 @@ package ru.m210projects.Build.Pattern;
 import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Gameutils.*;
 import static ru.m210projects.Build.Net.Mmulti.*;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 import static ru.m210projects.Build.Pragmas.klabs;
 import static ru.m210projects.Build.Pragmas.ksgn;
 
 import java.util.Arrays;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildGame.NetMode;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildGame.NetMode;
+import ru.m210projects.Build.Timer;
 import ru.m210projects.Build.Types.LittleEndian;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class BuildNet {
 	
@@ -377,7 +377,8 @@ public abstract class BuildNet {
 					i = 0;
 				}
 
-				totalclock -= game.pEngine.ticks * i;
+				Timer timer = game.pEngine.getTimer();
+				timer.setTotalClock(timer.getTotalClock() - game.pEngine.ticks * i);
 	            otherMinLag += i;
 
 				for ( int nPlayer = connecthead; nPlayer >= 0; nPlayer = connectpoint2[nPlayer] ) {
@@ -454,7 +455,7 @@ public abstract class BuildNet {
 	
 	public void NetDisconnect(int nPlayer)
 	{
-		Console.Println("Disconnected!", OSDTEXT_YELLOW);
+		Console.out.println("Disconnected!", OsdColor.YELLOW);
 		if ( numplayers > 1 )
 		{
 		    packbuf[0] = kPacketDisconnect;
@@ -486,8 +487,8 @@ public abstract class BuildNet {
 	public void ResetTimers()
 	{
 		game.pEngine.sampletimer(); //update timer before reset
-		
-		totalclock = 0;
+
+		game.pEngine.getTimer().reset();
 		ototalclock = 0;
 		gNetFifoMasterTail = 0;
 		gPredictTail = 0;
@@ -539,7 +540,7 @@ public abstract class BuildNet {
 			
 			if (/*ctrlKeyStatusOnce(Keys.ESCAPE) || */(timeout != 0 && time > timeout)) 
 			{
-				Console.Println("Connection timed out!", OSDTEXT_YELLOW);
+				Console.out.println("Connection timed out!", OsdColor.YELLOW);
 				return false;
 			}
 			

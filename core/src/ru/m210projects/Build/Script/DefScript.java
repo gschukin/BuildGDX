@@ -20,8 +20,6 @@ import static ru.m210projects.Build.Engine.RESERVEDPALS;
 import static ru.m210projects.Build.Engine.SPECULARPAL;
 import static ru.m210projects.Build.Engine.palette;
 import static ru.m210projects.Build.Gameutils.BClipRange;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 import java.io.File;
@@ -42,8 +40,7 @@ import ru.m210projects.Build.FileHandle.FileEntry;
 import ru.m210projects.Build.FileHandle.FileUtils;
 import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.FileHandle.Resource.Whence;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Render.ModelHandle.MDInfo;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
@@ -52,6 +49,7 @@ import ru.m210projects.Build.Render.ModelHandle.MDModel.MD2.MD2Info;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MD3.MD3Info;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class DefScript {
 
@@ -164,7 +162,7 @@ public class DefScript {
 
 	public boolean loadScript(FileEntry file) {
 		if (file == null) {
-			Console.Println("Def error: script not found", OSDTEXT_RED);
+			Console.out.println("Def error: script not found", OsdColor.RED);
 			return false;
 		}
 
@@ -173,7 +171,7 @@ public class DefScript {
 		res.close();
 
 		if (data == null) {
-			Console.Println("File is exists, but data == null! Path:" + file.getPath());
+			Console.out.println("File is exists, but data == null! Path:" + file.getPath());
 			return false;
 		}
 
@@ -184,7 +182,7 @@ public class DefScript {
 			defsparser(script);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Console.Println("Def error: the script " + file.getPath() + " has errors", OSDTEXT_RED);
+			Console.out.println("Def error: the script " + file.getPath() + " has errors", OsdColor.RED);
 			return false;
 		}
 
@@ -193,7 +191,7 @@ public class DefScript {
 
 	public boolean loadScript(String name, byte[] buf) {
 		if (buf == null) {
-			Console.Println("Def error: script not found", OSDTEXT_RED);
+			Console.out.println("Def error: script not found", OsdColor.RED);
 			return false;
 		}
 
@@ -201,7 +199,7 @@ public class DefScript {
 			defsparser(new Scriptfile(name, buf));
 		} catch (Exception e) {
 			e.printStackTrace();
-			Console.Println("Def error: the script " + name + " has errors", OSDTEXT_RED);
+			Console.out.println("Def error: the script " + name + " has errors", OsdColor.RED);
 			return false;
 		}
 
@@ -234,7 +232,7 @@ public class DefScript {
 	}
 
 	protected void defsparser(Scriptfile script) {
-		Console.Println("Loading " + script.filename + "...");
+		Console.out.println("Loading " + script.filename + "...");
 		while (true) {
 			Token basetoken = (Token) gettoken(script, basetokens);
 			if (basetoken != null) {
@@ -283,8 +281,8 @@ public class DefScript {
 
 	protected boolean check_tile(String defcmd, int tile, Scriptfile script, int cmdtokptr) {
 		if (tile >= MAXTILES) {
-			Console.Println("Error: " + defcmd + ": Invalid tile number on line " + script.filename + ":"
-					+ script.getlinum(cmdtokptr), OSDTEXT_RED);
+			Console.out.println("Error: " + defcmd + ": Invalid tile number on line " + script.filename + ":"
+					+ script.getlinum(cmdtokptr), OsdColor.RED);
 			return true;
 		}
 
@@ -293,16 +291,16 @@ public class DefScript {
 
 	protected boolean check_tile_range(String defcmd, int tilebeg, int tileend, Scriptfile script, int cmdtokptr) {
 		if (tileend < tilebeg) {
-			Console.Println("Warning: " + defcmd + ": backwards tile range on line " + script.filename + ":"
-					+ script.getlinum(cmdtokptr), OSDTEXT_YELLOW);
+			Console.out.println("Warning: " + defcmd + ": backwards tile range on line " + script.filename + ":"
+					+ script.getlinum(cmdtokptr), OsdColor.YELLOW);
 			int tmp = tilebeg;
 			tilebeg = tileend;
 			tileend = tmp;
 		}
 
 		if (tilebeg >= MAXTILES || tileend >= MAXTILES) {
-			Console.Println("Error: " + defcmd + ": Invalid tile range on line " + script.filename + ":"
-					+ script.getlinum(cmdtokptr), OSDTEXT_RED);
+			Console.out.println("Error: " + defcmd + ": Invalid tile range on line " + script.filename + ":"
+					+ script.getlinum(cmdtokptr), OsdColor.RED);
 			return true;
 		}
 
@@ -349,7 +347,7 @@ public class DefScript {
 				String fn = defs.get(2 * i + 1);
 				Resource res = BuildGdx.cache.open(fn, 0);
 				if (res == null) {
-					Console.Println("Warning: Failed including " + fn + " as module", OSDTEXT_RED);
+					Console.out.println("Warning: Failed including " + fn + " as module", OsdColor.RED);
 					continue;
 				}
 
@@ -539,10 +537,10 @@ public class DefScript {
 			byte[] data = BuildGdx.cache.getBytes(fn, 0);
 			if (data == null) {
 				if (cmdtokptr == 0) {
-					Console.Println("Warning: Failed including " + fn + " as module", OSDTEXT_YELLOW);
+					Console.out.println("Warning: Failed including " + fn + " as module", OsdColor.YELLOW);
 				} else {
-					Console.Println("Warning: Failed including " + fn + " on line " + script.filename + ":"
-							+ script.getlinum(cmdtokptr), OSDTEXT_YELLOW);
+					Console.out.println("Warning: Failed including " + fn + " on line " + script.filename + ":"
+							+ script.getlinum(cmdtokptr), OsdColor.YELLOW);
 				}
 				return;
 			}
@@ -582,9 +580,9 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			String message = script.getstring();
 			if(message != null) {
-				Console.Println(message, Console.OSDTEXT_GOLD);
+				Console.out.println(message, OsdColor.BROWN);
 			} else {
-				Console.Println("");
+				Console.out.println("");
 			}
 			return BaseToken.Ok;
 		}
@@ -609,7 +607,7 @@ public class DefScript {
 
 			int length = (tile1 - tile0);
 			if (length <= 0) {
-				Console.Println("Warning: Animation lenght < 0, skipping", Console.OSDTEXT_RED);
+				Console.out.println("Warning: Animation lenght < 0, skipping", OsdColor.RED);
 				return BaseToken.Warning;
 			}
 
@@ -665,13 +663,13 @@ public class DefScript {
 				Object tk = def.gettoken(script, tilefromtexturetokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(
+					Console.out.println(
 							script.filename + " has unknown token \""
 									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 									+ "\" on line: "
 									+ toLowerCase(
 											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							OsdColor.RED);
 					continue;
 				}
 				switch ((TileTextureTokens) tk) {
@@ -695,8 +693,8 @@ public class DefScript {
 						try {
 							xoffset = Byte.parseByte(xoffs);
 						} catch (Exception e) {
-							Console.Println("Xoffset value out of range. Value: \"" + xoffs + "\" was disabled.",
-									OSDTEXT_RED);
+							Console.out.println("Xoffset value out of range. Value: \"" + xoffs + "\" was disabled.",
+									OsdColor.RED);
 							break;
 						}
 					}
@@ -709,8 +707,8 @@ public class DefScript {
 						try {
 							yoffset = Byte.parseByte(yoffs);
 						} catch (Exception e) {
-							Console.Println("Yoffset value out of range. Value: \"" + yoffs + "\" was disabled.",
-									OSDTEXT_RED);
+							Console.out.println("Yoffset value out of range. Value: \"" + yoffs + "\" was disabled.",
+									OsdColor.RED);
 							break;
 						}
 					}
@@ -736,8 +734,8 @@ public class DefScript {
 			DefScript def = DefScript.this;
 
 			if (tile < 0 || tile >= MAXTILES) {
-				Console.Println("Error: missing or invalid 'tile number' for texture definition near line "
-						+ script.filename + ":" + script.getlinum(ttexturetokptr), OSDTEXT_RED);
+				Console.out.println("Error: missing or invalid 'tile number' for texture definition near line "
+						+ script.filename + ":" + script.getlinum(ttexturetokptr), OsdColor.RED);
 				return null;
 			}
 
@@ -756,8 +754,8 @@ public class DefScript {
 				}
 
 				if (xoffset == null && yoffset == null) {
-					Console.Println("Error: missing 'file name' for tilefromtexture definition near line "
-							+ script.filename + ":" + script.getlinum(ttexturetokptr), OSDTEXT_RED);
+					Console.out.println("Error: missing 'file name' for tilefromtexture definition near line "
+							+ script.filename + ":" + script.getlinum(ttexturetokptr), OsdColor.RED);
 				}
 
 				if (def.addDefTile(deftile, tile)) {
@@ -782,8 +780,8 @@ public class DefScript {
 			}
 
 			if (!def.addDefTile(texstatus, tile)) {
-				Console.Println("Error: \"" + fn + "\" has more than one tile, in tilefromtexture definition near line "
-						+ script.filename + ":" + script.getlinum(ttexturetokptr), OSDTEXT_RED);
+				Console.out.println("Error: \"" + fn + "\" has more than one tile, in tilefromtexture definition near line "
+						+ script.filename + ":" + script.getlinum(ttexturetokptr), OsdColor.RED);
 				return null;
 			}
 
@@ -796,7 +794,7 @@ public class DefScript {
 
 			byte[] data = BuildGdx.cache.getBytes(fn, 0);
 			if (data == null) {
-				Console.Println("ImportTileFromTexture error: file " + fn + " not found!", Console.OSDTEXT_RED);
+				Console.out.println("ImportTileFromTexture error: file " + fn + " not found!", OsdColor.RED);
 				return null;
 			}
 
@@ -804,7 +802,7 @@ public class DefScript {
 			try {
 				pix = new Pixmap(data, 0, data.length);
 			} catch (Throwable e) { // if native code didn't load
-				Console.Println("ImportTileFromTexture error: " + e.getMessage(), Console.OSDTEXT_RED);
+				Console.out.println("ImportTileFromTexture error: " + e.getMessage(), OsdColor.RED);
 				return null;
 			}
 
@@ -956,7 +954,7 @@ public class DefScript {
 
 			res = BuildGdx.cache.open(modelfn, 0);
 			if (res == null) {
-				Console.Println("Warning: File not found" + modelfn, OSDTEXT_YELLOW);
+				Console.out.println("Warning: File not found" + modelfn, OsdColor.YELLOW);
 				script.textptr = modelend + 1;
 				return BaseToken.Warning;
 			}
@@ -984,7 +982,7 @@ public class DefScript {
 			res.close();
 
 			if (m == null) {
-				Console.Println("Warning: Failed loading model " + modelfn, OSDTEXT_YELLOW);
+				Console.out.println("Warning: Failed loading model " + modelfn, OsdColor.YELLOW);
 				script.textptr = modelend + 1;
 				return BaseToken.Warning;
 			}
@@ -993,13 +991,13 @@ public class DefScript {
 				tk = gettoken(script, modeltokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(
+					Console.out.println(
 							script.filename + " has unknown token \""
 									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 									+ "\" on line: "
 									+ toLowerCase(
 											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							OsdColor.RED);
 					continue;
 				}
 
@@ -1047,12 +1045,12 @@ public class DefScript {
 						tk = gettoken(script, modelframetokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(
+							Console.out.println(
 									script.filename + " has unknown token \""
 											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 											+ "\" on line: " + toLowerCase(script.textbuf
 													.substring(getPtr(script, line), getPtr(script, line + 1))),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							continue;
 						}
 
@@ -1104,13 +1102,13 @@ public class DefScript {
 							happy = 0;
 							break; // invalid model id!?
 						case -2:
-							Console.Println("Invalid tile number on line " + script.filename + ":"
-									+ script.getlinum(frametokptr), OSDTEXT_RED);
+							Console.out.println("Invalid tile number on line " + script.filename + ":"
+									+ script.getlinum(frametokptr), OsdColor.RED);
 							happy = 0;
 							break;
 						case -3:
-							Console.Println("Invalid frame name on line " + script.filename + ":"
-									+ script.getlinum(frametokptr), OSDTEXT_RED);
+							Console.out.println("Invalid frame name on line " + script.filename + ":"
+									+ script.getlinum(frametokptr), OsdColor.RED);
 							happy = 0;
 							break;
 						default:
@@ -1137,12 +1135,12 @@ public class DefScript {
 						tk = gettoken(script, modelanimtokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(
+							Console.out.println(
 									script.filename + " has unknown token \""
 											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 											+ "\" on line: " + toLowerCase(script.textbuf
 													.substring(getPtr(script, line), getPtr(script, line + 1))),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							continue;
 						}
 
@@ -1170,14 +1168,14 @@ public class DefScript {
 					script.skipbrace(animend); // close bracke
 
 					if (startframe == null) {
-						Console.Println("Error: missing 'start frame' for anim definition near line " + script.filename
-								+ ":" + script.getlinum(animtokptr), OSDTEXT_RED);
+						Console.out.println("Error: missing 'start frame' for anim definition near line " + script.filename
+								+ ":" + script.getlinum(animtokptr), OsdColor.RED);
 						happy = 0;
 					}
 
 					if (endframe == null) {
-						Console.Println("Error: missing 'end frame' for anim definition near line " + script.filename
-								+ ":" + script.getlinum(animtokptr), OSDTEXT_RED);
+						Console.out.println("Error: missing 'end frame' for anim definition near line " + script.filename
+								+ ":" + script.getlinum(animtokptr), OsdColor.RED);
 						happy = 0;
 					}
 					model_ok &= happy;
@@ -1187,13 +1185,13 @@ public class DefScript {
 
 					switch (((MDInfo) m).setAnimation(startframe, endframe, (int) (dfps * (65536.0 * .001)), flags)) {
 					case -2:
-						Console.Println("Invalid starting frame name on line " + script.filename + ":"
-								+ script.getlinum(animtokptr), OSDTEXT_RED);
+						Console.out.println("Invalid starting frame name on line " + script.filename + ":"
+								+ script.getlinum(animtokptr), OsdColor.RED);
 						model_ok = 0;
 						break;
 					case -3:
-						Console.Println("Invalid ending frame name on line " + script.filename + ":"
-								+ script.getlinum(animtokptr), OSDTEXT_RED);
+						Console.out.println("Invalid ending frame name on line " + script.filename + ":"
+								+ script.getlinum(animtokptr), OsdColor.RED);
 						model_ok = 0;
 						break;
 					}
@@ -1218,12 +1216,12 @@ public class DefScript {
 						tk = gettoken(script, modelskintokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(
+							Console.out.println(
 									script.filename + " has unknown token \""
 											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 											+ "\" on line: " + toLowerCase(script.textbuf
 													.substring(getPtr(script, line), getPtr(script, line + 1))),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							continue;
 						}
 
@@ -1268,8 +1266,8 @@ public class DefScript {
 					script.skipbrace(skinend); // close bracke
 
 					if (skinfn == null) {
-						Console.Println("Error: missing 'skin filename' for skin definition near line "
-								+ script.filename + ":" + script.getlinum(skintokptr), OSDTEXT_RED);
+						Console.out.println("Error: missing 'skin filename' for skin definition near line "
+								+ script.filename + ":" + script.getlinum(skintokptr), OsdColor.RED);
 						model_ok = 0;
 						break;
 					}
@@ -1304,15 +1302,15 @@ public class DefScript {
 					switch (((MDInfo) m).setSkin(skinfn, palnum, Math.max(0, modelskin), surfnum, param, specpower,
 							specfactor)) {
 					case -2:
-						Console.Println(
+						Console.out.println(
 								"Invalid skin filename on line " + script.filename + ":" + script.getlinum(skintokptr),
-								OSDTEXT_RED);
+								OsdColor.RED);
 						model_ok = 0;
 						break;
 					case -3:
-						Console.Println(
+						Console.out.println(
 								"Invalid palette number on line " + script.filename + ":" + script.getlinum(skintokptr),
-								OSDTEXT_RED);
+								OsdColor.RED);
 						model_ok = 0;
 						break;
 					}
@@ -1332,12 +1330,12 @@ public class DefScript {
 						tk = gettoken(script, modelhudtokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(
+							Console.out.println(
 									script.filename + " has unknown token \""
 											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 											+ "\" on line: " + toLowerCase(script.textbuf
 													.substring(getPtr(script, line), getPtr(script, line + 1))),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							continue;
 						}
 
@@ -1409,9 +1407,9 @@ public class DefScript {
 
 					for (tilex = ftilenume; tilex <= ltilenume && happy != 0; tilex++) {
 						if (mdInfo.addHudInfo(tilex, xadd, yadd, zadd, (short) angadd, flags, fov) == -2) {
-							Console.Println(
+							Console.out.println(
 									"Invalid tile number on line " + script.filename + ":" + script.getlinum(hudtokptr),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							happy = 0;
 						}
 
@@ -1425,7 +1423,7 @@ public class DefScript {
 
 			if (model_ok == 0) {
 				if (m != null) {
-					Console.Println("Removing model " + modelfn + " due to errors.", OSDTEXT_YELLOW);
+					Console.out.println("Removing model " + modelfn + " due to errors.", OsdColor.YELLOW);
 					mdInfo.removeModelInfo(m);
 				}
 				return BaseToken.Error;
@@ -1491,13 +1489,13 @@ public class DefScript {
 				tk = gettoken(script, texturetokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(
+					Console.out.println(
 							script.filename + " has unknown token \""
 									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 									+ "\" on line: "
 									+ toLowerCase(
 											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							OsdColor.RED);
 					continue;
 				}
 
@@ -1526,12 +1524,12 @@ public class DefScript {
 						tk = gettoken(script, texturetokens);
 						if (tk instanceof BaseToken) {
 							int line = script.getlinum(script.ltextptr);
-							Console.Println(
+							Console.out.println(
 									script.filename + " has unknown token \""
 											+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 											+ "\" on line: " + toLowerCase(script.textbuf
 													.substring(getPtr(script, line), getPtr(script, line + 1))),
-									OSDTEXT_RED);
+									OsdColor.RED);
 							continue;
 						}
 
@@ -1615,22 +1613,22 @@ public class DefScript {
                         break; // message is printed later
                     }
 					if (token == TextureTokens.PAL && tpal >= MAXPALOOKUPS - RESERVEDPALS) {
-						Console.Println("Error: missing or invalid 'palette number' for texture definition near line "
-								+ script.filename + ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
+						Console.out.println("Error: missing or invalid 'palette number' for texture definition near line "
+								+ script.filename + ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 						return BaseToken.Error;
 					}
 					if (tfn == null) {
-						Console.Println("Error: missing 'file name' for texture definition near line " + script.filename
-								+ ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
+						Console.out.println("Error: missing 'file name' for texture definition near line " + script.filename
+								+ ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 						return BaseToken.Error;
 					}
 
 					if (!BuildGdx.cache.contains(tfn, 0)) {
-						Console.Println("Error: file \"" + tfn + "\" not found for texture definition near line "
-								+ script.filename + ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
+						Console.out.println("Error: file \"" + tfn + "\" not found for texture definition near line "
+								+ script.filename + ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 						return BaseToken.Error;
 					}
-//                  Console.Println("Loading hires texture \"" + tfn + "\"");
+//                  Console.out.println("Loading hires texture \"" + tfn + "\"");
 
 					texInfo.addTexture(ttile.intValue(), tpal.intValue(), tfn, (float) alphacut, (float) xscale,
 							(float) yscale, (float) specpower, (float) specfactor, flags);
@@ -1640,8 +1638,8 @@ public class DefScript {
 			script.skipbrace(textureend); // close bracke
 
 			if (ttile >= MAXTILES) {
-				Console.Println("Error: missing or invalid 'tile number' for texture definition near line "
-						+ script.filename + ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
+				Console.out.println("Error: missing or invalid 'tile number' for texture definition near line "
+						+ script.filename + ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 				return BaseToken.Error;
 			}
 
@@ -1688,7 +1686,7 @@ public class DefScript {
 
 			Resource res = BuildGdx.cache.open(fn, 0);
 			if (res == null) {
-				Console.Println("Warning: File not found" + fn, OSDTEXT_YELLOW);
+				Console.out.println("Warning: File not found" + fn, OsdColor.YELLOW);
 				script.textptr = vmodelend + 1;
 				return BaseToken.Warning;
 			}
@@ -1702,7 +1700,7 @@ public class DefScript {
 			res.close();
 
 			if (vox == null) {
-				Console.Println("Warning: Failed loading voxel model " + fn, OSDTEXT_YELLOW);
+				Console.out.println("Warning: Failed loading voxel model " + fn, OsdColor.YELLOW);
 				script.textptr = vmodelend + 1;
 
 				return BaseToken.Warning;
@@ -1712,13 +1710,13 @@ public class DefScript {
 				Object tk = gettoken(script, voxeltokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(
+					Console.out.println(
 							script.filename + " has unknown token \""
 									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 									+ "\" on line: "
 									+ toLowerCase(
 											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							OsdColor.RED);
 					continue;
 				}
 
@@ -1821,11 +1819,11 @@ public class DefScript {
 					Object tk = gettoken(script, skyboxtokens);
 					if (tk instanceof BaseToken) {
 						int line = script.getlinum(script.ltextptr);
-						Console.Println(script.filename + " has unknown token \""
+						Console.out.println(script.filename + " has unknown token \""
 								+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 								+ "\" on line: "
 								+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-								OSDTEXT_RED);
+								OsdColor.RED);
 						continue;
 					}
 
@@ -1881,20 +1879,20 @@ public class DefScript {
 
 		public boolean addSkybox(Scriptfile script, int stile, int spal, String[] sfn) {
 			if (stile < 0) {
-				Console.Println("Error: skybox: missing 'tile number' near line " + script.filename + ":"
-						+ script.getlinum(script.ltextptr), OSDTEXT_RED);
+				Console.out.println("Error: skybox: missing 'tile number' near line " + script.filename + ":"
+						+ script.getlinum(script.ltextptr), OsdColor.RED);
 				return false;
 			}
 
 			for (int i = 0; i < 6; i++) {
 				if (sfn[i] == null) {
-					Console.Println("Error: skybox: missing " + skyfaces[i] + " filename' near line " + script.filename
-							+ ":" + script.getlinum(script.ltextptr), OSDTEXT_RED);
+					Console.out.println("Error: skybox: missing " + skyfaces[i] + " filename' near line " + script.filename
+							+ ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 					return false;
 				}
 
 				if (!BuildGdx.cache.contains(sfn[i], 0)) {
-					Console.Println("Error: file \"" + sfn[i] + "\" does not exist", OSDTEXT_RED);
+					Console.out.println("Error: file \"" + sfn[i] + "\" does not exist", OsdColor.RED);
 					return false;
 				}
 			}
@@ -1955,7 +1953,7 @@ public class DefScript {
 				return BaseToken.Error;
 			}
 
-			Console.Println("Loading tint " + pal);
+			Console.out.println("Loading tint " + pal);
 			texInfo.setPaletteTint(pal.intValue(), r.intValue(), g.intValue(), b.intValue(), f.intValue());
 
 			return BaseToken.Ok;
@@ -1994,11 +1992,11 @@ public class DefScript {
 					Object tk = gettoken(script, tinttokens);
 					if (tk instanceof BaseToken) {
 						int line = script.getlinum(script.ltextptr);
-						Console.Println(script.filename + " has unknown token \""
+						Console.out.println(script.filename + " has unknown token \""
 								+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 								+ "\" on line: "
 								+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-								OSDTEXT_RED);
+								OsdColor.RED);
 						continue;
 					}
 
@@ -2037,11 +2035,11 @@ public class DefScript {
 			}
 			script.skipbrace(send); // close bracke
 			if (pal == -1) {
-				Console.Println("Tint palette is not found!", OSDTEXT_RED);
+				Console.out.println("Tint palette is not found!", OsdColor.RED);
 				return BaseToken.Error;
 			}
 
-			Console.Println("Loading tint " + pal);
+			Console.out.println("Loading tint " + pal);
 			texInfo.setPaletteTint((int) pal, r, g, b, f);
 
 			return BaseToken.Ok;
@@ -2076,13 +2074,13 @@ public class DefScript {
 				Object tk = gettoken(script, sound_musictokens);
 				if (tk instanceof BaseToken) {
 					int line = script.getlinum(script.ltextptr);
-					Console.Println(
+					Console.out.println(
 							script.filename + " has unknown token \""
 									+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr))
 									+ "\" on line: "
 									+ toLowerCase(
 											script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-							OSDTEXT_RED);
+							OsdColor.RED);
 					continue;
 				}
 
@@ -2111,11 +2109,11 @@ public class DefScript {
 	protected boolean checkErrorToken(Scriptfile script, Object tk) {
 		if (tk instanceof BaseToken) {
 			int line = script.getlinum(script.ltextptr);
-			Console.Println(
+			Console.out.println(
 					script.filename + " has unknown token \""
 							+ toLowerCase(script.textbuf.substring(script.ltextptr, script.textptr)) + "\" on line: "
 							+ toLowerCase(script.textbuf.substring(getPtr(script, line), getPtr(script, line + 1))),
-					OSDTEXT_RED);
+					OsdColor.RED);
 			return true;
 		}
 

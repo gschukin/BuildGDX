@@ -21,7 +21,6 @@ import static ru.m210projects.Build.Strhandler.toLowerCase;
 import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
 import static ru.m210projects.Build.Net.Mmulti.numplayers;
 import static ru.m210projects.Build.OnSceenDisplay.Console.CloseLogFile;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.io.OutputStream;
 import java.net.URL;
@@ -36,8 +35,7 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.FileHandle.Compat.Path;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
 import ru.m210projects.Build.Pattern.Tools.Interpolation;
@@ -48,6 +46,8 @@ import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.LittleEndian;
 import ru.m210projects.Build.Types.MemLog;
+import ru.m210projects.Build.osd.OsdColor;
+
 import static ru.m210projects.Build.RenderService.*;
 public abstract class BuildGame extends Game {
 
@@ -106,6 +106,7 @@ public abstract class BuildGame extends Game {
 
 	@Override
 	public void dispose() {
+		Console.out.getLogger().close();
 		pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
 		if(getScreen() instanceof InitScreen) {
 			getScreen().dispose();
@@ -138,7 +139,7 @@ public abstract class BuildGame extends Game {
 
 			me.printStackTrace();
 			String message = "Memory used: [ " + MemLog.used() + " / " + MemLog.total() + " mb ] \r\nPlease, increase the java's heap size.";
-			Console.Println(message, Console.OSDTEXT_RED);
+			Console.out.println(message, OsdColor.RED);
 			BuildGdx.message.show("OutOfMemory!", message, MessageType.Info);
 			System.exit(1);
 		} catch (Throwable e) {
@@ -273,9 +274,9 @@ public abstract class BuildGame extends Game {
 			System.exit(0);
 		} else {
 			String stack = stackTraceToString(ex);
-			Console.LogPrint(msg + "[" + exceptionHandler(ex) + "]: " + stack);
-			System.err.println(msg + "[" + exceptionHandler(ex) + "]: " + stack);
+			Console.out.println(msg + "[" + exceptionHandler(ex) + "]: " + stack, OsdColor.RED);
 			CloseLogFile();
+			Console.out.getLogger().close();
 
 			try {
 				String currScreen = getScrName();
@@ -300,9 +301,9 @@ public abstract class BuildGame extends Game {
 		msg += "\r\nFull stack trace: ";
 		msg += getStackTrace();
 
-		Console.LogPrint("FatalError: " + msg);
-		System.err.println("FatalError: " + msg);
+		Console.out.println("FatalError: " + msg, OsdColor.RED);
 		CloseLogFile();
+		Console.out.getLogger().close();
 
 		try {
 			String currScreen = getScrName();
@@ -323,7 +324,7 @@ public abstract class BuildGame extends Game {
 
 	public void GameMessage(String msg) {
 		BuildGdx.message.show("Message: ", msg, MessageType.Info);
-		Console.Println("Message: " + msg, OSDTEXT_RED);
+		Console.out.println("Message: " + msg, OsdColor.RED);
 	}
 
 	private final byte[] data1 = { 86, 10, 90, 88, 90 };
@@ -372,7 +373,7 @@ public abstract class BuildGame extends Game {
 			url = new URL(ftp + name + ":" + pass + address + "/" + appname + "/" + filename + ".log;type=i");
 			URLConnection urlc = url.openConnection();
 			OutputStream os = urlc.getOutputStream();
-			String text = Console.GetLog();
+			String text = Console.out.getLogger().toString();
 			text += "\r\n";
 			text += "Screen: " + curr + "\r\n";
 			if(prev != null) {

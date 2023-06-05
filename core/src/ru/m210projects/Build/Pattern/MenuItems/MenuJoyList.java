@@ -17,15 +17,13 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
 import static ru.m210projects.Build.Engine.getInput;
-import static ru.m210projects.Build.Engine.totalclock;
 import static ru.m210projects.Build.Gameutils.BClipLow;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Input.ButtonMap;
 import ru.m210projects.Build.Input.BuildControllers;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
@@ -92,10 +90,10 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 			}
 
 			if ( i == l_nFocus ) {
-				if(l_set == 1 && (totalclock & 0x20) != 0)
-				{
+//				if(l_set == 1 && (engine.getTotalClock() & 0x20) != 0)
+//				{
 					key = "____";
-				}
+//				}
 			}
 
 			char[] k = key.toCharArray();
@@ -200,7 +198,7 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 					int focus = l_nFocus - cfg.joymap.length;
 					cfg.gpadkeys[focus] = -1;
 					if(focus == GameKeys.Show_Console.getNum()) {
-						Console.setCaptureKey(-1, 3);
+//	FIXME					Console.setCaptureKey(-1, 3);
 					}
 				}
 

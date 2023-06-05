@@ -21,7 +21,6 @@ import static ru.m210projects.Build.Net.Mmulti.connecthead;
 import static ru.m210projects.Build.Net.Mmulti.inet;
 import static ru.m210projects.Build.Net.Mmulti.initmultiplayers;
 import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 import static ru.m210projects.Build.Strhandler.toCharArray;
 
 import com.badlogic.gdx.ScreenAdapter;
@@ -29,10 +28,10 @@ import com.badlogic.gdx.ScreenAdapter;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.BuildGame;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class ConnectAdapter extends ScreenAdapter {
 
@@ -103,7 +102,7 @@ public abstract class ConnectAdapter extends ScreenAdapter {
 			}
 
 			if (inet.netready == 0) {
-				Console.Println(inet.message, OSDTEXT_YELLOW);
+				Console.out.println(inet.message, OsdColor.YELLOW);
 				back();
 				
 				game.pEngine.nextpage();

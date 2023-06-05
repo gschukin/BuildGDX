@@ -14,13 +14,13 @@ import com.badlogic.gdx.utils.NumberUtils;
 
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.GdxRender.Tesselator.SurfaceInfo;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GdxRender.Tesselator.SurfaceInfo;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Type;
 import ru.m210projects.Build.Render.GdxRender.Tesselator.Vertex;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Timer;
 import ru.m210projects.Build.Types.Wall;
+import ru.m210projects.Build.osd.OsdColor;
 
 import static ru.m210projects.Build.Engine.*;
 
@@ -28,6 +28,7 @@ public class WorldMesh {
 
 	private final Tesselator tess;
 	private final Mesh mesh;
+	private final BoardService boardService;
 	protected Engine engine;
 	private int maxVertices;
 	private int meshOffset;
@@ -72,6 +73,7 @@ public class WorldMesh {
 
 	public WorldMesh(Engine engine) {
 		this.engine = engine;
+		this.boardService = engine.getBoardService();
 		this.tess = new Tesselator(this, VertexAttribute.Position(), VertexAttribute.ColorPacked(),
 				VertexAttribute.TexCoords(0));
 
@@ -83,9 +85,8 @@ public class WorldMesh {
 
 		quad = addQuad(vertices);
 
-		BoardService service = engine.getBoardService();
-		for (short s = 0; s < service.getSectorCount(); s++) {
-			Sector sec = Engine.getSector(s);
+		for (short s = 0; s < boardService.getSectorCount(); s++) {
+			Sector sec = boardService.getSector(s);
 			if (sec.getFloorz() == sec.getCeilingz()) {
 				continue;
 			}
@@ -133,9 +134,9 @@ public class WorldMesh {
 
 	public ArrayList<Vertex> getPoints(Heinum heinum, int sectnum, int z) {
 		int fz1, fz2, cz1, cz2;
-		Sector sec = Engine.getSector(sectnum);
-		Wall wal = Engine.getWall(z);
-		Wall wal2 = Engine.getWall(wal.getPoint2());
+		Sector sec = boardService.getSector(sectnum);
+		Wall wal = boardService.getWall(z);
+		Wall wal2 = boardService.getWall(wal.getPoint2());
 		int nextsector = wal.getNextsector();
 
 		switch (heinum) {
@@ -291,8 +292,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxFloor(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = Engine.getWall(wallnum);
-		final Sector sec = Engine.getSector(sectnum);
+		final Wall wal = boardService.getWall(wallnum);
+		final Sector sec = boardService.getSector(sectnum);
 
 		boolean isParallaxFloor = sec.isParallaxFloor();
 		if (!isParallaxFloor) {
@@ -300,7 +301,7 @@ public class WorldMesh {
 		}
 
 		int nextsector = wal.getNextsector();
-		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxFloor());
+		boolean isParallaxNext = nextsector != -1 && (boardService.getSector(nextsector).isParallaxFloor());
 
 		GLSurface surf = null;
 		if (isParallaxFloor && (nextsector == -1 || !isParallaxNext)) {
@@ -327,8 +328,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addParallaxCeiling(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = Engine.getWall(wallnum);
-		final Sector sec = Engine.getSector(sectnum);
+		final Wall wal = boardService.getWall(wallnum);
+		final Sector sec = boardService.getSector(sectnum);
 
 		boolean isParallaxCeiling = sec.isParallaxCeiling();
 		if (!isParallaxCeiling) {
@@ -336,7 +337,7 @@ public class WorldMesh {
 		}
 
 		int nextsector = wal.getNextsector();
-		boolean isParallaxNext = nextsector != -1 && (Engine.getSector(nextsector).isParallaxCeiling());
+		boolean isParallaxNext = nextsector != -1 && (boardService.getSector(nextsector).isParallaxCeiling());
 
 		GLSurface surf = null;
 		if (isParallaxCeiling && (nextsector == -1 || !isParallaxNext)) {
@@ -365,7 +366,7 @@ public class WorldMesh {
 
 	private GLSurface addMiddle(FloatArray vertices, int sectnum, int wallnum) {
 		GLSurface surf = null;
-		final int nextsector = Engine.getWall(wallnum).getNextsector();
+		final int nextsector = boardService.getWall(wallnum).getNextsector();
 		if (nextsector != -1) {
 			return setNull(walls, wallnum);
 		}
@@ -393,8 +394,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addUpper(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = Engine.getWall(wallnum).getNextsector();
-		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxCeiling() && Engine.getSector(sectnum).isParallaxCeiling())) {
+		final int nextsector = boardService.getWall(wallnum).getNextsector();
+		if (nextsector == -1 || (boardService.getSector(nextsector).isParallaxCeiling() && boardService.getSector(sectnum).isParallaxCeiling())) {
 			return setNull(upper_walls, wallnum);
 		}
 
@@ -421,8 +422,8 @@ public class WorldMesh {
 	}
 
 	private GLSurface addLower(FloatArray vertices, int sectnum, int wallnum) {
-		final int nextsector = Engine.getWall(wallnum).getNextsector();
-		if (nextsector == -1 || (Engine.getSector(nextsector).isParallaxFloor() && Engine.getSector(sectnum).isParallaxFloor())) {
+		final int nextsector = boardService.getWall(wallnum).getNextsector();
+		if (nextsector == -1 || (boardService.getSector(nextsector).isParallaxFloor() && boardService.getSector(sectnum).isParallaxFloor())) {
 			return setNull(lower_walls, wallnum);
 		}
 
@@ -449,7 +450,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addMaskedWall(FloatArray vertices, int sectnum, int wallnum) {
-		final Wall wal = Engine.getWall(wallnum);
+		final Wall wal = boardService.getWall(wallnum);
 		GLSurface surf = null;
 
 		if ((wal.isMasked() || wal.isOneWay()) && wal.getNextsector() != -1) {
@@ -476,7 +477,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addFloor(FloatArray vertices, int sectnum) {
-		if (Engine.getSector(sectnum).isParallaxFloor()) {
+		if (boardService.getSector(sectnum).isParallaxFloor()) {
 			return setNull(floors, sectnum);
 		}
 
@@ -512,7 +513,7 @@ public class WorldMesh {
 	}
 
 	private GLSurface addCeiling(FloatArray vertices, int sectnum) {
-		if (Engine.getSector(sectnum).isParallaxCeiling()) {
+		if (boardService.getSector(sectnum).isParallaxCeiling()) {
 			return setNull(ceilings, sectnum);
 		}
 
@@ -676,12 +677,12 @@ public class WorldMesh {
 	private int getCeilingHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final Sector sec = Engine.getSector(sectnum);
+		final Sector sec = boardService.getSector(sectnum);
 
 		final int startwall = sec.getWallptr();
 		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			Wall wal = Engine.getWall(z);
+			Wall wal = boardService.getWall(z);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
@@ -699,12 +700,12 @@ public class WorldMesh {
 	private int getFloorHash(int sectnum) {
 		int hash = 1;
 		final int prime = 31;
-		final Sector sec = Engine.getSector(sectnum);
+		final Sector sec = boardService.getSector(sectnum);
 
 		final int startwall = sec.getWallptr();
 		final int endwall = sec.getWallnum() + startwall;
 		for (int z = startwall; z < endwall; z++) {
-			Wall wal = Engine.getWall(z);
+			Wall wal = boardService.getWall(z);
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 			hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
 		}
@@ -720,16 +721,16 @@ public class WorldMesh {
 	}
 
 	private int getWallHash(int sectnum, int z) {
-		final Sector sec = Engine.getSector(sectnum);
-		final Wall wal = Engine.getWall(z);
+		final Sector sec = boardService.getSector(sectnum);
+		final Wall wal = boardService.getWall(z);
 
 		int hash = 1;
 		final int prime = 31;
 
 		hash = prime * hash + NumberUtils.floatToIntBits(wal.getX());
 		hash = prime * hash + NumberUtils.floatToIntBits(wal.getY());
-		hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(wal.getPoint2()).getX());
-		hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(wal.getPoint2()).getY());
+		hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(wal.getPoint2()).getX());
+		hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(wal.getPoint2()).getY());
 		hash = prime * hash + wal.getCstat();
 		hash = prime * hash + wal.getXpanning();
 		hash = prime * hash + wal.getYpanning();
@@ -739,7 +740,7 @@ public class WorldMesh {
 		hash = prime * hash + wal.getOverpicnum(); // middle texture
 
 		if (wal.isSwapped() && wal.getNextwall() != -1) {
-			final Wall swal = Engine.getWall(wal.getNextwall());
+			final Wall swal = boardService.getWall(wal.getNextwall());
 			hash = prime * hash + swal.getCstat();
 			hash = prime * hash + swal.getXpanning();
 			hash = prime * hash + swal.getYpanning();
@@ -749,8 +750,8 @@ public class WorldMesh {
 		}
 
 		if (((sec.getCeilingstat() | sec.getFloorstat()) & 2) != 0) {
-			hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(sec.getWallptr()).getX());
-			hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(sec.getWallptr()).getY());
+			hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(sec.getWallptr()).getX());
+			hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(sec.getWallptr()).getY());
 		}
 
 		hash = prime * hash + NumberUtils.floatToIntBits(sec.getFloorz());
@@ -764,7 +765,7 @@ public class WorldMesh {
 		hash = prime * hash + (sec.isParallaxCeiling() ? 1 : 0);
 
 		if (wal.getNextsector() != -1) {
-			final Sector nsec = getSector(wal.getNextsector());
+			final Sector nsec = boardService.getSector(wal.getNextsector());
 
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorz());
 			hash = prime * hash + NumberUtils.floatToIntBits(nsec.getFloorheinum());
@@ -777,8 +778,8 @@ public class WorldMesh {
 			hash = prime * hash + (nsec.isParallaxCeiling() ? 1 : 0);
 
 			if (((nsec.getCeilingstat() | nsec.getFloorstat()) & 2) != 0) {
-				hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(nsec.getWallptr()).getX());
-				hash = prime * hash + NumberUtils.floatToIntBits(Engine.getWall(nsec.getWallptr()).getY());
+				hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(nsec.getWallptr()).getX());
+				hash = prime * hash + NumberUtils.floatToIntBits(boardService.getWall(nsec.getWallptr()).getY());
 			}
 		}
 
@@ -816,8 +817,8 @@ public class WorldMesh {
 			return surf;
 		} else {
 			if (mesh == null) { // when initializing
-				Console.Println("Error: Unexpected behavior in mesh initialization, perhaps the map is corrupt",
-						Console.OSDTEXT_RED);
+				Console.out.println("Error: Unexpected behavior in mesh initialization, perhaps the map is corrupt",
+						OsdColor.RED);
 				meshOffset += limit;
 				return null;
 			}
@@ -889,7 +890,7 @@ public class WorldMesh {
 		}
 
 		public int getVisibility() {
-			return Engine.getSector(vis_ptr).getVisibility();
+			return boardService.getSector(vis_ptr).getVisibility();
 		}
 
 		public void render(ShaderProgram shader) {

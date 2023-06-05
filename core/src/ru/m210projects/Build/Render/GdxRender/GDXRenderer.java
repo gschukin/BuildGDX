@@ -36,7 +36,6 @@ import static com.badlogic.gdx.graphics.GL20.GL_VERSION;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
@@ -60,13 +59,13 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.utils.BufferUtils;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.GLInfo;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.GdxRender.WorldMesh.GLSurface;
@@ -103,6 +102,7 @@ import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.Wall;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class GDXRenderer implements GLRenderer {
 
@@ -125,6 +125,7 @@ public class GDXRenderer implements GLRenderer {
 	protected TextureManager textureCache;
 	protected ModelManager modelManager;
 	protected final Engine engine;
+	private final BoardService boardService;
 	protected boolean isInited = false;
 	protected GL20 gl;
 	protected float defznear = 0.001f;
@@ -169,6 +170,7 @@ public class GDXRenderer implements GLRenderer {
 
 	public GDXRenderer(Engine engine, IOverheadMapSettings settings) {
 		this.engine = engine;
+		this.boardService = engine.getBoardService();
 		this.textureCache = getTextureManager();
 		this.modelManager = new GDXModelManager(this);
 		this.manager = new ShaderManager();
@@ -218,9 +220,9 @@ public class GDXRenderer implements GLRenderer {
 
 			this.textureCache.changePalette(curpalette.getBytes());
 
-			Console.Println("Polygdx renderer is initialized", OSDTEXT_GOLD);
-			Console.Println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
-					OSDTEXT_GOLD);
+			Console.out.println("Polygdx renderer is initialized", OsdColor.YELLOW);
+			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
+					OsdColor.YELLOW);
 
 			orphoRen.init();
 
@@ -1106,7 +1108,7 @@ public class GDXRenderer implements GLRenderer {
 
 				for (int i = 0; i < MAXSPRITES; i++) {
 					removeSpriteCorr(i);
-					Sprite spr = Engine.getSprite(i);
+					Sprite spr = boardService.getSprite(i);
 					if (spr == null || ((spr.getCstat() >> 4) & 3) != 1 || spr.getStatnum() == MAXSTATUS) {
 						continue;
 					}
@@ -1390,10 +1392,10 @@ public class GDXRenderer implements GLRenderer {
 			return false;
 		}
 
-		Wall wal = Engine.getWall(w);
+		Wall wal = boardService.getWall(w);
 		int x1 = wal.getX();
 		int y1 = wal.getY();
-		wal = Engine.getWall(wal.getPoint2());
+		wal = boardService.getWall(wal.getPoint2());
 		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
@@ -1517,8 +1519,8 @@ public class GDXRenderer implements GLRenderer {
 //	private boolean WallFacingCheck(WALL wal) {
 //		float x1 = wal.x - globalposx;
 //		float y1 = wal.y - globalposy;
-//		float x2 = Engine.getWall(wal.point2).x - globalposx;
-//		float y2 = Engine.getWall(wal.point2).y - globalposy;
+//		float x2 = boardService.getWall(wal.point2).x - globalposx;
+//		float y2 = boardService.getWall(wal.point2).y - globalposy;
 //
 //		return (x1 * y2 - y1 * x2) >= 0;
 //	}
@@ -1538,7 +1540,7 @@ public class GDXRenderer implements GLRenderer {
 //	}
 //
 //	private ArrayList<Vertex> project(BuildCamera cam, int z, int sectnum, Heinum h) {
-//		WALL wal = Engine.getWall(z);
+//		WALL wal = boardService.getWall(z);
 //		if (!WallFacingCheck(wal))
 //			return null;
 //

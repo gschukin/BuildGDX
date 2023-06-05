@@ -13,6 +13,7 @@ package ru.m210projects.Build.Render.Polymost;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.ModelHandle.GLModel;
@@ -38,6 +39,7 @@ public class PolymostModelRenderer {
 
     private final Polymost parent;
     private final Engine engine;
+    private final BoardService boardService;
     private GL10 gl;
     private final Color polyColor = new Color();
     private final float[][] matrix = new float[4][4];
@@ -50,6 +52,7 @@ public class PolymostModelRenderer {
     public PolymostModelRenderer(Polymost parent) {
         this.parent = parent;
         this.engine = parent.engine;
+        this.boardService = engine.getBoardService();
     }
 
     public void init() {
@@ -63,7 +66,7 @@ public class PolymostModelRenderer {
             return 0;
         }
 
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
+        if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             return 0;
         }
 
@@ -78,10 +81,10 @@ public class PolymostModelRenderer {
         modela0.x = modela0.y = modela0.z = 0;
 
         f = (tspr.getXrepeat()) * (256.0f / 320.0f) / 64.0f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16) {
+        if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 16) {
             f *= 1.25f;
         }
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
+        if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             f *= 1.25f;
         }
 
@@ -121,12 +124,12 @@ public class PolymostModelRenderer {
         // k0 -= yoff * (tspr.yrepeat << 2);
 
         dvoxm0.y *= f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
+        if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             dvoxm0.y *= -1;
         }
         modela0.y = ((x0 - globalposx) / 1024.0f + modela0.y) * f;
         dvoxm0.x *= -f;
-        if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
+        if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
             dvoxm0.x *= -1;
         }
         if (xflip) {
@@ -170,7 +173,7 @@ public class PolymostModelRenderer {
         gl.glTranslatef(-xoff, yoff, 0);
 
         if (m.isRotating()) {
-            gl.glRotatef(totalclock % 360, 0, 1, 0);
+            gl.glRotatef(engine.getTotalClock() % 360, 0, 1, 0);
         }
 
         // transform to Build coords
@@ -322,7 +325,7 @@ public class PolymostModelRenderer {
         gl.glRotatef(-90, 0.0f, 1.0f, 0.0f);
 
         if (m.isRotating()) {
-            gl.glRotatef(totalclock % 360, 0, 1, 0);
+            gl.glRotatef(engine.getTotalClock() % 360, 0, 1, 0);
         }
 
         if ((parent.grhalfxdown10x >= 0) ^ ((globalorientation & 8) != 0) ^ ((globalorientation & 4) != 0)) {
@@ -345,7 +348,7 @@ public class PolymostModelRenderer {
         DefScript defs = parent.defs;
         if (defs != null) {
             if (m.isTintAffected()
-                    || (!(tspr.getOwner() >= MAXSPRITES) && getSector(Engine.getSprite(tspr.getOwner()).getSectnum()).getFloorpal() != 0)) {
+                    || (!(tspr.getOwner() >= MAXSPRITES) && boardService.getSector(boardService.getSprite(tspr.getOwner()).getSectnum()).getFloorpal() != 0)) {
                 Palette p = defs.texInfo.getTints(globalpal);
                 polyColor.r *= p.r / 255.0f;
                 polyColor.g *= p.g / 255.0f;
@@ -389,7 +392,7 @@ public class PolymostModelRenderer {
     public boolean mddraw(MDModel m, Sprite tspr) {
         DefScript defs = parent.defs;
 
-        m.updateanimation(defs.mdInfo, tspr);
+        m.updateanimation(defs.mdInfo, tspr, engine.getTimer().getTicsPerSecond());
 
         modelPrepare(m, tspr);
 

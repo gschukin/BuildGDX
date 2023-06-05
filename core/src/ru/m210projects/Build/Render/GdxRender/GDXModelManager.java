@@ -15,8 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager.Shader;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager.Shader;
 import ru.m210projects.Build.Render.ModelHandle.GLModel;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelManager;
@@ -36,6 +35,7 @@ import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.PixmapTileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class GDXModelManager extends ModelManager {
 
@@ -141,7 +141,7 @@ public class GDXModelManager extends ModelManager {
 
 		Resource res = BuildGdx.cache.open(skinfile, 0);
 		if (res == null) {
-			Console.Println("Skin " + skinfile + " not found.", Console.OSDTEXT_YELLOW);
+			Console.out.println("Skin " + skinfile + " not found.", OsdColor.YELLOW);
 			return null;
 		}
 
@@ -155,7 +155,7 @@ public class GDXModelManager extends ModelManager {
 			}
 			m.usesalpha = true;
 		} catch (Exception e) {
-			Console.Println("Couldn't load file: " + skinfile, Console.OSDTEXT_YELLOW);
+			Console.out.println("Couldn't load file: " + skinfile, OsdColor.YELLOW);
 			return null;
 		} finally {
 			res.close();

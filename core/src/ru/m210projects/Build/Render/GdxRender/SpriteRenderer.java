@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
@@ -355,7 +356,8 @@ public class SpriteRenderer {
 	}
 
 	public boolean draw(Sprite tspr) {
-		if (tspr.getOwner() < 0 || !Gameutils.isValidTile(tspr.getPicnum()) || !Gameutils.isValidSector(tspr.getSectnum())) {
+		BoardService boardService = engine.getBoardService();
+		if (tspr.getOwner() < 0 || !Gameutils.isValidTile(tspr.getPicnum()) || !boardService.isValidSector(tspr.getSectnum())) {
 			return false;
 		}
 
@@ -616,8 +618,8 @@ public class SpriteRenderer {
 		}
 
 		int vis = globalvisibility;
-		if (getSector(tspr.getSectnum()).getVisibility() != 0) {
-			vis = mulscale(globalvisibility, (getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
+		if (boardService.getSector(tspr.getSectnum()).getVisibility() != 0) {
+			vis = mulscale(globalvisibility, (boardService.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
 		}
 
 		if (tex.getPixelFormat() == PixelFormat.Pal8) {

@@ -34,13 +34,13 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.GLInfo;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GLFilter;
 import ru.m210projects.Build.Script.TextureHDInfo;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class TextureManager {
 
@@ -216,7 +216,7 @@ public class TextureManager {
 		}
 
 		if (!BuildGdx.cache.contains(fn, 0)) {
-			Console.Println("Hightile[" + dapic + "]: File \"" + fn + "\" not found");
+			Console.out.println("Hightile[" + dapic + "]: File \"" + fn + "\" not found");
 			if (facen > 0) {
 				hicr.skybox.ignore = 1;
 			} else {
@@ -336,7 +336,7 @@ public class TextureManager {
 	}
 
 	public void uninit() {
-		Console.Println("TextureCache uninited!", Console.OSDTEXT_RED);
+		Console.out.println("TextureCache uninited!", OsdColor.RED);
 
 		for (int i = MAXTILES - 1; i >= 0; i--) {
 			cache.dispose(i);

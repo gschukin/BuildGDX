@@ -108,12 +108,14 @@ public class Polymost2D extends OrphoRenderer {
 	private int globalorientation;
 
 	private final Polygon[] drawpoly = new Polygon[4];
+	private final BoardService boardService;
 
 	// Overhead map settings
 
 	public Polymost2D(Polymost parent, IOverheadMapSettings settings) {
 		super(parent.engine, settings);
 		this.parent = parent;
+		this.boardService = engine.getBoardService();
 		this.textureCache = parent.textureCache;
 
 		for (int i = 0; i < 4; i++) {
@@ -161,7 +163,7 @@ public class Polymost2D extends OrphoRenderer {
 		int sortnum = 0;
 
 		for (s = 0; s < numsectors; s++) {
-			sec = Engine.getSector(s);
+			sec = boardService.getSector(s);
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				npoints = 0;
@@ -173,7 +175,7 @@ public class Polymost2D extends OrphoRenderer {
 					continue;
 				}
 				for (w = sec.getWallnum(); w > 0; w--, j++) {
-					wal = Engine.getWall(j);
+					wal = boardService.getWall(j);
 					if (wal == null) {
 						continue;
 					}
@@ -281,8 +283,8 @@ public class Polymost2D extends OrphoRenderer {
 					globalx2 = bakgxvect;
 					globaly2 = bakgyvect;
 				} else {
-					ox = Engine.getWall(Engine.getWall(startwall).getPoint2()).getX() - Engine.getWall(startwall).getX();
-					oy = Engine.getWall(Engine.getWall(startwall).getPoint2()).getY() - Engine.getWall(startwall).getY();
+					ox = boardService.getWall(boardService.getWall(startwall).getPoint2()).getX() - boardService.getWall(startwall).getX();
+					oy = boardService.getWall(boardService.getWall(startwall).getPoint2()).getY() - boardService.getWall(startwall).getY();
 					i = EngineUtils.sqrt(ox * ox + oy * oy);
 					if (i == 0) {
 						continue;
@@ -297,7 +299,7 @@ public class Polymost2D extends OrphoRenderer {
 					globalx2 = -globalx1;
 					globaly2 = -globaly1;
 
-					daslope = Engine.getSector(s).getFloorheinum();
+					daslope = boardService.getSector(s).getFloorheinum();
 					i = EngineUtils.sqrt(daslope * daslope + 16777216);
 					globalposy = mulscale(globalposy, i, 12);
 					globalx2 = mulscale(globalx2, i, 12);
@@ -351,7 +353,7 @@ public class Polymost2D extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1) {
 				for (i = 0; i < sortnum - gap; i++) {
 					for (j = i; j >= 0; j -= gap) {
-						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ()) {
+						if (boardService.getSprite(tsprite[j].getOwner()).getZ() <= boardService.getSprite(tsprite[j + gap].getOwner()).getZ()) {
 							break;
 						}
 
@@ -363,7 +365,7 @@ public class Polymost2D extends OrphoRenderer {
 			}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				Sprite spr = Engine.getSprite(tsprite[s].getOwner());
+				Sprite spr = boardService.getSprite(tsprite[s].getOwner());
 				if ((spr.getCstat() & 32768) == 0) {
 					npoints = 0;
 
@@ -468,10 +470,10 @@ public class Polymost2D extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((getSector(spr.getSectnum()).getCeilingstat() & 1) > 0) {
-						globalshade = (getSector(spr.getSectnum()).getCeilingshade());
+					if ((boardService.getSector(spr.getSectnum()).getCeilingstat() & 1) > 0) {
+						globalshade = (boardService.getSector(spr.getSectnum()).getCeilingshade());
 					} else {
-						globalshade = (getSector(spr.getSectnum()).getFloorshade());
+						globalshade = (boardService.getSector(spr.getSectnum()).getFloorshade());
 					}
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 

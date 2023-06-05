@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.desktop.audio.midi;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +30,8 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Audio.Music;
 import ru.m210projects.Build.Audio.MusicSource;
 import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 import javax.sound.midi.MidiDevice.Info;
 
@@ -120,7 +120,7 @@ public class MidiMusicModule implements Music {
 			}
 
 			if(soundbank != null) {
-				Console.Println("Soundbank initializing...");
+				Console.out.println("Soundbank initializing...");
 				Synthesizer softsynth = MidiSystem.getSynthesizer();
 				device = softsynth;
 				device.open();
@@ -134,7 +134,7 @@ public class MidiMusicModule implements Music {
             name = device.getDeviceInfo().getName();
             sequencer.setReceiver(new MidiReceiver(device.getReceiver()));
             
-            Console.Println(getName() + " initialized", OSDTEXT_GOLD);
+            Console.out.println(getName() + " initialized", OsdColor.YELLOW);
 		    inited = true;
 		    return true;
 		} catch (Throwable e) {

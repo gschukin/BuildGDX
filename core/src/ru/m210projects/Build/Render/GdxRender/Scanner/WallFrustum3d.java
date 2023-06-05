@@ -6,8 +6,10 @@ import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Plane.PlaneSide;
 import com.badlogic.gdx.math.Vector3;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
+import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.collections.Pool;
 import ru.m210projects.Build.Types.collections.Pool.Poolable;
 import static ru.m210projects.Build.RenderService.*;
@@ -105,16 +107,9 @@ public class WallFrustum3d implements Poolable {
 		return frustum;
 	}
 
-	public WallFrustum3d build(BuildCamera cam, Pool<WallFrustum3d> pool, ArrayList<? extends Vector3> coords,
-			int sectnum) {
+	public WallFrustum3d build(BuildCamera cam, Pool<WallFrustum3d> pool, ArrayList<? extends Vector3> coords, int sectnum) {
 		if (coords == null) {
 			return null;
-		}
-
-		if (!Engine.getSector(sectnum).isParallaxCeiling() && !Engine.getSector(sectnum).isParallaxFloor()) {
-			if (!wallInFrustum(coords)) {
-				return null;
-			}
 		}
 
 		WallFrustum3d frustum = pool.obtain();

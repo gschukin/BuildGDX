@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.FileHandle.Resource.Whence;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.FileHandle.Resource.Whence;
 
 import static ru.m210projects.Build.FileHandle.Group.*;
 
@@ -60,7 +59,7 @@ public class Cache1D {
 		Group res = isGroup(filename);
 		if (res != null) {
 			if (res.numfiles != 0) {
-				Console.Println("Found " + res.numfiles + " files in " + filename + " archive");
+				Console.out.println("Found " + res.numfiles + " files in " + filename + " archive");
 				groupfil.add(res);
 			}
 			return res;
@@ -127,7 +126,7 @@ public class Cache1D {
 
 		if (out != null) {
 			if (out.numfiles != 0) {
-				Console.Println("Found " + out.numfiles + " files in " + out.name + " archive");
+				Console.out.println("Found " + out.numfiles + " files in " + out.name + " archive");
 				groupfil.add(out);
 			}
 		}

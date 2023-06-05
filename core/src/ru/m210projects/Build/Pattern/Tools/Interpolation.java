@@ -21,10 +21,10 @@ import static ru.m210projects.Build.Pragmas.mulscale;
 
 import java.util.Arrays;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Types.Sector;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Wall;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class Interpolation {
 
@@ -69,7 +69,7 @@ public class Interpolation {
 
 	protected void setinterpolation(Object obj, InterpolationType type) {
 		if (InterpolationCount == MAXINTERPOLATIONS) {
-			Console.Println("Too many interpolations", Console.OSDTEXT_RED);
+			Console.out.println("Too many interpolations", OsdColor.RED);
 			return;
 		}
 

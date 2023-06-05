@@ -17,8 +17,7 @@
 package ru.m210projects.Build.Pattern.CommonMenus;
 
 import ru.m210projects.Build.Input.BuildControllers;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuButton;
@@ -270,7 +269,7 @@ public abstract class MenuJoystick extends BuildMenu {
 				}
 				app.pInput.ctrlResetKeyStatus();
 				if (item.l_nFocus == GameKeys.Show_Console.getNum()) {
-					Console.setCaptureKey(cfg.gpadkeys[item.l_nFocus], 3);
+//FIXME					Console.setCaptureKey(cfg.gpadkeys[item.l_nFocus], 3);
 				}
 			}
 		};

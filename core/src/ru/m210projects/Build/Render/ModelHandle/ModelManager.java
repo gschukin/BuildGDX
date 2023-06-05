@@ -1,14 +1,12 @@
 package ru.m210projects.Build.Render.ModelHandle;
 
 import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.GLVoxel;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
@@ -18,6 +16,7 @@ import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.ModelsInfo;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class ModelManager {
 
@@ -138,7 +137,7 @@ public abstract class ModelManager {
 			if (out != null) {
 				return models[tile] = out;
 			} else {
-				Console.Println("Removing model of tile " + tile + " due to errors.", OSDTEXT_RED);
+				Console.out.println("Removing model of tile " + tile + " due to errors.", OsdColor.RED);
 				mdInfo.removeModelInfo(model);
 			}
 		}
@@ -190,7 +189,7 @@ public abstract class ModelManager {
 				tile2model.put(model, out);
 				return models[tile] = out;
 			} else {
-				Console.Println("Removing voxel of tile " + tile + " due to errors.", OSDTEXT_RED);
+				Console.out.println("Removing voxel of tile " + tile + " due to errors.", OsdColor.RED);
 				mdInfo.removeModelInfo(model);
 			}
 		}

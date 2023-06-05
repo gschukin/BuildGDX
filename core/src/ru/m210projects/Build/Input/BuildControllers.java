@@ -16,15 +16,14 @@
 
 package ru.m210projects.Build.Input;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 
 import ru.m210projects.Build.Architecture.BuildController;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class BuildControllers {
 	
@@ -45,12 +44,12 @@ public abstract class BuildControllers {
 		}
 		
 		if(gamepads.size() == 0) {
-			Console.Println("No gamepads found.", OSDTEXT_YELLOW);
+			Console.out.println("No gamepads found.", OsdColor.YELLOW);
 		} else {
 			for(int i = 0; i < gamepads.size(); i++)
 			{
 				BuildController c = gamepads.get(i);
-				Console.Println("Found controller: \"" + c.getName() + "\" [buttons: " + c.getButtonCount() + " axises: " + c.getAxisCount() + " povs: " + c.getPovCount() + "]", OSDTEXT_YELLOW);
+				Console.out.println("Found controller: \"" + c.getName() + "\" [buttons: " + c.getButtonCount() + " axises: " + c.getAxisCount() + " povs: " + c.getPovCount() + "]", OsdColor.YELLOW);
 			}
 		}
 		return this;

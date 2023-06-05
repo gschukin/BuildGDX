@@ -20,7 +20,8 @@ import static ru.m210projects.Build.OnSceenDisplay.Console.*;
 
 import java.nio.ByteBuffer;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class DummySound implements Sound {
 
@@ -28,7 +29,7 @@ public class DummySound implements Sound {
 	
 	@Override
 	public boolean init(SystemType system, int kMaxSFXChannels, int softResampler) {
-		Console.Println(getName() + " initialized", OSDTEXT_GOLD);
+		Console.out.println(getName() + " initialized", OsdColor.YELLOW);
 		return true;
 	}
 

@@ -11,7 +11,6 @@
 package ru.m210projects.Build.Net;
 
 import static ru.m210projects.Build.Engine.MAXPLAYERS;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,10 +22,11 @@ import java.util.Arrays;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Net.WaifUPnp.UPnP;
-import ru.m210projects.Build.OnSceenDisplay.Console;
 import ru.m210projects.Build.Types.LittleEndian;
 
 import com.badlogic.gdx.Input.Keys;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class Mmulti {
 	
@@ -122,10 +122,10 @@ public class Mmulti {
 				mysock = new UDPSocket(portnum);
 			}
 				//mysock = new TCPClient(((InetSocketAddress)othersocket[connecthead]).getHostString(), portnum);
-			Console.Println("mmulti: This machine's IP is " + hostAddress);
+			Console.out.println("mmulti: This machine's IP is " + hostAddress);
 			return 1;
 		} catch (Throwable e) {
-			Console.Println(e.getMessage(), OSDTEXT_RED);
+			Console.out.println(e.getMessage(), OsdColor.RED);
 			return 0;
 		}
 	}
@@ -347,7 +347,7 @@ public class Mmulti {
 					inet.plready = 1;
 					if (initmultiplayersparms(argv))
 					{
-						Console.Println("Waiting for players...");
+						Console.out.println("Waiting for players...");
 						long starttime = System.currentTimeMillis();
 						while (initmultiplayerscycle() != 0) {
 							long time = System.currentTimeMillis() - starttime;
@@ -401,7 +401,7 @@ public class Mmulti {
 						portnum = j;
 					}
 	
-					Console.Println("mmulti: Using port " + portnum);
+					Console.out.println("mmulti: Using port " + portnum);
 				}
 			}
 
@@ -423,9 +423,9 @@ public class Mmulti {
 								if (argv[i].length() > 5 && (argv[i].charAt(5) >= '0') && (argv[i].charAt(5) <= '9')) {
 									numplayers = (short) (numplayers*10+(argv[i].charAt(5)-'0'));
 								}
-								Console.Println("mmulti: "+ numplayers + "-player game");
+								Console.out.println("mmulti: "+ numplayers + "-player game");
 							}
-							Console.Println("mmulti: Master-slave mode");
+							Console.out.println("mmulti: Master-slave mode");
 						}
 						continue;
 					}
@@ -449,7 +449,7 @@ public class Mmulti {
 					inet.serverip = argv[i];
 					inet.port = portnum;
 					othersocket[daindex] = new InetSocketAddress(argv[i], portnum);
-					Console.Println("mmulti: Player " + daindex + " at " + argv[i] + ":" + portnum);
+					Console.out.println("mmulti: Player " + daindex + " at " + argv[i] + ":" + portnum);
 					daindex++;
 					continue;
 				}
@@ -475,10 +475,10 @@ public class Mmulti {
 						othersocket[daindex] = new InetSocketAddress(addr.getHostAddress(), pt);
 						portnum = pt;
 						inet.port = portnum;
-						Console.Println("mmulti: Player " + daindex + " at " + othersocket[daindex]);
+						Console.out.println("mmulti: Player " + daindex + " at " + othersocket[daindex]);
 						daindex++;
 					} catch (Exception e) {
-						Console.Println("mmulti: Failed resolving " + argv[i]);
+						Console.out.println("mmulti: Failed resolving " + argv[i]);
 					}
 					continue;
 				}

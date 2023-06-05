@@ -18,7 +18,6 @@ package ru.m210projects.Build.Settings;
 
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 import static ru.m210projects.Build.Net.Mmulti.NETPORT;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,9 +31,9 @@ import ru.m210projects.Build.FileHandle.FileResource;
 import ru.m210projects.Build.FileHandle.FileResource.Mode;
 import ru.m210projects.Build.Input.ButtonMap;
 import ru.m210projects.Build.Input.Keymap;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.Tools.IniFile;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.Tools.IniFile;
 import ru.m210projects.Build.Render.Renderer.RenderType;
+import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class BuildConfig extends IniFile {
 
@@ -218,9 +217,9 @@ public abstract class BuildConfig extends IniFile {
 			init(data);
 			raf.close();
 		} catch (FileNotFoundException e) {
-			Console.Println("File not found: " + path + this.name, OSDTEXT_YELLOW);
+			Console.out.println("File not found: " + path + this.name, OsdColor.YELLOW);
 		} catch (IOException e) {
-			Console.Println("Read file error: " + e.getMessage(), OSDTEXT_YELLOW);
+			Console.out.println("Read file error: " + e.getMessage(), OsdColor.YELLOW);
 		}
 
 		this.primarykeys = new int[keymap.length];
@@ -242,7 +241,7 @@ public abstract class BuildConfig extends IniFile {
 				raf.write(data);
 				raf.close();
 			} catch (Exception e) {
-				Console.Println("Old config file error: " + e.getMessage(), OSDTEXT_YELLOW);
+				Console.out.println("Old config file error: " + e.getMessage(), OsdColor.YELLOW);
 			}
 		}
 	}
@@ -364,7 +363,7 @@ public abstract class BuildConfig extends IniFile {
 		if (set("Main")) {
 			int value = GetKeyInt("OSDTextScale");
 			if (value != -1) {
-				Console.setTextScale(value);
+				Console.out.setOsdTextScale(value / 65536.0f);
 			}
 
 			value = GetKeyInt("UseVoxels");
@@ -669,7 +668,7 @@ public abstract class BuildConfig extends IniFile {
 		} else {
 			saveString(fil, "\r\nSoundBank = \r\n");
 		}
-		saveInteger(fil, "OSDTextScale", Console.getTextScale());
+		saveInteger(fil, "OSDTextScale", (int) (Console.out.getValue("osdtextscale") * 65536));
 		saveBoolean(fil, "UseVoxels", BuildSettings.useVoxels.get());
 		saveBoolean(fil, "UseModels", GLSettings.useModels.get());
 		saveBoolean(fil, "UseHightiles", GLSettings.useHighTile.get());

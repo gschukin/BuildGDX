@@ -73,7 +73,8 @@ public abstract class MovieScreen extends SkippableAdapter {
 		StopAllSounds();
 		engine.sampletimer();
 		LastMS = engine.getticks();
-		gCutsClock = totalclock = 0;
+		engine.getTimer().reset();
+		gCutsClock = 0;
 
 		mvfil.playAudio();
 	}
@@ -253,10 +254,10 @@ public abstract class MovieScreen extends SkippableAdapter {
 		}
 
 		if (game.pInput.ctrlKeyStatus(ANYKEY)) {
-			gCutsClock = totalclock;
+			gCutsClock = engine.getTotalClock();
 		}
 
-		if (totalclock - gCutsClock < 200 && escSkip) // 2 sec
+		if (engine.getTotalClock() - gCutsClock < 200 && escSkip) // 2 sec
 		{
 			DrawEscText(GetFont(), MAXPALOOKUPS - RESERVEDPALS - 1);
 		}

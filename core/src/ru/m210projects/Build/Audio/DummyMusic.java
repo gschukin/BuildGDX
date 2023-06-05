@@ -19,7 +19,8 @@ package ru.m210projects.Build.Audio;
 
 import static ru.m210projects.Build.OnSceenDisplay.Console.*;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class DummyMusic implements Music {
 
@@ -33,7 +34,7 @@ public class DummyMusic implements Music {
 
 	@Override
 	public boolean init() {
-		Console.Println(getName() + " initialized", OSDTEXT_GOLD);
+		Console.out.println(getName() + " initialized", OsdColor.RED);
 		return true;
 	}
 

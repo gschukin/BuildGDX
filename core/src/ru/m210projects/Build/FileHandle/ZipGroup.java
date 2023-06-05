@@ -32,7 +32,8 @@ import java.util.zip.ZipFile;
 
 import ru.m210projects.Build.StringUtils;
 import ru.m210projects.Build.FileHandle.Cache1D.PackageType;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class ZipGroup extends Group {
 
@@ -204,7 +205,7 @@ public class ZipGroup extends Group {
 		{
 			if(zfile == null)
 			{
-				Console.Println("Group is closed!", Console.OSDTEXT_RED);
+				Console.out.println("Group is closed!", OsdColor.RED);
 				return null;
 			}
 
@@ -475,13 +476,13 @@ public class ZipGroup extends Group {
 				if(size > 0 && zfile != null) {
 					int opos = position();
 					if(bis.seek(0, Whence.Set) == -1) {
-						Console.Println("Error seeking to resource!");
+						Console.out.println("Error seeking to resource!");
 						return null;
 					}
 
 					byte[] data = new byte[size];
 					if(bis.read(data) == -1) {
-						Console.Println("Error loading resource!");
+						Console.out.println("Error loading resource!");
 						return null;
 					}
 					bis.seek(opos, Whence.Set);

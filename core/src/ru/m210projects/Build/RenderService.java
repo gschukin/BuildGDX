@@ -9,8 +9,7 @@ import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Compat;
 import ru.m210projects.Build.FileHandle.DirectoryEntry;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.GLRenderer;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GdxRender.GDXRenderer;
 import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.Software.Software;
@@ -19,6 +18,7 @@ import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.osd.OsdColor;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -29,7 +29,6 @@ import static java.lang.Math.*;
 import static java.lang.Math.pow;
 import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_YELLOW;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.buildString;
@@ -329,7 +328,7 @@ public class RenderService {
         pitch = (-EngineUtils.getAngle(160, (int) (dahoriz - 100))) / (2048.0f / 360.0f);
 
         globalcursectnum = (short) dacursectnum;
-        totalclocklock = totalclock;
+        totalclocklock = engine.getTotalClock();
 
         cosglobalang = (int) BCosAngle(globalang);
         singlobalang = (int) BSinAngle(globalang);
@@ -381,7 +380,7 @@ public class RenderService {
         setview(0, 0, xdim - 1, ydim - 1);
         setbrightness(curbrightness, palette, GLRenderer.GLInvalidateFlag.All);
 
-        Console.ResizeDisplay(daxdim, daydim);
+        Console.out.revalidate();
 
         if (render instanceof Software) {
             // Software renderer must be reinitialize when resolution is changed
@@ -402,7 +401,7 @@ public class RenderService {
             }
 
             if (m == null) {
-                Console.Println("Warning: " + daxdim + "x" + daydim + " fullscreen not supported", OSDTEXT_YELLOW);
+                Console.out.println("Warning: " + daxdim + "x" + daydim + " fullscreen not supported", OsdColor.YELLOW);
                 BuildGdx.graphics.setWindowedMode(daxdim, daydim);
                 return false;
             } else {
@@ -439,7 +438,7 @@ public class RenderService {
 
     public void nextpage() {
         render.nextpage();
-        totalclocklock = totalclock;
+        totalclocklock = engine.getTotalClock();
     }
 
     public void setaspect_new() { // eduke32 aspect
@@ -639,10 +638,11 @@ public class RenderService {
     }
 
     public void preparemirror(int dax, int day, int daz, float daang, float dahoriz, int dawall, int dasector) { // jfBuild
-        int x = Engine.getWall(dawall).getX();
-        int dx = getWall(Engine.getWall(dawall).getPoint2()).getX() - x;
-        int y = Engine.getWall(dawall).getY();
-        int dy = getWall(Engine.getWall(dawall).getPoint2()).getY() - y;
+        BoardService boardService = engine.getBoardService();
+        int x = boardService.getWall(dawall).getX();
+        int dx = boardService.getWall(boardService.getWall(dawall).getPoint2()).getX() - x;
+        int y = boardService.getWall(dawall).getY();
+        int dy = boardService.getWall(boardService.getWall(dawall).getPoint2()).getY() - y;
         int j = dx * dx + dy * dy;
         if (j == 0) {
             return;

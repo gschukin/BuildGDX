@@ -17,14 +17,12 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
 import static ru.m210projects.Build.Engine.getInput;
-import static ru.m210projects.Build.Engine.totalclock;
 import static ru.m210projects.Build.Gameutils.BClipLow;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Settings.BuildConfig;
@@ -80,9 +78,9 @@ public abstract class MenuKeyboardList extends MenuList
 			}
 
 			if ( i == l_nFocus ) {
-				if(l_set == 1 && (totalclock & 0x20) != 0) {
+//				if(l_set == 1 && (totalclock & 0x20) != 0) {
 					key = "____";
-				}
+//				}
 			}
 
 			char[] k = key.toCharArray();
@@ -96,10 +94,10 @@ public abstract class MenuKeyboardList extends MenuList
 				key = " - ";
 			}
 			if ( i == l_nFocus ) {
-				if(l_set == 1 && (totalclock & 0x20) != 0)
-				{
+//				if(l_set == 1 && (totalclock & 0x20) != 0)
+//				{
 					key = "____";
-				}
+//				}
 			}
 			k = key.toCharArray();
 			font.drawText(x + width - slider.getScrollerWidth() - 2 - font.getWidth(k), py, k, shade, pal2, TextAlign.Left, 2, fontShadow);	
@@ -175,9 +173,9 @@ public abstract class MenuKeyboardList extends MenuList
 				cfg.mousekeys[l_nFocus] = 0;
 				
 				if(l_nFocus == GameKeys.Show_Console.getNum()) {
-					Console.setCaptureKey(cfg.primarykeys[l_nFocus], 0);
-					Console.setCaptureKey(cfg.secondkeys[l_nFocus], 1);
-					Console.setCaptureKey(cfg.mousekeys[l_nFocus], 2);
+//	FIXME				Console.setCaptureKey(cfg.primarykeys[l_nFocus], 0);
+//					Console.setCaptureKey(cfg.secondkeys[l_nFocus], 1);
+//					Console.setCaptureKey(cfg.mousekeys[l_nFocus], 2);
 				}
 				return false;
 			case PGUP:

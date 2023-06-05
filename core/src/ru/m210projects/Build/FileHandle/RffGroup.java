@@ -16,15 +16,14 @@
 
 package ru.m210projects.Build.FileHandle;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import ru.m210projects.Build.FileHandle.Cache1D.PackageType;
 import ru.m210projects.Build.FileHandle.Resource.Whence;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Types.LittleEndian;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Types.LittleEndian;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class RffGroup extends Group {
 
@@ -288,7 +287,7 @@ public class RffGroup extends Group {
 			synchronized(parent) {
 				if(buffer == null) {
 					if(file.seek(offset, Whence.Set) == -1) {
-						Console.Println("Error seeking to resource!");
+						Console.out.println("Error seeking to resource!");
 						return;
 					}
 					
@@ -310,13 +309,13 @@ public class RffGroup extends Group {
 				int size = this.size();
 				if(size > 0) {
 					if(file.seek(offset, Whence.Set) == -1) {
-						Console.Println("Error seeking to resource!");
+						Console.out.println("Error seeking to resource!");
 						return null;
 					}
 	
 					byte[] data = new byte[size];
 					if(file.read(data) == -1) {
-						Console.Println("Error loading resource!");
+						Console.out.println("Error loading resource!");
 						return null;
 					}
 					
@@ -416,7 +415,7 @@ public class RffGroup extends Group {
 				if(res.size > 0) {
 					add(res);
 				} else {
-					Console.Println("Error: negative file size! " + res.filename + " size: " + res.size, OSDTEXT_RED);
+					Console.out.println("Error: negative file size! " + res.filename + " size: " + res.size, OsdColor.RED);
 				}
 			}
 		}

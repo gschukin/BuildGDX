@@ -17,8 +17,8 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.ModelHandle.GLModel;
+import ru.m210projects.Build.Settings.GLSettings;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.ModelHandle.GLModel;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelManager;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
@@ -36,6 +36,7 @@ import ru.m210projects.Build.Render.TextureHandle.Hicreplctyp;
 import ru.m210projects.Build.Render.TextureHandle.PixmapTileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class PolymostModelManager extends ModelManager {
 
@@ -128,7 +129,7 @@ public class PolymostModelManager extends ModelManager {
 
 		Resource res = BuildGdx.cache.open(skinfile, 0);
 		if (res == null) {
-			Console.Println("Skin " + skinfile + " not found.", Console.OSDTEXT_YELLOW);
+			Console.out.println("Skin " + skinfile + " not found.", OsdColor.YELLOW);
 			return null;
 		}
 
@@ -142,7 +143,7 @@ public class PolymostModelManager extends ModelManager {
 			}
 			m.usesalpha = true;
 		} catch (Exception e) {
-			Console.Println("Couldn't load file: " + skinfile, Console.OSDTEXT_YELLOW);
+			Console.out.println("Couldn't load file: " + skinfile, OsdColor.YELLOW);
 			return null;
 		} finally {
 			res.close();
@@ -163,7 +164,7 @@ public class PolymostModelManager extends ModelManager {
 			parent.bind(texid);
 
 			texunits = GL_TEXTURE0;
-			if (Console.Geti("r_detailmapping") != 0) {
+			if (GLSettings.detailMapping != 0) {
 				if ((texid = m.getSkin(DETAILPAL, skinnum, surfnum)) != null) {
 					if (!texid.isDetailTexture()) {
 						System.err.println("Wtf detail!");
@@ -185,7 +186,7 @@ public class PolymostModelManager extends ModelManager {
 				}
 			}
 
-			if (Console.Geti("r_glowmapping") != 0) {
+			if (GLSettings.glowMapping != 0) {
 				if ((texid = m.getSkin(GLOWPAL, skinnum, surfnum)) != null) {
 					if (!texid.isGlowTexture()) {
 						System.err.println("Wtf glow! " + surfnum);

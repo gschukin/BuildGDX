@@ -27,8 +27,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
 import ru.m210projects.Build.Pattern.BuildGame.NetMode;
@@ -198,7 +197,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 		pNet.CheckSync();
 
 		float smoothratio = 65536;
-		if (!game.gPaused && (game.nNetMode != NetMode.Single || !pMenu.gShowMenu && !Console.IsShown())) {
+		if (!game.gPaused && (game.nNetMode != NetMode.Single || !pMenu.gShowMenu && !Console.out.isShowing())) {
 			smoothratio = pEngine.getsmoothratio();
 			if (smoothratio < 0 || smoothratio > 0x10000) {
 //				System.err.println("Interpolation error " + smoothratio);
@@ -262,7 +261,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 		if (game.nNetMode == NetMode.Single && numplayers < 2) {
 			{
 				game.gPaused = false;
-				pNet.ototalclock = totalclock;
+				pNet.ototalclock = game.pEngine.getTotalClock();
 			}
 			sndHandlePause(game.gPaused);
 		}

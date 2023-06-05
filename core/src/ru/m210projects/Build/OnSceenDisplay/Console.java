@@ -1182,7 +1182,7 @@ public class Console {
 
 	    {
 	        int offset = ((osdflags & (OSD_CAPS|OSD_SHIFT)) == (OSD_CAPS|OSD_SHIFT) && osdhead > 0)?1:0;
-	        int shade = ((int)osdpromptshade.value!=0)?(int)osdpromptshade.value:(EngineUtils.sin(totalclock<<4)>>11);
+	        int shade = ((int)osdpromptshade.value!=0)?(int)osdpromptshade.value:(EngineUtils.sin(engine.getTotalClock()<<4)>>11);
 
 	        if (osdhead == osdlines-1) {
 				func.drawchar(0,osdrowscur,'~',shade,(int)osdpromptpal.value, osdtextscale);
@@ -1209,7 +1209,7 @@ public class Console {
 
 	        if (osdver != null) {
 				func.drawstr(osdcols-osdverlen + 2, osdrowscur - ((offset >= osdcols-osdverlen+2)?1:0),
-						  osdver ,osdverlen,(EngineUtils.sin(totalclock<<4)>>11),osdverpal, osdtextscale);
+						  osdver ,osdverlen,(EngineUtils.sin((engine.getTotalClock()<<4))>>11),osdverpal, osdtextscale);
 			}
 	     }
 	}

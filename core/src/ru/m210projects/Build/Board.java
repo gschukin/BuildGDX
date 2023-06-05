@@ -1,10 +1,10 @@
 package ru.m210projects.Build;
 
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Types.BuildPos;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Types.BuildPos;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Wall;
+import ru.m210projects.Build.osd.OsdColor;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class Board {
                 Wall wal = getWall(i);
                 Wall wal2;
                 if (wal == null || (wal2 = getWall(wal.getPoint2())) == null) {
-                    Console.Println(String.format("Sector %d has corrupt contour", s), Console.OSDTEXT_RED);
+                    Console.out.println(String.format("Sector %d has corrupt contour", s), OsdColor.RED);
                     sec.setWallnum(0);
                     sec.setWallptr(0);
                     sectorWalls = new Wall[0];

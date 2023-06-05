@@ -8,13 +8,13 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.totalclock;
 import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT1;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT2;
 
 import com.badlogic.gdx.math.Matrix4;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildGdx;
@@ -37,11 +37,13 @@ public class GDXModelRenderer {
 	private final Matrix4 transform;
 	private final GDXRenderer parent;
 	private final Engine engine;
+	private final BoardService boardService;
 
 	public GDXModelRenderer(GDXRenderer parent) {
 		this.transform = new Matrix4();
 		this.parent = parent;
 		this.engine = parent.engine;
+		this.boardService = engine.getBoardService();
 	}
 
 	public boolean mddraw(GLModel m, Sprite tspr) {
@@ -72,7 +74,7 @@ public class GDXModelRenderer {
 				transform.translate(0, -vox.ypiv / 64.0f, -vox.zpiv / 64.0f);
 			}
 		} else if (m instanceof MDModel) {
-			((MDModel) m).updateanimation(defs.mdInfo, tspr);
+			((MDModel) m).updateanimation(defs.mdInfo, tspr, engine.getTimer().getTicsPerSecond());
 			if (m.getType() == Type.Md3) {
                 transform.scale(1 / 64.0f, 1 / 64.0f, -1 / 64.0f);
             }
@@ -120,8 +122,8 @@ public class GDXModelRenderer {
 
 	private int getVisibility(Sprite tspr) {
 		int vis = globalvisibility;
-		if (Engine.getSector(tspr.getSectnum()).getVisibility() != 0) {
-            vis = mulscale(globalvisibility, (Engine.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
+		if (boardService.getSector(tspr.getSectnum()).getVisibility() != 0) {
+            vis = mulscale(globalvisibility, (boardService.getSector(tspr.getSectnum()).getVisibility() + 16) & 0xFF, 4);
         }
 		return vis;
 	}
@@ -184,7 +186,7 @@ public class GDXModelRenderer {
         }
 		transform.translate(-xoff / 64.0f, 0, (-yoff / 64.0f) - yoffset);
 		if (m.isRotating()) {
-            transform.rotate(0, 0, -1, totalclock % 360);
+            transform.rotate(0, 0, -1, engine.getTotalClock() % 360);
         }
 		if (m instanceof MDModel) {
 			transform.scale(0.01f, 0.01f, 0.01f);
@@ -326,7 +328,7 @@ public class GDXModelRenderer {
 //		if (m == null)
 //			return 0;
 //
-//		if ((Engine.getSprite()[tspr.owner].cstat & 48) == 32)
+//		if ((boardService.getSprite()[tspr.owner].cstat & 48) == 32)
 //			return 0;
 //
 //		ShaderManager manager = parent.manager;
@@ -378,8 +380,8 @@ public class GDXModelRenderer {
 //			BuildGdx.gl.glFrontFace(GL_CW);
 //
 //		int vis = globalvisibility;
-//		if (Engine.getSector()[tspr.sectnum].visibility != 0)
-//			vis = mulscale(globalvisibility, (Engine.getSector()[tspr.sectnum].visibility + 16) & 0xFF, 4);
+//		if (boardService.getSector()[tspr.sectnum].visibility != 0)
+//			vis = mulscale(globalvisibility, (boardService.getSector()[tspr.sectnum].visibility + 16) & 0xFF, 4);
 //
 //		parent.switchShader(
 //				parent.getTexFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader);

@@ -10,6 +10,7 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Plane;
 
+import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Types.collections.Pool;
@@ -27,6 +28,11 @@ public class RayCaster {
 	protected byte[] gotwall = new byte[MAXWALLS >> 3];
 	protected byte[] handled = new byte[MAXWALLS >> 3];
 	protected boolean globalcheck;
+	protected final BoardService boardService;
+
+	public RayCaster(BoardService boardService) {
+		this.boardService = boardService;
+	}
 
 	private final Pool<Segment> pSegmentPool = new Pool<Segment>() {
 		@Override
@@ -60,7 +66,7 @@ public class RayCaster {
 		}
 
 		public boolean isPortal() {
-			return Engine.getWall(wallid).getNextsector() != -1;
+			return boardService.getWall(wallid).getNextsector() != -1;
 		}
 
 		@Override
@@ -239,8 +245,8 @@ public class RayCaster {
 	}
 
 	public void add(int z, WallFrustum2d frust) {
-		Wall wal = Engine.getWall(z);
-		Wall wal2 = Engine.getWall(wal.getPoint2());
+		Wall wal = boardService.getWall(z);
+		Wall wal2 = boardService.getWall(wal.getPoint2());
 
 		if (frust == null || frust.sectnum == globalcursectnum) {
 			addSegment(z, wal.getX(), wal.getY(), wal2.getX(), wal2.getY());
@@ -261,8 +267,8 @@ public class RayCaster {
 
 	public void addClippedSegment(WallFrustum2d frustum, int z) {
 		Plane[] planes = frustum.planes;
-		Wall p1 = Engine.getWall(z);
-		Wall p2 = Engine.getWall(p1.getPoint2());
+		Wall p1 = boardService.getWall(z);
+		Wall p2 = boardService.getWall(p1.getPoint2());
 
 		float p1x = p1.getX();
 		float p1y = p1.getY();

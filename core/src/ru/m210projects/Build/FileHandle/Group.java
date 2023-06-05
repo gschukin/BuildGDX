@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ru.m210projects.Build.FileHandle.Cache1D.PackageType;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-
+import ru.m210projects.Build.osd.Console;
 public abstract class Group {
 
 	protected boolean debug = false;
@@ -132,7 +131,7 @@ public abstract class Group {
 
 	public GroupResource open(int fileid, String type) {
 		if(type == null) {
-			Console.Println("type == null");
+			Console.out.println("type == null");
 			return null;
 		}
 

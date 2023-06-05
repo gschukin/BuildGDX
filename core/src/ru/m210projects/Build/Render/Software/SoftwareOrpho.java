@@ -10,9 +10,8 @@
 
 package ru.m210projects.Build.Render.Software;
 
+import static java.lang.Math.*;
 import static ru.m210projects.Build.RenderService.*;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
@@ -60,6 +59,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 	protected int asm1;
 	protected int asm2;
 	protected int globalpolytype;
+	protected final BoardService boardService;
 
 	public int[] nrx1 = new int[8], nry1 = new int[8], nrx2 = new int[8], nry2 = new int[8]; // JBF 20031206: Thanks Ken
 
@@ -67,6 +67,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		super(parent.engine, settings);
 		this.parent = parent;
 		this.MAXPERMS = parent.MAXPERMS;
+		this.boardService = engine.getBoardService();
 	}
 
 	@Override
@@ -305,7 +306,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		int sortnum = 0;
 
 		for (s = 0; s < numsectors; s++) {
-			sec = Engine.getSector(s);
+			sec = boardService.getSector(s);
 
 			if (mapSettings.isFullMap() || (show2dsector[s >> 3] & pow2char[s & 7]) != 0) {
 				npoints = 0;
@@ -317,7 +318,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					continue;
 				}
 				for (w = sec.getWallnum(); w > 0; w--, j++) {
-					wal = Engine.getWall(j);
+					wal = boardService.getWall(j);
 					if (wal == null) {
 						continue;
 					}
@@ -358,7 +359,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 							if (sortnum >= MAXSPRITESONSCREEN) {
 								continue;
 							}
-							if ((Engine.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8)) {
+							if ((boardService.getSprite(i1).getCstat() & (64 + 8)) == (64 + 8)) {
 								continue;
 							}
 
@@ -414,8 +415,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = bakgxvect;
 					globaly2 = bakgyvect;
 				} else {
-					ox = Engine.getWall(Engine.getWall(startwall).getPoint2()).getX() - Engine.getWall(startwall).getX();
-					oy = Engine.getWall(Engine.getWall(startwall).getPoint2()).getY() - Engine.getWall(startwall).getY();
+					ox = boardService.getWall(boardService.getWall(startwall).getPoint2()).getX() - boardService.getWall(startwall).getX();
+					oy = boardService.getWall(boardService.getWall(startwall).getPoint2()).getY() - boardService.getWall(startwall).getY();
 					i = EngineUtils.sqrt(ox * ox + oy * oy);
 					if (i == 0) {
 						continue;
@@ -430,7 +431,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = -globalx1;
 					globaly2 = -globaly1;
 
-					daslope = Engine.getSector(s).getFloorheinum();
+					daslope = boardService.getSector(s).getFloorheinum();
 					i = EngineUtils.sqrt(daslope * daslope + 16777216);
 					globalposy = mulscale(globalposy, i, 12);
 					globalx2 = mulscale(globalx2, i, 12);
@@ -490,7 +491,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			for (gap >>= 1; gap > 0; gap >>= 1) {
 				for (i = 0; i < sortnum - gap; i++) {
 					for (j = i; j >= 0; j -= gap) {
-						if (Engine.getSprite(tsprite[j].getOwner()).getZ() <= Engine.getSprite(tsprite[j + gap].getOwner()).getZ()) {
+						if (boardService.getSprite(tsprite[j].getOwner()).getZ() <= boardService.getSprite(tsprite[j + gap].getOwner()).getZ()) {
 							break;
 						}
 
@@ -502,7 +503,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			}
 
 			for (s = sortnum - 1; s >= 0; s--) {
-				Sprite spr = Engine.getSprite(tsprite[s].getOwner());
+				Sprite spr = boardService.getSprite(tsprite[s].getOwner());
 				if ((spr.getCstat() & 48) == 32) {
 					npoints = 0;
 
@@ -617,10 +618,10 @@ public class SoftwareOrpho extends OrphoRenderer {
 					// This can really happen when drawing the second frame of a floor-aligned
 					// 'storm icon' sprite (4894+1)
 
-					if ((getSector(spr.getSectnum()).getCeilingstat() & 1) > 0) {
-						globalshade = (getSector(spr.getSectnum()).getCeilingshade());
+					if ((boardService.getSector(spr.getSectnum()).getCeilingstat() & 1) > 0) {
+						globalshade = (boardService.getSector(spr.getSectnum()).getCeilingshade());
 					} else {
-						globalshade = (getSector(spr.getSectnum()).getFloorshade());
+						globalshade = (boardService.getSector(spr.getSectnum()).getFloorshade());
 					}
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 

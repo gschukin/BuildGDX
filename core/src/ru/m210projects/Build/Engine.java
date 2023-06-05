@@ -13,14 +13,14 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.FileHandle.Resource.Whence;
 import ru.m210projects.Build.Input.KeyInput;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.OnSceenDisplay.DEFOSDFUNC;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.DefaultOsdFunc;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
@@ -98,7 +98,7 @@ public abstract class Engine {
     protected ClipMover clipmove = new ClipMover(this);
     protected final EngineService engineService = new EngineService(this);
     protected final PushMover pushMover = new PushMover(this);
-    protected static BoardService boardService;
+    protected final BoardService boardService;
     protected final RenderService renderService;
     public static int hitscangoalx = (1 << 29) - 1, hitscangoaly = (1 << 29) - 1;
     private final HitScanner scanner = new HitScanner(this);
@@ -163,10 +163,7 @@ public abstract class Engine {
     public static byte[] show2dsprite;
 
     // timer
-    public static int totalclock;
-    protected int timerfreq;
-    protected long timerlastsample;
-    public static int timerticspersec;
+    protected Timer timer;
 
     // tiles
     public String tilesPath = "tilesXXX.art";
@@ -183,6 +180,8 @@ public abstract class Engine {
     protected int randomseed;
     public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
     public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
+
+    private Console console;
 
     // Engine.c
 
@@ -215,8 +214,7 @@ public abstract class Engine {
     public Engine() throws Exception { // gdxBuild
         InitArrays();
 
-        // loadtables
-        EngineUtils.init(this);
+        EngineUtils.init(this); // loadtables
         this.renderService = createRenderService();
         this.boardService = createBoardService();
 
@@ -224,7 +222,6 @@ public abstract class Engine {
         pskybits = 0;
         paletteloaded = 0;
         automapping = 0;
-        totalclock = 0;
         visibility = 512;
         parallaxvisibility = 512;
 
@@ -232,7 +229,7 @@ public abstract class Engine {
 
         initkeys();
 
-        Console.setFunction(new DEFOSDFUNC(this));
+//        Console.setFunction(new DEFOSDFUNC(this));
         randomseed = 1; // random for voxels
     }
 
@@ -259,7 +256,7 @@ public abstract class Engine {
         curpalette = new Palette();
         palookup = new byte[MAXPALOOKUPS][];
 
-        Console.Println("Loading palettes");
+        Console.out.println("Loading palettes");
         if ((fil = BuildGdx.cache.open("palette.dat", 0)) == null) {
             throw new Exception("Failed to load \"palette.dat\"!");
         }
@@ -271,9 +268,9 @@ public abstract class Engine {
         palookup[0] = new byte[numshades << 8];
         transluc = new byte[65536];
 
-        Console.Println("Loading gamma correction tables");
+        Console.out.println("Loading gamma correction tables");
         fil.read(palookup[0], 0, numshades << 8);
-        Console.Println("Loading translucency table");
+        Console.out.println("Loading translucency table");
 
         fil.read(transluc);
 
@@ -315,25 +312,19 @@ public abstract class Engine {
     }
 
     public void inittimer(int tickspersecond) { // jfBuild
-        if (timerfreq != 0) {
-            return; // already installed
-        }
+        this.timer = new Timer(tickspersecond);
+    }
 
-        timerfreq = 1000;
-        timerticspersec = tickspersecond;
-        timerlastsample = System.nanoTime() * timerticspersec / (timerfreq * 1000000L);
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public int getTotalClock() {
+        return timer.getTotalClock();
     }
 
     public void sampletimer() { // jfBuild
-        if (timerfreq == 0) {
-            return;
-        }
-
-        long n = (System.nanoTime() * timerticspersec / (timerfreq * 1000000)) - timerlastsample;
-        if (n > 0) {
-            totalclock += n;
-            timerlastsample += n;
-        }
+        timer.update();
     }
 
     public long getticks() { // gdxBuild
@@ -478,8 +469,6 @@ public abstract class Engine {
             artfilename[5] = (char) (((i / 100) % 10) + 48);
 
             artfil = BuildGdx.cache.open(new String(artfilename), 0);
-
-            faketimerhandler();
         }
 
         if (artfil == null) {
@@ -492,14 +481,12 @@ public abstract class Engine {
 
         if (artfilplc != tilefileoffs[tilenume]) {
             artfil.seek(tilefileoffs[tilenume] - artfilplc, Whence.Current);
-            faketimerhandler();
         }
 
         if (artfil.read(pic.data) == -1) {
             return null;
         }
 
-        faketimerhandler();
         artfilplc = tilefileoffs[tilenume] + dasiz;
 
         return pic.data;
@@ -525,15 +512,15 @@ public abstract class Engine {
 
         short sectortouse = -1;
 
-        short wallid = Engine.getSector(sectnum).getWallptr();
-        int i = Engine.getSector(sectnum).getWallnum(), testz;
+        short wallid = boardService.getSector(sectnum).getWallptr();
+        int i = boardService.getSector(sectnum).getWallnum(), testz;
         do {
-            Wall wal = Engine.getWall(wallid);
+            Wall wal = boardService.getWall(wallid);
             if (wal.getNextsector() >= 0) {
                 if (topbottom == 1) {
-                    testz = getSector(wal.getNextsector()).getFloorz();
+                    testz = boardService.getSector(wal.getNextsector()).getFloorz();
                 } else {
-                    testz = getSector(wal.getNextsector()).getCeilingz();
+                    testz = boardService.getSector(wal.getNextsector()).getCeilingz();
                 }
                 if (direction == 1) {
                     if ((testz > thez) && (testz < nextz)) {
@@ -556,7 +543,7 @@ public abstract class Engine {
 
     public void nextpage() { // gdxBuild
         faketimerhandler();
-        Console.draw(this);
+        Console.out.draw();
         BuildGdx.audio.update();
         renderService.nextpage();
     }
@@ -603,14 +590,14 @@ public abstract class Engine {
 //        for (int dacnt = 0; dacnt < sectorSet.size(); dacnt++) {
 //            dasector = (short) sectorSet.getValue(dacnt);
 //
-//            startwall = Engine.getSector(dasector).getWallptr();
-//            endwall = (startwall + Engine.getSector(dasector).getWallnum() - 1);
+//            startwall = boardService.getSector(dasector).getWallptr();
+//            endwall = (startwall + boardService.getSector(dasector).getWallnum() - 1);
 //            if (startwall < 0 || endwall < 0) {
 //                continue;
 //            }
 //            for (int z = startwall; z <= endwall; z++) {
-//                Wall wal = Engine.getWall(z);
-//                Wall wal2 = Engine.getWall(wal.getPoint2());
+//                Wall wal = boardService.getWall(z);
+//                Wall wal2 = boardService.getWall(wal.getPoint2());
 //                x1 = wal.getX();
 //                y1 = wal.getY();
 //                x2 = wal2.getX();
@@ -620,9 +607,9 @@ public abstract class Engine {
 //
 //                good = 0;
 //                if (nextsector >= 0) {
-//                    if (((tagsearch & 1) != 0) && Engine.getSector(nextsector).getLotag() != 0)
+//                    if (((tagsearch & 1) != 0) && boardService.getSector(nextsector).getLotag() != 0)
 //                        good |= 1;
-//                    if (((tagsearch & 2) != 0) && Engine.getSector(nextsector).getHitag() != 0)
+//                    if (((tagsearch & 2) != 0) && boardService.getSector(nextsector).getHitag() != 0)
 //                        good |= 1;
 //                }
 //                if (((tagsearch & 1) != 0) && wal.getLotag() != 0)
@@ -655,7 +642,7 @@ public abstract class Engine {
 //
 //            for (SpriteNode node = spriteSectMap.getFirst(dasector); node != null; node = node.getNext()) {
 //                int z = node.getIndex();
-//                Sprite spr = Engine.getSprite(z);
+//                Sprite spr = boardService.getSprite(z);
 //
 //                good = 0;
 //                if (((tagsearch & 1) != 0) && spr.getLotag() != 0)
@@ -720,23 +707,23 @@ public abstract class Engine {
     }
 
     public void dragpoint(int pointhighlight, int dax, int day) { // jfBuild
-        Engine.getWall(pointhighlight).setX(dax);
-        Engine.getWall(pointhighlight).setY(day);
+        boardService.getWall(pointhighlight).setX(dax);
+        boardService.getWall(pointhighlight).setY(day);
 
         int cnt = MAXWALLS;
         int tempshort = pointhighlight; // search points CCW
         do {
-            if (Engine.getWall(tempshort).getNextwall() >= 0) {
-                tempshort = getWall(Engine.getWall(tempshort).getNextwall()).getPoint2();
-                Engine.getWall(tempshort).setX(dax);
-                Engine.getWall(tempshort).setY(day);
+            if (boardService.getWall(tempshort).getNextwall() >= 0) {
+                tempshort = boardService.getWall(boardService.getWall(tempshort).getNextwall()).getPoint2();
+                boardService.getWall(tempshort).setX(dax);
+                boardService.getWall(tempshort).setY(day);
             } else {
                 tempshort = pointhighlight; // search points CW if not searched all the way around
                 do {
-                    if (Engine.getWall(lastwall(tempshort)).getNextwall() >= 0) {
-                        tempshort = Engine.getWall(lastwall(tempshort)).getNextwall();
-                        Engine.getWall(tempshort).setX(dax);
-                        Engine.getWall(tempshort).setY(day);
+                    if (boardService.getWall(lastwall(tempshort)).getNextwall() >= 0) {
+                        tempshort = boardService.getWall(lastwall(tempshort)).getNextwall();
+                        boardService.getWall(tempshort).setX(dax);
+                        boardService.getWall(tempshort).setY(day);
                     } else {
                         break;
                     }
@@ -749,14 +736,14 @@ public abstract class Engine {
     }
 
     public int lastwall(int point) { // jfBuild
-        if ((point > 0) && (Engine.getWall(point - 1).getPoint2() == point)) {
+        if ((point > 0) && (boardService.getWall(point - 1).getPoint2() == point)) {
             return (point - 1);
         }
 
         int i = point, j;
         int cnt = MAXWALLS;
         do {
-            j = Engine.getWall(i).getPoint2();
+            j = boardService.getWall(i).getPoint2();
             if (j == point) {
                 return (i);
             }
@@ -899,13 +886,13 @@ public abstract class Engine {
 
     public int loopnumofsector(int sectnum, int wallnum) { // jfBuild
         int numloops = 0;
-        int startwall = Engine.getSector(sectnum).getWallptr();
-        int endwall = startwall + Engine.getSector(sectnum).getWallnum();
+        int startwall = boardService.getSector(sectnum).getWallptr();
+        int endwall = startwall + boardService.getSector(sectnum).getWallnum();
         for (int i = startwall; i < endwall; i++) {
             if (i == wallnum) {
                 return (numloops);
             }
-            if (Engine.getWall(i).getPoint2() < i) {
+            if (boardService.getWall(i).getPoint2() < i) {
                 numloops++;
             }
         }
@@ -978,22 +965,22 @@ public abstract class Engine {
         int themin = -1;
         int i = wallstart - 1;
         do {
-            if (!Gameutils.isValidWall(++i)) {
+            if (!boardService.isValidWall(++i)) {
                 break;
             }
 
-            if (Engine.getWall(Engine.getWall(i).getPoint2()).getX() < minx) {
-                minx = Engine.getWall(Engine.getWall(i).getPoint2()).getX();
+            if (boardService.getWall(boardService.getWall(i).getPoint2()).getX() < minx) {
+                minx = boardService.getWall(boardService.getWall(i).getPoint2()).getX();
                 themin = i;
             }
-        } while (Engine.getWall(i).getPoint2() != wallstart);
+        } while (boardService.getWall(i).getPoint2() != wallstart);
 
-        int x0 = Engine.getWall(themin).getX();
-        int y0 = Engine.getWall(themin).getY();
-        int x1 = Engine.getWall(Engine.getWall(themin).getPoint2()).getX();
-        int y1 = Engine.getWall(Engine.getWall(themin).getPoint2()).getY();
-        int x2 = Engine.getWall(Engine.getWall(Engine.getWall(themin).getPoint2()).getPoint2()).getX();
-        int y2 = Engine.getWall(Engine.getWall(Engine.getWall(themin).getPoint2()).getPoint2()).getY();
+        int x0 = boardService.getWall(themin).getX();
+        int y0 = boardService.getWall(themin).getY();
+        int x1 = boardService.getWall(boardService.getWall(themin).getPoint2()).getX();
+        int y1 = boardService.getWall(boardService.getWall(themin).getPoint2()).getY();
+        int x2 = boardService.getWall(boardService.getWall(boardService.getWall(themin).getPoint2()).getPoint2()).getX();
+        int y2 = boardService.getWall(boardService.getWall(boardService.getWall(themin).getPoint2()).getPoint2()).getY();
 
         if ((y1 >= y2) && (y1 <= y0)) {
             return Clockdir.CW;
@@ -1017,8 +1004,7 @@ public abstract class Engine {
 
     public void handleevents() { // gdxBuild
         input.handleevents();
-        Console.HandleScanCode();
-
+        Console.out.handleevents();
         sampletimer();
     }
 
@@ -1159,26 +1145,6 @@ public abstract class Engine {
         return boardService;
     }
 
-    public static Sector getSector(int index) {
-        return boardService.getSector(index);
-    }
-
-    public static Wall getWall(int index) {
-        return boardService.getWall(index);
-    }
-
-    public static Sprite getSprite(int index) {
-        return boardService.getSprite(index);
-    }
-
-    public int insertspritesect(int sectnum) {
-        return boardService.insertspritesect(sectnum);
-    }
-
-    public int insertspritestat(int newstatnum) {
-        return boardService.insertspritestat(newstatnum);
-    }
-
     public int insertsprite(int sectnum, int statnum) { // jfBuild
         return boardService.insertsprite(sectnum, statnum);
     }
@@ -1210,7 +1176,7 @@ public abstract class Engine {
     }
 
     public int inside(int x, int y, int sectnum) { // jfBuild
-        return boardService.inside(x, y, Engine.getSector(sectnum)) ? 1 : 0;
+        return boardService.inside(x, y, boardService.getSector(sectnum)) ? 1 : 0;
     }
 
     protected static int SETSPRITEZ = 0;
@@ -1228,11 +1194,11 @@ public abstract class Engine {
     }
 
     public int getflorzofslope(int sectnum, int dax, int day) { // jfBuild
-        return boardService.getflorzofslope(getSector(sectnum), dax, day);
+        return boardService.getflorzofslope(boardService.getSector(sectnum), dax, day);
     }
 
     public void getzsofslope(int sectnum, int dax, int day, AtomicInteger fz, AtomicInteger cz) {
-        Sector sec = getSector(sectnum);
+        Sector sec = boardService.getSector(sectnum);
         fz.set(sec.getFloorz());
         cz.set(sec.getCeilingz());
         boardService.getzsofslope(sec, dax, day, fz, cz);

@@ -86,7 +86,7 @@ public class DEFOSDFUNC implements OSDFunc {
 
 	@Override
 	public int gettime() {
-		return Engine.totalclock;
+		return engine.getTotalClock();
 	}
 
 	@Override

@@ -12,7 +12,6 @@
 package ru.m210projects.Build.Render.Software;
 
 import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.dmulscale;
 import static ru.m210projects.Build.Pragmas.klabs;
@@ -31,8 +30,7 @@ import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.OnSceenDisplay.Console;
-import ru.m210projects.Build.Render.IOverheadMapSettings;
+import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
@@ -45,6 +43,7 @@ import ru.m210projects.Build.Tables;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.osd.OsdColor;
 
 public class Software implements Renderer {
 
@@ -52,7 +51,8 @@ public class Software implements Renderer {
 	public static final int MAXVOXMIPS = 5;
 
 	protected A a;
-	protected Engine engine;
+	protected final Engine engine;
+	protected final BoardService boardService;
 	protected DefScript defs;
 
 	public int bytesperline, frameoffset;
@@ -162,6 +162,7 @@ public class Software implements Renderer {
 	public Software(Engine engine, IOverheadMapSettings settings) {
 
 		this.engine = engine;
+		this.boardService = engine.getBoardService();
 
 		ortho = allocOrphoRenderer(settings);
 
@@ -220,7 +221,7 @@ public class Software implements Renderer {
 			a.fixtransluscence(transluc);
 			a.setpalookupaddress(palookup[globalpalwritten]);
 
-			Console.Println("Software renderer is initialized", OSDTEXT_GOLD);
+			Console.out.println("Software renderer is initialized", OsdColor.YELLOW);
 			isInited = true;
 		} catch (Throwable t) {
 			isInited = false;
@@ -536,7 +537,7 @@ public class Software implements Renderer {
 			mirrorsx1 = xdimen - 1;
 			mirrorsx2 = 0;
 			for (i = numscans - 1; i >= 0; i--) {
-				if (Engine.getWall(thewall[i]).getNextsector() < 0) {
+				if (boardService.getWall(thewall[i]).getNextsector() < 0) {
 					continue;
 				}
 				if (xb1[i] < mirrorsx1) {
@@ -660,7 +661,7 @@ public class Software implements Renderer {
 	private void drawalls(int bunch) {
 		int z = bunchfirst[bunch];
 		short sectnum = thesector[z];
-		Sector sec = Engine.getSector(sectnum);
+		Sector sec = boardService.getSector(sectnum);
 
 		int andwstat1 = 0xff;
 		int andwstat2 = 0xff;
@@ -713,7 +714,7 @@ public class Software implements Renderer {
 			}
 
 			int wallnum = thewall[z];
-			Wall wal = Engine.getWall(wallnum);
+			Wall wal = boardService.getWall(wallnum);
 			short nextsectnum = wal.getNextsector();
 			Sector nextsec = null;
 
@@ -723,11 +724,11 @@ public class Software implements Renderer {
 			int startsmostcnt = smostcnt;
 
 			if (nextsectnum >= 0) {
-				nextsec = Engine.getSector(nextsectnum);
+				nextsec = boardService.getSector(nextsectnum);
 				engine.getzsofslope(sectnum, wal.getX(), wal.getY(), fz[0], cz[0]);
-				engine.getzsofslope(sectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), fz[1], cz[1]);
+				engine.getzsofslope(sectnum, boardService.getWall(wal.getPoint2()).getX(), boardService.getWall(wal.getPoint2()).getY(), fz[1], cz[1]);
 				engine.getzsofslope(nextsectnum, wal.getX(), wal.getY(), fz[2], cz[2]);
-				engine.getzsofslope(nextsectnum, Engine.getWall(wal.getPoint2()).getX(), Engine.getWall(wal.getPoint2()).getY(), fz[3], cz[3]);
+				engine.getzsofslope(nextsectnum, boardService.getWall(wal.getPoint2()).getX(), boardService.getWall(wal.getPoint2()).getY(), fz[3], cz[3]);
 				engine.getzsofslope(nextsectnum, globalposx, globalposy, fz[4], cz[4]);
 
 				if ((wal.getCstat() & 48) == 16) {
@@ -865,7 +866,7 @@ public class Software implements Renderer {
 
 						if ((wal.getCstat() & 2) > 0) {
 							wallnum = wal.getNextwall();
-							wal = Engine.getWall(wallnum);
+							wal = boardService.getWall(wallnum);
 							globalorientation = wal.getCstat();
 							globalpicnum = wal.getPicnum();
 							if (globalpicnum >= MAXTILES) {
@@ -879,7 +880,7 @@ public class Software implements Renderer {
 							globalshade = wal.getShade();
 							globalpal = wal.getPal();
 							wallnum = thewall[z];
-							wal = Engine.getWall(wallnum);
+							wal = boardService.getWall(wallnum);
 						} else {
 							globalorientation = wal.getCstat();
 							globalpicnum = wal.getPicnum();
@@ -1093,7 +1094,7 @@ public class Software implements Renderer {
 		if (BuildSettings.useVoxels.get()) {
 			Tile2model entry = defs != null ? defs.mdInfo.getParams(tilenum) : null;
 			if (entry != null && entry.voxel != null) {
-				if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) != 32) {
+				if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) != 32) {
 					vtilenum = entry.voxel;
 					cstat |= 48;
 				}
@@ -1101,7 +1102,7 @@ public class Software implements Renderer {
 		}
 
 		short sectnum = tspr.getSectnum();
-		Sector sec = Engine.getSector(sectnum);
+		Sector sec = boardService.getSector(sectnum);
 		globalpal = tspr.getPal();
 		if (palookup[globalpal] == null) {
 			globalpal = 0; // JBF: fixes null-pointer crash
@@ -1555,11 +1556,11 @@ public class Software implements Renderer {
 						x = 0x80000000;
 					} else {
 						x = thewall[j];
-						xp1 = Engine.getWall(x).getX();
-						yp1 = Engine.getWall(x).getY();
-						x = Engine.getWall(x).getPoint2();
-						xp2 = Engine.getWall(x).getX();
-						yp2 = Engine.getWall(x).getY();
+						xp1 = boardService.getWall(x).getX();
+						yp1 = boardService.getWall(x).getY();
+						x = boardService.getWall(x).getPoint2();
+						xp2 = boardService.getWall(x).getX();
+						yp2 = boardService.getWall(x).getY();
 
 						z1 = (xp2 - xp1) * (y1 - yp1) - (yp2 - yp1) * (x1 - xp1);
 						z2 = (xp2 - xp1) * (y2 - yp1) - (yp2 - yp1) * (x2 - xp1);
@@ -1573,7 +1574,7 @@ public class Software implements Renderer {
 								x = -(z1 + z2);
 							} else {
 								if ((xp2 - xp1) * (tspr.getY() - yp1) == (tspr.getX() - xp1) * (yp2 - yp1)) {
-									if (Engine.getWall(thewall[j]).getNextsector() == tspr.getSectnum()) {
+									if (boardService.getWall(thewall[j]).getNextsector() == tspr.getSectnum()) {
 										x = 0x80000000;
 									} else {
 										x = 0x7fffffff;
@@ -1950,16 +1951,16 @@ public class Software implements Renderer {
 
 				// if (spritewallfront(tspr,thewall[j]) == 0)
 				x = thewall[j];
-				xp1 = Engine.getWall(x).getX();
-				yp1 = Engine.getWall(x).getY();
-				x = Engine.getWall(x).getPoint2();
-				xp2 = Engine.getWall(x).getX();
-				yp2 = Engine.getWall(x).getY();
+				xp1 = boardService.getWall(x).getX();
+				yp1 = boardService.getWall(x).getY();
+				x = boardService.getWall(x).getPoint2();
+				xp2 = boardService.getWall(x).getX();
+				yp2 = boardService.getWall(x).getY();
 				x = (xp2 - xp1) * (tspr.getY() - yp1) - (tspr.getX() - xp1) * (yp2 - yp1);
 				if ((yp > yb1[j]) && (yp > yb2[j])) {
 					x = -1;
 				}
-				if ((x >= 0) && ((x != 0) || (Engine.getWall(thewall[j]).getNextsector() != tspr.getSectnum()))) {
+				if ((x >= 0) && ((x != 0) || (boardService.getWall(thewall[j]).getNextsector() != tspr.getSectnum()))) {
 					continue;
 				}
 
@@ -2150,7 +2151,7 @@ public class Software implements Renderer {
 
 			i = tspr.getAng() + 1536;
 			if (vtilenum.isRotating()) {
-				i -= (5 * totalclock) & 2047;
+				i -= (5 * engine.getTotalClock()) & 2047;
 			}
 
 			Spriteext sprext = defs.mapInfo.getSpriteInfo(tspr.getOwner());
@@ -2159,7 +2160,7 @@ public class Software implements Renderer {
 			}
 
 			float f = 1.0f;
-			if ((Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 16 || (Engine.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
+			if ((boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 16 || (boardService.getSprite(tspr.getOwner()).getCstat() & 48) == 32) {
 				f *= 1.25f;
 			}
 
@@ -2191,7 +2192,7 @@ public class Software implements Renderer {
 		int dasprz = daspr.getZ();
 		int dashade = daspr.getShade();
 		int dapal = daspr.getPal();
-		Sector sec = getSector(daspr.getSectnum());
+		Sector sec = boardService.getSector(daspr.getSectnum());
 
 		cosang = EngineUtils.cos((int) (globalang + 512));
 		sinang = EngineUtils.sin((int) globalang);
@@ -2597,10 +2598,10 @@ public class Software implements Renderer {
 		Wall wal;
 
 		z = maskwall[damaskwallcnt];
-		wal = Engine.getWall(thewall[z]);
+		wal = boardService.getWall(thewall[z]);
 		sectnum = thesector[z];
-		sec = Engine.getSector(sectnum);
-		nsec = getSector(wal.getNextsector());
+		sec = boardService.getSector(sectnum);
+		nsec = boardService.getSector(wal.getNextsector());
 		z1 = Math.max(nsec.getCeilingz(), sec.getCeilingz());
 		z2 = Math.min(nsec.getFloorz(), sec.getFloorz());
 
@@ -2996,7 +2997,7 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = Engine.getSector(sectnum);
+		sec = boardService.getSector(sectnum);
 		if (sec.getFloorpal() != globalpalwritten) {
 			globalpalwritten = sec.getFloorpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
@@ -3042,8 +3043,8 @@ public class Software implements Renderer {
 			globalypanning = -(globalposy << 20);
 		} else {
 			j = sec.getWallptr();
-			ox = Engine.getWall(Engine.getWall(j).getPoint2()).getX() - Engine.getWall(j).getX();
-			oy = Engine.getWall(Engine.getWall(j).getPoint2()).getY() - Engine.getWall(j).getY();
+			ox = boardService.getWall(boardService.getWall(j).getPoint2()).getX() - boardService.getWall(j).getX();
+			oy = boardService.getWall(boardService.getWall(j).getPoint2()).getY() - boardService.getWall(j).getY();
 			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0) {
 				i = 1024;
@@ -3055,8 +3056,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((Engine.getWall(j).getX() - globalposx) << 6);
-			oy = ((Engine.getWall(j).getY() - globalposy) << 6);
+			ox = ((boardService.getWall(j).getX() - globalposx) << 6);
+			oy = ((boardService.getWall(j).getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -3229,7 +3230,7 @@ public class Software implements Renderer {
 		short[] topptr, botptr;
 
 		short sectnum = thesector[bunchfirst[bunch]];
-		sec = Engine.getSector(sectnum);
+		sec = boardService.getSector(sectnum);
 		globalhorizbak = (int) globalhoriz;
 		if (parallaxyscale != 65536) {
 			globalhoriz = mulscale((int) globalhoriz - (ydimen >> 1), parallaxyscale, 16) + (ydimen >> 1);
@@ -3281,18 +3282,18 @@ public class Software implements Renderer {
 
 		for (z = bunchfirst[bunch]; z >= 0; z = p2[z]) {
 			wallnum = thewall[z];
-			nextsectnum = Engine.getWall(wallnum).getNextsector();
+			nextsectnum = boardService.getWall(wallnum).getNextsector();
 
 			j = 0;
 			if (nextsectnum != -1) {
 				if (dastat == 0) {
-					j = Engine.getSector(nextsectnum).getCeilingstat();
+					j = boardService.getSector(nextsectnum).getCeilingstat();
 				} else {
-					j = Engine.getSector(nextsectnum).getFloorstat();
+					j = boardService.getSector(nextsectnum).getFloorstat();
 				}
 			}
 
-			if ((nextsectnum < 0) || ((Engine.getWall(wallnum).getCstat() & 32) != 0) || ((j & 1) == 0)) {
+			if ((nextsectnum < 0) || ((boardService.getWall(wallnum).getCstat() & 32) != 0) || ((j & 1) == 0)) {
 				if (x == -1) {
 					x = xb1[z];
 				}
@@ -3427,11 +3428,11 @@ public class Software implements Renderer {
 		}
 
 		if(y - (int) globalhoriz + horizycent < 0 || y - (int) globalhoriz + horizycent >= lookups.length) {
-			Console.Println("Crash catcher:");
-			Console.Println("y = " + y);
-			Console.Println("globalhoriz = " + globalhoriz);
-			Console.Println("horizycent = " + horizycent);
-			Console.Println("globalzd = " + globalzd);
+			Console.out.println("Crash catcher:");
+			Console.out.println("y = " + y);
+			Console.out.println("globalhoriz = " + globalhoriz);
+			Console.out.println("horizycent = " + horizycent);
+			Console.out.println("globalzd = " + globalzd);
 		}
 
 		v = mulscale(globalzd, lookups[y - (int) globalhoriz + horizycent], 20);
@@ -3454,7 +3455,7 @@ public class Software implements Renderer {
 		int shoffs, shinc, m1, m2;
 		int mptr1, mptr2, nptr1, nptr2;
 		Wall wal;
-		Sector sec = Engine.getSector(sectnum);
+		Sector sec = boardService.getSector(sectnum);
 
 		if (dastat == 0) {
 			if (globalposz <= engine.getceilzofslope(sectnum, globalposx, globalposy)) {
@@ -3492,9 +3493,9 @@ public class Software implements Renderer {
 			engine.loadtile(globalpicnum);
 		}
 
-		wal = Engine.getWall(sec.getWallptr());
-		wx = Engine.getWall(wal.getPoint2()).getX() - wal.getX();
-		wy = Engine.getWall(wal.getPoint2()).getY() - wal.getY();
+		wal = boardService.getWall(sec.getWallptr());
+		wx = boardService.getWall(wal.getPoint2()).getX() - wal.getX();
+		wy = boardService.getWall(wal.getPoint2()).getY() - wal.getY();
 		dasqr = krecipasm(EngineUtils.sqrt(wx * wx + wy * wy));
 		i = mulscale(daslope, dasqr, 21);
 		wx *= i;
@@ -3514,8 +3515,8 @@ public class Software implements Renderer {
 
 		if ((globalorientation & 64) != 0) // Relative alignment
 		{
-			dx = mulscale(Engine.getWall(wal.getPoint2()).getX() - wal.getX(), dasqr, 14);
-			dy = mulscale(Engine.getWall(wal.getPoint2()).getY() - wal.getY(), dasqr, 14);
+			dx = mulscale(boardService.getWall(wal.getPoint2()).getX() - wal.getX(), dasqr, 14);
+			dy = mulscale(boardService.getWall(wal.getPoint2()).getY() - wal.getY(), dasqr, 14);
 
 			i = EngineUtils.sqrt(daslope * daslope + 16777216);
 
@@ -3656,7 +3657,7 @@ public class Software implements Renderer {
 		int i, j, ox, oy, x, y1, y2, twall, bwall;
 		Sector sec;
 
-		sec = Engine.getSector(sectnum);
+		sec = boardService.getSector(sectnum);
 		if (sec.getCeilingpal() != globalpalwritten) {
 			globalpalwritten = sec.getCeilingpal();
 			a.setpalookupaddress(palookup[globalpalwritten]);
@@ -3702,8 +3703,8 @@ public class Software implements Renderer {
 			globalypanning = -(globalposy << 20);
 		} else {
 			j = sec.getWallptr();
-			ox = Engine.getWall(Engine.getWall(j).getPoint2()).getX() - Engine.getWall(j).getX();
-			oy = Engine.getWall(Engine.getWall(j).getPoint2()).getY() - Engine.getWall(j).getY();
+			ox = boardService.getWall(boardService.getWall(j).getPoint2()).getX() - boardService.getWall(j).getX();
+			oy = boardService.getWall(boardService.getWall(j).getPoint2()).getY() - boardService.getWall(j).getY();
 			i = EngineUtils.sqrt(ox * ox + oy * oy);
 			if (i == 0) {
 				i = 1024;
@@ -3715,8 +3716,8 @@ public class Software implements Renderer {
 			globalx2 = -globalx1;
 			globaly2 = -globaly1;
 
-			ox = ((Engine.getWall(j).getX() - globalposx) << 6);
-			oy = ((Engine.getWall(j).getY() - globalposy) << 6);
+			ox = ((boardService.getWall(j).getX() - globalposx) << 6);
+			oy = ((boardService.getWall(j).getY() - globalposy) << 6);
 			i = dmulscale(oy, cosglobalang, -ox, singlobalang, 14);
 			j = dmulscale(ox, cosglobalang, oy, singlobalang, 14);
 			ox = i;
@@ -4116,25 +4117,25 @@ public class Software implements Renderer {
 			bunchfrst = numbunches;
 			numscansbefore = numscans;
 
-			if (Engine.getSector(sectnum) == null) {
+			if (boardService.getSector(sectnum) == null) {
 				continue;
 			}
 
-			startwall = Engine.getSector(sectnum).getWallptr();
-			endwall = startwall + Engine.getSector(sectnum).getWallnum();
+			startwall = boardService.getSector(sectnum).getWallptr();
+			endwall = startwall + boardService.getSector(sectnum).getWallnum();
 			scanfirst = numscans;
 
 			if (startwall < 0 || endwall < 0) {
 				continue;
 			}
 			for (z = startwall; z < endwall; z++) {
-				wal = Engine.getWall(z);
+				wal = boardService.getWall(z);
 				if (wal == null || wal.getPoint2() < 0 || wal.getPoint2() >= MAXWALLS) {
 					continue;
 				}
 				nextsectnum = wal.getNextsector();
 
-				wal2 = Engine.getWall(wal.getPoint2());
+				wal2 = boardService.getWall(wal.getPoint2());
 				if (wal2 == null) {
 					continue;
 				}
@@ -4154,7 +4155,7 @@ public class Software implements Renderer {
 					}
 				}
 
-				if ((z == startwall) || (Engine.getWall(z - 1).getPoint2() != z)) {
+				if ((z == startwall) || (boardService.getWall(z - 1).getPoint2() != z)) {
 					xp1 = dmulscale(y1, cosglobalang, -x1, singlobalang, 6);
 					yp1 = dmulscale(x1, cosviewingrangeglobalang, y1, sinviewingrangeglobalang, 6);
 				} else {
@@ -4236,7 +4237,7 @@ public class Software implements Renderer {
 					}
 				} while (false);
 
-				if ((Engine.getWall(z).getPoint2() < z) && (scanfirst < numscans)) {
+				if ((boardService.getWall(z).getPoint2() < z) && (scanfirst < numscans)) {
 					p2[numscans - 1] = (short) scanfirst;
 					scanfirst = numscans;
 				}
@@ -4246,7 +4247,7 @@ public class Software implements Renderer {
 				if (z >= MAXWALLSB || p2[z] >= MAXWALLSB) {
 					continue;
 				}
-				if ((getWall(thewall[z]).getPoint2() != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
+				if ((boardService.getWall(thewall[z]).getPoint2() != thewall[p2[z]]) || (xb2[z] >= xb1[p2[z]])) {
 					bunchfirst[numbunches++] = p2[z];
 					p2[z] = -1;
 				}
@@ -4273,10 +4274,10 @@ public class Software implements Renderer {
 			return false;
 		}
 
-		Wall wal = Engine.getWall(w);
+		Wall wal = boardService.getWall(w);
 		int x1 = wal.getX();
 		int y1 = wal.getY();
-		wal = Engine.getWall(wal.getPoint2());
+		wal = boardService.getWall(wal.getPoint2());
 		return (dmulscale(wal.getX() - x1, s.getY() - y1, -(s.getX() - x1), wal.getY() - y1, 32) >= 0);
 	}
 
@@ -4313,16 +4314,16 @@ public class Software implements Renderer {
 		Wall wal;
 		int x11, y11, x21, y21, x12, y12, x22, y22, dx, dy, t1, t2;
 
-		wal = Engine.getWall(thewall[l1]);
+		wal = boardService.getWall(thewall[l1]);
 		x11 = wal.getX();
 		y11 = wal.getY();
-		wal = Engine.getWall(wal.getPoint2());
+		wal = boardService.getWall(wal.getPoint2());
 		x21 = wal.getX();
 		y21 = wal.getY();
-		wal = Engine.getWall(thewall[l2]);
+		wal = boardService.getWall(thewall[l2]);
 		x12 = wal.getX();
 		y12 = wal.getY();
-		wal = Engine.getWall(wal.getPoint2());
+		wal = boardService.getWall(wal.getPoint2());
 		x22 = wal.getX();
 		y22 = wal.getY();
 
@@ -4500,31 +4501,31 @@ public class Software implements Renderer {
 		int t;
 
 		if (dastat == 0) {
-			z = (Engine.getSector(sectnum).getCeilingz() - globalposz);
-			if ((Engine.getSector(sectnum).getCeilingstat() & 2) == 0) {
+			z = (boardService.getSector(sectnum).getCeilingz() - globalposz);
+			if ((boardService.getSector(sectnum).getCeilingstat() & 2) == 0) {
 				return (owallmost(mostbuf, w, z));
 			}
 		} else {
-			z = (Engine.getSector(sectnum).getFloorz() - globalposz);
-			if ((Engine.getSector(sectnum).getFloorstat() & 2) == 0) {
+			z = (boardService.getSector(sectnum).getFloorz() - globalposz);
+			if ((boardService.getSector(sectnum).getFloorstat() & 2) == 0) {
 				return (owallmost(mostbuf, w, z));
 			}
 		}
 
 		i = thewall[w];
-		if (i == Engine.getSector(sectnum).getWallptr()) {
+		if (i == boardService.getSector(sectnum).getWallptr()) {
 			return (owallmost(mostbuf, w, z));
 		}
 
-		x1 = Engine.getWall(i).getX();
-		x2 = Engine.getWall(Engine.getWall(i).getPoint2()).getX() - x1;
-		y1 = Engine.getWall(i).getY();
-		y2 = Engine.getWall(Engine.getWall(i).getPoint2()).getY() - y1;
+		x1 = boardService.getWall(i).getX();
+		x2 = boardService.getWall(boardService.getWall(i).getPoint2()).getX() - x1;
+		y1 = boardService.getWall(i).getY();
+		y2 = boardService.getWall(boardService.getWall(i).getPoint2()).getY() - y1;
 
-		fw = Engine.getSector(sectnum).getWallptr();
-		i = Engine.getWall(fw).getPoint2();
-		dx = Engine.getWall(i).getX() - Engine.getWall(fw).getX();
-		dy = Engine.getWall(i).getY() - Engine.getWall(fw).getY();
+		fw = boardService.getSector(sectnum).getWallptr();
+		i = boardService.getWall(fw).getPoint2();
+		dx = boardService.getWall(i).getX() - boardService.getWall(fw).getX();
+		dy = boardService.getWall(i).getY() - boardService.getWall(fw).getY();
 		dasqr = krecipasm(EngineUtils.sqrt(dx * dx + dy * dy));
 
 		if (xb1[w] == 0) {
@@ -4540,14 +4541,14 @@ public class Software implements Renderer {
 			i = divscale(i, j, 28);
 		}
 		if (dastat == 0) {
-			t = mulscale(Engine.getSector(sectnum).getCeilingheinum(), dasqr, 15);
-			z1 = Engine.getSector(sectnum).getCeilingz();
+			t = mulscale(boardService.getSector(sectnum).getCeilingheinum(), dasqr, 15);
+			z1 = boardService.getSector(sectnum).getCeilingz();
 		} else {
-			t = mulscale(Engine.getSector(sectnum).getFloorheinum(), dasqr, 15);
-			z1 = Engine.getSector(sectnum).getFloorz();
+			t = mulscale(boardService.getSector(sectnum).getFloorheinum(), dasqr, 15);
+			z1 = boardService.getSector(sectnum).getFloorz();
 		}
-		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - Engine.getWall(fw).getY()) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - Engine.getWall(fw).getX()) << 8), 24) + ((z1 - globalposz) << 7);
+		z1 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - boardService.getWall(fw).getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - boardService.getWall(fw).getX()) << 8), 24) + ((z1 - globalposz) << 7);
 
 		if (xb2[w] == xdimen - 1) {
 			xv = cosglobalang - sinviewingrangeglobalang;
@@ -4562,14 +4563,14 @@ public class Software implements Renderer {
 			i = divscale(i, j, 28);
 		}
 		if (dastat == 0) {
-			t = mulscale(Engine.getSector(sectnum).getCeilingheinum(), dasqr, 15);
-			z2 = Engine.getSector(sectnum).getCeilingz();
+			t = mulscale(boardService.getSector(sectnum).getCeilingheinum(), dasqr, 15);
+			z2 = boardService.getSector(sectnum).getCeilingz();
 		} else {
-			t = mulscale(Engine.getSector(sectnum).getFloorheinum(), dasqr, 15);
-			z2 = Engine.getSector(sectnum).getFloorz();
+			t = mulscale(boardService.getSector(sectnum).getFloorheinum(), dasqr, 15);
+			z2 = boardService.getSector(sectnum).getFloorz();
 		}
-		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - Engine.getWall(fw).getY()) << 8), -dy * t,
-				mulscale(x2, i, 20) + ((x1 - Engine.getWall(fw).getX()) << 8), 24) + ((z2 - globalposz) << 7);
+		z2 = dmulscale(dx * t, mulscale(y2, i, 20) + ((y1 - boardService.getWall(fw).getY()) << 8), -dy * t,
+				mulscale(x2, i, 20) + ((x1 - boardService.getWall(fw).getX()) << 8), 24) + ((z2 - globalposz) << 7);
 
 		s1 = mulscale(globaluclip, yb1[w], 20);
 		s2 = mulscale(globaluclip, yb2[w], 20);

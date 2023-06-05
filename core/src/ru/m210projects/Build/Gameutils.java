@@ -147,24 +147,8 @@ public class Gameutils {
 		return (ang * Math.PI) * (1.0 / 1024.0);
 	}
 
-	public static boolean isValidSector(int i) {
-		return i >= 0 && i < MAXSECTORS && Engine.getSector(i) != null;
-	}
-
 	public static boolean isValidStat(int i) {
 		return i >= 0 && i <= MAXSTATUS;
-	}
-
-	public static boolean isValidSprite(int i) {
-		return i >= 0 && i < MAXSPRITES && Engine.getSprite(i) != null;
-	}
-
-	public static boolean isValidWall(int i) {
-		return i >= 0 && i < MAXWALLS && Engine.getWall(i) != null;
-	}
-
-	public static boolean isCorruptWall(int i) {
-		return !isValidWall(i) || !isValidWall(Engine.getWall(i).getPoint2());
 	}
 
 	public static boolean isValidTile(int tile) {
