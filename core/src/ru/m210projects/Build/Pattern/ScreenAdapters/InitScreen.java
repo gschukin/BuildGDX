@@ -21,6 +21,8 @@ import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
 import java.awt.event.KeyEvent;
 import java.io.*;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
 
 import ru.m210projects.Build.Engine;
@@ -113,7 +115,6 @@ public class InitScreen extends ScreenAdapter {
 		this.game = game;
 		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
-		Console.init(factory);
 
 		try {
 			Console.out.setLogger(new ConsoleLogger(game.appname + ".log"));
@@ -169,9 +170,11 @@ public class InitScreen extends ScreenAdapter {
 		}
 
 		game.pFonts = factory.fonts();
+		Console.out.setFunc(factory.getOsdFunc());
 
 		BuildSettings.init(engine, cfg);
 		GLSettings.init(engine, cfg);
+
 
 		if(!engine.setrendermode(factory.renderer(cfg.renderType))) {
 			engine.setrendermode(factory.renderer(RenderType.Software));
@@ -194,6 +197,19 @@ public class InitScreen extends ScreenAdapter {
 				}
 			}
 		}
+
+		Gdx.input.setInputProcessor(new InputAdapter() {
+			@Override
+			public boolean keyDown(int keycode) {
+				return true;
+			}
+
+			@Override
+			public boolean keyTyped(char character) {
+				System.out.println(character);
+				return super.keyTyped(character);
+			}
+		});
 
 		thread = new Thread(new Runnable() {
 			@Override

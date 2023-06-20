@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.desktop.audio;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
+import static ru.m210projects.Build.OnSceenDisplay.OsdColor.RED;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFER;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_FALSE;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_GAIN;
@@ -32,7 +32,7 @@ import static ru.m210projects.Build.desktop.audio.ALAudio.AL_TRUE;
 
 import ru.m210projects.Build.Audio.Source;
 import ru.m210projects.Build.Audio.SourceCallback;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
 
 public class ALSource extends Source {
 
@@ -76,7 +76,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error setPosition " + error + ", values: ["+ x + ", " + y + ", " + z + "]", OSDTEXT_RED);
+			Console.out.println("OpenAL Error setPosition " + error + ", values: ["+ x + ", " + y + ", " + z + "]", OsdColor.RED);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error setVolume " + error + ", value is " + volume, OSDTEXT_RED);
+			Console.out.println("OpenAL Error setVolume " + error + ", value is " + volume, OsdColor.RED);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error setPitch " + error + ", value is " + pitch, OSDTEXT_RED);
+			Console.out.println("OpenAL Error setPitch " + error + ", value is " + pitch, OsdColor.RED);
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error setGlobal " + error + ", value is " + num, OSDTEXT_RED);
+			Console.out.println("OpenAL Error setGlobal " + error + ", value is " + num, OsdColor.RED);
 	}
 
 	@Override
@@ -165,7 +165,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error setLooping " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL Error setLooping " + error, OsdColor.RED);
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class ALSource extends Source {
 		
 		int error = al.alGetError();
 		if(error != AL_NO_ERROR) 
-			Console.Println("OpenAL Error play " + error, OSDTEXT_RED);
+			Console.out.println("OpenAL Error play " + error, OsdColor.RED);
 	}
 
 	@Override

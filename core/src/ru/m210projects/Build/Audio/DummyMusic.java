@@ -17,49 +17,47 @@
 
 package ru.m210projects.Build.Audio;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.*;
-
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
 public class DummyMusic implements Music {
 
-	@Override
-	public void setVolume(float volume) {
-	}
+    @Override
+    public void setVolume(float volume) {
+    }
 
-	@Override
-	public void dispose() {
-	}
+    @Override
+    public void dispose() {
+    }
 
-	@Override
-	public boolean init() {
-		Console.out.println(getName() + " initialized", OsdColor.RED);
-		return true;
-	}
+    @Override
+    public boolean init() {
+        Console.out.println(getName() + " initialized", OsdColor.GREEN);
+        return true;
+    }
 
-	@Override
-	public String getName() {
-		return "Dummy music";
-	}
+    @Override
+    public String getName() {
+        return "Dummy music";
+    }
 
-	@Override
-	public boolean isInited() {
-		return true;
-	}
+    @Override
+    public boolean isInited() {
+        return true;
+    }
 
-	@Override
-	public MusicSource newMusic(byte[] data) {
-		
-		return null;
-	}
+    @Override
+    public MusicSource newMusic(byte[] data) {
 
-	@Override
-	public MusicSource newMusic(String name) {
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void update() {
-	}
+    @Override
+    public MusicSource newMusic(String name) {
+        return null;
+    }
+
+    @Override
+    public void update() {
+    }
 }

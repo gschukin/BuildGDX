@@ -217,9 +217,9 @@ public abstract class BuildConfig extends IniFile {
 			init(data);
 			raf.close();
 		} catch (FileNotFoundException e) {
-			Console.out.println("File not found: " + path + this.name, OsdColor.YELLOW);
+			System.out.println("File not found: " + path + this.name);
 		} catch (IOException e) {
-			Console.out.println("Read file error: " + e.getMessage(), OsdColor.YELLOW);
+			System.out.println("Read file error: " + e.getMessage());
 		}
 
 		this.primarykeys = new int[keymap.length];
@@ -241,7 +241,7 @@ public abstract class BuildConfig extends IniFile {
 				raf.write(data);
 				raf.close();
 			} catch (Exception e) {
-				Console.out.println("Old config file error: " + e.getMessage(), OsdColor.YELLOW);
+				System.out.println("Old config file error: " + e.getMessage());
 			}
 		}
 	}

@@ -10,8 +10,8 @@ public enum OsdColor {
     YELLOW("\u001B[93m"),
     BROWN("\u001B[33m"),
     WHITE("\u001B[97m"),
-    PURPLE("\u001B[95m"),
-    CYAN("\u001B[96m"),
+//    PURPLE("\u001B[95m"),
+//    CYAN("\u001B[96m"),
     GREY("\u001B[90m");
 
     private int pal;

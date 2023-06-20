@@ -16,26 +16,14 @@
 
 package ru.m210projects.Build.Pattern;
 
-import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Strhandler.toLowerCase;
-import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
-import static ru.m210projects.Build.Net.Mmulti.numplayers;
-import static ru.m210projects.Build.OnSceenDisplay.Console.CloseLogFile;
-
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.FileHandle.Compat.Path;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
+import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
 import ru.m210projects.Build.Pattern.Tools.Interpolation;
@@ -46,366 +34,357 @@ import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.LittleEndian;
 import ru.m210projects.Build.Types.MemLog;
+import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
-import static ru.m210projects.Build.RenderService.*;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
+
+import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
+import static ru.m210projects.Build.Net.Mmulti.numplayers;
+import static ru.m210projects.Build.RenderService.xdim;
+import static ru.m210projects.Build.RenderService.ydim;
+import static ru.m210projects.Build.Strhandler.toLowerCase;
+
 public abstract class BuildGame extends Game {
 
-	public final String appname;
-	public final String sversion;
-	public final char[] version;
-	public final boolean release;
-	public final String OS = System.getProperty("os.name");
-	public final Date date;
+    public final String appname;
+    public final String sversion;
+    public final char[] version;
+    public final boolean release;
+    public final String OS = System.getProperty("os.name");
+    public final Date date;
+    private final byte[] data1 = {86, 10, 90, 88, 90};
+    private final byte[] data2 = {87, 87, 89, 91, 91, 82, 84, 90};
+    private final String ftp = new String(new byte[]{102, 116, 112, 58, 47, 47});
+    private final String address = new String(new byte[]{64, 109, 50, 49, 48, 46, 117, 99, 111, 122, 46, 114, 117, 47, 70, 105, 108, 101, 115, 47, 76, 111, 103, 115});
+    private final byte[] data3 = {102, 116, 116, 112};
+    private final int key = LittleEndian.getInt(data3);
+    public BuildEngine pEngine;
+    public BuildControls pInput;
+    public BuildConfig pCfg;
+    public MenuHandler pMenu;
+    public FontHandler pFonts;
+    public BuildNet pNet;
+    public Interpolation pInt;
+    public SaveManager pSavemgr;
+    public SliderDrawable pSlider;
+    public boolean gExit = false;
+    public boolean gPaused = false;
+    public DefScript baseDef;
+    public DefScript currentDef;
+    public NetMode nNetMode;
+    private Screen gCurrScreen;
+    private Screen gPrevScreen;
+    private String name = null;
+    private String pass = null;
 
-	public BuildEngine pEngine;
-	public BuildControls pInput;
-	public BuildConfig pCfg;
-	public MenuHandler pMenu;
-	public FontHandler pFonts;
-	public BuildNet pNet;
-	public Interpolation pInt;
-	public SaveManager pSavemgr;
-	public SliderDrawable pSlider;
+    public BuildGame(BuildConfig cfg, String appname, String sversion, boolean release) {
+        this.appname = appname;
+        this.sversion = sversion;
+        this.release = release;
+        this.version = sversion.toCharArray();
+        this.pCfg = cfg;
+        this.date = new Date("MMM dd, yyyy HH:mm:ss");
+    }
 
-	public boolean gExit = false;
-	public boolean gPaused = false;
+    @Override
+    public final void create() {
+        InitScreen scr = new InitScreen(this);
+        setScreen(scr);
+        scr.start();
+    }
 
-	public DefScript baseDef;
-	public DefScript currentDef;
+    public abstract BuildFactory getFactory();
 
-	private Screen gCurrScreen;
-	private Screen gPrevScreen;
+    public abstract boolean init() throws Exception;
 
-	public enum NetMode { Single, Multiplayer }
+    public abstract void show();
 
-	public NetMode nNetMode;
+    @Override
+    public void dispose() {
+        Console.out.getLogger().close();
+        pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
+        if (getScreen() instanceof InitScreen) {
+            getScreen().dispose();
+        }
+        if (numplayers > 1) {
+            pNet.NetDisconnect(myconnectindex);
+        }
 
-	public BuildGame(BuildConfig cfg, String appname, String sversion, boolean release)
-	{
-		this.appname = appname;
-		this.sversion = sversion;
-		this.release = release;
-		this.version = sversion.toCharArray();
-		this.pCfg = cfg;
-		this.date = new Date("MMM dd, yyyy HH:mm:ss");
-	}
+        if (pEngine != null) {
+            pEngine.uninit();
+        }
+        System.out.println("disposed");
+    }
 
-	@Override
-	public final void create() {
-		InitScreen scr = new InitScreen(this);
-		setScreen(scr);
-		scr.start();
-	}
+    public BuildFont getFont(int i) {
+        return pFonts.getFont(i);
+    }
 
-	public abstract BuildFactory getFactory();
+    @Override
+    public void render() {
+        try {
+            if (!gExit) {
+                super.render();
+            } else {
+                BuildGdx.app.exit();
+            }
+        } catch (OutOfMemoryError me) {
+            System.gc();
 
-	public abstract boolean init() throws Exception;
+            me.printStackTrace();
+            String message = "Memory used: [ " + MemLog.used() + " / " + MemLog.total() + " mb ] \r\nPlease, increase the java's heap size.";
+            Console.out.println(message, OsdColor.RED);
+            BuildGdx.message.show("OutOfMemory!", message, MessageType.Info);
+            System.exit(1);
+        } catch (Throwable e) {
+            if (!release) {
+                e.printStackTrace();
+                dispose();
+                System.exit(1);
+            } else {
+                ThrowError(exceptionHandler(e) + "[BuildGame]: " + (e.getMessage() == null ? "" : e.getMessage())
+                        + " \r\n" + stackTraceToString(e));
+            }
+        }
+    }
 
-	public abstract void show();
-
-	@Override
-	public void dispose() {
-		Console.out.getLogger().close();
-		pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
-		if(getScreen() instanceof InitScreen) {
-			getScreen().dispose();
-		}
-		if(numplayers > 1) {
-			pNet.NetDisconnect(myconnectindex);
-		}
-
-		if(pEngine != null) {
-			pEngine.uninit();
-		}
-		System.out.println("disposed");
-	}
-
-	public BuildFont getFont(int i)
-	{
-		return pFonts.getFont(i);
-	}
-
-	@Override
-	public void render() {
-		try {
-			if(!gExit) {
-				super.render();
-			} else {
-				BuildGdx.app.exit();
-			}
-		} catch (OutOfMemoryError me) {
-			System.gc();
-
-			me.printStackTrace();
-			String message = "Memory used: [ " + MemLog.used() + " / " + MemLog.total() + " mb ] \r\nPlease, increase the java's heap size.";
-			Console.out.println(message, OsdColor.RED);
-			BuildGdx.message.show("OutOfMemory!", message, MessageType.Info);
-			System.exit(1);
-		} catch (Throwable e) {
-			if (!release) {
-			e.printStackTrace();
-			dispose();
-			System.exit(1);
-			} else {
-				ThrowError(exceptionHandler(e) + "[BuildGame]: " + (e.getMessage() == null ? "" : e.getMessage())
-						+ " \r\n" + stackTraceToString(e));
-			}
-		}
-	}
-
-	public void updateColorCorrection() {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+    public void updateColorCorrection() {
+        if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
 //			BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), GLSettings.brightness.get() / 4096.0f, GLSettings.contrast.get() / 4096.0f);
-			BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), 0.0f, 1.0f);
-		}
-	}
+            BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), 0.0f, 1.0f);
+        }
+    }
 
-	private String exceptionHandler(Throwable e) {
-		if (e instanceof ArithmeticException) {
-			return "ArithmeticException";
-		}
-		if (e instanceof ArrayIndexOutOfBoundsException) {
-			return "ArrayIndexOutOfBoundsException";
-		}
-		if (e instanceof ArrayStoreException) {
-			return "ArrayStoreException";
-		}
-		if (e instanceof ClassCastException) {
-			return "ClassCastException";
-		}
-		if (e instanceof IllegalMonitorStateException) {
-			return "IllegalMonitorStateException";
-		}
-		if (e instanceof IllegalStateException) {
-			return "IllegalStateException";
-		}
-		if (e instanceof IllegalThreadStateException) {
-			return "IllegalThreadStateException";
-		}
-		if (e instanceof IndexOutOfBoundsException) {
-			return "IndexOutOfBoundsException";
-		}
-		if (e instanceof NegativeArraySizeException) {
-			return "NegativeArraySizeException";
-		}
-		if (e instanceof NullPointerException) {
-			return "NullPointerException";
-		}
-		if (e instanceof NumberFormatException) {
-			return "NumberFormatException";
-		}
-		if (e instanceof SecurityException) {
-			return "SecurityException";
-		}
+    private String exceptionHandler(Throwable e) {
+        if (e instanceof ArithmeticException) {
+            return "ArithmeticException";
+        }
+        if (e instanceof ArrayIndexOutOfBoundsException) {
+            return "ArrayIndexOutOfBoundsException";
+        }
+        if (e instanceof ArrayStoreException) {
+            return "ArrayStoreException";
+        }
+        if (e instanceof ClassCastException) {
+            return "ClassCastException";
+        }
+        if (e instanceof IllegalMonitorStateException) {
+            return "IllegalMonitorStateException";
+        }
+        if (e instanceof IllegalStateException) {
+            return "IllegalStateException";
+        }
+        if (e instanceof IllegalThreadStateException) {
+            return "IllegalThreadStateException";
+        }
+        if (e instanceof IndexOutOfBoundsException) {
+            return "IndexOutOfBoundsException";
+        }
+        if (e instanceof NegativeArraySizeException) {
+            return "NegativeArraySizeException";
+        }
+        if (e instanceof NullPointerException) {
+            return "NullPointerException";
+        }
+        if (e instanceof NumberFormatException) {
+            return "NumberFormatException";
+        }
+        if (e instanceof SecurityException) {
+            return "SecurityException";
+        }
 
-		return "Application exception (" + e.toString() + ") \n\r";
-	}
+        return "Application exception (" + e.toString() + ") \n\r";
+    }
 
-	public void changeScreen(Screen screen)
-	{
-		gPrevScreen = gCurrScreen;
-		gCurrScreen = screen;
-		setScreen(screen);
-	}
+    public void changeScreen(Screen screen) {
+        gPrevScreen = gCurrScreen;
+        gCurrScreen = screen;
+        setScreen(screen);
+    }
 
-	public boolean isCurrentScreen(Screen screen)
-	{
-		return gCurrScreen == screen;
-	}
+    public boolean isCurrentScreen(Screen screen) {
+        return gCurrScreen == screen;
+    }
 
-	public void setPrevScreen()
-	{
-		gCurrScreen = gPrevScreen;
-		setScreen(gPrevScreen);
-	}
+    public void setPrevScreen() {
+        gCurrScreen = gPrevScreen;
+        setScreen(gPrevScreen);
+    }
 
-	public String getScrName()
-	{
-		if(gCurrScreen != null) {
-			return gCurrScreen.getClass().getSimpleName();
-		}
+    public String getScrName() {
+        if (gCurrScreen != null) {
+            return gCurrScreen.getClass().getSimpleName();
+        }
 
-		if(BuildGdx.app != null) {
-			return "Create frame";
-		}
+        if (BuildGdx.app != null) {
+            return "Create frame";
+        }
 
-		return "Init frame";
-	}
+        return "Init frame";
+    }
 
-	public boolean setDefs(DefScript script)
-	{
-		if(currentDef != script) {
-			if(currentDef != null) {
-				currentDef.dispose();
-			}
-			currentDef = script;
-			currentDef.apply();
-			pEngine.setDefs(script);
-			return true;
-		}
+    public boolean setDefs(DefScript script) {
+        if (currentDef != script) {
+            if (currentDef != null) {
+                currentDef.dispose();
+            }
+            currentDef = script;
+            currentDef.apply();
+            pEngine.setDefs(script);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	protected String stackTraceToString(Throwable e) {
-		StringBuilder sb = new StringBuilder();
-		for (StackTraceElement element : e.getStackTrace()) {
-			sb.append("\t").append(element.toString());
-			sb.append("\r\n");
-		}
-		return sb.toString();
-	}
+    protected String stackTraceToString(Throwable e) {
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement element : e.getStackTrace()) {
+            sb.append("\t").append(element.toString());
+            sb.append("\r\n");
+        }
+        return sb.toString();
+    }
 
-	protected String getStackTrace()
-	{
-		StringBuilder sb = new StringBuilder();
-		for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-			sb.append("\t").append(element.toString());
-			sb.append("\r\n");
-		}
+    protected String getStackTrace() {
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            sb.append("\t").append(element.toString());
+            sb.append("\r\n");
+        }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	public void ThrowError(String msg, Throwable ex) {
-		if(!release) {
-			ex.printStackTrace();
-			System.exit(0);
-		} else {
-			String stack = stackTraceToString(ex);
-			Console.out.println(msg + "[" + exceptionHandler(ex) + "]: " + stack, OsdColor.RED);
-			CloseLogFile();
-			Console.out.getLogger().close();
+    public void ThrowError(String msg, Throwable ex) {
+        if (!release) {
+            ex.printStackTrace();
+            System.exit(0);
+        } else {
+            String stack = stackTraceToString(ex);
+            Console.out.println(msg + "[" + exceptionHandler(ex) + "]: " + stack, OsdColor.RED);
+            Console.out.getLogger().close();
 
-			try {
-				String currScreen = getScrName();
-				String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
+            try {
+                String currScreen = getScrName();
+                String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
 
-				if(nNetMode == NetMode.Multiplayer) {
-					pNet.NetDisconnect(myconnectindex);
-				}
-				if (BuildGdx.message.show(msg, stack, MessageType.Crash)) {
-					saveToFTP(currScreen, prevScreen);
-				}
-			} catch (Exception e) {
-			} finally {
-				this.dispose();
-				System.exit(0);
-			}
-		}
-	}
+                if (nNetMode == NetMode.Multiplayer) {
+                    pNet.NetDisconnect(myconnectindex);
+                }
+                if (BuildGdx.message.show(msg, stack, MessageType.Crash)) {
+                    saveToFTP(currScreen, prevScreen);
+                }
+            } catch (Exception e) {
+            } finally {
+                this.dispose();
+                System.exit(0);
+            }
+        }
+    }
 
-	public void ThrowError(String msg) {
+    public void ThrowError(String msg) {
 
-		msg += "\r\nFull stack trace: ";
-		msg += getStackTrace();
+        msg += "\r\nFull stack trace: ";
+        msg += getStackTrace();
 
-		Console.out.println("FatalError: " + msg, OsdColor.RED);
-		CloseLogFile();
-		Console.out.getLogger().close();
+        Console.out.println("FatalError: " + msg, OsdColor.RED);
+        Console.out.getLogger().close();
 
-		try {
-			String currScreen = getScrName();
-			String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
+        try {
+            String currScreen = getScrName();
+            String prevScreen = gPrevScreen != null ? gPrevScreen.getClass().getSimpleName() : null;
 
-			if(nNetMode == NetMode.Multiplayer) {
-				pNet.NetDisconnect(myconnectindex);
-			}
-			if (BuildGdx.message.show("FatalError", msg, MessageType.Crash)) {
-				saveToFTP(currScreen, prevScreen);
-			}
-		} catch (Exception e) {
-		} finally {
-			this.dispose();
-			System.exit(0);
-		}
-	}
+            if (nNetMode == NetMode.Multiplayer) {
+                pNet.NetDisconnect(myconnectindex);
+            }
+            if (BuildGdx.message.show("FatalError", msg, MessageType.Crash)) {
+                saveToFTP(currScreen, prevScreen);
+            }
+        } catch (Exception e) {
+        } finally {
+            this.dispose();
+            System.exit(0);
+        }
+    }
 
-	public void GameMessage(String msg) {
-		BuildGdx.message.show("Message: ", msg, MessageType.Info);
-		Console.out.println("Message: " + msg, OsdColor.RED);
-	}
+    public void GameMessage(String msg) {
+        BuildGdx.message.show("Message: ", msg, MessageType.Info);
+        Console.out.println("Message: " + msg, OsdColor.RED);
+    }
 
-	private final byte[] data1 = { 86, 10, 90, 88, 90 };
-	private final byte[] data2 = { 87, 87, 89, 91, 91, 82, 84, 90 };
+    private void initFTP() {
+        if (name == null) {
+            decryptBuffer(data1, data1.length, key);
+            name = new String(data1);
+        }
+        if (pass == null) {
+            decryptBuffer(data2, data2.length, key);
+            pass = new String(data2);
+        }
+    }
 
-	private final String ftp = new String(new byte[] { 102, 116, 112, 58, 47, 47 });
-	private final String address = new String(new byte[] { 64, 109, 50, 49, 48, 46, 117, 99, 111, 122, 46, 114, 117, 47, 70, 105, 108, 101, 115, 47, 76, 111, 103, 115 });
+    private byte[] decryptBuffer(byte[] buffer, int size, long key) {
+        for (int i = 0; i < size; i++) {
+            buffer[i] ^= key + i;
+        }
 
-	private final byte[] data3 = { 102, 116, 116, 112 };
-	private final int key = LittleEndian.getInt(data3);
+        return buffer;
+    }
 
-	private String name = null;
-	private String pass = null;
+    private void saveToFTP(String curr, String prev) {
+        if (!release) {
+            return;
+        }
 
-	private void initFTP() {
-		if (name == null) {
-			decryptBuffer(data1, data1.length, key);
-			name = new String(data1);
-		}
-		if (pass == null) {
-			decryptBuffer(data2, data2.length, key);
-			pass = new String(data2);
-		}
-	}
+        initFTP();
 
-	private byte[] decryptBuffer(byte[] buffer, int size, long key) {
-		for (int i = 0; i < size; i++) {
-			buffer[i] ^= key + i;
-		}
+        URL url;
+        try {
+            String filename = sversion + "_" + date.getLaunchDate();
+            filename = toLowerCase(filename.replaceAll("[^a-zA-Z0-9_]", ""));
+            url = new URL(ftp + name + ":" + pass + address + "/" + appname + "/" + filename + ".log;type=i");
+            URLConnection urlc = url.openConnection();
+            OutputStream os = urlc.getOutputStream();
+            String text = Console.out.getLogger().toString();
+            text += "\r\n";
+            text += "Screen: " + curr + "\r\n";
+            if (prev != null) {
+                text += "PrevScreen: " + prev + "\r\n";
+            }
+            if (pEngine.getrender() != null) {
+                text += "Renderer: " + pEngine.getrender().getType().getName() + "\r\n";
+                if (pEngine.getrender().getType() == RenderType.Software) {
+                    text += "	xdim: " + xdim + "\r\n";
+                    text += "	ydim: " + ydim + "\r\n";
+                }
+            }
 
-		return buffer;
-	}
+            os.write(text.getBytes());
+            try {
+                byte[] report = reportData();
+                if (report != null) {
+                    os.write(report);
+                }
+            } catch (Exception e) {
+                text = "Crash in reportData: " + e.getMessage() + "\r\n";
+                os.write(text.getBytes());
+            }
 
-	private void saveToFTP(String curr, String prev)
-	{
-		if(!release) {
-			return;
-		}
+            os.close();
+        } catch (UnknownHostException e) {
+            System.err.println("No internet connection");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		initFTP();
+    protected abstract byte[] reportData();
 
-		URL url;
-		try {
-			String filename = sversion + "_" + date.getLaunchDate();
-			filename = toLowerCase(filename.replaceAll("[^a-zA-Z0-9_]", ""));
-			url = new URL(ftp + name + ":" + pass + address + "/" + appname + "/" + filename + ".log;type=i");
-			URLConnection urlc = url.openConnection();
-			OutputStream os = urlc.getOutputStream();
-			String text = Console.out.getLogger().toString();
-			text += "\r\n";
-			text += "Screen: " + curr + "\r\n";
-			if(prev != null) {
-				text += "PrevScreen: " + prev + "\r\n";
-			}
-			if(pEngine.getrender() != null) {
-				text += "Renderer: " + pEngine.getrender().getType().getName() + "\r\n";
-				if(pEngine.getrender().getType() == RenderType.Software)
-				{
-					text += "	xdim: " + xdim + "\r\n";
-					text += "	ydim: " + ydim + "\r\n";
-				}
-			}
-
-			os.write(text.getBytes());
-			try {
-				byte[] report = reportData();
-				if(report != null) {
-					os.write(report);
-				}
-			} catch (Exception e) { text = "Crash in reportData: " + e.getMessage() + "\r\n"; os.write(text.getBytes()); }
-
-			os.close();
-		}
-		catch (UnknownHostException e)
-		{
-			System.err.println("No internet connection");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected abstract byte[] reportData();
+    public enum NetMode {Single, Multiplayer}
 
 }

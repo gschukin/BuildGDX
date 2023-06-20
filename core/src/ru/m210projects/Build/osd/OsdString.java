@@ -16,10 +16,10 @@ public class OsdString {
     public void insert(int pos, char ch, int pal, int shade) {
         if(pos < text.length()) {
             text.setCharAt(pos, ch);
-            fmt.set(pos, (short) (pal + (shade << 5)));
+            fmt.set(pos, (short) (pal + (shade << 8)));
         } else {
             text.insert(pos, ch);
-            fmt.add((short) (pal + (shade << 5)));
+            fmt.add((short) (pal + (shade << 8)));
         }
     }
 
@@ -28,11 +28,19 @@ public class OsdString {
     }
 
     public int getPal(int pos) {
-        return fmt.get(pos) & ~0xE0;
+        if (pos >= fmt.size()) {
+            return 0;
+        }
+
+        return fmt.get(pos) & 0xFF;
     }
 
     public int getShade(int pos) {
-        return (fmt.get(pos) & ~0x1F) >> 4;
+        if (pos >= fmt.size()) {
+            return 0;
+        }
+
+        return (fmt.get(pos) >> 8);
     }
 
     public char getCharAt(int pos) {

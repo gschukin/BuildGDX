@@ -147,7 +147,7 @@ public class MenuTextField extends MenuItem {
 
 			font.drawText(px - font.getWidth(typingBuf), y, typingBuf, shade, pal, TextAlign.Left, 2, fontShadow);
 //		    if(typing && (totalclock & 0x20) != 0) {
-				font.drawChar(px, y, '_', shade, pal, 2, false);
+				font.drawText(px, y, "_", shade, pal, TextAlign.Left, 2, false);
 //			}
 		}
 		handler.mPostDraw(this);

@@ -151,7 +151,7 @@ public class ALSoundDrv implements Sound {
 		resetListener();
 		this.system = system;
 
-		Console.out.println(al.getName() + " initialized", OsdColor.YELLOW);
+		Console.out.println(al.getName() + " initialized", OsdColor.GREEN);
 		Console.out.println("\twith max voices: " + sourceManager.getSourcesNum(), OsdColor.YELLOW);
 		Console.out.println("\tOpenAL version: " + al.getVersion(), OsdColor.YELLOW); 	
 		noDevice = false;

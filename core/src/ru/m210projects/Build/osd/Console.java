@@ -3,6 +3,7 @@ package ru.m210projects.Build.osd;
 import com.badlogic.gdx.Input;
 import org.jetbrains.annotations.NotNull;
 import ru.m210projects.Build.Pattern.BuildFactory;
+import ru.m210projects.Build.StringUtils;
 import ru.m210projects.Build.Types.collections.MapList;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.osd.commands.*;
@@ -23,9 +24,10 @@ public class Console {
 
     private static final int MAX_LINES = 512;
     private static final OsdCommand UNKNOWN_COMMAND = new UnknownCommand();
-    public static Console out;
+    public static Console out = new Console();
+
     final Map<String, OsdCommand> osdVars;
-    final OsdFunc func;
+    OsdFunc func;
     // TODO сделать OSDString сегментами (сегмент цвета и кусок текста)
     private final MapList<OsdString> osdTextList = new MapList<>();
     private final OsdCommandPrompt prompt;
@@ -61,10 +63,22 @@ public class Console {
     private int osdTextShade = 0;
     private ConsoleLogger logger;
 
-    private Console(@NotNull OsdFunc func) {
+    private Console() {
         this.osdVars = new HashMap<>();
         this.prompt = new OsdCommandPrompt(this);
-        this.func = func;
+
+        registerCommand(new OsdCallback("osd_color_test", "", args -> {
+            int len = MAXPALOOKUPS;
+
+            if (args.length != 0 && StringUtils.isNumeric(args[0])) {
+                len = Integer.parseInt(args[0]);
+            }
+
+            for (int i = 0; i < len; i++) {
+                Console.out.println(String.format("pal%d: ^%dThe quick brown fox jumps over the lazy dog", i, i));
+            }
+            return CommandResponse.SILENT_RESPONSE;
+        }));
 
         registerCommand(new OsdCommand("help", "lists all registered functions, cvars and aliases") {
             @Override
@@ -88,7 +102,7 @@ public class Console {
                 osdTextPal = OsdColor.findColor((int) value);
             }
         });
-        registerCommand(new OsdValueRange("osdtextshade", "osdtextshade: sets the shade of the OSD text", 0, 7) {
+        registerCommand(new OsdValueRange("osdtextshade", "osdtextshade: sets the shade of the OSD text", 0, 255) {
             @Override
             public float getValue() {
                 return osdTextShade;
@@ -124,9 +138,8 @@ public class Console {
         });
     }
 
-    public static Console init(BuildFactory factory) {
-        Console.out = new Console(factory.getOsdFunc());
-        return out;
+    public void setFunc(OsdFunc func) {
+        this.func = func;
     }
 
     // FIXME get rid of...parameter keycode. make it as listener?
@@ -306,7 +319,7 @@ public class Console {
                         return;
                     }
 
-                    println(String.format("\"%s\" ^%dis not a valid command or cvar", text, OsdColor.RED.getPal()), OsdColor.RED);
+                    println(String.format("\"%s^O\" is not a valid command or cvar", text), OsdColor.RED);
                     break;
             }
         } catch (Exception e) {
@@ -333,7 +346,7 @@ public class Console {
         osdScroll = -1;
         osdRowsCur--;
         prompt.captureInput(false);
-        osdScrTime = func.getTicks();
+        osdScrTime = getTicks();
     }
 
     void onPageUp() {
@@ -380,7 +393,7 @@ public class Console {
             osdScroll = 0;
         } else {
             if ((osdRowsCur < osdRows && osdScroll == 1) || osdRowsCur < -1) {
-                long j = (func.getTicks() - osdScrTime);
+                long j = (getTicks() - osdScrTime);
                 while (j > -1) {
                     osdRowsCur++;
                     j -= 200 / osdRows;
@@ -389,8 +402,9 @@ public class Console {
                     }
                 }
             }
+
             if ((osdRowsCur > -1 && osdScroll == -1) || osdRowsCur > osdRows) {
-                long j = (func.getTicks() - osdScrTime);
+                long j = (getTicks() - osdScrTime);
                 while (j > -1) {
                     osdRowsCur--;
                     j -= 200 / osdRows;
@@ -399,7 +413,7 @@ public class Console {
                     }
                 }
             }
-            osdScrTime = func.getTicks();
+            osdScrTime = getTicks();
         }
 
         if (!osdDraw || osdRowsCur <= 0) {
@@ -425,7 +439,7 @@ public class Console {
         osdRowsCur += osdScroll;
         prompt.captureInput(osdScroll == 1);
         getInput().initMessageInput(null);
-        osdScrTime = func.getTicks();
+        osdScrTime = getTicks();
     }
 
     public boolean isCaptured() {
@@ -469,42 +483,35 @@ public class Console {
             }
 
             if (text.charAt(chp) == '^') {
-                String number = "";
-                if (chp + 1 >= text.length()) {
+                StringBuilder number = new StringBuilder();
+                int pos = chp + 1;
+                if (pos >= text.length()) {
                     continue;
                 }
 
-                char num1 = text.charAt(chp + 1);
+                char num1 = text.charAt(pos++);
                 if (Character.isDigit(num1)) {
-                    number += num1;
-                    char num2 = ' ';
-                    if (++chp + 1 < text.length()) {
-                        num2 = text.charAt(chp + 1);
+                    number.append(num1);
+                    while(pos < text.length() && Character.isDigit(text.charAt(pos)) && number.length() < 3) {
+                        number.append(text.charAt(pos));
+                        pos++;
                     }
 
-                    if (!Character.isDigit(num2)) {
-                        pal = Integer.parseInt(number, 10);
+                    if (number.length() > 0) {
+                        pal = Integer.parseInt(number.toString(), 10);
+                        chp = pos - 1;
                         continue;
                     }
-
-                    chp++;
-                    number += num2;
-                    pal = Integer.parseInt(number, 10);
-                    continue;
-                }
-
-                if (num1 == 'S' || num1 == 's') {
+                } else if (num1 == 'S' || num1 == 's') {
                     chp++;
                     char num = text.charAt(++chp);
                     if (Character.isDigit(num)) {
-                        number += num;
-                        s = Integer.parseInt(number, 10);
+                        number.append(num);
+                        s = Integer.parseInt(number.toString(), 10);
                         continue;
                     }
-                }
-
-                if (num1 == 'O' || num1 == 'o') {
-                    pal = osdTextPal.getPal();
+                } else if (num1 == 'O' || num1 == 'o') {
+                    pal = color.getPal();
                     s = osdTextShade;
                     chp++;
                     continue;
@@ -513,10 +520,6 @@ public class Console {
 
             osdString.insert(osdCharacterPos++, text.charAt(chp), pal, s);
         } while (++chp < text.length());
-    }
-
-    public void print(String text) {
-        print(text, osdTextPal);
     }
 
     public void println(String text) {
@@ -570,8 +573,7 @@ public class Console {
                     currentLength = 0;
                 }
             }
-            msg.append("\n");
-            print(msg.toString());
+            println(msg.toString());
             println(footer, OsdColor.RED);
         }
     }
@@ -623,5 +625,9 @@ public class Console {
 
     public ConsoleLogger getLogger() {
         return logger;
+    }
+
+    private long getTicks() {
+        return System.currentTimeMillis();
     }
 }

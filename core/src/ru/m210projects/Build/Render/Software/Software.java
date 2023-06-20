@@ -221,7 +221,7 @@ public class Software implements Renderer {
 			a.fixtransluscence(transluc);
 			a.setpalookupaddress(palookup[globalpalwritten]);
 
-			Console.out.println("Software renderer is initialized", OsdColor.YELLOW);
+			Console.out.println("Software renderer is initialized", OsdColor.GREEN);
 			isInited = true;
 		} catch (Throwable t) {
 			isInited = false;

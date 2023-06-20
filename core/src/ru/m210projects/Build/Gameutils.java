@@ -159,6 +159,18 @@ public class Gameutils {
 		Normal, AlignLeft, AlignRight, Stretch
 	}
 
+	public static ConvertType getType(int nFlags) {
+		ConvertType type = ConvertType.Normal;
+		if ((nFlags & 256) != 0)
+			type = ConvertType.AlignLeft;
+		if ((nFlags & 512) != 0)
+			type = ConvertType.AlignRight;
+		if ((nFlags & 1024) != 0)
+			type = ConvertType.Stretch;
+
+		return type;
+	}
+
 	public static int coordsConvertXScaled(int coord, ConvertType type) {
 		int oxdim = xdim;
 
@@ -178,7 +190,7 @@ public class Gameutils {
 		int wx = (xdim << 15) + scale(normxofs, xdim, buildim);
 
 		if (type == ConvertType.Stretch) {
-			return wx;
+			return wx - 1;
 		}
 
 		wx += (oxdim - xdim) / 2;
@@ -193,10 +205,6 @@ public class Gameutils {
 		return wx - 1;
 	}
 
-	public static boolean isSquareResolution(int width, int height) {
-		return (3 * width / 4) == height || (4 * width / 5) == height;
-	}
-
 	public static int coordsConvertYScaled(int coord) {
 		int oydim = ydim;
 		int ydim = (3 * xdim) / 4;
@@ -204,6 +212,10 @@ public class Gameutils {
 		int normxofs = coord - (buildim << 15);
 
 		return (ydim << 15) + scale(normxofs, ydim, buildim);
+	}
+
+	public static boolean isSquareResolution(int width, int height) {
+		return (3 * width / 4) == height || (4 * width / 5) == height;
 	}
 
 	public static byte[] getInternalResource(String name) {

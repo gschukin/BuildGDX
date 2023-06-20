@@ -16,9 +16,14 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
+import ru.m210projects.Build.Gameutils;
+import ru.m210projects.Build.Pattern.BuildChar;
 import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+
+import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
+import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
 
 public class MenuConteiner extends MenuItem
 {
@@ -76,7 +81,7 @@ public class MenuConteiner extends MenuItem
 			if(w2 + bound >= width - w1) {
 				int tx = px + w1 + bound;
 				int ty = py + (font.getHeight() - listFont.getHeight()) / 2;
-				brDrawText(listFont, key, tx + bound, ty, shade, handler.getPal(listFont, this), 0, px + width - 1);
+				brDrawText(listFont, key, tx + bound, ty, shade, handler.getPal(listFont, this), px + width - 1);
 			} else {
 				listFont.drawText(x + width - 1 - listFont.getWidth(key), py + (font.getHeight() - listFont.getHeight()) / 2, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
 			}
@@ -84,18 +89,19 @@ public class MenuConteiner extends MenuItem
 		handler.mPostDraw(this);
 	}
 	
-	protected void brDrawText( BuildFont font, char[] text, int x, int y, int shade, int pal, int x1, int x2 )
-	{
+	protected void brDrawText(BuildFont font, char[] text, int x, int y, int shade, int pal, int x2) {
 		int tptr = 0;
-
-	    while(tptr < text.length && text[tptr] != 0)
-	    {
-        	if(x > x1 && x <= x2) {
-				x += font.drawChar(x, y, text[tptr], shade, pal, 2, listShadow);
-			} else {
-				x += font.getWidth(text[tptr]);
+		y = coordsConvertYScaled(y);
+	    while(tptr < text.length && text[tptr] != 0) {
+			if (x > x2) {
+				return;
 			}
-        	
+
+			int textX = coordsConvertXScaled(x, Gameutils.ConvertType.Normal);
+			BuildChar charInfo = font.getCharInfo(text[tptr]);
+			if (charInfo != null) {
+				x += charInfo.draw(textX, y, 0x10000, shade, pal, 2, listShadow);
+			}
 	        tptr++;
 	    }
 	}

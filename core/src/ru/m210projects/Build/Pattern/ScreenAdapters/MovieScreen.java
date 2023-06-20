@@ -187,13 +187,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 			remapbuf[i] = (byte) white;
 		}
 		engine.makepalookup(palnum, remapbuf, 0, 1, 0, 1);
-
-		for (int i = 0; i < 256; i++) {
-			int tile = GetFont().getTile(i);
-			if (tile >= 0) {
-				engine.getrender().invalidatetile(tile, palnum, -1);
-			}
-		}
+		GetFont().invalidate(palnum);
 	}
 
 	protected boolean play() {

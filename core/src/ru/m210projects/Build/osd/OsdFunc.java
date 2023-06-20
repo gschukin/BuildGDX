@@ -19,14 +19,7 @@ public interface OsdFunc {
      */
     int getPulseShade(int speed);
 
-    /**
-     * fix for TCs like Layre which don't have the BGTILE for
-     * some reason
-     * most of this is copied from my dummytile stuff in defs.c
-     */
-    void showOsd(boolean isFullscreen);
-
-    long getTicks();
+    void showOsd(boolean captured);
 
     int getcolumnwidth(int osdtextscale);
 

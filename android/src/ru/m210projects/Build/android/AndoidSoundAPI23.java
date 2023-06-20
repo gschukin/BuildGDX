@@ -16,8 +16,8 @@
 
 package ru.m210projects.Build.android;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_GOLD;
-import static ru.m210projects.Build.OnSceenDisplay.Console.OSDTEXT_RED;
+import static ru.m210projects.Build.OnSceenDisplay.OsdColor.YELLOW;
+import static ru.m210projects.Build.OnSceenDisplay.OsdColor.RED;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import ru.m210projects.Build.Audio.Sound;
 import ru.m210projects.Build.Audio.SoundData;
 import ru.m210projects.Build.Audio.Source;
 import ru.m210projects.Build.Audio.SourceCallback;
-import ru.m210projects.Build.OnSceenDisplay.Console;
+import ru.m210projects.Build.osd.Console;
 
 public class AndoidSoundAPI23 implements Sound {
 	
@@ -51,11 +51,11 @@ public class AndoidSoundAPI23 implements Sound {
 		this.mediaPlayer = new MediaPlayer();
 		inited = true;
 		
-		Console.Println(getName() + " initialized", OSDTEXT_GOLD);
-		Console.Println("\twith max voices: " + sourceManager.getSourcesNum(), OSDTEXT_GOLD);
+		Console.out.println(getName() + " initialized", OsdColor.GREEN);
+		Console.out.println("\twith max voices: " + sourceManager.getSourcesNum(), OsdColor.YELLOW);
 	
-		Console.Println("ALC_EXT_EFX not supported!");	 
-		Console.Println("AL_SOFT_Source_Resampler not supported!");	 
+		Console.out.println("ALC_EXT_EFX not supported!");	 
+		Console.out.println("AL_SOFT_Source_Resampler not supported!");	 
 
 //		getDigitalMusic().init();
 		

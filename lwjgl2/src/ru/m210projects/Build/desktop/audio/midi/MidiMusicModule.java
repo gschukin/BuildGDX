@@ -134,7 +134,7 @@ public class MidiMusicModule implements Music {
             name = device.getDeviceInfo().getName();
             sequencer.setReceiver(new MidiReceiver(device.getReceiver()));
             
-            Console.out.println(getName() + " initialized", OsdColor.YELLOW);
+            Console.out.println(getName() + " initialized", OsdColor.GREEN);
 		    inited = true;
 		    return true;
 		} catch (Throwable e) {

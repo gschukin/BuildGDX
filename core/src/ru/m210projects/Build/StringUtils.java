@@ -24,4 +24,18 @@ public class StringUtils {
 		}
 		return t.replaceAll("[^\\p{L}\\p{Nd}\\W_]+|\0", ""); //return t.replaceAll("[^a-zA-Z0-9_. /-]", "");
 	}
+
+	public static boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+
+		try {
+			Double.parseDouble(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+
+		return true;
+	}
 }

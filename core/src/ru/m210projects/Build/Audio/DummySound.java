@@ -16,111 +16,109 @@
 
 package ru.m210projects.Build.Audio;
 
-import static ru.m210projects.Build.OnSceenDisplay.Console.*;
-
-import java.nio.ByteBuffer;
-
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
+import java.nio.ByteBuffer;
+
 public class DummySound implements Sound {
 
-	public static final String name = "Dummy sound";
-	
-	@Override
-	public boolean init(SystemType system, int kMaxSFXChannels, int softResampler) {
-		Console.out.println(getName() + " initialized", OsdColor.YELLOW);
-		return true;
-	}
+    public static final String name = "Dummy sound";
 
-	@Override
-	public boolean isInited() {
-		return true;
-	}
+    @Override
+    public boolean init(SystemType system, int kMaxSFXChannels, int softResampler) {
+        Console.out.println(getName() + " initialized", OsdColor.GREEN);
+        return true;
+    }
 
-	@Override
-	public void dispose() {
-	}
+    @Override
+    public boolean isInited() {
+        return true;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public void dispose() {
+    }
 
-	@Override
-	public void setListener(int x, int y, int z, int ang) {
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public void resetListener() {
-	}
+    @Override
+    public void setListener(int x, int y, int z, int ang) {
+    }
 
-	@Override
-	public float getVolume() {
-		return 1.0f;
-	}
+    @Override
+    public void resetListener() {
+    }
 
-	@Override
-	public void setVolume(float vol) {
-	}
+    @Override
+    public float getVolume() {
+        return 1.0f;
+    }
 
-	@Override
-	public void stopAllSounds() {
-	}
+    @Override
+    public void setVolume(float vol) {
+    }
 
-	@Override
-	public Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority) {
-		return null;
-	}
-	
-	@Override
-	public SoundData decodeSound(byte[] data) {
-		return null;
-	}
+    @Override
+    public void stopAllSounds() {
+    }
 
-	@Override
-	public void update() {
-	}
+    @Override
+    public Source newSound(ByteBuffer data, int rate, int bits, int channels, int priority) {
+        return null;
+    }
 
-	@Override
-	public Music getDigitalMusic() {
-		return null;
-	}
+    @Override
+    public SoundData decodeSound(byte[] data) {
+        return null;
+    }
 
-	@Override
-	public boolean isAvailable(int priority) {
-		return true;
-	}
+    @Override
+    public void update() {
+    }
 
-	@Override
-	public float getReverb() {
-		return 0;
-	}
+    @Override
+    public Music getDigitalMusic() {
+        return null;
+    }
 
-	@Override
-	public void setReverb(boolean enable, float delay) {
-	}
+    @Override
+    public boolean isAvailable(int priority) {
+        return true;
+    }
 
-	@Override
-	public int getCurrentSoftResampler() {
-		return 0;
-	}
+    @Override
+    public float getReverb() {
+        return 0;
+    }
 
-	@Override
-	public void setSoftResampler(int num) {
-	}
+    @Override
+    public void setReverb(boolean enable, float delay) {
+    }
 
-	@Override
-	public String getSoftResamplerName(int num) {
-		return "Not supported";
-	}
+    @Override
+    public int getCurrentSoftResampler() {
+        return 0;
+    }
 
-	@Override
-	public void uninit() {
-	}
+    @Override
+    public void setSoftResampler(int num) {
+    }
 
-	@Override
-	public int getNumResamplers() {
-		return 1;
-	}
+    @Override
+    public String getSoftResamplerName(int num) {
+        return "Not supported";
+    }
+
+    @Override
+    public void uninit() {
+    }
+
+    @Override
+    public int getNumResamplers() {
+        return 1;
+    }
 }

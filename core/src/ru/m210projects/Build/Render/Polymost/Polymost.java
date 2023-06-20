@@ -342,7 +342,7 @@ public class Polymost implements GLRenderer {
 				r_vbos = 0;
 			}
 
-			Console.out.println("Polymost renderer is initialized", OsdColor.YELLOW);
+			Console.out.println("Polymost renderer is initialized", OsdColor.GREEN);
 			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION), OsdColor.YELLOW);
 
 			isInited = true;

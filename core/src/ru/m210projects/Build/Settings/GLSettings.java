@@ -173,8 +173,8 @@ public class GLSettings extends BuildSettings {
 		};
 		usePaletteShader.set(cfg.paletteEmulation);
 
-//		OSDCOMMAND r_paletteshader = new OSDCOMMAND("r_paletteshader",
-//				"r_paletteshader: " + GLSettings.usePaletteShader.get(), new OSDCVARFUNC() {
+//		OSDCOMMAND r_paletteshader = new OsdCallback("r_paletteshader",
+//				"r_paletteshader: " + GLSettings.usePaletteShader.get(), new OsdCallback.OsdRunnable() {
 //					@Override
 //					public CommandResponse execute(String[] argv) {
 //						if (Console.osd_argc != 2) {
@@ -196,7 +196,7 @@ public class GLSettings extends BuildSettings {
 //					}
 //				});
 //		r_paletteshader.setRange(0, 1);
-//		Console.RegisterCvar(r_paletteshader);
+//		Console.out.registerCommand(r_paletteshader);
 
 		animSmoothing = new BooleanVar(true, "Use  model animation smoothing");
 

@@ -167,7 +167,7 @@ public class OsdCommandPrompt {
 
     public void onEnter() {
         if (!isEmpty()) {
-            String input = osdEditBuf.toString().toLowerCase();
+            String input = osdEditBuf.toString();
             inputHistory.add(input);
             parent.dispatch(input);
         }
@@ -308,13 +308,8 @@ public class OsdCommandPrompt {
 
         if (osdVersionText != null) {
             int xpos = parent.osdCols - osdVersionText.length() + 2;
-            shade = osdVersionShade;
-            if (shade == 0) {
-                shade = func.getPulseShade(4);
-            }
-
             func.drawstr(parent.osdCols - osdVersionText.length() + 2, ypos - ((offset >= xpos) ? 1 : 0),
-                    osdVersionText, shade, osdVersionPal, textScale);
+                    osdVersionText, func.getPulseShade(4), osdVersionPal, textScale);
         }
     }
 

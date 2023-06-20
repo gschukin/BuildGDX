@@ -220,7 +220,7 @@ public class GDXRenderer implements GLRenderer {
 
 			this.textureCache.changePalette(curpalette.getBytes());
 
-			Console.out.println("Polygdx renderer is initialized", OsdColor.YELLOW);
+			Console.out.println("Polygdx renderer is initialized", OsdColor.GREEN);
 			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
 					OsdColor.YELLOW);
 

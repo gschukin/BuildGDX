@@ -19,4 +19,13 @@ public class OsdCallback extends OsdCommand {
     public interface OsdRunnable {
         CommandResponse execute(String[] argv);
     }
+
+    public interface OsdSilentRunnable extends OsdRunnable {
+        void run(String[] argv);
+
+        default CommandResponse execute(String[] argv) {
+            run(argv);
+            return CommandResponse.SILENT_RESPONSE;
+        }
+    }
 }

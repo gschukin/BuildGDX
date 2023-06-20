@@ -28,8 +28,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Gameutils.ConvertType;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Pattern.BuildChar;
 import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
@@ -317,13 +319,16 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	protected void brDrawText(BuildFont font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
-		int tptr = 0, tx = 0;
+		int tptr = 0;
 
+		//y = coordsConvertYScaled(y);
 		while (tptr < text.length && text[tptr] != 0) {
-			if (tx + x > x1 && tx + x <= x2) {
-				x += font.drawChar(x, y, text[tptr], shade, pal, 2, fontShadow);
+			//int textX = coordsConvertXScaled(x, ConvertType.Normal);
+			BuildChar charInfo = font.getCharInfo(text[tptr]);
+			if (x > x1 && x <= x2) {
+				x += charInfo.draw(x, y, 65536, shade, pal, 2, fontShadow);
 			} else {
-				x += font.getWidth(text[tptr]);
+				x += charInfo.getWidth();
 			}
 
 			tptr++;
