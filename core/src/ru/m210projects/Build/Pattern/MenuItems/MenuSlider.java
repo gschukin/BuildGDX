@@ -23,12 +23,11 @@ import static ru.m210projects.Build.Strhandler.buildString;
 import java.util.Arrays;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
-import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
-import ru.m210projects.Build.Pattern.MenuItems.MenuItem;
-import ru.m210projects.Build.Pattern.MenuItems.MenuProc;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuSlider extends MenuItem {
 
@@ -40,14 +39,14 @@ public class MenuSlider extends MenuItem {
 	public float digitalMax;
 	public char[] dbuff; 
 	public MenuProc callback;
-	public BuildFont sliderNumbers;
+	public Font sliderNumbers;
 
 	private int touchX;
 	private boolean isTouched;
 	private static MenuSlider touchedObj;
 	private final SliderDrawable slider;
 	
-	public MenuSlider(SliderDrawable slider, Object text, BuildFont textStyle, int x, int y, int width, int value, int min, int max, 
+	public MenuSlider(SliderDrawable slider, Object text, Font textStyle, int x, int y, int width, int value, int min, int max,
 			int step, MenuProc callback, boolean digital) {
 		super(text, textStyle);
 
@@ -75,7 +74,7 @@ public class MenuSlider extends MenuItem {
 		int shade = handler.getShade(this);
 		
 		if ( text != null ) {
-			font.drawText(x, y, text, shade, handler.getPal(font, this), TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(x, y, text, 1.0f, shade, handler.getPal(font, this), TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 
 		slider.drawSliderBackground(x + width - slider.getSliderRange(), y, shade, handler.getPal(null, this));
@@ -92,7 +91,7 @@ public class MenuSlider extends MenuItem {
 				Arrays.fill(dbuff, index + 4, dbuff.length, (char)0);
 			}
 
-			sliderNumbers.drawText(x + width - slider.getSliderRange() - sliderNumbers.getWidth(dbuff) - 5, y + (font.getHeight() - sliderNumbers.getHeight()) / 2, dbuff, shade, handler.getPal(sliderNumbers, this), TextAlign.Left, 2, fontShadow);
+			sliderNumbers.drawTextScaled(x + width - slider.getSliderRange() - sliderNumbers.getWidth(dbuff, 1.0f) - 5, y + (font.getHeight() - sliderNumbers.getHeight()) / 2, dbuff, 1.0f, shade, handler.getPal(sliderNumbers, this), TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 		
 		int xRange = slider.getSliderRange() - slider.getSliderWidth();
@@ -206,7 +205,7 @@ public class MenuSlider extends MenuItem {
 		}
 		
 		if(text != null) {
-			if(mx > x && mx < x + font.getWidth(text)) {
+			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
 				if(my > y && my < y + font.getHeight()) {
 					return true;
 				}

@@ -99,6 +99,9 @@ import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLFog;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
@@ -4263,18 +4266,11 @@ public class Polymost implements GLRenderer {
 	}
 
 	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale) {
+	public int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent) {
 		globalfog.disable();
-		ortho.printext(font, xpos, ypos, text, col, shade, bit, scale);
+		int width = ortho.printext(font, x, y, text, scale, shade, palnum, align, transparent);
 		globalfog.enable();
-	}
-
-	@Override
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		globalfog.disable();
-		ortho.printext(xpos, ypos, col, backcol, text, fontsize, scale);
-		globalfog.enable();
+		return width;
 	}
 
 	@Override

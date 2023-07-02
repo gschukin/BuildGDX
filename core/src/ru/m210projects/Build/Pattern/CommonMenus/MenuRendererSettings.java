@@ -24,6 +24,7 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.BuildVariable;
 import ru.m210projects.Build.Types.BuildVariable.RespondType;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuRendererSettings extends BuildMenuList {
 
@@ -32,7 +33,7 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 	private PixelFormat currentFormat;
 	public BuildGame app;
 
-	public BuildFont style;
+	public Font style;
 	public int width;
 	public boolean fontShadow = false;
 	public boolean listShadow = false;
@@ -59,7 +60,7 @@ public abstract class MenuRendererSettings extends BuildMenuList {
 	@Override
 	public abstract MenuTitle getTitle(BuildGame app, String text);
 
-	public MenuRendererSettings(final BuildGame app, int x, int y, int width, int step, BuildFont style) {
+	public MenuRendererSettings(final BuildGame app, int x, int y, int width, int step, Font style) {
 		super(app, "Renderer settings", x, y, width, step, 15);
 
 		this.app = app;

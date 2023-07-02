@@ -20,13 +20,15 @@ import static ru.m210projects.Build.Engine.*;
 import com.badlogic.gdx.Input.Keys;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public abstract class MenuVariants extends MenuTitle
 {
-	public MenuVariants(Engine draw, String text, BuildFont font, int x, int y) {
+	public MenuVariants(Engine draw, String text, Font font, int x, int y) {
 		super(draw, text, font, x, y, -1);
 		this.flags = 3 | 4;
 	}
@@ -34,7 +36,7 @@ public abstract class MenuVariants extends MenuTitle
 	@Override
 	public void draw(MenuHandler handler) {
 		if ( text != null ) {
-			font.drawText(x, y - font.getHeight() / 2, text, handler.getShade(this), pal, TextAlign.Center, 2, fontShadow);
+			font.drawTextScaled(x, y - font.getHeight() / 2, text, 1.0f, handler.getShade(this), pal, TextAlign.Center, Transparent.None, ConvertType.Normal,  fontShadow);
 		}
 		
 		handler.mPostDraw(this);

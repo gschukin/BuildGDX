@@ -24,6 +24,7 @@ import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLUP;
 
 import com.badlogic.gdx.Input.Keys;
 
+import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
@@ -46,7 +47,7 @@ public abstract class MenuKeyboard extends BuildMenu {
 	
 	public abstract String keyNames(int keycode);
 	
-	public MenuKeyboard(final BuildGame app, int posx, int posy, int width, int list_len, BuildFont style) {
+	public MenuKeyboard(final BuildGame app, int posx, int posy, int width, int list_len, Font style) {
 		addItem(getTitle(app, "Configure keys"), false);
 		final BuildConfig cfg = app.pCfg;
 		

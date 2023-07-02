@@ -28,7 +28,6 @@ import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.OrphoRenderer;
-import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.TileFont.FontType;
@@ -70,8 +69,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		this.boardService = engine.getBoardService();
 	}
 
-	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
 
 		if(col < 0) {
@@ -124,8 +122,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		}
 	}
 
-	@Override
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
+	private void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
 		int stx = xpos;
 		int charxsiz = 8;
 		int charysiz = (int) (scale * 7);

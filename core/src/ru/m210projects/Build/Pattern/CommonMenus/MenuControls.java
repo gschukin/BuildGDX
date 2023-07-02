@@ -25,6 +25,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuText;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 import ru.m210projects.Build.Pattern.MenuItems.MenuVariants;
 import ru.m210projects.Build.Settings.BuildConfig;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuControls extends BuildMenu {
 	
@@ -44,7 +45,7 @@ public abstract class MenuControls extends BuildMenu {
 	
 	public abstract void mResetClassic(BuildConfig cfg, MenuHandler menu);
 	
-	public MenuControls(BuildGame app, int posy, int questionPos, int menuHeight, int separatorHeight, BuildFont style, int pal, int questionPal)
+	public MenuControls(BuildGame app, int posy, int questionPos, int menuHeight, int separatorHeight, Font style, int pal, int questionPal)
 	{
 		addItem(getTitle(app, "Controls setup"), false);
 
@@ -67,7 +68,7 @@ public abstract class MenuControls extends BuildMenu {
 		addItem(mKeyReset2, false);
 	}
 	
-	protected BuildMenu getResetDefaultMenu(final BuildGame app, BuildFont style, int posy, int pal)
+	protected BuildMenu getResetDefaultMenu(final BuildGame app, Font style, int posy, int pal)
 	{
 		BuildMenu menu = new BuildMenu();
 		
@@ -87,7 +88,7 @@ public abstract class MenuControls extends BuildMenu {
 		return menu;
 	}
 	
-	protected BuildMenu getResetClassicMenu(final BuildGame app, BuildFont style, int posy, int pal)
+	protected BuildMenu getResetClassicMenu(final BuildGame app, Font style, int posy, int pal)
 	{
 		BuildMenu menu = new BuildMenu();
 		

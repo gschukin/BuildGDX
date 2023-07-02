@@ -20,7 +20,7 @@ import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
 import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Gameutils.ConvertType;
+import ru.m210projects.Build.Types.ConvertType;
 
 public abstract class SliderDrawable {
 	

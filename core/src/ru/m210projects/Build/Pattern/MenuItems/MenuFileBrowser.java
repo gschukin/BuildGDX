@@ -28,18 +28,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Gameutils.ConvertType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.BuildChar;
 import ru.m210projects.Build.Pattern.BuildEngine;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.FileHandle.DirectoryEntry;
 import ru.m210projects.Build.FileHandle.FileEntry;
 import ru.m210projects.Build.FileHandle.Compat.Path;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.CharInfo;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public abstract class MenuFileBrowser extends MenuItem {
 
@@ -109,7 +110,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 	private final SliderDrawable slider;
 	private int nBackground;
 	private int scrollerHeight;
-	protected BuildFont topFont, pathFont;
+	protected Font topFont, pathFont;
 	public int topPal, pathPal, listPal, backgroundPal;
 	public int transparent = 1;
 
@@ -123,8 +124,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 		classProperties.put(cl, new ExtProp(pal, priority));
 	}
 
-	public MenuFileBrowser(BuildGame app, BuildFont font, BuildFont topFont, BuildFont pathFont, int x, int y,
-			int width, int nItemHeight, int nListItems, int nBackground) {
+	public MenuFileBrowser(BuildGame app, Font font, Font topFont, Font pathFont, int x, int y,
+						   int width, int nItemHeight, int nListItems, int nBackground) {
 		super(null, font);
 
 		list[DIRECTORY] = new StringList();
@@ -221,8 +222,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	protected void drawHeader(int x1, int x2, int y) {
-		/* directories */ topFont.drawText(x1, y, dirs, -32, topPal, TextAlign.Left, 2, fontShadow);
-		/* files */ topFont.drawText(x2, y, ffs, -32, topPal, TextAlign.Left, 2, fontShadow);
+		/* directories */ topFont.drawTextScaled(x1, y, dirs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
+		/* files */ topFont.drawTextScaled(x2, y, ffs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 	}
 
 	protected void drawPath(int x, int y) {
@@ -241,7 +242,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 				coordsConvertYScaled(yList + nListItems * mFontOffset() + 6));
 
 		int px = x + 3;
-		drawHeader(px, x - 3 + width - topFont.getWidth(ffs), yColNames);
+		drawHeader(px, x - 3 + width - topFont.getWidth(ffs, 1.0f), yColNames);
 		px += scrollerWidth + 3;
 		drawPath(px, yPath);
 
@@ -285,7 +286,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 				}
 			}
 
-			px = x + width - font.getWidth(text) - scrollerWidth - 5;
+			px = x + width - font.getWidth(text, 1.0f) - scrollerWidth - 5;
 			brDrawText(font, text, px, py, shade, pal, this.x + this.width / 2 + 4, this.x + this.width);
 			py += mFontOffset();
 		}
@@ -318,15 +319,12 @@ public abstract class MenuFileBrowser extends MenuItem {
 		}
 	}
 
-	protected void brDrawText(BuildFont font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
+	protected void brDrawText(Font font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
 		int tptr = 0;
-
-		//y = coordsConvertYScaled(y);
 		while (tptr < text.length && text[tptr] != 0) {
-			//int textX = coordsConvertXScaled(x, ConvertType.Normal);
-			BuildChar charInfo = font.getCharInfo(text[tptr]);
+			CharInfo charInfo = font.getCharInfo(text[tptr]);
 			if (x > x1 && x <= x2) {
-				x += charInfo.draw(x, y, 65536, shade, pal, 2, fontShadow);
+				x += font.drawCharScaled(x, y, text[tptr], 1.0f, shade, pal, Transparent.None, ConvertType.Normal, fontShadow);
 			} else {
 				x += charInfo.getWidth();
 			}

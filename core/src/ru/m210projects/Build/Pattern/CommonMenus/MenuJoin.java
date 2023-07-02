@@ -32,6 +32,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuItem;
 import ru.m210projects.Build.Pattern.MenuItems.MenuProc;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTextField;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuJoin extends BuildMenu {
 	
@@ -40,7 +41,7 @@ public abstract class MenuJoin extends BuildMenu {
 	public MenuTextField mIPAddress;
 	public MenuButton mConnect;
 	
-	public MenuJoin(final BuildGame app, int posx, int posy, int menuHeight, int width, BuildFont style)
+	public MenuJoin(final BuildGame app, int posx, int posy, int menuHeight, int width, Font style)
 	{
 		addItem(getTitle(app, "Join a game"), false);
 

@@ -11,12 +11,15 @@ import java.util.List;
 import com.badlogic.gdx.Input.Keys;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
 import ru.m210projects.Build.Pattern.Tools.SaveManager.SaveInfo;
+import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
+
 import static ru.m210projects.Build.RenderService.*;
 
 public abstract class MenuSlotList extends MenuList
@@ -35,8 +38,8 @@ public abstract class MenuSlotList extends MenuList
 	public String typed;
 	public int yHelpText;
 	public int helpPal;
-	public BuildFont questionFont;
-	public BuildFont desriptionFont;
+	public Font questionFont;
+	public Font desriptionFont;
 	public int specPal, backgroundPal;
 	public int transparent = 1;
 
@@ -48,8 +51,8 @@ public abstract class MenuSlotList extends MenuList
 	protected int nBackground;
 	protected int listPal;
 
-	public MenuSlotList(Engine draw, SaveManager saveManager, BuildFont font, int x, int y, int yHelpText, int width,
-			int nListItems, MenuProc updateCallback, MenuProc confirmCallback, int listPal, int specPal, int nBackground, boolean saveList ) {
+	public MenuSlotList(Engine draw, SaveManager saveManager, Font font, int x, int y, int yHelpText, int width,
+						int nListItems, MenuProc updateCallback, MenuProc confirmCallback, int listPal, int specPal, int nBackground, boolean saveList ) {
 
 		super(null, font, x, y, width, 0, null, null, nListItems);
 		this.draw = draw;
@@ -147,7 +150,7 @@ public abstract class MenuSlotList extends MenuList
 					}
 				}
 
-				font.drawText(x + width / 2 + nListOffset, py, rtext,shade, pal, TextAlign.Left, 2, fontShadow);
+				font.drawTextScaled(x + width / 2 + nListOffset, py, rtext, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
 				py += mFontOffset();
 			}
@@ -174,7 +177,7 @@ public abstract class MenuSlotList extends MenuList
 				rtext = toCharArray("List is empty");
 			}
 
-			font.drawText(x + width / 2 + nListOffset, py, rtext,shade, listPal, TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(x + width / 2 + nListOffset, py, rtext, 1.0f, shade, listPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 
 		pal = helpPal;
@@ -200,13 +203,13 @@ public abstract class MenuSlotList extends MenuList
 			int shade = handler.getShade(m_pMenu.m_pItems[m_pMenu.m_nFocus]);
 
 			char[] ctext = toCharArray("Do you want to delete \"" + SaveName() + "\"");
-			questionFont.drawText(160 - questionFont.getWidth(ctext) / 2, 100, ctext, shade, pal, TextAlign.Left, 2, fontShadow);
+			questionFont.drawTextScaled(160 - questionFont.getWidth(ctext, 1.0f) / 2, 100, ctext, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 			ctext = toCharArray("[Y/N]");
-			questionFont.drawText(160 - questionFont.getWidth(ctext) / 2, 110, ctext, shade, pal, TextAlign.Left, 2, fontShadow);
+			questionFont.drawTextScaled(160 - questionFont.getWidth(ctext, 1.0f) / 2, 110, ctext, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 		} else {
 			char[] ctext = toCharArray("Press \"DELETE\" to remove the savegame file");
 
-			desriptionFont.drawText(160 - desriptionFont.getWidth(ctext) / 2, yHelpText, ctext, 0, pal, TextAlign.Left, 2, fontShadow);
+			desriptionFont.drawTextScaled(160 - desriptionFont.getWidth(ctext, 1.0f) / 2, yHelpText, ctext, 1.0f,0, pal, TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 		}
 
 		handler.mPostDraw(this);

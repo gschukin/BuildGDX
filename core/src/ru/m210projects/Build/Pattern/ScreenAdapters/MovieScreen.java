@@ -10,6 +10,10 @@ import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.font.Font;
+
+import java.util.Arrays;
+
 import static ru.m210projects.Build.RenderService.*;
 
 public abstract class MovieScreen extends SkippableAdapter {
@@ -60,9 +64,9 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	protected abstract byte[] DoDrawFrame(int num);
 
-	protected abstract BuildFont GetFont();
+	protected abstract Font GetFont();
 
-	protected abstract void DrawEscText(BuildFont font, int pal);
+	protected abstract void DrawEscText(Font font, int pal);
 
 	@Override
 	public void show() {
@@ -183,11 +187,16 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 		int palnum = MAXPALOOKUPS - RESERVEDPALS - 1;
 		byte[] remapbuf = new byte[768];
-		for (int i = 0; i < 768; i++) {
-			remapbuf[i] = (byte) white;
-		}
+		Arrays.fill(remapbuf, (byte) white);
 		engine.makepalookup(palnum, remapbuf, 0, 1, 0, 1);
-		GetFont().invalidate(palnum);
+
+		Font font = GetFont();
+		for (char i = 0; i < 256; i++) {
+			int tile = font.getCharInfo(i).getTile();
+			if (tile >= 0) {
+				engine.getrender().invalidatetile(tile, palnum, -1);
+			}
+		}
 	}
 
 	protected boolean play() {

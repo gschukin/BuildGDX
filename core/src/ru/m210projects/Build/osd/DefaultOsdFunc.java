@@ -2,9 +2,13 @@ package ru.m210projects.Build.osd;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
-import static ru.m210projects.Build.Engine.palette;
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.RenderService.xdim;
@@ -15,8 +19,8 @@ public class DefaultOsdFunc implements OsdFunc {
 
     protected final Engine engine;
     protected final char[] charbuf = new char[1];
-    protected int BGTILE;
-    protected int BGCTILE;
+    protected int BGTILE = -1;
+    protected int BGCTILE = -1;
     protected int PALETTE;
     protected int BORDTILE = -1;
     protected int BITSTH = 1 + 32 + 8 + 16;    // high translucency
@@ -24,9 +28,11 @@ public class DefaultOsdFunc implements OsdFunc {
     protected int BITS = 8 + 16 + 64;        // solid
     protected int BORDERANG = 0;
     protected int SHADE = 50;
+    protected Font font;
 
     public DefaultOsdFunc(Engine engine) {
         this.engine = engine;
+        this.font = EngineUtils.getLargeFont();
     }
 
     protected int calcStartX(int x, int scale) {
@@ -34,7 +40,7 @@ public class DefaultOsdFunc implements OsdFunc {
     }
 
     protected int calcStartY(int y) {
-        return (y << 3);
+        return y * font.getHeight();
     }
 
     @Override
@@ -42,7 +48,7 @@ public class DefaultOsdFunc implements OsdFunc {
         x = calcStartX(x, scale);
         y = mulscale(calcStartY(y), scale, 16);
         charbuf[0] = ch;
-        engine.printext256(x, y, color.getPal(), -1, charbuf, 0, scale / 65536.0f);
+        font.drawText(x, y, charbuf, scale / 65536.0f, shade, color.getPal(), TextAlign.Left, Transparent.None, false);
     }
 
     @Override
@@ -71,8 +77,8 @@ public class DefaultOsdFunc implements OsdFunc {
             }
 
             charbuf[0] = symb;
-            engine.printext256(textX, mulscale(textY, scale, 16), text.getPal(chpos), -1, charbuf, 0, scale / 65536.0f);
-            textX += mulscale(8, scale, 16);
+            int symbWidth = font.drawText(textX, mulscale(textY, scale, 16), charbuf, scale / 65536.0f, text.getShade(chpos), text.getPal(chpos), TextAlign.Left, Transparent.None, false);
+            textX += mulscale(symbWidth, scale, 16);
             chpos++;
             xpos++;
         }
@@ -82,7 +88,7 @@ public class DefaultOsdFunc implements OsdFunc {
 
     @Override
     public void drawstr(int x, int y, String text, int shade, OsdColor color, int scale) {
-        engine.printext256(calcStartX(x, scale), mulscale(calcStartY(y), scale, 16), color.getPal(), -1, toCharArray(text), 0, scale / 65536.0f);
+        font.drawText(calcStartX(x, scale), mulscale(calcStartY(y), scale, 16), toCharArray(text), scale / 65536.0f, 0, color.getPal(), TextAlign.Left, Transparent.None, false);
     }
 
     @Override
@@ -93,7 +99,8 @@ public class DefaultOsdFunc implements OsdFunc {
                 ch = '#';
             }
             charbuf[0] = ch;
-            engine.printext256(calcStartX(x, scale), mulscale(calcStartY(y), scale, 16), OsdColor.DEFAULT.getPal(), -1, charbuf, 0, scale / 65536.0f);
+
+            font.drawText(calcStartX(x, scale), mulscale(calcStartY(y), scale, 16), charbuf, scale / 65536.0f, 0, OsdColor.DEFAULT.getPal(), TextAlign.Left, Transparent.None, false);
         }
     }
 
@@ -114,7 +121,7 @@ public class DefaultOsdFunc implements OsdFunc {
     @Override
     public void clearbg(int col, int row) {
         int bits = BITSTH;
-        int daydim = (row << 3) + 3;
+        int daydim = (row * font.getHeight()) + 5;
 
         Tile pic = engine.getTile(BGTILE);
 
@@ -168,12 +175,12 @@ public class DefaultOsdFunc implements OsdFunc {
 
     @Override
     public int getcolumnwidth(int osdtextscale) {
-        return divscale(xdim, osdtextscale, 16) / 8 - 3;
+        return divscale(xdim, osdtextscale, 16) / (font.getCharInfo(' ').getCellSize()) - 3;
     }
 
     @Override
     public int getrowheight(int osdtextscale) {
-        return divscale(ydim, osdtextscale, 16) >> 3;
+        return divscale(ydim, osdtextscale, 16) / font.getHeight();
     }
 
     @Override

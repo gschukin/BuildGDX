@@ -1330,10 +1330,6 @@ public abstract class Engine {
         renderService.setbrightness(dabrightness, dapal, flags);
     }
 
-    public void printext256(int xpos, int ypos, int col, int backcol, char[] name, int fontsize, float scale) { // gdxBuild
-        renderService.printext256(xpos, ypos, col, backcol, name, fontsize, scale);
-    }
-
     public String screencapture(String fn) { // jfBuild + gdxBuild (screenshot)
         return renderService.screencapture(fn);
     }

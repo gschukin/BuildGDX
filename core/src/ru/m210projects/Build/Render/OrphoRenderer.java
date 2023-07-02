@@ -19,11 +19,12 @@ package ru.m210projects.Build.Render;
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Gameutils;
+import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
-import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 import static ru.m210projects.Build.Engine.show2dsector;
 import static ru.m210projects.Build.Net.Mmulti.connecthead;
@@ -54,10 +55,9 @@ public abstract class OrphoRenderer {
 
     public abstract void uninit();
 
-    public abstract void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-                                  float scale);
-
-    public abstract void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale);
+    public int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent) {
+        return 0;
+    }
 
     public abstract void drawline256(int x1, int y1, int x2, int y2, int col);
 

@@ -34,6 +34,7 @@ import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.LittleEndian;
 import ru.m210projects.Build.Types.MemLog;
+import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -120,7 +121,7 @@ public abstract class BuildGame extends Game {
         System.out.println("disposed");
     }
 
-    public BuildFont getFont(int i) {
+    public Font getFont(int i) {
         return pFonts.getFont(i);
     }
 

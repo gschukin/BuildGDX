@@ -31,6 +31,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuSwitch;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Settings.BuildConfig;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuMouse extends BuildMenu {
 	
@@ -54,7 +55,7 @@ public abstract class MenuMouse extends BuildMenu {
 
 	public abstract MenuTitle getTitle(BuildGame app, String text);
 
-	public MenuMouse(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, BuildFont style, int buttonPal)
+	public MenuMouse(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, Font style, int buttonPal)
 	{
 		addItem(getTitle(app, "Mouse setup"), false);
 		
@@ -176,7 +177,7 @@ public abstract class MenuMouse extends BuildMenu {
 		addItem(mAdvance, false);
 	}
 	
-	protected BuildMenu buildAdvancedAxisMenu(BuildGame app, int posx, int posy, int width, int menuHeight, BuildFont style) {
+	protected BuildMenu buildAdvancedAxisMenu(BuildGame app, int posx, int posy, int width, int menuHeight, Font style) {
 		BuildMenu advancedMenu = new BuildMenu();
 		
 		advancedMenu.addItem(getTitle(app, "Digital axis"), false);

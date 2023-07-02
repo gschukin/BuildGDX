@@ -30,6 +30,9 @@ import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
@@ -3947,14 +3950,8 @@ public class Software implements Renderer {
 	}
 
 	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale) {
-		ortho.printext(font, xpos, ypos, text, col, shade, bit, scale);
-	}
-
-	@Override
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		ortho.printext(xpos, ypos, col, backcol, text, fontsize, scale);
+	public int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent) {
+		return ortho.printext(font, x, y, text, scale, shade, palnum, align, transparent);
 	}
 
 	private ByteBuffer indexbuffer;

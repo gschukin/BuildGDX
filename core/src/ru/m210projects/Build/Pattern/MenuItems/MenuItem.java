@@ -20,9 +20,9 @@ import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
 import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Gameutils.ConvertType;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuItem {
 	
@@ -33,7 +33,7 @@ public abstract class MenuItem {
 
 	public BuildMenu m_pMenu;
 	public char[] text;          
-	public BuildFont font;     
+	public Font font;
 	public boolean fontShadow;
 	public int x = 0;              
 	public int y = 0;             
@@ -42,7 +42,7 @@ public abstract class MenuItem {
 	public int pal = 0;
 	public int align;
 	
-	public MenuItem(Object text, BuildFont textStyle) {
+	public MenuItem(Object text, Font textStyle) {
 		if(text != null) {
 			if(text instanceof String) {
 				this.text = ((String)text).toCharArray();

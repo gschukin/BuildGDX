@@ -39,7 +39,7 @@ public class TileFont {
 	public static final HashSet<TileFont> managedFont = new HashSet<TileFont>();
 
 	public enum FontType {
-		Tilemap, Bitmap
+		Tilemap, Bitmap, BITMAP_FONT, TILE_FONT
 	}
 
 	public GLTile atlas;

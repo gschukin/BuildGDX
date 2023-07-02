@@ -16,24 +16,25 @@
 
 package ru.m210projects.Build.Render.TextureHandle;
 
-import static com.badlogic.gdx.graphics.GL20.GL_LUMINANCE;
-import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE;
-import static com.badlogic.gdx.graphics.GL20.GL_TEXTURE_2D;
-import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
-import static ru.m210projects.Build.Engine.MAXTILES;
-import static ru.m210projects.Build.Engine.RESERVEDPALS;
+import static com.badlogic.gdx.graphics.GL20.*;
+import static com.badlogic.gdx.graphics.GL20.GL_ALPHA;
+import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Render.Types.GL10.GL_MODELVIEW;
 import static ru.m210projects.Build.Render.Types.GL10.GL_RGB_SCALE;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
 import static ru.m210projects.Build.RenderService.pSmallTextfont;
 import static ru.m210projects.Build.RenderService.pTextfont;
+import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Types.font.BitmapFont;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GLFilter;
@@ -41,6 +42,10 @@ import ru.m210projects.Build.Script.TextureHDInfo;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.osd.OsdColor;
+
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TextureManager {
 
@@ -52,6 +57,7 @@ public class TextureManager {
 	protected GLTile[] palookups; // to shader
 	protected int texunits = 0;
 	protected final ExpandTexture expand;
+	protected final Map<Font, GLTile> fontAtlas;
 
 	public enum ExpandTexture {
 		Horizontal(1), Vertical(2), Both(1 | 2);
@@ -72,6 +78,49 @@ public class TextureManager {
 		this.cache = new GLTileArray(MAXTILES);
 		this.palookups = new GLTile[MAXPALOOKUPS];
 		this.expand = opt;
+		this.fontAtlas = new HashMap<>();
+	}
+
+	public GLTile getBitmapFontAtlas(BitmapFont font) {
+		GLTile pth = fontAtlas.computeIfAbsent(font, e -> createGLBitmap(font));
+		fontAtlas.putIfAbsent(font, pth);
+		return pth;
+	}
+
+	protected GLTile createGLBitmap(BitmapFont bitmapFont) {
+		final int sizx = bitmapFont.getAtlasWidth();
+		final int sizy = bitmapFont.getAtlasHeight();
+		final byte[] textfont = bitmapFont.getData();
+
+		TileFont.TileFontData dat = new TileFont.TileFontData(sizx, sizy) {
+			@Override
+			public ByteBuffer buildAtlas(ByteBuffer data) {
+				for (int h = 0; h < 256; h++) {
+					int tptr = (h % 16) * 8 + (h / 16) * sizx * 8;
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							data.put(tptr + j, (textfont[h * 8 + i] & pow2char[7 - j]) != 0 ? (byte) 255 : 0);
+						}
+						tptr += sizx;
+					}
+				}
+				return data;
+			}
+
+			@Override
+			public int getGLInternalFormat() {
+				return GL_ALPHA;
+			}
+
+			@Override
+			public int getGLFormat() {
+				return GL_ALPHA;
+			}
+		};
+
+		GLTile atlas = newTile(dat, 0, false);
+		atlas.setupTextureFilter(glfiltermodes[0], 1);
+		return atlas;
 	}
 
 	public void setTextureInfo(TextureHDInfo info) {

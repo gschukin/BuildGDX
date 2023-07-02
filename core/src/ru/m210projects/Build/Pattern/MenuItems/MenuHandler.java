@@ -33,6 +33,7 @@ import com.badlogic.gdx.Input.Keys;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.BuildControls;
 import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuHandler {
 	
@@ -80,7 +81,7 @@ public abstract class MenuHandler {
 	//item == m_pMenu.m_pItems[m_pMenu.m_nFocus] for get focused shade
 	public abstract int getShade(MenuItem item);
 	
-	public abstract int getPal(BuildFont font, MenuItem item);
+	public abstract int getPal(Font font, MenuItem item);
 	
 	public abstract void mPostDraw(MenuItem item);
 

@@ -9,6 +9,8 @@ import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Compat;
 import ru.m210projects.Build.FileHandle.DirectoryEntry;
+import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GdxRender.GDXRenderer;
 import ru.m210projects.Build.Render.Renderer;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 
 import static java.lang.Math.*;
 import static java.lang.Math.pow;
@@ -32,6 +35,7 @@ import static ru.m210projects.Build.Gameutils.*;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.buildString;
+import static ru.m210projects.Build.Strhandler.toCharArray;
 
 public class RenderService {
 
@@ -659,10 +663,6 @@ public class RenderService {
         render.completemirror();
     }
 
-    public void printext256(int xpos, int ypos, int col, int backcol, char[] name, int fontsize, float scale) { // gdxBuild
-        render.printext(xpos, ypos, col, backcol, name, fontsize, scale);
-    }
-
     public String screencapture(String fn) { // jfBuild + gdxBuild (screenshot)
         int a, b, c, d;
         fn = fn.replaceAll("[^a-zA-Z0-9_. \\[\\]-]", "");
@@ -758,16 +758,11 @@ public class RenderService {
             int fps = BuildGdx.graphics.getFramesPerSecond();
             float rate = BuildGdx.graphics.getDeltaTime() * 1000;
             if (fps <= 9999 && rate <= 9999) {
-                int chars = buildString(fpsbuffer, 0, Double.toString(Math.round(rate * 100) / 100.0));
-//				int chars = Bitoa((int) rate, fpsbuffer);
-                chars = buildString(fpsbuffer, chars, "ms ", fps);
-                chars = buildString(fpsbuffer, chars, "fps");
-                fpsx = windowx2 - (int) ((chars << 3) * scale);
-                fpsy = windowy1 + 1;
+                buildString(fpsbuffer, 0, String.format(Locale.US, "%.2fms %dfps", Math.round(rate * 100) / 100.0, fps));
             }
             fpstime = System.currentTimeMillis();
         }
-        render.printext(fpsx, fpsy, fpscol, -1, fpsbuffer, 0, scale);
+        EngineUtils.getLargeFont().drawText(windowx2 - 1, windowy1 + 1, fpsbuffer, scale, 0, fpscol, TextAlign.Right, Transparent.None, false);
     }
 
     public void uninit() {

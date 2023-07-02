@@ -17,6 +17,7 @@
 package ru.m210projects.Build.Pattern.CommonMenus;
 
 import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
@@ -56,7 +57,7 @@ public abstract class MenuJoystick extends BuildMenu {
 
 	public abstract String keyNames(int keycode);
 	
-	public MenuJoystick(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, BuildFont style, int list_len)
+	public MenuJoystick(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, Font style, int list_len)
 	{
 		addItem(getTitle(app, "Joystick setup"), false);
 		
@@ -215,7 +216,7 @@ public abstract class MenuJoystick extends BuildMenu {
 		addItem(mInvert, false);
 	}
 
-	public BuildMenu getJoyButtonsMenu(MenuJoystick parent, final BuildGame app, int width, BuildFont style, int posx, int posy, int list_len)
+	public BuildMenu getJoyButtonsMenu(MenuJoystick parent, final BuildGame app, int width, Font style, int posx, int posy, int list_len)
 	{
 		BuildMenu menu = new BuildMenu();
 		

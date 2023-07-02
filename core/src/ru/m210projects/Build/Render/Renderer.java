@@ -19,9 +19,13 @@ package ru.m210projects.Build.Render;
 import java.nio.ByteBuffer;
 
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
+import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Script.DefScript;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.TileFont;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public interface Renderer {
 
@@ -43,10 +47,6 @@ public interface Renderer {
 		public String getName() {
 			return name;
 		}
-	}
-
-    enum Transparent {
-		None, Bit1, Bit2
 	}
 
 	PixelFormat getTexFormat();
@@ -80,10 +80,7 @@ public interface Renderer {
 
 	void drawmapview(int dax, int day, int zoome, int ang);
 
-	void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-                  float scale);
-
-	void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale);
+	int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent);
 
 	ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz);
 

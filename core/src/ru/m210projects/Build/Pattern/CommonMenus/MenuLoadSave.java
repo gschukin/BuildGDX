@@ -32,6 +32,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuSlotList;
 import ru.m210projects.Build.Pattern.MenuItems.MenuText;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuLoadSave extends BuildMenu {
 
@@ -40,7 +41,7 @@ public abstract class MenuLoadSave extends BuildMenu {
 	public MenuScroller slider;
 	public MenuText mInfo;
 	
-	public MenuLoadSave(BuildGame app, BuildFont style, int posx, int posy, int posyHelp, int width, int nItems, int listPal, int specPal, int nBackground, MenuProc confirm, boolean saveMenu)
+	public MenuLoadSave(BuildGame app, Font style, int posx, int posy, int posyHelp, int width, int nItems, int listPal, int specPal, int nBackground, MenuProc confirm, boolean saveMenu)
 	{
 		addItem(getTitle(app, saveMenu ? "Save game" : "Load game"), false);
 

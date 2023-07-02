@@ -33,6 +33,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuSlider;
 import ru.m210projects.Build.Pattern.MenuItems.MenuSwitch;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTextField;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuCreate extends BuildMenu {
 	
@@ -45,7 +46,7 @@ public abstract class MenuCreate extends BuildMenu {
 	public MenuSwitch mMenuFakeMM;
 	public MenuButton mCreate;
 	
-	public MenuCreate(final BuildGame app, int posx, int posy, int menuHeight, int width, BuildFont style, int kMaxPlayers)
+	public MenuCreate(final BuildGame app, int posx, int posy, int menuHeight, int width, Font style, int kMaxPlayers)
 	{
 		addItem(getTitle(app, "Multiplayer"), false);
 		

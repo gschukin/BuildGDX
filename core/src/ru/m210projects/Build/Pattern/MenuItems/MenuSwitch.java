@@ -16,18 +16,20 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuSwitch extends MenuItem
 {
 	public boolean value;
 	public MenuProc callback;
 	char[] onMessage, offMessage;
-	public BuildFont switchFont;
+	public Font switchFont;
 	
-	public MenuSwitch(Object text, BuildFont font, int x, int y, int width, boolean value, 
+	public MenuSwitch(Object text, Font font, int x, int y, int width, boolean value,
 			MenuProc callback, String onMessage, String offMessage) 
 	{
 		super(text, font);
@@ -57,14 +59,14 @@ public class MenuSwitch extends MenuItem
 		int pal = handler.getPal(font, this);
 		
 		if ( text != null ) {
-			font.drawText(x, y, text, shade, pal, TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(x, y, text, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 		}
 		char[] sw = offMessage;
 		if(value) {
 			sw = onMessage;
 		}
 		
-		switchFont.drawText(x + width - 1 - switchFont.getWidth(sw), y + (font.getHeight() - switchFont.getHeight()) / 2, sw, shade, handler.getPal(switchFont, this), TextAlign.Left, 2, fontShadow);
+		switchFont.drawTextScaled(x + width - 1 - switchFont.getWidth(sw, 1.0f), y + (font.getHeight() - switchFont.getHeight()) / 2, sw, 1.0f, shade, handler.getPal(switchFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 		handler.mPostDraw(this);
 	}
 	
@@ -90,7 +92,7 @@ public class MenuSwitch extends MenuItem
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text)) {
+			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
 				if(my > y && my < y + font.getHeight()) {
 					return true;
 				}
@@ -102,7 +104,7 @@ public class MenuSwitch extends MenuItem
 			sw = onMessage;
 		}
 
-		int fontx = font.getWidth(sw);
+		int fontx = font.getWidth(sw, 1.0f);
 		int px = x + width - 1 - fontx;
 		if(mx > px && mx < px + fontx) {
 			return my > y && my < y + font.getHeight();

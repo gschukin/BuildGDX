@@ -34,6 +34,7 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuSlider;
 import ru.m210projects.Build.Pattern.MenuItems.MenuSwitch;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 import ru.m210projects.Build.Settings.BuildConfig;
+import ru.m210projects.Build.Types.font.Font;
 
 public abstract class MenuAudio extends BuildMenu {
 
@@ -122,7 +123,7 @@ public abstract class MenuAudio extends BuildMenu {
 	private AudioListener listener;
 
 	public MenuAudio(BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight,
-			BuildFont menuItems) {
+			Font menuItems) {
 		final BuildConfig cfg = app.pCfg;
 		
 		addItem(getTitle(app, "Audio setup"), false);

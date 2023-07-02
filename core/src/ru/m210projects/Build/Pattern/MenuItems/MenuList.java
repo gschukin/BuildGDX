@@ -18,9 +18,11 @@ package ru.m210projects.Build.Pattern.MenuItems;
 
 import java.util.List;
 
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuList extends MenuItem {
 	public int len;
@@ -31,8 +33,8 @@ public class MenuList extends MenuItem {
 	public MenuProc callback;
 	public BuildMenu nextMenu;
 
-	public MenuList(List<char[]> text, BuildFont font, int x, int y, int width, int align, BuildMenu nextMenu,
-			MenuProc callback, int nListItems) {
+	public MenuList(List<char[]> text, Font font, int x, int y, int width, int align, BuildMenu nextMenu,
+					MenuProc callback, int nListItems) {
 
 		super(null, font);
 		this.text = text;
@@ -66,19 +68,19 @@ public class MenuList extends MenuItem {
 				int shade = handler.getShade(i == l_nFocus ? this : null);
 
 				if (align == 1) {
-					px = width / 2 + x - font.getWidth(text.get(i)) / 2;
+					px = width / 2 + x - font.getWidth(text.get(i), 1.0f) / 2;
 				}
 				if (align == 2) {
-					px = x + width - 1 - font.getWidth(text.get(i));
+					px = x + width - 1 - font.getWidth(text.get(i), 1.0f);
 				}
-				font.drawText(px, py, text.get(i), shade, pal, TextAlign.Left, 2, fontShadow);
+				font.drawTextScaled(px, py, text.get(i), 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 				py += mFontOffset();
 			}
 		} else {
 			int pal = handler.getPal(font, this);
 
 			String text = "List is empty";
-			int fontx = font.getWidth(text.toCharArray());
+			int fontx = font.getWidth(text.toCharArray(), 1.0f);
 			int px = x, py = y;
 			if (align == 1) {
 				px = width / 2 + x - fontx / 2;
@@ -88,7 +90,7 @@ public class MenuList extends MenuItem {
 			}
 
 			int shade = handler.getShade(this);
-			font.drawText(px, py, text.toCharArray(), shade, pal, TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(px, py, text.toCharArray(), 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 
 		handler.mPostDraw(this);
@@ -151,7 +153,7 @@ public class MenuList extends MenuItem {
 		if (len > 0) {
 			int px = x, py = y;
 			for (int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
-				int wd = font.getWidth(text.get(i));
+				int wd = font.getWidth(text.get(i), 1.0f);
 				if (align == 1) {
 					px = width / 2 + x - wd / 2;
 				}

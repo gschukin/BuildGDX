@@ -25,9 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuButton;
 import ru.m210projects.Build.Pattern.MenuItems.MenuConteiner;
@@ -69,7 +72,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 
 	public abstract void setMode(BuildConfig cfg);
 
-	public BuildMenu getResolutionListMenu(final MenuVideoMode parent, final BuildGame app, int posx, int posy, int width, int nListItems, BuildFont style, int nListBackground) {
+	public BuildMenu getResolutionListMenu(final MenuVideoMode parent, final BuildGame app, int posx, int posy, int width, int nListItems, Font style, int nListBackground) {
 		BuildMenu menu = new BuildMenu();
 
 		menu.addItem(parent.getTitle(app, "Resolution"), false);
@@ -111,9 +114,9 @@ public abstract class MenuVideoMode extends BuildMenu {
 		return menu;
 	}
 
-	public abstract MenuRendererSettings getRenSettingsMenu(final BuildGame app, int posx, int posy, int width, int nHeight, BuildFont style);
+	public abstract MenuRendererSettings getRenSettingsMenu(final BuildGame app, int posx, int posy, int width, int nHeight, Font style);
 
-	public MenuVideoMode(final BuildGame app, int posx, int posy, int width, int itemHeight, BuildFont style, int nListItems, int nListWidth, int nBackground) {
+	public MenuVideoMode(final BuildGame app, int posx, int posy, int width, int itemHeight, Font style, int nListItems, int nListWidth, int nBackground) {
 
 		addItem(getTitle(app, "Video mode"), false);
 
@@ -233,13 +236,13 @@ public abstract class MenuVideoMode extends BuildMenu {
 
 				int pal = handler.getPal(font, this);
 				int shade = handler.getShade(this);
-				font.drawText(px, py, text, shade, pal, TextAlign.Left, 2, fontShadow);
+				font.drawTextScaled(px, py, text, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
 				if(key == null) {
 					return;
 				}
 
-				listFont.drawText(x + width - 1 - listFont.getWidth(key), py, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
+				listFont.drawTextScaled(x + width - 1 - listFont.getWidth(key, 1.0f), py, key, 1.0f, shade, handler.getPal(listFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal,  listShadow);
 
 				handler.mPostDraw(this);
 			}

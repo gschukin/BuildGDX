@@ -22,8 +22,10 @@ import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildConfig.GameKeys;
@@ -43,7 +45,7 @@ public abstract class MenuKeyboardList extends MenuList
 	public int pal_left;
 	public int pal_right;
 
-	public MenuKeyboardList(SliderDrawable slider, BuildConfig cfg, BuildFont font, int x, int y, int width, int len, MenuProc callback)
+	public MenuKeyboardList(SliderDrawable slider, BuildConfig cfg, Font font, int x, int y, int width, int len, MenuProc callback)
 	{
 		super(null, font, x, y, width, 0, null, callback, len);
 		this.slider = slider;
@@ -84,9 +86,9 @@ public abstract class MenuKeyboardList extends MenuList
 			}
 
 			char[] k = key.toCharArray();
-			font.drawText(px, py, text.toCharArray(), shade, pal1, TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(px, py, text.toCharArray(), 1.0f, shade, pal1, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
-			font.drawText(x + width / 2 - 1 - font.getWidth(k) + 40, py, k, shade, pal2, TextAlign.Left, 2, fontShadow);		
+			font.drawTextScaled(x + width / 2 - 1 - font.getWidth(k, 1.0f) + 40, py, k, 1.0f, shade, pal2, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 			
 			if(cfg.mousekeys[i] != 0) {
 				key = getKeyName(cfg.mousekeys[i]);
@@ -100,7 +102,7 @@ public abstract class MenuKeyboardList extends MenuList
 //				}
 			}
 			k = key.toCharArray();
-			font.drawText(x + width - slider.getScrollerWidth() - 2 - font.getWidth(k), py, k, shade, pal2, TextAlign.Left, 2, fontShadow);	
+			font.drawTextScaled(x + width - slider.getScrollerWidth() - 2 - font.getWidth(k, 1.0f), py, k, 1.0f, shade, pal2, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 				
 			py += mFontOffset();
 		}

@@ -447,6 +447,10 @@ public class Console {
     }
 
     public void print(String text, OsdColor color) {
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+
         if (color == osdTextPal || color == OsdColor.DEFAULT) {
             System.out.println(text);
         } else {

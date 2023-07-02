@@ -32,6 +32,7 @@ import ru.m210projects.Build.FileHandle.DataResource;
 import ru.m210projects.Build.FileHandle.Group;
 import ru.m210projects.Build.FileHandle.GroupResource;
 import ru.m210projects.Build.Script.DefScript;
+import ru.m210projects.Build.Types.ConvertType;
 
 public class Gameutils {
 
@@ -153,10 +154,6 @@ public class Gameutils {
 
 	public static boolean isValidTile(int tile) {
 		return tile >= 0 && tile < MAXTILES;
-	}
-
-	public enum ConvertType {
-		Normal, AlignLeft, AlignRight, Stretch
 	}
 
 	public static ConvertType getType(int nFlags) {

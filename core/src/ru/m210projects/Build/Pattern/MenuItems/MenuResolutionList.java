@@ -24,10 +24,11 @@ import static ru.m210projects.Build.Gameutils.*;
 import java.util.List;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Gameutils.ConvertType;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuResolutionList extends MenuList {
 
@@ -36,9 +37,9 @@ public class MenuResolutionList extends MenuList {
 	public int transparent = 1;
 	public int backgroundPal;
 
-	public MenuResolutionList(Engine draw, List<char[]> text, BuildFont font, int x, int y,
-			int width, int align, BuildMenu nextMenu,
-			MenuProc specialCall, int nListItems, int nBackground) {
+	public MenuResolutionList(Engine draw, List<char[]> text, Font font, int x, int y,
+							  int width, int align, BuildMenu nextMenu,
+							  MenuProc specialCall, int nListItems, int nBackground) {
 		super(text, font, x, y, width, align, nextMenu, specialCall, nListItems);
 		this.nBackground = nBackground;
 		this.draw = draw;
@@ -77,12 +78,12 @@ public class MenuResolutionList extends MenuList {
 					pal = handler.getPal(font, this);
 				}
 			    if(align == 1) {
-					px = width / 2 + x - font.getWidth(text.get(i)) / 2;
+					px = width / 2 + x - font.getWidth(text.get(i), 1.0f) / 2;
 				}
 			    if(align == 2) {
-					px = x + width - 1 - font.getWidth(text.get(i));
+					px = x + width - 1 - font.getWidth(text.get(i), 1.0f);
 				}
-			    font.drawText(px, py, text.get(i), shade, pal, TextAlign.Left, 2, fontShadow);
+			    font.drawTextScaled(px, py, text.get(i), 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
 				py += mFontOffset();
 			}
@@ -94,14 +95,14 @@ public class MenuResolutionList extends MenuList {
 			
 			int px = x, py = y;		
 			if(align == 1) {
-				px = width / 2 + x - font.getWidth(text.toCharArray()) / 2;
+				px = width / 2 + x - font.getWidth(text.toCharArray(), 1.0f) / 2;
 			}
 		    if(align == 2) {
-				px = x + width - 1 - font.getWidth(text.toCharArray());
+				px = x + width - 1 - font.getWidth(text.toCharArray(), 1.0f);
 			}
 		    int shade = handler.getShade(this);
 		    
-		    font.drawText(px, py, text.toCharArray(), shade, pal, TextAlign.Left, 2, fontShadow);
+		    font.drawTextScaled(px, py, text.toCharArray(), 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 
 		handler.mPostDraw(this);
@@ -172,7 +173,7 @@ public class MenuResolutionList extends MenuList {
 		if(text.size() > 0) {
 			int px = x, py = y;
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < text.size(); i++) {	
-				int fontx = font.getWidth(text.get(i));
+				int fontx = font.getWidth(text.get(i), 1.0f);
 				if(align == 1) {
 					px = width / 2 + x - fontx / 2;
 				}

@@ -20,7 +20,6 @@ import ru.m210projects.Build.Render.GdxRender.WorldMesh.GLSurface;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.OrphoRenderer;
-import ru.m210projects.Build.Render.Renderer.Transparent;
 import ru.m210projects.Build.Render.TextureHandle.DummyTileData;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
@@ -122,8 +121,7 @@ public class GDXOrtho extends OrphoRenderer {
 		drawing = false;
 	}
 
-	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
 			float scale) {
 		if(col < 0) {
             return;
@@ -205,11 +203,6 @@ public class GDXOrtho extends OrphoRenderer {
 			c++;
 		}
 		BuildGdx.gl.glDepthMask(true); // re-enable writing to the z-buffer
-	}
-
-	@Override
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		printext(fontsize == 0 ? pTextfont : pSmallTextfont, xpos, ypos, text, col, 0, Transparent.None, scale);
 	}
 
 	@Override

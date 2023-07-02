@@ -65,6 +65,10 @@ import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
@@ -96,12 +100,7 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.Sector;
-import ru.m210projects.Build.Types.Sprite;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.Types.Wall;
 import ru.m210projects.Build.osd.OsdColor;
 
 public class GDXRenderer implements GLRenderer {
@@ -883,18 +882,10 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	@Override
-	public void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale) {
+	public int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent) {
 		rendering = Rendering.Tile.setIndex(0);
 		set2dview();
-		orphoRen.printext(font, xpos, ypos, text, col, shade, bit, scale);
-	}
-
-	@Override
-	public void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		rendering = Rendering.Tile.setIndex(0);
-		set2dview();
-		orphoRen.printext(xpos, ypos, col, backcol, text, fontsize, scale);
+		return orphoRen.printext(font, x, y, text, scale, shade, palnum, align, transparent);
 	}
 
 	@Override

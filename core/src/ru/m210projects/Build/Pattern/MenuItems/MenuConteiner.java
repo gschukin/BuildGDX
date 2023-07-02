@@ -16,11 +16,12 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import ru.m210projects.Build.Gameutils;
-import ru.m210projects.Build.Pattern.BuildChar;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.CharInfo;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
 import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
@@ -30,10 +31,10 @@ public class MenuConteiner extends MenuItem
 	public int num;
 	public MenuProc callback;
 	public char[][] list;
-	public BuildFont listFont;
+	public Font listFont;
 	public boolean listShadow;
 	
-	public MenuConteiner(Object text, BuildFont font, int x, int y, int width, String[] list, int num, MenuProc callback)
+	public MenuConteiner(Object text, Font font, int x, int y, int width, String[] list, int num, MenuProc callback)
 	{
 		super(text, font);
 		this.listFont = font;
@@ -54,7 +55,7 @@ public class MenuConteiner extends MenuItem
 		this.pal = 0;
 	}
 	
-	public MenuConteiner(Object text, BuildFont font, BuildFont listFont, int x, int y, int width, String[] list, int num, MenuProc callback)
+	public MenuConteiner(Object text, Font font, Font listFont, int x, int y, int width, String[] list, int num, MenuProc callback)
 	{
 		this(text, font, x, y, width, list, num, callback);
 		this.listFont = listFont;
@@ -71,36 +72,34 @@ public class MenuConteiner extends MenuItem
 
 		int pal = handler.getPal(font, this);
 		int shade = handler.getShade(this);
-		font.drawText(px, py, text, shade, pal, TextAlign.Left, 2, fontShadow);
+		font.drawTextScaled(px, py, text, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		
 		if(key != null) {
 			int bound = 10;
-			int w1 = font.getWidth(text);
-			int w2 = listFont.getWidth(key);
+			int w1 = font.getWidth(text, 1.0f);
+			int w2 = listFont.getWidth(key, 1.0f);
 
 			if(w2 + bound >= width - w1) {
 				int tx = px + w1 + bound;
 				int ty = py + (font.getHeight() - listFont.getHeight()) / 2;
 				brDrawText(listFont, key, tx + bound, ty, shade, handler.getPal(listFont, this), px + width - 1);
 			} else {
-				listFont.drawText(x + width - 1 - listFont.getWidth(key), py + (font.getHeight() - listFont.getHeight()) / 2, key, shade, handler.getPal(listFont, this), TextAlign.Left, 2, listShadow);
+				listFont.drawTextScaled(x + width - 1 - listFont.getWidth(key, 1.0f), py + (font.getHeight() - listFont.getHeight()) / 2, key, 1, shade, handler.getPal(listFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal, listShadow);
 			}
 		}
 		handler.mPostDraw(this);
 	}
 	
-	protected void brDrawText(BuildFont font, char[] text, int x, int y, int shade, int pal, int x2) {
+	protected void brDrawText(Font font, char[] text, int x, int y, int shade, int pal, int x2) {
 		int tptr = 0;
-		y = coordsConvertYScaled(y);
 	    while(tptr < text.length && text[tptr] != 0) {
 			if (x > x2) {
 				return;
 			}
 
-			int textX = coordsConvertXScaled(x, Gameutils.ConvertType.Normal);
-			BuildChar charInfo = font.getCharInfo(text[tptr]);
+			CharInfo charInfo = font.getCharInfo(text[tptr]);
 			if (charInfo != null) {
-				x += charInfo.draw(textX, y, 0x10000, shade, pal, 2, listShadow);
+				x += font.drawCharScaled(x, y, text[tptr], 1.0f, shade, pal, Transparent.None, ConvertType.Normal, listShadow);
 			}
 	        tptr++;
 	    }
@@ -162,7 +161,7 @@ public class MenuConteiner extends MenuItem
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text)) {
+			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
 				if(my > y && my < y + font.getHeight()) {
 					return true;
 				}
@@ -176,7 +175,7 @@ public class MenuConteiner extends MenuItem
 		char[] key;
 		if(num != -1 && num < list.length) {
 			key = list[num];
-			int fontx =  listFont.getWidth(key);
+			int fontx =  listFont.getWidth(key, 1.0f);
 			int px = x + width - 1 - fontx;
 			if(mx > px && mx < px + fontx) {
 				return my > y && my < y + font.getHeight();

@@ -25,10 +25,14 @@ import static ru.m210projects.Build.Strhandler.isdigit;
 import com.badlogic.gdx.Input.Keys;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Input.InputCallback;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Render.Renderer;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuTextField extends MenuItem {
 
@@ -47,7 +51,7 @@ public class MenuTextField extends MenuItem {
 	private final InputCallback inputCallback;
 	private final MenuProc confirmCallback;
 	
-	public MenuTextField(Object text, String input, BuildFont font, int x, int y, int width, final int charFlag, MenuProc confirmCallback) {
+	public MenuTextField(Object text, String input, Font font, int x, int y, int width, final int charFlag, MenuProc confirmCallback) {
 		super(text, font);
 		
 		this.flags = 3 | 4;
@@ -137,7 +141,7 @@ public class MenuTextField extends MenuItem {
 				typing = false;
 			}
 
-		    font.drawText(x, y, text, shade, pal, TextAlign.Left, 2, fontShadow);
+		    font.drawTextScaled(x, y, text, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
 	    	int px = x + width - 1;
 			if(typing) {
@@ -145,9 +149,9 @@ public class MenuTextField extends MenuItem {
 				px -= 4;
 			}
 
-			font.drawText(px - font.getWidth(typingBuf), y, typingBuf, shade, pal, TextAlign.Left, 2, fontShadow);
+			font.drawTextScaled(px - font.getWidth(typingBuf, 1.0f), y, typingBuf, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 //		    if(typing && (totalclock & 0x20) != 0) {
-				font.drawText(px, y, "_", shade, pal, TextAlign.Left, 2, false);
+				font.drawTextScaled(px, y, "_", 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, false);
 //			}
 		}
 		handler.mPostDraw(this);
@@ -216,13 +220,13 @@ public class MenuTextField extends MenuItem {
 	public boolean mouseAction(int mx, int my) {
 		if(text != null)
 		{
-			if(mx > x && mx < x + font.getWidth(text)) {
+			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
 				if(my > y && my < y + font.getHeight()) {
 					return true;
 				}
 			}
 
-			if(mx > x + width - font.getWidth(typingBuf) && mx < x + width - 1) {
+			if(mx > x + width - font.getWidth(typingBuf, 1.0f) && mx < x + width - 1) {
 				return my > y && my < y + font.getHeight();
 			}
 		}

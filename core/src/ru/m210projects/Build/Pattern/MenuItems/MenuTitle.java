@@ -16,18 +16,19 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.RenderService.*;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Pattern.BuildFont.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class MenuTitle extends MenuItem {
 	
 	public int nTile;
 	protected Engine draw;
 	
-	public MenuTitle(Engine draw, Object text, BuildFont font, int x, int y, int nTile) {
+	public MenuTitle(Engine draw, Object text, Font font, int x, int y, int nTile) {
 		super(text, font);
 		
 		this.flags = 1;
@@ -46,7 +47,7 @@ public class MenuTitle extends MenuItem {
 		    if(nTile != -1) {
 				draw.rotatesprite(160 << 16, y << 16, 65536, 0, nTile, -128, 0, 78);
 			}
-		    font.drawText(x, y - font.getHeight() / 2, text, -128, pal, TextAlign.Center, 2, fontShadow);
+		    font.drawTextScaled(x, y - font.getHeight() / 2, text, 1.0f,-128, pal, TextAlign.Center, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 		handler.mPostDraw(this);
 	}

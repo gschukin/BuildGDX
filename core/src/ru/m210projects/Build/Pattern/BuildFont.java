@@ -20,6 +20,8 @@ import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.toCharArray;
 
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.Types.TileFont;
+import ru.m210projects.Build.Types.font.TextAlign;
 
 public class  BuildFont {
 
@@ -29,10 +31,6 @@ public class  BuildFont {
 			return 0;
 		}
 	};
-
-	public enum TextAlign {
-		Left, Center, Right
-	}
 
 	public static final int nSpace = -2;
 
@@ -44,6 +42,10 @@ public class  BuildFont {
 	protected BuildFont(Engine draw) {
 		this.draw = draw;
 		this.charInfo = initCharInfo(draw);
+	}
+
+	public TileFont.FontType getFontType() {
+		return null;
 	}
 
 	protected BuildChar[] initCharInfo(Engine draw) {

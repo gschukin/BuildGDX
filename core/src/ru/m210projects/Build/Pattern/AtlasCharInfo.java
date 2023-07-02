@@ -3,7 +3,6 @@ package ru.m210projects.Build.Pattern;
 import ru.m210projects.Build.Types.Tile;
 
 import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.Pragmas.scale;
 
 public class AtlasCharInfo extends BuildChar {
 
@@ -31,11 +30,14 @@ public class AtlasCharInfo extends BuildChar {
      */
     protected void drawChar(int x, int y, int scale, int shade, int pal, int bits) {
         final int aspect = ((bits & 10) == 0 ? ((12 << 16) / 10) : 65536);
+        final float scalexf = scale / (float) aspect;
+        final float scaleyf = scale / 65536.0f;
 
         int cx1 = x;
         int cy1 = y;
-        int cx2 = cx1 + (scale(width, scale, aspect));
-        int cy2 = cy1 + (scale(parent.nHeight, scale, 65536));
+        int cx2 = (int) (cx1 + width * scalexf);
+        int cy2 = (int) (cy1 + parent.nHeight * scaleyf);
+
         if ((bits & 2) != 0) {
             bits |= 8;
 
@@ -45,9 +47,9 @@ public class AtlasCharInfo extends BuildChar {
             cy2 = coordsConvertYScaled(cy2);
         }
 
-        int sx = x - scale(atlasx, scale, aspect);
-        int sy = y - scale(atlasy, scale, 65536);
+        float sx = x - atlasx * scalexf;
+        float sy = y - atlasy * scaleyf;
 
-        parent.draw.rotatesprite(sx << 16, sy << 16, scale, 0, nTile, shade, pal, 16 | bits, cx1, cy1, cx2, cy2);
+        parent.draw.rotatesprite((int) (sx * 65536.0f), (int) (sy * 65536.0f), scale, 0, nTile, shade, pal, 16 | bits, cx1, cy1, cx2, cy2);
     }
 }
