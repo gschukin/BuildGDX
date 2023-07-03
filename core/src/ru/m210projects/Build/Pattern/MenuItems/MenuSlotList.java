@@ -429,7 +429,7 @@ public abstract class MenuSlotList extends MenuList
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
 
 				if(mx > px && mx < px + width - 14) {
-					if(my > py && my < py + font.getHeight())
+					if(my > py && my < py + font.getSize())
 					{
 						l_nFocus = i;
 						if(ol_nFocus != i && updateCallback != null) {

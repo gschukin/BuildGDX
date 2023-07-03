@@ -287,12 +287,6 @@ public abstract class Engine {
 
     public void uninit() // gdxBuild
     {
-        Iterator<TileFont> it;
-        while ((it = TileFont.managedFont.iterator()).hasNext()) {
-            TileFont font = it.next();
-            font.dispose();
-        }
-
         renderService.uninit();
 
         if (artfil != null) {

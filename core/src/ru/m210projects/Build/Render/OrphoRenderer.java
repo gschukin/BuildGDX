@@ -19,7 +19,6 @@ package ru.m210projects.Build.Render;
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.MapNode;

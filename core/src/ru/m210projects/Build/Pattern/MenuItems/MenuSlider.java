@@ -91,7 +91,7 @@ public class MenuSlider extends MenuItem {
 				Arrays.fill(dbuff, index + 4, dbuff.length, (char)0);
 			}
 
-			sliderNumbers.drawTextScaled(x + width - slider.getSliderRange() - sliderNumbers.getWidth(dbuff, 1.0f) - 5, y + (font.getHeight() - sliderNumbers.getHeight()) / 2, dbuff, 1.0f, shade, handler.getPal(sliderNumbers, this), TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
+			sliderNumbers.drawTextScaled(x + width - slider.getSliderRange() - sliderNumbers.getWidth(dbuff, 1.0f) - 5, y + (font.getSize() - sliderNumbers.getSize()) / 2, dbuff, 1.0f, shade, handler.getPal(sliderNumbers, this), TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 		
 		int xRange = slider.getSliderRange() - slider.getSliderWidth();
@@ -206,7 +206,7 @@ public class MenuSlider extends MenuItem {
 		
 		if(text != null) {
 			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
-				if(my > y && my < y + font.getHeight()) {
+				if(my > y && my < y + font.getSize()) {
 					return true;
 				}
 			}
@@ -215,7 +215,7 @@ public class MenuSlider extends MenuItem {
 		if(touchedObj == null) {
 			int cx = x + width - slider.getSliderRange();
 			if(mx > cx && mx < cx + slider.getSliderRange()) {
-				if(my > y && my < y + font.getHeight()) {
+				if(my > y && my < y + font.getSize()) {
 					isTouched = true;
 					if(BuildGdx.input.isTouched()) {
 						touchedObj = this;

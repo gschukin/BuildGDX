@@ -23,8 +23,6 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_MODELVIEW;
 import static ru.m210projects.Build.Render.Types.GL10.GL_RGB_SCALE;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
-import static ru.m210projects.Build.RenderService.pSmallTextfont;
-import static ru.m210projects.Build.RenderService.pTextfont;
 import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -34,8 +32,9 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.font.BitmapFont;
 import ru.m210projects.Build.Types.font.Font;
-import ru.m210projects.Build.Types.TileFont;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
+import ru.m210projects.Build.Types.font.TileFontData;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GLFilter;
 import ru.m210projects.Build.Script.TextureHDInfo;
@@ -92,7 +91,7 @@ public class TextureManager {
 		final int sizy = bitmapFont.getAtlasHeight();
 		final byte[] textfont = bitmapFont.getData();
 
-		TileFont.TileFontData dat = new TileFont.TileFontData(sizx, sizy) {
+		TileFontData dat = new TileFontData(sizx, sizy) {
 			@Override
 			public ByteBuffer buildAtlas(ByteBuffer data) {
 				for (int h = 0; h < 256; h++) {
@@ -392,8 +391,10 @@ public class TextureManager {
 		}
 
 		// GLAtlas dispose
-		pTextfont.uninit();
-		pSmallTextfont.uninit();
+		for (GLTile tile : fontAtlas.values()) {
+			tile.delete();
+		}
+		fontAtlas.clear();
 	}
 
 	public GLTile getLastBinded() {

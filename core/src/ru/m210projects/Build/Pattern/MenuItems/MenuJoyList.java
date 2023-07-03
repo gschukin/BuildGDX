@@ -282,7 +282,7 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 		if(!isTouched) {
 			int py = y;
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {	
-				if(my >= py && my < py + font.getHeight())
+				if(my >= py && my < py + font.getSize())
 				{
 					if(l_nMin < cfg.joymap.length && i == cfg.joymap.length) {
 						return false;

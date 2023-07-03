@@ -3,7 +3,6 @@ package ru.m210projects.Build.Pattern.CommonMenus;
 import static ru.m210projects.Build.Engine.pow2long;
 import static ru.m210projects.Build.Render.GLInfo.maxanisotropy;
 
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenuList;
 import ru.m210projects.Build.Pattern.MenuItems.DummyItem;

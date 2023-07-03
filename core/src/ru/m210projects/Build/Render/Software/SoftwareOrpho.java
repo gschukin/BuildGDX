@@ -30,7 +30,6 @@ import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.OrphoRenderer;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont.FontType;
 import ru.m210projects.Build.Types.collections.MapNode;
 
 public class SoftwareOrpho extends OrphoRenderer {
@@ -69,92 +68,92 @@ public class SoftwareOrpho extends OrphoRenderer {
 		this.boardService = engine.getBoardService();
 	}
 
-	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale) {
+//	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+//			float scale) {
+//
+//		if(col < 0) {
+//			return;
+//		}
+//
+//		if (font.type == FontType.Tilemap) {
+//			if (palookup[col] == null) {
+//				col = 0;
+//			}
+//
+//			int nTile = (Integer) font.ptr;
+//			Tile pic = engine.getTile(nTile);
+//			if (pic.data == null && engine.loadtile(nTile) == null) {
+//				return;
+//			}
+//
+//			int flags = 0;
+//			if (bit == Transparent.Bit1) {
+//				flags = 1;
+//			}
+//			if (bit == Transparent.Bit2) {
+//				flags = 1 | 32;
+//			}
+//
+//			float tx, ty;
+//			int mscale = (int) (scale * 65536);
+//			int ctx, cty, textsize = mulscale(font.charsizx, mscale, 16);
+//
+//			for (int i = 0; i < text.length && text[i] != 0; i++, xpos += textsize) {
+//				if (xpos < 0) {
+//					continue;
+//				}
+//				tx = (text[i] % font.cols) / (float) font.cols;
+//				ty = (text[i] / font.cols) / (float) font.rows;
+//
+//				ctx = mulscale((int) (tx * pic.getWidth()), mscale, 16);
+//				cty = mulscale((int) (ty * pic.getHeight()), mscale, 16);
+//
+//				engine.rotatesprite((xpos - ctx) << 16, (ypos - cty) << 16, mscale, 0, nTile, shade, col,
+//						8 | 16 | flags, xpos, ypos, xpos + textsize - 1, ypos + textsize - 1);
+//			}
+//		} else {
+//			int fontsize = 0;
+//			if (font.ptr == EngineUtils.getTables().getSmallTextFont()) {
+//				fontsize = 1;
+//			}
+//
+//			printext(xpos, ypos, col, -1, text, fontsize, scale);
+//		}
+//	}
 
-		if(col < 0) {
-			return;
-		}
-
-		if (font.type == FontType.Tilemap) {
-			if (palookup[col] == null) {
-				col = 0;
-			}
-
-			int nTile = (Integer) font.ptr;
-			Tile pic = engine.getTile(nTile);
-			if (pic.data == null && engine.loadtile(nTile) == null) {
-				return;
-			}
-
-			int flags = 0;
-			if (bit == Transparent.Bit1) {
-				flags = 1;
-			}
-			if (bit == Transparent.Bit2) {
-				flags = 1 | 32;
-			}
-
-			float tx, ty;
-			int mscale = (int) (scale * 65536);
-			int ctx, cty, textsize = mulscale(font.charsizx, mscale, 16);
-
-			for (int i = 0; i < text.length && text[i] != 0; i++, xpos += textsize) {
-				if (xpos < 0) {
-					continue;
-				}
-				tx = (text[i] % font.cols) / (float) font.cols;
-				ty = (text[i] / font.cols) / (float) font.rows;
-
-				ctx = mulscale((int) (tx * pic.getWidth()), mscale, 16);
-				cty = mulscale((int) (ty * pic.getHeight()), mscale, 16);
-
-				engine.rotatesprite((xpos - ctx) << 16, (ypos - cty) << 16, mscale, 0, nTile, shade, col,
-						8 | 16 | flags, xpos, ypos, xpos + textsize - 1, ypos + textsize - 1);
-			}
-		} else {
-			int fontsize = 0;
-			if (font.ptr == EngineUtils.getTables().getSmallTextFont()) {
-				fontsize = 1;
-			}
-
-			printext(xpos, ypos, col, -1, text, fontsize, scale);
-		}
-	}
-
-	private void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
-		int stx = xpos;
-		int charxsiz = 8;
-		int charysiz = (int) (scale * 7);
-		byte[] fontptr = EngineUtils.getTables().getTextFont();
-		if (fontsize != 0) {
-			fontptr = EngineUtils.getTables().getSmallTextFont();
-			charxsiz = 4;
-		}
-
-		for (int i = 0; i < text.length && text[i] != 0; i++) {
-			int ptr = parent.bytesperline * (ypos + charysiz) + (stx - fontsize);
-			if (ptr < 0) {
-				continue;
-			}
-
-			for (int y = charysiz; y >= 0; y--) {
-				for (int x = (int) (scale * (charxsiz - 1)); x >= 0; x--) {
-					int index = Math.round(y / scale) + (text[i] << 3);
-					if (index >= fontptr.length) {
-						continue;
-					}
-					if ((fontptr[index] & pow2char[7 - fontsize - Math.round(x / scale)]) != 0) {
-						parent.getA().drawpixel(ptr + x, (byte) col);
-					} else if (backcol >= 0) {
-						parent.getA().drawpixel(ptr + x, (byte) backcol);
-					}
-				}
-				ptr -= parent.bytesperline;
-			}
-			stx += (scale * charxsiz);
-		}
-	}
+//	private void printext(int xpos, int ypos, int col, int backcol, char[] text, int fontsize, float scale) {
+//		int stx = xpos;
+//		int charxsiz = 8;
+//		int charysiz = (int) (scale * 7);
+//		byte[] fontptr = EngineUtils.getTables().getTextFont();
+//		if (fontsize != 0) {
+//			fontptr = EngineUtils.getTables().getSmallTextFont();
+//			charxsiz = 4;
+//		}
+//
+//		for (int i = 0; i < text.length && text[i] != 0; i++) {
+//			int ptr = parent.bytesperline * (ypos + charysiz) + (stx - fontsize);
+//			if (ptr < 0) {
+//				continue;
+//			}
+//
+//			for (int y = charysiz; y >= 0; y--) {
+//				for (int x = (int) (scale * (charxsiz - 1)); x >= 0; x--) {
+//					int index = Math.round(y / scale) + (text[i] << 3);
+//					if (index >= fontptr.length) {
+//						continue;
+//					}
+//					if ((fontptr[index] & pow2char[7 - fontsize - Math.round(x / scale)]) != 0) {
+//						parent.getA().drawpixel(ptr + x, (byte) col);
+//					} else if (backcol >= 0) {
+//						parent.getA().drawpixel(ptr + x, (byte) backcol);
+//					}
+//				}
+//				ptr -= parent.bytesperline;
+//			}
+//			stx += (scale * charxsiz);
+//		}
+//	}
 
 	@Override
 	public void drawline256(int x1, int y1, int x2, int y2, int c) {

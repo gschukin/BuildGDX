@@ -2,8 +2,6 @@ package ru.m210projects.Build.osd;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Pattern.BuildFont;
-import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
@@ -40,7 +38,7 @@ public class DefaultOsdFunc implements OsdFunc {
     }
 
     protected int calcStartY(int y) {
-        return y * font.getHeight();
+        return y * font.getSize();
     }
 
     @Override
@@ -121,7 +119,7 @@ public class DefaultOsdFunc implements OsdFunc {
     @Override
     public void clearbg(int col, int row) {
         int bits = BITSTH;
-        int daydim = (row * font.getHeight()) + 5;
+        int daydim = (row * font.getSize()) + 5;
 
         Tile pic = engine.getTile(BGTILE);
 
@@ -180,7 +178,7 @@ public class DefaultOsdFunc implements OsdFunc {
 
     @Override
     public int getrowheight(int osdtextscale) {
-        return divscale(ydim, osdtextscale, 16) / font.getHeight();
+        return divscale(ydim, osdtextscale, 16) / font.getSize();
     }
 
     @Override

@@ -16,81 +16,79 @@
 
 package ru.m210projects.Build.Render;
 
-import java.nio.ByteBuffer;
-
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
-import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.font.TextAlign;
+
+import java.nio.ByteBuffer;
 
 public interface Renderer {
 
-	enum RenderType {
-		Software(FrameType.Canvas, "Classic"), Polymost(FrameType.GL, "Polymost"), PolyGDX(FrameType.GL, "PolyGDX");
+    PixelFormat getTexFormat();
 
-		FrameType type;
-		String name;
+    void init();
 
-		RenderType(FrameType type, String name) {
-			this.type = type;
-			this.name = name;
-		}
+    void uninit();
 
-		public FrameType getFrameType() {
-			return type;
-		}
+    boolean isInited();
 
-		public String getName() {
-			return name;
-		}
-	}
+    void drawmasks();
 
-	PixelFormat getTexFormat();
+    void drawrooms();
 
-	void init();
+    void clearview(int dacol);
 
-	void uninit();
+    void changepalette(byte[] palette);
 
-	boolean isInited();
+    void nextpage();
 
-	void drawmasks();
+    void setview(int x1, int y1, int x2, int y2);
 
-	void drawrooms();
+    void invalidatetile(int tilenume, int pal, int how);
 
-	void clearview(int dacol);
-
-	void changepalette(byte[] palette);
-
-	void nextpage();
-
-	void setview(int x1, int y1, int x2, int y2);
-
-	void invalidatetile(int tilenume, int pal, int how);
-
-	void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
+    void rotatesprite(int sx, int sy, int z, int a, int picnum, int dashade, int dapalnum, int dastat, int cx1,
                       int cy1, int cx2, int cy2);
 
-	void completemirror();
+    void completemirror();
 
-	void drawoverheadmap(int cposx, int cposy, int czoom, short cang);
+    void drawoverheadmap(int cposx, int cposy, int czoom, short cang);
 
-	void drawmapview(int dax, int day, int zoome, int ang);
+    void drawmapview(int dax, int day, int zoome, int ang);
 
-	int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent);
+    int printext(Font font, int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent);
 
-	ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz);
+    ByteBuffer getFrame(PixelFormat format, int xsiz, int ysiz);
 
-	byte[] screencapture(int newwidth, int newheight);
+    byte[] screencapture(int newwidth, int newheight);
 
-	void drawline256(int x1, int y1, int x2, int y2, int col);
+    void drawline256(int x1, int y1, int x2, int y2, int col);
 
-	void settiltang(int tilt);
+    void settiltang(int tilt);
 
-	void setDefs(DefScript defs);
+    void setDefs(DefScript defs);
 
-	RenderType getType();
+    RenderType getType();
+
+    enum RenderType {
+        Software(FrameType.Canvas, "Classic"), Polymost(FrameType.GL, "Polymost"), PolyGDX(FrameType.GL, "PolyGDX");
+
+        FrameType type;
+        String name;
+
+        RenderType(FrameType type, String name) {
+            this.type = type;
+            this.name = name;
+        }
+
+        public FrameType getFrameType() {
+            return type;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }

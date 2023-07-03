@@ -18,7 +18,6 @@ package ru.m210projects.Build.Pattern.CommonMenus;
 
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuButton;

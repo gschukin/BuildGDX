@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
@@ -111,7 +110,7 @@ public class MenuButton extends MenuItem
 			}
 
 			if(mx > px && mx < px + wd) {
-				return my > y && my < y + font.getHeight();
+				return my > y && my < y + font.getSize();
 			}
 		}
 		return false;

@@ -1,7 +1,6 @@
 package ru.m210projects.Build.Types.font;
 
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Types.TileFont;
 
 public class BitmapFont extends Font {
 
@@ -14,7 +13,7 @@ public class BitmapFont extends Font {
         this.data = data;
         this.atlasWidth = atlasWidth;
         this.atlasHeight = atlasHeight;
-        this.height = atlasHeight / rows;
+        this.size = atlasHeight / rows;
 
         for (int i = 0; i < cols * rows; i++) {
             addCharInfo((char) i, new AtlasCharInfo(this, (char) i, 0, atlasWidth, atlasHeight, cols, rows));
@@ -28,8 +27,8 @@ public class BitmapFont extends Font {
     }
 
     @Override
-    public TileFont.FontType getFontType() {
-        return TileFont.FontType.BITMAP_FONT;
+    public FontType getFontType() {
+        return FontType.BITMAP_FONT;
     }
 
     public int getAtlasWidth() {

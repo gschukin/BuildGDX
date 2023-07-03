@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuButton;
@@ -74,7 +73,7 @@ public abstract class MenuControls extends BuildMenu {
 		
 		MenuText QuitQuestion = new MenuText("Do you really want to reset keys?", style, 160, posy, 1);
 		QuitQuestion.pal = pal;
-		MenuVariants QuitVariants = new MenuVariants(app.pEngine, "[Y/N]", style, 160, posy += 2 * style.getHeight()) {
+		MenuVariants QuitVariants = new MenuVariants(app.pEngine, "[Y/N]", style, 160, posy += 2 * style.getSize()) {
 			@Override
 			public void positive(MenuHandler menu) {
 				mResetDefault(app.pCfg, menu);
@@ -94,7 +93,7 @@ public abstract class MenuControls extends BuildMenu {
 		
 		MenuText QuitQuestion = new MenuText("Do you really want reset to classic keys?", style, 160, posy, 1);
 		QuitQuestion.pal = pal;
-		MenuVariants QuitVariants = new MenuVariants(app.pEngine, "[Y/N]", style, 160, posy += 2 * style.getHeight()) {
+		MenuVariants QuitVariants = new MenuVariants(app.pEngine, "[Y/N]", style, 160, posy += 2 * style.getSize()) {
 			@Override
 			public void positive(MenuHandler menu) {
 				mResetClassic(app.pCfg, menu);

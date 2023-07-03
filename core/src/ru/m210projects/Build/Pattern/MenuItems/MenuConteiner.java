@@ -23,9 +23,6 @@ import ru.m210projects.Build.Types.font.CharInfo;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
 
-import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
-import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
-
 public class MenuConteiner extends MenuItem
 {
 	public int num;
@@ -81,10 +78,10 @@ public class MenuConteiner extends MenuItem
 
 			if(w2 + bound >= width - w1) {
 				int tx = px + w1 + bound;
-				int ty = py + (font.getHeight() - listFont.getHeight()) / 2;
+				int ty = py + (font.getSize() - listFont.getSize()) / 2;
 				brDrawText(listFont, key, tx + bound, ty, shade, handler.getPal(listFont, this), px + width - 1);
 			} else {
-				listFont.drawTextScaled(x + width - 1 - listFont.getWidth(key, 1.0f), py + (font.getHeight() - listFont.getHeight()) / 2, key, 1, shade, handler.getPal(listFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal, listShadow);
+				listFont.drawTextScaled(x + width - 1 - listFont.getWidth(key, 1.0f), py + (font.getSize() - listFont.getSize()) / 2, key, 1, shade, handler.getPal(listFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal, listShadow);
 			}
 		}
 		handler.mPostDraw(this);
@@ -162,7 +159,7 @@ public class MenuConteiner extends MenuItem
 		if(text != null)
 		{
 			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
-				if(my > y && my < y + font.getHeight()) {
+				if(my > y && my < y + font.getSize()) {
 					return true;
 				}
 			}
@@ -178,7 +175,7 @@ public class MenuConteiner extends MenuItem
 			int fontx =  listFont.getWidth(key, 1.0f);
 			int px = x + width - 1 - fontx;
 			if(mx > px && mx < px + fontx) {
-				return my > y && my < y + font.getHeight();
+				return my > y && my < y + font.getSize();
 			}
 		}
 		

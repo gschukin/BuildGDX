@@ -2,7 +2,6 @@ package ru.m210projects.Build.Types.font;
 
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Types.ConvertType;
-import ru.m210projects.Build.Types.TileFont;
 import ru.m210projects.Build.Types.Transparent;
 
 import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
@@ -14,7 +13,7 @@ public class Font {
 
     protected final Engine engine;
     protected CharInfo[] charInfo;
-    protected int height;
+    protected int size;
     protected boolean verticalScaled = true;
 
     public Font(Engine engine) {
@@ -27,8 +26,8 @@ public class Font {
         this.charInfo[ch] = charInfo;
     }
 
-    public TileFont.FontType getFontType() {
-        return TileFont.FontType.TILE_FONT;
+    public FontType getFontType() {
+        return FontType.TILE_FONT;
     }
 
     public CharInfo getCharInfo(char ch) {
@@ -59,8 +58,8 @@ public class Font {
         return getWidth(toCharArray(text), scale);
     }
 
-    public int getHeight() {
-        return height;
+    public int getSize() {
+        return size;
     }
 
     public int drawText(int x, int y, char[] text, float scale, int shade, int palnum, TextAlign align, Transparent transparent, boolean shadow) {

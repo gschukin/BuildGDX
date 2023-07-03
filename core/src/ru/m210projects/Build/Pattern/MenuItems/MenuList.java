@@ -53,7 +53,7 @@ public class MenuList extends MenuItem {
 	}
 
 	public int mFontOffset() {
-		return font.getHeight() + 2;
+		return font.getSize() + 2;
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class MenuList extends MenuItem {
 				}
 
 				if (mx > px && mx < px + wd) {
-					if (my > py && my < py + font.getHeight()) {
+					if (my > py && my < py + font.getSize()) {
 						l_nFocus = i;
 						return true;
 					}

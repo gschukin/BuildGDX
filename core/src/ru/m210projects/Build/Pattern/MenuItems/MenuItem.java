@@ -82,7 +82,7 @@ public abstract class MenuItem {
 		int x = coordsConvertXScaled(this.x - 1, ConvertType.Normal);
 		int y = coordsConvertYScaled(this.y - 1);
 		int x2 = coordsConvertXScaled(this.x + width + 1, ConvertType.Normal);
-		int y2 = coordsConvertYScaled(this.y + font.getHeight() + 1);
+		int y2 = coordsConvertYScaled(this.y + font.getSize() + 1);
 		
 		draw.getrender().drawline256(x * 4096, y * 4096, x2 * 4096, y * 4096, col);
 		draw.getrender().drawline256(x * 4096, y2 * 4096, x2 * 4096, y2 * 4096, col);

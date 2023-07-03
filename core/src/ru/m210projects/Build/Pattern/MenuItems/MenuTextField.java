@@ -25,10 +25,8 @@ import static ru.m210projects.Build.Strhandler.isdigit;
 import com.badlogic.gdx.Input.Keys;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Input.InputCallback;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
-import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
@@ -221,13 +219,13 @@ public class MenuTextField extends MenuItem {
 		if(text != null)
 		{
 			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
-				if(my > y && my < y + font.getHeight()) {
+				if(my > y && my < y + font.getSize()) {
 					return true;
 				}
 			}
 
 			if(mx > x + width - font.getWidth(typingBuf, 1.0f) && mx < x + width - 1) {
-				return my > y && my < y + font.getHeight();
+				return my > y && my < y + font.getSize();
 			}
 		}
 

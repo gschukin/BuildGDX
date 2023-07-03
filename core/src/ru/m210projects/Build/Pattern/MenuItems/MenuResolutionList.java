@@ -182,7 +182,7 @@ public class MenuResolutionList extends MenuList {
 				}
 	
 			    if(mx > px && mx < px + fontx) {
-					if(my > py && my < py + font.getHeight())
+					if(my > py && my < py + font.getSize())
 					{
 						l_nFocus = i;
 						return true;

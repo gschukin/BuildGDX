@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.BufferUtils;
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
@@ -28,7 +27,6 @@ import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont.FontType;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.font.*;
 
@@ -44,7 +42,7 @@ import static ru.m210projects.Build.Render.Polymost.Polymost.MAXWALLSB;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.*;
 import static ru.m210projects.Build.RenderService.*;
-import static ru.m210projects.Build.Types.TileFont.FontType.BITMAP_FONT;
+import static ru.m210projects.Build.Types.font.FontType.BITMAP_FONT;
 
 public class Polymost2D extends OrphoRenderer {
 

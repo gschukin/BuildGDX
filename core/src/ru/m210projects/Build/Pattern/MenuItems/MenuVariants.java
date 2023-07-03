@@ -36,7 +36,7 @@ public abstract class MenuVariants extends MenuTitle
 	@Override
 	public void draw(MenuHandler handler) {
 		if ( text != null ) {
-			font.drawTextScaled(x, y - font.getHeight() / 2, text, 1.0f, handler.getShade(this), pal, TextAlign.Center, Transparent.None, ConvertType.Normal,  fontShadow);
+			font.drawTextScaled(x, y - font.getSize() / 2, text, 1.0f, handler.getShade(this), pal, TextAlign.Center, Transparent.None, ConvertType.Normal,  fontShadow);
 		}
 		
 		handler.mPostDraw(this);

@@ -16,12 +16,10 @@
 
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
-import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Net.Mmulti.connecthead;
 import static ru.m210projects.Build.Net.Mmulti.inet;
 import static ru.m210projects.Build.Net.Mmulti.initmultiplayers;
 import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
-import static ru.m210projects.Build.Strhandler.toCharArray;
 
 import com.badlogic.gdx.ScreenAdapter;
 
@@ -32,7 +30,7 @@ import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.osd.OsdColor;
 

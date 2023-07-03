@@ -66,7 +66,7 @@ public class MenuSwitch extends MenuItem
 			sw = onMessage;
 		}
 		
-		switchFont.drawTextScaled(x + width - 1 - switchFont.getWidth(sw, 1.0f), y + (font.getHeight() - switchFont.getHeight()) / 2, sw, 1.0f, shade, handler.getPal(switchFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
+		switchFont.drawTextScaled(x + width - 1 - switchFont.getWidth(sw, 1.0f), y + (font.getSize() - switchFont.getSize()) / 2, sw, 1.0f, shade, handler.getPal(switchFont, this), TextAlign.Left, Transparent.None, ConvertType.Normal,  fontShadow);
 		handler.mPostDraw(this);
 	}
 	
@@ -93,7 +93,7 @@ public class MenuSwitch extends MenuItem
 		if(text != null)
 		{
 			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
-				if(my > y && my < y + font.getHeight()) {
+				if(my > y && my < y + font.getSize()) {
 					return true;
 				}
 			}
@@ -107,7 +107,7 @@ public class MenuSwitch extends MenuItem
 		int fontx = font.getWidth(sw, 1.0f);
 		int px = x + width - 1 - fontx;
 		if(mx > px && mx < px + fontx) {
-			return my > y && my < y + font.getHeight();
+			return my > y && my < y + font.getSize();
 		}
 		
 		return false;

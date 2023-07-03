@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Pattern.BuildChar;
 import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
@@ -169,7 +168,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	public int mFontOffset() {
-		return font.getHeight() + nItemHeight;
+		return font.getSize() + nItemHeight;
 	}
 
 	private void changeDir(DirectoryEntry dir) {
@@ -233,8 +232,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 	@Override
 	public void draw(MenuHandler handler) {
 		int yColNames = y + 3;
-		int yPath = yColNames + topFont.getHeight() + 2;
-		int yList = yPath + pathFont.getHeight() + 2;
+		int yPath = yColNames + topFont.getSize() + 2;
+		int yList = yPath + pathFont.getSize() + 2;
 		int scrollerWidth = slider.getScrollerWidth();
 
 		draw.rotatesprite(x << 16, y << 16, 65536, 0, nBackground, 127, backgroundPal, 10 | 16 | transparent, 0, 0,
@@ -418,7 +417,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 				int nList = BClipLow(list[currColumn].size() - nListItems, 1);
 				int nRange = scrollerHeight;
 
-				int py = y + 3 + pathFont.getHeight() + 2 + topFont.getHeight() + 2;
+				int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
 
 				l_nFocus[currColumn] = -1;
 				l_nMin[currColumn] = BClipRange(((touchY - py) * nList) / nRange, 0, nList);
@@ -518,12 +517,12 @@ public abstract class MenuFileBrowser extends MenuItem {
 		}
 
 		if ((!scrollTouch[DIRECTORY] && !scrollTouch[FILE]) && list[currColumn].size() > 0) {
-			int py = y + 3 + pathFont.getHeight() + 2 + topFont.getHeight() + 2;
+			int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
 
 			for (int i = l_nMin[currColumn]; i >= 0 && i < l_nMin[currColumn] + nListItems
 					&& i < list[currColumn].size(); i++) {
 				if (mx > x && mx < scrollX[FILE]) {
-					if (my > py && my < py + font.getHeight()) {
+					if (my > py && my < py + font.getSize()) {
 						l_nFocus[currColumn] = i;
 						return true;
 					}

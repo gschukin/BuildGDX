@@ -29,7 +29,7 @@ import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildFont;
+import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuButton;
@@ -150,7 +150,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 			}
 		};
 
-		mResList = getResolutionListMenu(this, app, posx + (width - nListWidth) / 2, posy + 2 * style.getHeight(), nListWidth, nListItems, style, nBackground);
+		mResList = getResolutionListMenu(this, app, posx + (width - nListWidth) / 2, posy + 2 * style.getSize(), nListWidth, nListItems, style, nBackground);
 
 		mRenSettingsMenu = getRenSettingsMenu(app, posx, posy, width, itemHeight, style);
 

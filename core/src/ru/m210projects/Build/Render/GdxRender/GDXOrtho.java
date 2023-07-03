@@ -30,7 +30,6 @@ import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.Tile.AnimType;
-import ru.m210projects.Build.Types.TileFont.FontType;
 import ru.m210projects.Build.Types.collections.MapNode;
 
 import java.nio.ByteBuffer;
@@ -121,89 +120,89 @@ public class GDXOrtho extends OrphoRenderer {
 		drawing = false;
 	}
 
-	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
-			float scale) {
-		if(col < 0) {
-            return;
-        }
-
-		if (font.type == FontType.Tilemap) {
-			if (palookup[col] == null) {
-                col = 0;
-            }
-
-			int nTile = (Integer) font.ptr;
-			if (!engine.getTile(nTile).isLoaded() && engine.loadtile(nTile) == null) {
-                return;
-            }
-		}
-
-		GLTile atlas = font.getGL(parent.textureCache, parent.getTexFormat(), col);
-		if (atlas == null) {
-            return;
-        }
-
-		xpos <<= 16;
-		ypos <<= 16;
-
-		BuildGdx.gl.glDisable(GL_CULL_FACE);
-		BuildGdx.gl.glDisable(GL_DEPTH_TEST);
-		Shader shader = ((font.type == FontType.Tilemap)
-				? (atlas.getPixelFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader)
-				: Shader.BitmapShader);
-		if (!isDrawing()) {
-            begin(shader);
-        }
-
-		setType(GL20.GL_TRIANGLES);
-		switchShader(shader);
-		if (font.type == FontType.Tilemap) {
-			float alpha = 1.0f;
-			if (bit == Transparent.Bit1) {
-                alpha = TRANSLUSCENT1;
-            }
-			if (bit == Transparent.Bit2) {
-                alpha = TRANSLUSCENT2;
-            }
-
-			if (atlas.getPixelFormat() != PixelFormat.Pal8) {
-				float sh = (numshades - min(max(shade, 0), numshades)) / (float) numshades;
-				setColor(sh, sh, sh, alpha);
-			} else {
-                switchTextureParams(col, shade, alpha, false);
-            }
-		} else {
-            setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f,
-                    curpalette.getBlue(col) / 255.0f, 1.0f);
-        }
-		enableBlending();
-
-		int oxpos = xpos;
-		int c = 0, line = 0, yoffs;
-		float tx, ty;
-		int df = font.sizx / font.cols;
-		while (c < text.length && text[c] != '\0') {
-			if (text[c] == '\n') {
-				text[c] = 0;
-				line += 1;
-				xpos = oxpos - (int) (scale * font.charsizx);
-			}
-			if (text[c] == '\r') {
-                text[c] = 0;
-            }
-			yoffs = (int) (scale * line * font.charsizy);
-
-			tx = (text[c] % font.cols) * df;
-			ty = (text[c] / font.cols) * df;
-
-			draw(atlas, xpos, ypos, font.charsizx, font.charsizy, 0, -yoffs, tx, ty, font.charsizx, font.charsizy, 0,
-					(int) (scale * 65536), 8, 0, 0, xdim - 1, ydim - 1);
-
-			xpos += scale * (font.charsizx << 16);
-			c++;
-		}
-		BuildGdx.gl.glDepthMask(true); // re-enable writing to the z-buffer
-	}
+//	private void printext(TileFont font, int xpos, int ypos, char[] text, int col, int shade, Transparent bit,
+//			float scale) {
+//		if(col < 0) {
+//            return;
+//        }
+//
+//		if (font.type == FontType.Tilemap) {
+//			if (palookup[col] == null) {
+//                col = 0;
+//            }
+//
+//			int nTile = (Integer) font.ptr;
+//			if (!engine.getTile(nTile).isLoaded() && engine.loadtile(nTile) == null) {
+//                return;
+//            }
+//		}
+//
+//		GLTile atlas = font.getGL(parent.textureCache, parent.getTexFormat(), col);
+//		if (atlas == null) {
+//            return;
+//        }
+//
+//		xpos <<= 16;
+//		ypos <<= 16;
+//
+//		BuildGdx.gl.glDisable(GL_CULL_FACE);
+//		BuildGdx.gl.glDisable(GL_DEPTH_TEST);
+//		Shader shader = ((font.type == FontType.Tilemap)
+//				? (atlas.getPixelFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader)
+//				: Shader.BitmapShader);
+//		if (!isDrawing()) {
+//            begin(shader);
+//        }
+//
+//		setType(GL20.GL_TRIANGLES);
+//		switchShader(shader);
+//		if (font.type == FontType.Tilemap) {
+//			float alpha = 1.0f;
+//			if (bit == Transparent.Bit1) {
+//                alpha = TRANSLUSCENT1;
+//            }
+//			if (bit == Transparent.Bit2) {
+//                alpha = TRANSLUSCENT2;
+//            }
+//
+//			if (atlas.getPixelFormat() != PixelFormat.Pal8) {
+//				float sh = (numshades - min(max(shade, 0), numshades)) / (float) numshades;
+//				setColor(sh, sh, sh, alpha);
+//			} else {
+//                switchTextureParams(col, shade, alpha, false);
+//            }
+//		} else {
+//            setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f,
+//                    curpalette.getBlue(col) / 255.0f, 1.0f);
+//        }
+//		enableBlending();
+//
+//		int oxpos = xpos;
+//		int c = 0, line = 0, yoffs;
+//		float tx, ty;
+//		int df = font.sizx / font.cols;
+//		while (c < text.length && text[c] != '\0') {
+//			if (text[c] == '\n') {
+//				text[c] = 0;
+//				line += 1;
+//				xpos = oxpos - (int) (scale * font.charsizx);
+//			}
+//			if (text[c] == '\r') {
+//                text[c] = 0;
+//            }
+//			yoffs = (int) (scale * line * font.charsizy);
+//
+//			tx = (text[c] % font.cols) * df;
+//			ty = (text[c] / font.cols) * df;
+//
+//			draw(atlas, xpos, ypos, font.charsizx, font.charsizy, 0, -yoffs, tx, ty, font.charsizx, font.charsizy, 0,
+//					(int) (scale * 65536), 8, 0, 0, xdim - 1, ydim - 1);
+//
+//			xpos += scale * (font.charsizx << 16);
+//			c++;
+//		}
+//		BuildGdx.gl.glDepthMask(true); // re-enable writing to the z-buffer
+//	}
 
 	@Override
 	public void drawline256(int x1, int y1, int x2, int y2, int col) {

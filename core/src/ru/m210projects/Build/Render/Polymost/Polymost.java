@@ -99,7 +99,6 @@ import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLFog;

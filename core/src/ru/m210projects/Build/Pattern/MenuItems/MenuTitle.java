@@ -47,7 +47,7 @@ public class MenuTitle extends MenuItem {
 		    if(nTile != -1) {
 				draw.rotatesprite(160 << 16, y << 16, 65536, 0, nTile, -128, 0, 78);
 			}
-		    font.drawTextScaled(x, y - font.getHeight() / 2, text, 1.0f,-128, pal, TextAlign.Center, Transparent.None, ConvertType.Normal, fontShadow);
+		    font.drawTextScaled(x, y - font.getSize() / 2, text, 1.0f,-128, pal, TextAlign.Center, Transparent.None, ConvertType.Normal, fontShadow);
 		}
 		handler.mPostDraw(this);
 	}

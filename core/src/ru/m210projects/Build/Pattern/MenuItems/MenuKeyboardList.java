@@ -57,7 +57,7 @@ public abstract class MenuKeyboardList extends MenuList
 	public abstract String getKeyName(int keycode);
 	
 	public int mFontOffset() {
-		return font.getHeight() + 2;
+		return font.getSize() + 2;
 	}
 	
 	@Override
@@ -240,7 +240,7 @@ public abstract class MenuKeyboardList extends MenuList
 		{
 			int py = y;
 			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {	
-				if(my >= py && my < py + font.getHeight())
+				if(my >= py && my < py + font.getSize())
 				{
 					l_nFocus = i;
 					return true;

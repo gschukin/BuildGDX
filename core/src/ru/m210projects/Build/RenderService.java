@@ -9,7 +9,6 @@ import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.FileHandle.Compat;
 import ru.m210projects.Build.FileHandle.DirectoryEntry;
-import ru.m210projects.Build.Pattern.BuildFont;
 import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GdxRender.GDXRenderer;
@@ -35,11 +34,8 @@ import static ru.m210projects.Build.Gameutils.*;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.Strhandler.buildString;
-import static ru.m210projects.Build.Strhandler.toCharArray;
 
 public class RenderService {
-
-    public static TileFont pTextfont, pSmallTextfont;
 
     public static float TRANSLUSCENT1 = 0.66f;
     public static float TRANSLUSCENT2 = 0.33f;
@@ -126,9 +122,6 @@ public class RenderService {
         bakwindowx2 = new int[4];
         bakwindowy2 = new int[4];
 
-        Tables tables = EngineUtils.getTables();
-        pTextfont = new TextFont(tables.getTextFont());
-        pSmallTextfont = new SmallTextFont(tables.getSmallTextFont());
         calcbritable();
 
         parallaxyoffs = 0;
