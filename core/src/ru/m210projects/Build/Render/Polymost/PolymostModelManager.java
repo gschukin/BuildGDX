@@ -16,8 +16,8 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.Settings.GLSettings;
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.ModelHandle.GLModel;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelManager;
@@ -37,6 +37,8 @@ import ru.m210projects.Build.Render.TextureHandle.PixmapTileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.osd.OsdColor;
+
+import java.io.IOException;
 
 public class PolymostModelManager extends ModelManager {
 
@@ -90,35 +92,40 @@ public class PolymostModelManager extends ModelManager {
 
 	@Override
 	public GLModel allocateModel(ModelInfo modelInfo) {
-		switch (modelInfo.getType()) {
-		case Md3:
-			return new MD3ModelGL10((MD3Info) modelInfo) {
-				@Override
-				protected GLTile loadTexture(String skinfile, int palnum) {
-					return loadMDTexture(this, skinfile, palnum);
-				}
+		try {
+			switch (modelInfo.getType()) {
+				case Md3:
+					return new MD3ModelGL10((MD3Info) modelInfo) {
+						@Override
+						protected GLTile loadTexture(String skinfile, int palnum) {
+							return loadMDTexture(this, skinfile, palnum);
+						}
 
-				@Override
-				protected int bindSkin(int pal, int skinnum, int surfnum) {
-					return bindMDSkin(this, pal, skinnum, surfnum);
-				}
-			};
-		case Md2:
-			return new MD2ModelGL10((MD2Info) modelInfo) {
-				@Override
-				protected int bindSkin(int pal, int skinnum) {
-					return bindMDSkin(this, pal, skinnum, 0);
-				}
+						@Override
+						protected int bindSkin(int pal, int skinnum, int surfnum) {
+							return bindMDSkin(this, pal, skinnum, surfnum);
+						}
+					};
+				case Md2:
+					return new MD2ModelGL10((MD2Info) modelInfo) {
+						@Override
+						protected int bindSkin(int pal, int skinnum) {
+							return bindMDSkin(this, pal, skinnum, 0);
+						}
 
-				@Override
-				protected GLTile loadTexture(String skinfile, int palnum) {
-					return loadMDTexture(this, skinfile, palnum);
-				}
+						@Override
+						protected GLTile loadTexture(String skinfile, int palnum) {
+							return loadMDTexture(this, skinfile, palnum);
+						}
 
-			};
-		default:
-			return null;
+					};
+				default:
+					return null;
+			}
+		} catch (IOException e) {
+			Console.out.println(e.getMessage(), OsdColor.RED);
 		}
+		return null;
 	}
 
 	protected GLTile loadMDTexture(MDModel m, String skinfile, int palnum) {
@@ -127,8 +134,8 @@ public class PolymostModelManager extends ModelManager {
 			return texidx;
 		}
 
-		Resource res = BuildGdx.cache.open(skinfile, 0);
-		if (res == null) {
+		Entry res = BuildGdx.cache.getEntry(skinfile, true);
+		if (!res.exists()) {
 			Console.out.println("Skin " + skinfile + " not found.", OsdColor.YELLOW);
 			return null;
 		}
@@ -145,8 +152,6 @@ public class PolymostModelManager extends ModelManager {
 		} catch (Exception e) {
 			Console.out.println("Couldn't load file: " + skinfile, OsdColor.YELLOW);
 			return null;
-		} finally {
-			res.close();
 		}
 		texidx.setupTextureWrap(TextureWrap.Repeat);
 

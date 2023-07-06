@@ -16,6 +16,8 @@
 
 package ru.m210projects.Build.Audio;
 
+import ru.m210projects.Build.filehandle.Entry;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -283,12 +285,12 @@ public class BuildAudio {
 		return null;
 	}
 	
-	public MusicSource newMusic(MusicType type, byte[] data) {
+	public MusicSource newMusic(MusicType type, Entry entry) {
 		if(type == MusicType.Midi && mx.isInited()) {
-			return mx.newMusic(data);
+			return mx.newMusic(entry);
 		}
 		if(type == MusicType.Digital && fx.getDigitalMusic() != null && fx.getDigitalMusic().isInited()) {
-			return fx.getDigitalMusic().newMusic(data);
+			return fx.getDigitalMusic().newMusic(entry);
 		}
 		
 		return null;

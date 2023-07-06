@@ -14,20 +14,19 @@
 //You should have received a copy of the GNU General Public License
 //along with BuildGDX.  If not, see <http://www.gnu.org/licenses/>.
 
-package ru.m210projects.Build.FileHandle;
+package ru.m210projects.Build.filehandle;
 
 import java.io.File;
+import java.util.Locale;
 
 public class FileUtils {
-
 	public static boolean isExtension(String filename, String ext) {
 		return filename.endsWith("." + ext);
 	}
 
 	public static String getExtension(String filename) {
-		if (filename == null || filename.isEmpty()) {
+		if (filename == null || filename.isEmpty())
 			return null;
-		}
 		return filename.substring(filename.lastIndexOf('.') + 1);
 	}
 	
@@ -40,9 +39,8 @@ public class FileUtils {
 		if (path != null) {
 			int index;
 			if ((index = path.lastIndexOf(File.separator)) != -1 || (index = path.lastIndexOf("\\")) != -1
-					|| (index = path.lastIndexOf("/")) != -1) {
+					|| (index = path.lastIndexOf("/")) != -1)
 				path = path.substring(index + 1);
-			}
 		}
 
 		return path;
@@ -51,11 +49,9 @@ public class FileUtils {
 	public static String getCorrectPath(String path) {
 		if (path != null) {
 			String[] separators = { "/"/* - Linux separator */, "\\" };
-			for (String separator : separators) {
-				if (!separator.equals(File.separator) && path.contains(separator)) {
+			for (String separator : separators)
+				if (!separator.equals(File.separator) && path.contains(separator))
 					path = path.replace(separator, File.separator);
-				}
-			}
 			path = path.replaceAll("(\\\\){2,}", "$1");
 		}
 		return path;

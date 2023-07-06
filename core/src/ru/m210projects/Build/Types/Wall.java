@@ -9,11 +9,11 @@
 
 package ru.m210projects.Build.Types;
 
-import ru.m210projects.Build.FileHandle.DataResource;
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.StreamUtils;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -44,36 +44,36 @@ public class Wall {
     public Wall() {
     }
 
-    public Wall(byte[] data) {
-        readObject(new DataResource(data));
+    public Wall(byte[] data) throws IOException {
+        readObject(new ByteArrayInputStream(data));
     }
 
-    public Wall(Resource data) {
-        readObject(data);
+    public Wall(InputStream is) throws IOException {
+        readObject(is);
     }
 
     public static int getSizeof() {
         return sizeof;
     }
 
-    public Wall readObject(Resource bb) {
-        setX(bb.readInt());
-        setY(bb.readInt());
-        setPoint2(bb.readShort());
-        setNextwall(bb.readShort());
-        setNextsector(bb.readShort());
-        setCstat(bb.readShort());
-        setPicnum(bb.readShort());
-        setOverpicnum(bb.readShort());
-        setShade(bb.readByte());
-        setPal(bb.readByte());
-        setXrepeat(bb.readByte());
-        setYrepeat(bb.readByte());
-        setXpanning(bb.readByte());
-        setYpanning(bb.readByte());
-        setLotag(bb.readShort());
-        setHitag(bb.readShort());
-        setExtra(bb.readShort());
+    public Wall readObject(InputStream is) throws IOException {
+        setX(StreamUtils.readInt(is));
+        setY(StreamUtils.readInt(is));
+        setPoint2(StreamUtils.readShort(is));
+        setNextwall(StreamUtils.readShort(is));
+        setNextsector(StreamUtils.readShort(is));
+        setCstat(StreamUtils.readShort(is));
+        setPicnum(StreamUtils.readShort(is));
+        setOverpicnum(StreamUtils.readShort(is));
+        setShade(is.read());
+        setPal(is.read());
+        setXrepeat(is.read());
+        setYrepeat(is.read());
+        setXpanning(is.read());
+        setYpanning(is.read());
+        setLotag(StreamUtils.readShort(is));
+        setHitag(StreamUtils.readShort(is));
+        setExtra(StreamUtils.readShort(is));
         return this;
     }
 

@@ -16,7 +16,8 @@
 
 package ru.m210projects.Build.Script;
 
-import ru.m210projects.Build.FileHandle.FileUtils;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.FileUtils;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -49,8 +50,8 @@ public class CueScript extends Scriptfile {
     private final Map<Integer, String> pTrackList;
     private int nTracks;
 
-    public CueScript(String filename, byte[] data) throws RuntimeException {
-        super(filename, data);
+    public CueScript(String filename, Entry entry) throws RuntimeException {
+        super(filename, entry);
 
         nTracks = 0;
         pTrackList = new HashMap<Integer, String>();

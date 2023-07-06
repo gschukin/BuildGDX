@@ -68,6 +68,7 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
@@ -99,7 +100,6 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.osd.OsdColor;
 
 public class GDXRenderer implements GLRenderer {
@@ -179,7 +179,7 @@ public class GDXRenderer implements GLRenderer {
 		this.scanner = new SectorScanner(engine) {
 			@Override
 			protected Matrix4 getSpriteMatrix(Sprite tspr) {
-				Tile pic = engine.getTile(tspr.getPicnum());
+				ArtEntry pic = engine.getTile(tspr.getPicnum());
 				return sprR.getMatrix(tspr, pic.getWidth(), pic.getHeight());
 			}
 		};
@@ -485,7 +485,7 @@ public class GDXRenderer implements GLRenderer {
 
 			if (BuildSettings.useVoxels.get()) {
 				int picnum = tspr.getPicnum();
-				if (engine.getTile(picnum).getType() != AnimType.None) {
+				if (engine.getTile(picnum).getType() != AnimType.NONE) {
 					picnum += engine.animateoffs(picnum, tspr.getOwner() + 32768);
 				}
 
@@ -659,11 +659,11 @@ public class GDXRenderer implements GLRenderer {
 			return;
 		}
 
-		if (engine.getTile(picnum).getType() != AnimType.None) {
+		if (engine.getTile(picnum).getType() != AnimType.NONE) {
 			picnum += engine.animateoffs(picnum, 0);
 		}
 
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 		if (!pic.isLoaded()) {
 			engine.loadtile(picnum);
 		}
@@ -700,11 +700,11 @@ public class GDXRenderer implements GLRenderer {
 		if (surf.count != 0 && (flags == 0 || (surf.visflag & flags) != 0)) {
 			int picnum = surf.picnum;
 
-			if (engine.getTile(picnum).getType() != AnimType.None) {
+			if (engine.getTile(picnum).getType() != AnimType.NONE) {
 				picnum += engine.animateoffs(picnum, 0);
 			}
 
-			Tile pic = engine.getTile(picnum);
+			ArtEntry pic = engine.getTile(picnum);
 			if (!pic.isLoaded()) {
 				engine.loadtile(picnum);
 			}
@@ -1446,7 +1446,7 @@ public class GDXRenderer implements GLRenderer {
 	protected final GLTileArray skycache = new GLTileArray(MAXTILES);
 
 	protected GLTile getSkyTexture(PixelFormat fmt, int picnum, int palnum) {
-		if (!engine.getTile(picnum).hasSize()) {
+		if (engine.getTile(picnum).getSize() == 0) {
 			return textureCache.get(getTexFormat(), picnum, palnum, 0, 0);
 		}
 
@@ -1483,7 +1483,7 @@ public class GDXRenderer implements GLRenderer {
 			dapskybits = 0;
 		}
 
-		Tile tile = engine.getTile(picnum);
+		ArtEntry tile = engine.getTile(picnum);
 		TileAtlas sky = new TileAtlas(fmt, tile.getWidth() * (1 << dapskybits), tile.getHeight(), tile.getWidth(),
 				tile.getHeight(), false);
 		for (int i = 0; i < (1 << dapskybits); i++) {

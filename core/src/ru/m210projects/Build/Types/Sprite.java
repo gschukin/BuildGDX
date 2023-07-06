@@ -10,14 +10,13 @@
 package ru.m210projects.Build.Types;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
 
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.StreamUtils;
-import ru.m210projects.Build.StringUtils;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
 import static ru.m210projects.Build.Engine.MAXSTATUS;
 
@@ -49,30 +48,30 @@ public class Sprite {
 	private short hitag;
 	private short extra = -1;
 
-	public Sprite readObject(Resource bb) {
-		setX(bb.readInt());
-    	setY(bb.readInt());
-    	setZ(bb.readInt());
-    	setCstat(bb.readShort());
-    	setPicnum(bb.readShort());
-    	setShade(bb.readByte());
-    	setPal(bb.readByte());
-    	setClipdist(bb.readByte());
-    	setDetail(bb.readByte());
-    	setXrepeat(bb.readByte());
-    	setYrepeat(bb.readByte());
-    	setXoffset(bb.readByte());
-    	setYoffset(bb.readByte());
-    	setSectnum(bb.readShort());
-    	setStatnum(bb.readShort());
-    	setAng(bb.readShort());
-    	setOwner(bb.readShort());
-    	setXvel(bb.readShort());
-    	setYvel(bb.readShort());
-    	setZvel(bb.readShort());
-    	setLotag(bb.readShort());
-    	setHitag(bb.readShort());
-    	setExtra(bb.readShort());
+	public Sprite readObject(InputStream is) throws IOException {
+		setX(StreamUtils.readInt(is));
+    	setY(StreamUtils.readInt(is));
+    	setZ(StreamUtils.readInt(is));
+    	setCstat(StreamUtils.readShort(is));
+    	setPicnum(StreamUtils.readShort(is));
+    	setShade(is.read());
+    	setPal(is.read());
+    	setClipdist(is.read());
+    	setDetail(is.read());
+    	setXrepeat(is.read());
+    	setYrepeat(is.read());
+    	setXoffset(is.read());
+    	setYoffset(is.read());
+    	setSectnum(StreamUtils.readShort(is));
+    	setStatnum(StreamUtils.readShort(is));
+    	setAng(StreamUtils.readShort(is));
+    	setOwner(StreamUtils.readShort(is));
+    	setXvel(StreamUtils.readShort(is));
+    	setYvel(StreamUtils.readShort(is));
+    	setZvel(StreamUtils.readShort(is));
+    	setLotag(StreamUtils.readShort(is));
+    	setHitag(StreamUtils.readShort(is));
+    	setExtra(StreamUtils.readShort(is));
 		return this;
 	}
 

@@ -18,6 +18,7 @@
 
 package ru.m210projects.Build.desktop.audio;
 
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.OsdColor;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFERS_PROCESSED;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_BUFFERS_QUEUED;
@@ -33,6 +34,7 @@ import static ru.m210projects.Build.desktop.audio.ALAudio.AL_SEC_OFFSET;
 import static ru.m210projects.Build.desktop.audio.ALAudio.AL_SOURCE_STATE;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -44,8 +46,8 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Audio.Music;
 import ru.m210projects.Build.Audio.MusicSource;
 import ru.m210projects.Build.Audio.Source;
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.desktop.audio.ALSoundDrv.SourceManager;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.desktop.audio.ALSoundDrv.SourceManager;
 
 public class ALMusicDrv implements Music {
 
@@ -64,8 +66,8 @@ public class ALMusicDrv implements Music {
 	}
 
 	@Override
-	public MusicSource newMusic(byte[] data) {
-		if(drv.noDevice || data == null) {
+	public MusicSource newMusic(Entry entry) {
+		if(drv.noDevice || !entry.exists()) {
 			return null;
 		}
 		if(music != null) {
@@ -76,7 +78,7 @@ public class ALMusicDrv implements Music {
 		}
 		
 		try {
-			music = new ALMusicSource(new Ogg.Music(drv, musicBuffers, data));
+			music = new ALMusicSource(new Ogg.Music(drv, musicBuffers, entry));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			Console.out.println("Can't load ogg file", OsdColor.RED);
@@ -93,15 +95,12 @@ public class ALMusicDrv implements Music {
 			return null;
 		}
 		
-		Resource res = BuildGdx.cache.open(name, 0);
-		if(res == null) {
+		Entry entry = BuildGdx.cache.getEntry(name, true);
+		if(!entry.exists()) {
 			Console.out.println("OpenAL Music: Unable to load " + name, OsdColor.RED);
 			return null;
 		}
-		
-		byte[] data = res.getBytes();
-		res.close();
-		return newMusic(data);
+		return newMusic(entry);
 	}
 
 	@Override
@@ -172,17 +171,15 @@ abstract class OpenALMusic {
 	private int format, sampleRate;
 	private boolean isLooping, isPlaying;
 	private float renderedSeconds, secondsPerBuffer;
-	protected byte[] data;
 	private float musicVolume;
 	private final IntBuffer musicBuffers;
 	private final ALSoundDrv drv;
 	private final ALAudio al;
 	
-	public OpenALMusic (ALSoundDrv drv, IntBuffer ALbuffers, byte[] data) {
+	public OpenALMusic (ALSoundDrv drv, IntBuffer ALbuffers) {
 		this.drv = drv;
 		this.al = drv.getALAudio();
 		this.sourceManager = drv.sourceManager;
-		this.data = data;
 		this.musicBuffers = ALbuffers;
 	}
 
@@ -341,16 +338,25 @@ abstract class OpenALMusic {
 class Ogg {
 	static public class Music extends OpenALMusic {
 		private OggInputStream input;
-		public Music(ALSoundDrv drv, IntBuffer ALbuffers, byte[] data) {
-			super(drv, ALbuffers, data);
-			input = new OggInputStream(new ByteArrayInputStream(data, 0, data.length));
+		private final Entry entry;
+		public Music(ALSoundDrv drv, IntBuffer ALbuffers, Entry entry) throws IOException {
+			super(drv, ALbuffers);
+			this.entry = entry;
+			init();
+		}
+
+		private void init() throws IOException {
+			input = new OggInputStream(entry.getInputStream());
 			setup(input.getChannels(), input.getSampleRate());
 		}
 
 		public int read(byte[] buffer) {
 			if (input == null) {
-				input = new OggInputStream(new ByteArrayInputStream(data, 0, data.length));
-				setup(input.getChannels(), input.getSampleRate());
+				try {
+					init();
+				} catch (IOException ignored) {
+					return 0;
+				}
 			}
 			return input.read(buffer);
 		}

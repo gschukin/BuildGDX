@@ -6,9 +6,6 @@ public class Tile {
 		return (anm & 0x00FF0000) != 0;
     }
 
-    public enum AnimType {
-		Oscil, Forward, Backward, None
-	}
 
 	private int width, height;
 	public int anm;
@@ -84,12 +81,12 @@ public class Tile {
 	public AnimType getType() {
 		switch (anm & 192) {
 		case 64:
-			return AnimType.Oscil;
+			return AnimType.OSCIL;
 		case 128:
-			return AnimType.Forward;
+			return AnimType.FORWARD;
 		case 192:
-			return AnimType.Backward;
+			return AnimType.BACKWARD;
 		}
-		return AnimType.None;
+		return AnimType.NONE;
 	}
 }

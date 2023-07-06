@@ -20,6 +20,7 @@ import ru.m210projects.Build.Render.GdxRender.WorldMesh.Heinum;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.Pool;
 import ru.m210projects.Build.Types.collections.RuntimeArray;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class Tesselator {
 
@@ -276,7 +277,7 @@ public class Tesselator {
 			surf.obj = sec;
 //			surf.shade = type == Type.Floor ? sec.floorshade : sec.ceilingshade;
 //			surf.pal = type == Type.Floor ? sec.floorpal : sec.ceilingpal;
-			Tile pic = engine.getTile(surf.picnum);
+			ArtEntry pic = engine.getTile(surf.picnum);
 
 			int n = 0, j = 0;
 			for (int i = 0; i < zoids.size(); i++) {
@@ -436,7 +437,7 @@ public class Tesselator {
 				surf.picnum = picnum;
 				surf.obj = ptr;
 
-				Tile pic = engine.getTile(picnum);
+				ArtEntry pic = engine.getTile(picnum);
 				if (pic.hasSize()) {
 					uCoff = wal.getXrepeat() * 8.0f / pic.getWidth();
 					vCoff = -wal.getYrepeat() * 4.0f / GLInfo.calcSize(pic.getHeight());

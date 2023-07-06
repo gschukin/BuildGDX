@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Render.ModelHandle.MDModel.MD2;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.badlogic.gdx.graphics.GL20;
@@ -19,7 +20,7 @@ public abstract class MD2ModelGL20 extends MDModel {
 	private final MD2Triangle[] tris;
 	private float oldinterpol;
 
-	public MD2ModelGL20(MD2Info md) {
+	public MD2ModelGL20(MD2Info md) throws IOException {
 		super(md);
 
 		MD2Builder builder = new MD2Builder(md);

@@ -22,7 +22,6 @@ import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
-import ru.m210projects.Build.FileHandle.Compat.Path;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
@@ -107,7 +106,7 @@ public abstract class BuildGame extends Game {
     @Override
     public void dispose() {
         Console.out.getLogger().close();
-        pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
+//    FIXME:     pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
         if (getScreen() instanceof InitScreen) {
             getScreen().dispose();
         }

@@ -23,14 +23,13 @@ import static ru.m210projects.Build.RenderService.MAXYDIM;
 import java.util.Arrays;
 
 import ru.m210projects.Build.BoardService;
-import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.IOverheadMapSettings.MapView;
 import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.OrphoRenderer;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class SoftwareOrpho extends OrphoRenderer {
 
@@ -385,22 +384,22 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalpicnum = 0;
 				}
 				engine.setgotpic(globalpicnum);
-				Tile pic = engine.getTile(globalpicnum);
+				ArtEntry pic = engine.getTile(globalpicnum);
 
 				if (!pic.hasSize()) {
 					continue;
 				}
 
-				if (pic.getType() != AnimType.None) {
+				if (pic.getType() != AnimType.NONE) {
 					globalpicnum += engine.animateoffs(globalpicnum, s);
 					pic = engine.getTile(globalpicnum);
 				}
 
-				if (pic.data == null) {
+				if (!pic.isLoaded()) {
 					engine.loadtile(globalpicnum);
 				}
 
-				parent.globalbufplc = pic.data;
+				parent.globalbufplc = pic.getBytes();
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
 				if ((globalorientation & 64) == 0) {
@@ -507,7 +506,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						spr.setPicnum(0);
 					}
 
-					Tile pic = engine.getTile(spr.getPicnum());
+					ArtEntry pic = engine.getTile(spr.getPicnum());
 
 					xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
 					yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
@@ -594,21 +593,21 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalpicnum = spr.getPicnum();
 					globalpal = spr.getPal(); // GL needs this, software doesn't
 					engine.setgotpic(globalpicnum);
-					Tile sprpic = engine.getTile(globalpicnum);
+					ArtEntry sprpic = engine.getTile(globalpicnum);
 
 					if (!sprpic.hasSize()) {
 						continue;
 					}
-					if (sprpic.getType() != AnimType.None) {
+					if (sprpic.getType() != AnimType.NONE) {
 						globalpicnum += engine.animateoffs(globalpicnum, s);
 						sprpic = engine.getTile(globalpicnum);
 					}
 
-					if (sprpic.data == null) {
+					if (!sprpic.isLoaded()) {
 						engine.loadtile(globalpicnum);
 					}
 
-					parent.globalbufplc = sprpic.data;
+					parent.globalbufplc = sprpic.getBytes();
 
 					// 'loading' the tile doesn't actually guarantee that it's there afterwards.
 					// This can really happen when drawing the second frame of a floor-aligned
@@ -1103,9 +1102,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			return;
 		}
 
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 
-		if (pic.getType() != AnimType.None) {
+		if (pic.getType() != AnimType.NONE) {
 			picnum += engine.animateoffs(picnum, 0xc000);
 			pic = engine.getTile(picnum);
 		}
@@ -1174,7 +1173,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					if (per2.a != per.a) {
 						continue;
 					}
-					Tile pic2 = engine.getTile(per2.picnum);
+					ArtEntry pic2 = engine.getTile(per2.picnum);
 
 					if (pic2.getWidth() > pic.getWidth()) {
 						continue;
@@ -1229,7 +1228,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 						if ((per2.sy >> 16) < (per.sy >> 16)) {
 							continue;
 						}
-						Tile pic2 = engine.getTile(per2.picnum);
+						ArtEntry pic2 = engine.getTile(per2.picnum);
 
 						if ((per2.sx >> 16) + pic2.getWidth() > (per.sx >> 16) + pic.getWidth()) {
 							continue;
@@ -1267,7 +1266,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			cy2 = ydim - 1;
 		}
 
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 
 		int xsiz = pic.getWidth();
 		int ysiz = pic.getHeight();
@@ -1418,11 +1417,11 @@ public class SoftwareOrpho extends OrphoRenderer {
 			nextv = v;
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(picnum);
 		}
 		engine.setgotpic(picnum);
-		byte[] bufplc = pic.data;
+		byte[] bufplc = pic.getBytes();
 
 		int palookupshade = engine.getpalookup(0, dashade) << 8;
 

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
+import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.Types.Spriteext;
@@ -58,7 +59,7 @@ public class Maphack extends Scriptfile {
 	};
 
 	public Maphack() { // new maphack
-		super("", new byte[0]);
+		super("", DUMMY_ENTRY);
 
 		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
 		for (int i = 0; i < spriteext.length; i++) {
@@ -67,7 +68,7 @@ public class Maphack extends Scriptfile {
 	}
 
 	public Maphack(String filename) {
-		super(filename, BuildGdx.cache.getBytes(filename, 0));
+		super(filename, BuildGdx.cache.getEntry(filename, true));
 
 		spriteext = new Spriteext[MAXSPRITES + MAXUNIQHUDID];
 		for (int i = 0; i < spriteext.length; i++) {

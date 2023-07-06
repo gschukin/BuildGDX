@@ -16,10 +16,8 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import java.io.File;
-
+import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.FileHandle.Compat.Path;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
@@ -73,10 +71,8 @@ public abstract class MenuLoadSave extends BuildMenu {
 		addItem(slider, false);
 	}
 	
-	public boolean checkFile(String filename)
-	{
-		File file = new File(Path.User.getPath() + filename);
-		return file.exists();
+	public boolean checkFile(String filename) {
+		return BuildGdx.cache.getUserDirectory().getEntry(filename).exists();
 	}
 	
 	public abstract boolean loadData(String filename);

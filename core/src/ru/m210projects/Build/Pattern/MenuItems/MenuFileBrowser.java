@@ -25,21 +25,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
-import ru.m210projects.Build.FileHandle.DirectoryEntry;
-import ru.m210projects.Build.FileHandle.FileEntry;
-import ru.m210projects.Build.FileHandle.Compat.Path;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.CharInfo;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.fs.Directory;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public abstract class MenuFileBrowser extends MenuItem {
 
@@ -103,7 +102,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 	public String path;
 	protected int currColumn;
-	protected DirectoryEntry currDir;
+	protected Directory currDir;
 
 	private final BuildEngine draw;
 	private final SliderDrawable slider;
@@ -148,7 +147,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 		this.currColumn = FILE;
 
 		init();
-		changeDir(BuildGdx.compat.getDirectory(Path.Game));
+		changeDir(BuildGdx.cache.getGameDirectory());
 	}
 
 	public abstract void init();
@@ -157,13 +156,13 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 	public abstract void invoke(Object fil);
 
-	public abstract void handleDirectory(DirectoryEntry dir);
+	public abstract void handleDirectory(Directory dir);
 
 	public String getFileName() {
 		return list[FILE].get(l_nFocus[FILE]);
 	}
 
-	public DirectoryEntry getDirectory() {
+	public Directory getDirectory() {
 		return currDir;
 	}
 
@@ -171,8 +170,8 @@ public abstract class MenuFileBrowser extends MenuItem {
 		return font.getSize() + nItemHeight;
 	}
 
-	private void changeDir(DirectoryEntry dir) {
-		if (!dir.checkCacheList() && currDir == dir) {
+	private void changeDir(Directory dir) {
+		if (!dir.revalidate() && currDir == dir) {
 			return;
 		}
 
@@ -181,17 +180,13 @@ public abstract class MenuFileBrowser extends MenuItem {
 		list[FILE].clear();
 
 		currDir = dir;
-		path = File.separator;
-		if (dir.getRelativePath() != null) {
-			path += currDir.getRelativePath();
-		}
-
-		for (Iterator<DirectoryEntry> it = dir.getDirectories().values().iterator(); it.hasNext();) {
-			DirectoryEntry sdir = it.next();
-			if (!sdir.getName().equals("<userdir>")) {
-				list[DIRECTORY].add(toLowerCase(sdir.getName()));
+		path = currDir.getPath().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
+		for (Entry entry : dir.getEntries()) {
+			if (entry instanceof FileEntry && entry.isDirectory()) {
+				list[DIRECTORY].add(toLowerCase(entry.getName()));
 			}
 		}
+
 		Collections.sort(list[DIRECTORY]);
 		if (dir.getParent() != null) {
 			list[DIRECTORY].add(0, back);
@@ -199,12 +194,14 @@ public abstract class MenuFileBrowser extends MenuItem {
 
 		handleDirectory(dir);
 
-		for (Iterator<FileEntry> it = dir.getFiles().values().iterator(); it.hasNext();) {
-			FileEntry file = it.next();
-			if (extensionProperties.get(file.getExtension()) != null) {
-				handleFile(file);
+		for (Entry entry : dir.getEntries()) {
+			if (entry instanceof FileEntry && !entry.isDirectory()) {
+				if (extensionProperties.get(entry.getExtension()) != null) {
+					handleFile((FileEntry) entry);
+				}
 			}
 		}
+
 		sortFiles();
 
 		l_nFocus[DIRECTORY] = l_nMin[DIRECTORY] = 0;
@@ -311,7 +308,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 				handler.getShade(currColumn == DIRECTORY ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
 
 		if (System.currentTimeMillis() - checkDirectory >= 2000) {
-			if (currDir.checkCacheList()) {
+			if (currDir.revalidate()) {
 				refreshList();
 			}
 			checkDirectory = System.currentTimeMillis();
@@ -430,9 +427,9 @@ public abstract class MenuFileBrowser extends MenuItem {
 				}
 				String dirName = list[DIRECTORY].get(l_nFocus[DIRECTORY]);
 				if (dirName.equals(back)) {
-					changeDir(currDir.getParent());
+					//changeDir(currDir.getParent()); fixme
 				} else {
-					changeDir(currDir.checkDirectory(dirName));
+					//changeDir(currDir.checkDirectory(dirName)); fixme
 				}
 			} else if (list[FILE].size() > 0 && currColumn == FILE) {
 
@@ -449,7 +446,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 			return true;
 		case BSPACE:
 			if (currDir.getParent() != null) {
-				changeDir(currDir.getParent());
+//				changeDir(currDir.getParent()); fixme
 			}
 			return false;
 		case PGUP:
@@ -545,7 +542,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 	}
 
 	public void refreshList() {
-		DirectoryEntry dir = currDir;
+		Directory dir = currDir;
 		currDir = null;
 		changeDir(dir);
 	}

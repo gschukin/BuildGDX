@@ -9,16 +9,17 @@
 
 package ru.m210projects.Build.Types;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.FileHandle.DataResource;
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.StreamUtils;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
 public class Sector {
 	public static final int sizeof = 40;
@@ -60,11 +61,11 @@ public class Sector {
 	public Sector() {
 	}
 
-	public Sector(byte[] data) {
-		readObject(new DataResource(data));
+	public Sector(byte[] data) throws IOException {
+		readObject(new ByteArrayInputStream(data));
 	}
 
-	public Sector(Resource data) {
+	public Sector(InputStream data) throws IOException {
 		readObject(data);
 	}
 
@@ -156,30 +157,30 @@ public class Sector {
 		return (getFloorstat() & (128 | 256)) != 0;
 	}
 
-	public Sector readObject(Resource bb) {
-		setWallptr(bb.readShort());
-		setWallnum(bb.readShort());
-		setCeilingz(bb.readInt());
-		setFloorz(bb.readInt());
-		setCeilingstat(bb.readShort());
-		setFloorstat(bb.readShort());
-		setCeilingpicnum(bb.readShort());
-		setCeilingheinum(bb.readShort());
-		setCeilingshade(bb.readByte());
-		setCeilingpal(bb.readByte());
-		setCeilingxpanning(bb.readByte());
-		setCeilingypanning(bb.readByte());
-		setFloorpicnum(bb.readShort());
-		setFloorheinum(bb.readShort());
-		setFloorshade(bb.readByte());
-		setFloorpal(bb.readByte());
-		setFloorxpanning(bb.readByte());
-		setFloorypanning(bb.readByte());
-		setVisibility(bb.readByte());
-		setFiller(bb.readByte());
-		setLotag(bb.readShort());
-		setHitag(bb.readShort());
-		setExtra(bb.readShort());
+	public Sector readObject(InputStream is) throws IOException {
+		setWallptr(StreamUtils.readShort(is));
+		setWallnum(StreamUtils.readShort(is));
+		setCeilingz(StreamUtils.readInt(is));
+		setFloorz(StreamUtils.readInt(is));
+		setCeilingstat(StreamUtils.readShort(is));
+		setFloorstat(StreamUtils.readShort(is));
+		setCeilingpicnum(StreamUtils.readShort(is));
+		setCeilingheinum(StreamUtils.readShort(is));
+		setCeilingshade(is.read());
+		setCeilingpal(is.read());
+		setCeilingxpanning(is.read());
+		setCeilingypanning(is.read());
+		setFloorpicnum(StreamUtils.readShort(is));
+		setFloorheinum(StreamUtils.readShort(is));
+		setFloorshade(is.read());
+		setFloorpal(is.read());
+		setFloorxpanning(is.read());
+		setFloorypanning(is.read());
+		setVisibility(is.read());
+		setFiller(is.read());
+		setLotag(StreamUtils.readShort(is));
+		setHitag(StreamUtils.readShort(is));
+		setExtra(StreamUtils.readShort(is));
 
 		return this;
 	}

@@ -10,6 +10,8 @@ import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
+import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 
 import java.util.Arrays;
 
@@ -103,10 +105,14 @@ public abstract class MovieScreen extends SkippableAdapter {
 			return false;
 		}
 
-		Tile pic = engine.getTile(TILE_MOVIE);
-		pic.setWidth(mvfil.getWidth());
-		pic.setHeight(mvfil.getHeight());
-		pic.data = null;
+		ArtEntry pic = engine.getTile(TILE_MOVIE);
+		if (pic instanceof CachedArtEntry) {
+			if (pic.getWidth() != mvfil.getWidth() || pic.getHeight() != mvfil.getHeight()) {
+				engine.replaceTile(new CachedArtEntry(TILE_MOVIE, new byte[mvfil.getWidth() * mvfil.getHeight()], mvfil.getWidth(), mvfil.getHeight()));
+			} else {
+				((CachedArtEntry) pic).clearData();
+			}
+		}
 
 		float kt = pic.getHeight() / (float) pic.getWidth();
 		float kv = xdim / (float) ydim;
@@ -203,7 +209,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 			if (LastMS == -1) {
 				LastMS = engine.getticks();
 			}
-			Tile pic = engine.getTile(TILE_MOVIE);
+			CachedArtEntry pic = (CachedArtEntry) engine.getTile(TILE_MOVIE);
 
 			long ms = engine.getticks();
 			long dt = ms - LastMS;
@@ -211,7 +217,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 			float tick = mvfil.getRate();
 			if (mvtime >= tick) {
 				if (frame < mvfil.getFrames()) {
-					pic.data = DoDrawFrame(frame);
+					pic.copyData(DoDrawFrame(frame));
 					engine.getrender().invalidatetile(TILE_MOVIE, 0, -1); // JBF 20031228
 
 					frame++;
@@ -226,7 +232,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 				return false;
 			}
 
-			if (pic.data != null) {
+			if (pic.getData() != null) {
 				engine.rotatesprite(nPosX << 16, nPosY << 16, nScale, 512, TILE_MOVIE, 0, 0, nFlags, 0, 0, xdim - 1,
 						ydim - 1);
 			}

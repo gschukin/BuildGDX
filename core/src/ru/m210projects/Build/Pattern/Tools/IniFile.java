@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import ru.m210projects.Build.FileHandle.FileEntry;
 import ru.m210projects.Build.Types.PropertyIgnoreCase;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public class IniFile {
 	

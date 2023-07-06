@@ -29,7 +29,7 @@ import javax.sound.midi.Synthesizer;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Audio.Music;
 import ru.m210projects.Build.Audio.MusicSource;
-import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -85,9 +85,9 @@ public class MidiMusicModule implements Music {
 	}
 	
 	@Override
-	public MusicSource newMusic(byte[] data) {
+	public MusicSource newMusic(Entry entry) {
 		try {
-			return new MidiMusicSource(sequencer, data);
+			return new MidiMusicSource(sequencer, entry);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -96,14 +96,11 @@ public class MidiMusicModule implements Music {
 	
 	@Override
 	public MusicSource newMusic(String name) {
-		Resource res = BuildGdx.cache.open(name, 0);
-		if(res == null) {
+		Entry entry = BuildGdx.cache.getEntry(name, true);
+		if(!entry.exists()) {
 			return null;
 		}
-		
-		byte[] data = res.getBytes();
-		res.close();
-		return newMusic(data);
+		return newMusic(entry);
 	}
 
 	@Override

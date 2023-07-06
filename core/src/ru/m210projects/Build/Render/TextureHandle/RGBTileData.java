@@ -12,6 +12,7 @@ import java.nio.ByteOrder;
 
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class RGBTileData extends TileData {
 
@@ -20,8 +21,8 @@ public class RGBTileData extends TileData {
 	public final int width, height;
 	public final boolean clamped;
 
-	public RGBTileData(Tile tile, int dapal, boolean clamped, boolean alpha, int expflag) {
-		byte[] data = tile.data;
+	public RGBTileData(ArtEntry tile, int dapal, boolean clamped, boolean alpha, int expflag) {
+		byte[] data = tile.getBytes();
 		int tsizx = tile.getWidth();
 		int tsizy = tile.getHeight();
 

@@ -9,6 +9,8 @@
 
 package ru.m210projects.Build.Script;
 
+import ru.m210projects.Build.filehandle.Entry;
+
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 import java.io.File;
@@ -261,11 +263,8 @@ public class Scriptfile {
 		eof = textbuf.length() - 1;
 	}
 
-	public Scriptfile(String filename, byte[] data) {
-		if(data == null) {
-            throw new RuntimeException("byte[] data == NULL");
-        }
-
+	public Scriptfile(String filename, Entry entry) {
+		byte[] data = entry.getBytes();
 		int flen = data.length;
 		byte[] tx = Arrays.copyOf(data, flen + 2);
 		tx[flen] = tx[flen + 1] = 0;

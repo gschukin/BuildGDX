@@ -29,10 +29,6 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.Audio.BuildAudio.Driver;
-import ru.m210projects.Build.FileHandle.Compat.Path;
-import ru.m210projects.Build.FileHandle.DirectoryEntry;
-import ru.m210projects.Build.FileHandle.Group;
-import ru.m210projects.Build.FileHandle.GroupResource;
 import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.Tools.Interpolation;
@@ -43,6 +39,9 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Pattern.BuildFactory;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.Group;
+import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.CommandResponse;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.ConsoleLogger;
@@ -92,10 +91,10 @@ public class InitScreen extends ScreenAdapter {
 		Console.out.registerCommand(new OsdCommand("deb_filelist", "deb_filelist") {
 			@Override
 			public CommandResponse execute(String[] argv) {
-				for (Group g : BuildGdx.cache.getGroupList()) {
-					Console.out.println("group: " + g.name);
-					for (GroupResource res : g.getList()) {
-						Console.out.println("\t   file: " + res.getFullName());
+				for (Group g : BuildGdx.cache.getGroups()) {
+					Console.out.println("group: " + g.getName());
+					for (Entry res : g.getEntries()) {
+						Console.out.println("\t   file: " + res.getName());
 					}
 				}
 				return CommandResponse.SILENT_RESPONSE;
@@ -115,6 +114,7 @@ public class InitScreen extends ScreenAdapter {
 		this.game = game;
 		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
+		Directory gameDirectory = BuildGdx.cache.getGameDirectory();
 
 		try {
 			Console.out.setLogger(new ConsoleLogger(game.appname + ".log"));
@@ -137,9 +137,10 @@ public class InitScreen extends ScreenAdapter {
 
 		for (int i = 0; i < factory.resources.length; i++) {
 			try {
-				BuildGdx.cache.add(factory.resources[i]);
-//				if(BuildGdx.cache.add(factory.resources[i]) == null)
-//					throw new Exception("Can't load package " + factory.resources[i]);
+				Entry entry = gameDirectory.getEntry(factory.resources[i]);
+				if (entry.exists() && !entry.isDirectory()) {
+					BuildGdx.cache.add(entry);
+				}
 			} catch (Exception e) {
 				BuildGdx.message.show("Init error!", "Resource initialization error! \r\n" + e.getMessage(),
 						MessageType.Info);
@@ -162,9 +163,10 @@ public class InitScreen extends ScreenAdapter {
 		}
 
 		if (engine.loadpics() == 0) {
-			BuildGdx.message.show("Build Engine Initialization Error!",
-					"ART files not found " + new File(Path.Game.getPath() + engine.tilesPath).getAbsolutePath(),
-					MessageType.Info);
+			// FIXME:
+//			BuildGdx.message.show("Build Engine Initialization Error!",
+//					"ART files not found " + new File(Path.Game.getPath() + engine.tilesPath).getAbsolutePath(),
+//					MessageType.Info);
 			System.exit(1);
 			return;
 		}
@@ -189,9 +191,9 @@ public class InitScreen extends ScreenAdapter {
 
 
 		if(cfg.autoloadFolder) {
-			DirectoryEntry autoloadDir = BuildGdx.compat.checkDirectory("autoload");
-			if(autoloadDir == null) { // not found
-				File f = new File(Path.Game.getPath() + File.separator + "autoload");
+			Entry entry = gameDirectory.getEntry("autoload");
+			if (!entry.exists()) {
+				File f = new File(gameDirectory.getPath().resolve("autoload").toString());
 				if(!f.exists() && !f.mkdirs() && !f.isDirectory()) {
 					Console.out.println("Can't create autoload folder", OsdColor.RED);
 				}

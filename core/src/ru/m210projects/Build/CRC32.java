@@ -7,14 +7,14 @@
 
 package ru.m210projects.Build;
 
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
+
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-
-import ru.m210projects.Build.FileHandle.FileEntry;
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.FileHandle.Resource.Whence;
 
 public class CRC32 {
 	private static final int[] table = { 0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -77,29 +77,18 @@ public class CRC32 {
 		return crc & 0xFFFFFFFFL;
 	}
 
-	public static long getChecksum(FileEntry file) {
-		long value = -1;
-		try {
-			FileInputStream inputStream = new FileInputStream(file.getFile());
-			FileChannel fileChannel = inputStream.getChannel();
-			MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
-			value = getChecksum(buffer);
-			inputStream.close();
-		} catch (Exception e) {
-		}
-		return value;
-	}
-
-	public static long getChecksum(Resource res) {
+	public static long getChecksum(Entry res) {
 		int crc = 0xffffffff;
 		int len;
 		byte[] bytes = new byte[2048];
 
-		res.seek(0, Whence.Set);
-		while ((len = res.read(bytes)) != -1) {
-			for (int i = 0; i < len; i++) {
-				crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xff];
+		try(InputStream is = res.getInputStream()) {
+			while ((len = is.read(bytes)) != -1) {
+				for (int i = 0; i < len; i++) {
+					crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xff];
+				}
 			}
+		} catch (Exception ignored) {
 		}
 
 		// flip bits

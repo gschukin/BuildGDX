@@ -31,6 +31,7 @@ import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class GDXModelRenderer {
 
@@ -131,7 +132,7 @@ public class GDXModelRenderer {
 	private Matrix4 prepareTransform(GLModel m, Sprite tspr) {
 		BuildCamera cam = parent.cam;
 
-		Tile pic = engine.getTile(tspr.getPicnum());
+		ArtEntry pic = engine.getTile(tspr.getPicnum());
 		int orientation = tspr.getCstat();
 
 		boolean xflip = (orientation & 4) != 0;

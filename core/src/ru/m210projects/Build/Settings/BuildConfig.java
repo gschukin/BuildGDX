@@ -25,10 +25,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
-import ru.m210projects.Build.FileHandle.Compat;
-import ru.m210projects.Build.FileHandle.Compat.Path;
-import ru.m210projects.Build.FileHandle.FileResource;
-import ru.m210projects.Build.FileHandle.FileResource.Mode;
 import ru.m210projects.Build.Input.ButtonMap;
 import ru.m210projects.Build.Input.Keymap;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.Tools.IniFile;
@@ -42,6 +38,19 @@ public abstract class BuildConfig extends IniFile {
 
 	public final int cfgVersion = 1901; // year XX, num XX
 	public boolean isInited;
+
+    public void setKey(int l_nFocus, int up) {
+    }
+
+	public void setButton(KeyType keyType, int kb) {
+	}
+
+    public void InitKeymap() {
+    }
+
+	public boolean InitConfig(boolean b) {
+		return false;
+	}
 
 	public interface KeyType {
 
@@ -246,8 +255,20 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
+	public abstract KeyType[] getKeyMap();
+
 	public boolean isExist() {
 		return data != null && version == cfgVersion;
+	}
+
+	public int getKeyIndex(String keyname) {
+		keyname = keyname.replaceAll("[^a-zA-Z_-]", "");
+		for (int i = 0; i < keymap.length; i++) {
+			if (keyname.equals(keymap[i].getName())) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	public void LoadMain() {
@@ -581,6 +602,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
+	/*
 	public void saveConfig(Compat compat, String path) {
 		if (!isInited) { // has saving from launcher
 			FileResource fil = compat.open(cfgPath + name, Path.Absolute, Mode.Write);
@@ -727,8 +749,6 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	public abstract KeyType[] getKeyMap();
-
 	public void setKey(int index, int keyId) {
 		if (primarykeys[index] == 0 && secondkeys[index] == 0) {
 			primarykeys[index] = keyId;
@@ -774,16 +794,6 @@ public abstract class BuildConfig extends IniFile {
 		} else {
 			gpadkeys[key.getNum()] = button;
 		}
-	}
-
-	public int getKeyIndex(String keyname) {
-		keyname = keyname.replaceAll("[^a-zA-Z_-]", "");
-		for (int i = 0; i < keymap.length; i++) {
-			if (keyname.equals(keymap[i].getName())) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	public void saveBoolean(FileResource fil, String name, boolean var) {
@@ -887,4 +897,5 @@ public abstract class BuildConfig extends IniFile {
 			fil.writeBytes(gamePart.toCharArray(), gamePart.length());
 		}
 	}
+	*/
 }

@@ -29,8 +29,8 @@ import ru.m210projects.Build.Render.Types.Palette;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -275,11 +275,11 @@ public class GDXOrtho extends OrphoRenderer {
 			}
 		}
 
-		if (engine.getTile(picnum).getType() != AnimType.None) {
+		if (engine.getTile(picnum).getType() != AnimType.NONE) {
             picnum += engine.animateoffs(picnum, 0xC000);
         }
 
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 		if (!pic.hasSize()) {
             return;
         }
@@ -415,7 +415,7 @@ public class GDXOrtho extends OrphoRenderer {
 			float fy = sy * (1.0f / 65536.0f);
 
 			if ((dastat & 16) != 0) {
-				Tile pic = engine.getTile(picnum);
+				ArtEntry pic = engine.getTile(picnum);
 
 				int xsiz = pic.getWidth();
 				int ysiz = pic.getHeight();
@@ -567,7 +567,7 @@ public class GDXOrtho extends OrphoRenderer {
                     continue;
                 }
 
-				Tile pic = engine.getTile(wal.getPicnum());
+				ArtEntry pic = engine.getTile(wal.getPicnum());
 				if (!pic.hasSize()) {
                     continue;
                 }
@@ -609,7 +609,7 @@ public class GDXOrtho extends OrphoRenderer {
 						}
 						break;
 					case 16: {
-						Tile pic = engine.getTile(spr.getPicnum());
+						ArtEntry pic = engine.getTile(spr.getPicnum());
 						int x1 = mapSettings.getSpriteX(j);
 						int y1 = mapSettings.getSpriteY(j);
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
@@ -644,7 +644,7 @@ public class GDXOrtho extends OrphoRenderer {
 					}
 						break;
 					case 32: {
-						Tile pic = engine.getTile(spr.getPicnum());
+						ArtEntry pic = engine.getTile(spr.getPicnum());
 						byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
 						byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
 						if ((spr.getCstat() & 4) > 0) {
@@ -861,13 +861,13 @@ public class GDXOrtho extends OrphoRenderer {
                     globalpicnum = 0;
                 }
 				engine.setgotpic(globalpicnum);
-				Tile pic = engine.getTile(globalpicnum);
+				ArtEntry pic = engine.getTile(globalpicnum);
 
 				if (!pic.hasSize()) {
                     continue;
                 }
 
-				if (pic.getType() != AnimType.None) {
+				if (pic.getType() != AnimType.NONE) {
 					globalpicnum += engine.animateoffs(globalpicnum, s);
 					pic = engine.getTile(globalpicnum);
 				}

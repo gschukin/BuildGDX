@@ -17,8 +17,10 @@
 
 package ru.m210projects.Build.Audio;
 
+import ru.m210projects.Build.filehandle.Entry;
+
 public interface Music {
-	MusicSource newMusic(byte[] data);
+	MusicSource newMusic(Entry entry);
 	MusicSource newMusic(String name);
 
 	void setVolume(float volume);

@@ -7,9 +7,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.FileHandle.Compat;
-import ru.m210projects.Build.FileHandle.DirectoryEntry;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
+import ru.m210projects.Build.filehandle.art.CachedArtEntry;
+import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GdxRender.GDXRenderer;
 import ru.m210projects.Build.Render.Renderer;
@@ -21,8 +22,8 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.osd.OsdColor;
 
-import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -153,9 +154,9 @@ public class RenderService {
 
     public int animateoffs(int tilenum, int nInfo) { // jfBuild + gdxBuild
         long clock, index = 0;
-        Tile tile = engine.getTile(tilenum);
+        ArtEntry tile = engine.getTile(tilenum);
 
-        int speed = tile.getSpeed();
+        int speed = tile.getAnimSpeed();
         if ((nInfo & 0xC000) == 0x8000) { // sprite
             // hash sprite frame by info variable
 
@@ -167,20 +168,20 @@ public class RenderService {
             clock = totalclocklock >> speed;
         }
 
-        int frames = tile.getFrames();
+        int frames = tile.getAnimFrames();
 
         if (frames > 0) {
             switch (tile.getType()) {
-                case Oscil:
+                case OSCIL:
                     index = clock % (frames * 2L);
                     if (index >= frames) {
                         index = frames * 2L - index;
                     }
                     break;
-                case Forward:
+                case FORWARD:
                     index = clock % (frames + 1);
                     break;
-                case Backward:
+                case BACKWARD:
                     index = -(clock % (frames + 1));
                     break;
                 default: // None
@@ -586,17 +587,15 @@ public class RenderService {
         render.clearview(dacol);
     }
 
-    public void setviewtotile(int tilenume, int xsiz, int ysiz) // jfBuild
+    public void setviewtotile(int tilenume) // jfBuild
     {
-        Tile pic = engine.getTile(tilenume);
+        ArtEntry pic = engine.getTile(tilenume);
         if (render.getType() == Renderer.RenderType.Software) {
-            ((Software) render).setviewtotile(tilenume, pic.getWidth(), pic.getHeight());
+            ((Software) render).setviewtotile(tilenume);
             return;
         }
 
         // DRAWROOMS TO TILE BACKUP&SET CODE
-        pic.setWidth(xsiz);
-        pic.setHeight(ysiz);
         bakwindowx1[setviewcnt] = windowx1;
         bakwindowy1[setviewcnt] = windowy1;
         bakwindowx2[setviewcnt] = windowx2;
@@ -609,7 +608,7 @@ public class RenderService {
         offscreenrendering = true;
 
         setviewcnt++;
-        setview(0, 0, ysiz - 1, xsiz - 1);
+        setview(0, 0, pic.getHeight() - 1, pic.getWidth() - 1);
         setaspect(65536, 65536);
     }
 
@@ -623,7 +622,10 @@ public class RenderService {
         offscreenrendering = (setviewcnt > 0);
 
         if (setviewcnt == 0 && render.getType() != Renderer.RenderType.Software) {
-            engine.getTile(baktile).data = setviewbuf();
+            ArtEntry artEntry = engine.getTile(baktile);
+            if (artEntry instanceof CachedArtEntry) {
+                ((CachedArtEntry) artEntry).copyData(setviewbuf());
+            }
             render.invalidatetile(baktile, -1, -1);
         }
 
@@ -662,7 +664,7 @@ public class RenderService {
 
         fn = fn.substring(0, fn.lastIndexOf('.') - 4);
 
-        DirectoryEntry userdir = BuildGdx.compat.getDirectory(Compat.Path.User);
+        Directory userDir = BuildGdx.cache.getUserDirectory();
 
         int capturecount = 0;
         do { // JBF 2004022: So we don't overwrite existing screenshots
@@ -675,9 +677,10 @@ public class RenderService {
             c = ((capturecount / 10) % 10);
             d = (capturecount % 10);
 
-            if (userdir.checkFile(fn + a + b + c + d + ".png") == null) {
+            if(!userDir.getEntry(fn + a + b + c + d + ".png").exists()) {
                 break;
             }
+
             capturecount++;
         } while (true);
 
@@ -687,10 +690,9 @@ public class RenderService {
             capture = new Pixmap(w, h, Pixmap.Format.RGB888);
             ByteBuffer pixels = capture.getPixels();
             pixels.put(render.getFrame(TileData.PixelFormat.Rgb, xdim, -ydim));
-
-            File pci = new File(userdir.getAbsolutePath() + fn + a + b + c + d + ".png");
-            PixmapIO.writePNG(new FileHandle(pci), capture);
-            userdir.addFile(pci);
+            Path path = userDir.getPath().resolve(fn + a + b + c + d + ".png");
+            PixmapIO.writePNG(new FileHandle(path.toFile()), capture);
+            userDir.addEntry(path);
             capture.dispose();
             return fn + a + b + c + d + ".png";
         } catch (Throwable e) {
@@ -702,11 +704,11 @@ public class RenderService {
     }
 
     protected byte[] setviewbuf() { // gdxBuild
-        Tile pic = engine.getTile(baktile);
+        ArtEntry pic = engine.getTile(baktile);
 
         int width = pic.getWidth();
         int heigth = pic.getHeight();
-        byte[] data = pic.data;
+        byte[] data = pic.getBytes();
         if (data == null || data.length < width * heigth) {
             data = new byte[width * heigth];
         }

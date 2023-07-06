@@ -24,6 +24,7 @@ import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static ru.m210projects.Build.Engine.show2dsector;
 import static ru.m210projects.Build.Net.Mmulti.connecthead;
@@ -172,7 +173,7 @@ public abstract class OrphoRenderer {
                             }
                             break;
                         case 16: {
-                            Tile pic = engine.getTile(spr.getPicnum());
+                            ArtEntry pic = engine.getTile(spr.getPicnum());
 
                             x1 = mapSettings.getSpriteX(j);
                             y1 = mapSettings.getSpriteY(j);
@@ -210,7 +211,7 @@ public abstract class OrphoRenderer {
                         }
                         break;
                         case 32: {
-                            Tile pic = engine.getTile(spr.getPicnum());
+                            ArtEntry pic = engine.getTile(spr.getPicnum());
 
                             byte xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
                             byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
@@ -308,7 +309,7 @@ public abstract class OrphoRenderer {
                 if (wal.getNextwall() >= 0) {
                     continue;
                 }
-                Tile pic = engine.getTile(wal.getPicnum());
+                ArtEntry pic = engine.getTile(wal.getPicnum());
                 if (!pic.hasSize()) {
                     continue;
                 }

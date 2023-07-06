@@ -101,6 +101,7 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GLFog;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
@@ -124,7 +125,6 @@ import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -213,10 +213,10 @@ public class Polymost implements GLRenderer {
 
 	protected DefScript defs;
 
-	private final int[] h_xsize = new int[MAXTILES];
-	private final int[] h_ysize = new int[MAXTILES];
-	private final byte[] h_xoffs = new byte[MAXTILES];
-	private final byte[] h_yoffs = new byte[MAXTILES];
+//	private final int[] h_xsize = new int[MAXTILES];
+//	private final int[] h_ysize = new int[MAXTILES];
+//	private final byte[] h_xoffs = new byte[MAXTILES];
+//	private final byte[] h_yoffs = new byte[MAXTILES];
 
 	protected GL10 gl;
 	protected OrphoRenderer ortho;
@@ -783,7 +783,7 @@ public class Polymost implements GLRenderer {
         }
 
 		engine.setgotpic(globalpicnum);
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 		tsizx = pic.getWidth();
 		tsizy = pic.getHeight();
 
@@ -792,7 +792,7 @@ public class Polymost implements GLRenderer {
         }
 
 		boolean HOM = false;
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			if (TexDebug != -1) {
                 TexDebug = System.nanoTime();
             }
@@ -1320,7 +1320,7 @@ public class Polymost implements GLRenderer {
 		double t1 = (refposz - globalposz) * ryp1 + ghoriz;
 		double t = ((gdx * x0 + gdo) * yrepeat) / ((x1 - x0) * ryp0 * 2048.f);
 
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 		int i = (1 << (picsiz[globalpicnum] >> 4));
 		if (i < pic.getHeight()) {
             i <<= 1;
@@ -1445,7 +1445,7 @@ public class Polymost implements GLRenderer {
 				globalshade = sec.getFloorshade();
 				globalpal = sec.getFloorpal();
 				globalorientation = sec.getFloorstat();
-				if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+				if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
                     globalpicnum += engine.animateoffs(globalpicnum, sectnum);
                 }
 
@@ -1470,7 +1470,7 @@ public class Polymost implements GLRenderer {
 				globalshade = sec.getCeilingshade();
 				globalpal = sec.getCeilingpal() & 0xFF;
 				globalorientation = sec.getCeilingstat();
-				if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+				if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
                     globalpicnum += engine.animateoffs(globalpicnum, sectnum);
                 }
 
@@ -1519,7 +1519,7 @@ public class Polymost implements GLRenderer {
 					globalpicnum = wal.getPicnum();
 					globalshade = wal.getShade();
 					globalpal = wal.getPal() & 0xFF;
-					if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+					if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
                         globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
                     }
 
@@ -1568,7 +1568,7 @@ public class Polymost implements GLRenderer {
 					globalpicnum = drawalls_nwal.getPicnum();
 					globalshade = drawalls_nwal.getShade();
 					globalpal = drawalls_nwal.getPal() & 0xFF;
-					if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+					if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
                         globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
                     }
 
@@ -1621,7 +1621,7 @@ public class Polymost implements GLRenderer {
 					globalpicnum = (nextsectnum < 0) ? wal.getPicnum() : wal.getOverpicnum();
 					globalshade = wal.getShade();
 					globalpal = wal.getPal() & 0xFF;
-					if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+					if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
                         globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
                     }
 
@@ -1921,7 +1921,7 @@ public class Polymost implements GLRenderer {
         }
 
 		BoardService boardService = engine.getBoardService();
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		Sector sec = boardService.getSector(sectnum);
 		drawalls_dd[0] = xdimen * .0000001; // Adjust sky depth based on screen size!
@@ -2572,7 +2572,7 @@ public class Polymost implements GLRenderer {
             globalpicnum = 0;
         }
 
-		if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+		if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
             globalpicnum += engine.animateoffs(globalpicnum, thewall[z] + 16384);
         }
 		globalshade = wal.getShade();
@@ -2824,7 +2824,6 @@ public class Polymost implements GLRenderer {
 		float x0, y0, x1, y1, sc0, sf0, sc1, sf1, xv, yv, t0, t1;
 		int i, j, spritenum, xoff = 0, yoff = 0, method, npoints;
 		Sprite tspr;
-		int oldsizx, oldsizy;
 		int tsizx, tsizy;
 
 		tspr = tspriteptr[snum];
@@ -2839,21 +2838,21 @@ public class Polymost implements GLRenderer {
 		globalpal = tspr.getPal() & 0xFF;
 		globalorientation = tspr.getCstat();
 		spritenum = tspr.getOwner();
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		if ((globalorientation & 48) != 48) {
 			boolean flag;
 
-			if (pic.getType() != AnimType.None) {
+			if (pic.getType() != AnimType.NONE) {
 				globalpicnum += engine.animateoffs(globalpicnum, spritenum + 32768);
 				pic = engine.getTile(globalpicnum);
 			}
 
-			flag = (GLSettings.useHighTile.get() && h_xsize[globalpicnum] != 0);
+			flag = false; //(GLSettings.useHighTile.get() && h_xsize[globalpicnum] != 0);
 			xoff = tspr.getXoffset();
 			yoff = tspr.getYoffset();
-			xoff += flag ? h_xoffs[globalpicnum] : pic.getOffsetX();
-			yoff += flag ? h_yoffs[globalpicnum] : pic.getOffsetY();
+			xoff += /*flag ? h_xoffs[globalpicnum] : */pic.getOffsetX();
+			yoff += /*flag ? h_yoffs[globalpicnum] : */pic.getOffsetY();
 		}
 
 		method = 1 + 4;
@@ -2938,13 +2937,8 @@ public class Polymost implements GLRenderer {
 //			}
 //		}
 
-		oldsizx = tsizx = pic.getWidth();
-		oldsizy = tsizy = pic.getHeight();
-
-		if (GLSettings.useHighTile.get() && h_xsize[globalpicnum] != 0) {
-			tsizx = h_xsize[globalpicnum];
-			tsizy = h_ysize[globalpicnum];
-		}
+		tsizx = pic.getWidth();
+		tsizy = pic.getHeight();
 
 		if (tsizx <= 0 || tsizy <= 0) {
             return;
@@ -3054,8 +3048,6 @@ public class Polymost implements GLRenderer {
                     dsprite[2].py = dsprite[3].py = sy0;
                 }
 			}
-
-			pic.setWidth(tsizx).setHeight(tsizy);
 
 			gl.glDepthRange(defznear, defzfar - (10f / (dist + 1)));
 
@@ -3215,8 +3207,6 @@ public class Polymost implements GLRenderer {
 			dsprite[2].py = sf1;
 			dsprite[3].px = sx0;
 			dsprite[3].py = sf0;
-
-			pic.setWidth(tsizx).setHeight(tsizy);
 
 			if (spritewall[tspr.getOwner()] != -1 && (tspr.getCstat() & 2) != 0) {
                 gl.glDepthMask(false);
@@ -3396,8 +3386,6 @@ public class Polymost implements GLRenderer {
 				}
 			}
 
-			pic.setWidth(tsizx).setHeight(tsizy);
-
 			if ((tspr.getCstat() & 2) != 0) {
                 gl.glDepthMask(false);
             }
@@ -3423,8 +3411,6 @@ public class Polymost implements GLRenderer {
 		case 3: // Voxel sprite
 			break;
 		}
-
-		pic.setWidth(oldsizx).setHeight(oldsizy);
 
 		if (automapping == 1) {
             show2dsprite[snum >> 3] |= pow2char[snum & 7];
@@ -3646,7 +3632,7 @@ public class Polymost implements GLRenderer {
                     }
 
 					if ((tspriteptr[k].getCstat() & 48) != 32) {
-						Tile pic = engine.getTile(tspriteptr[k].getPicnum());
+						ArtEntry pic = engine.getTile(tspriteptr[k].getPicnum());
 						yoff = (byte) (pic.getOffsetY() + tspriteptr[k].getYoffset());
 						spritesz[k] -= ((yoff * tspriteptr[k].getYrepeat()) << 2);
 						yspan = (pic.getHeight() * tspriteptr[k].getYrepeat() << 2);
@@ -4024,7 +4010,7 @@ public class Polymost implements GLRenderer {
 				int daz = engine.getflorzofslope(sectnum, xs, ys);
 				int daz2 = engine.getflorzofslope(wal.getNextsector(), xs, ys);
 
-				Tile pic = engine.getTile(spr.getPicnum());
+				ArtEntry pic = engine.getTile(spr.getPicnum());
 				boolean clipyou = false;
 				int z1 = spr.getZ(), z2 = spr.getZ();
 				int yoff = pic.getOffsetY();

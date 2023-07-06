@@ -1,6 +1,6 @@
 package ru.m210projects.Build.osd;
 
-import ru.m210projects.Build.FileHandle.Compat;
+import ru.m210projects.Build.Architecture.BuildGdx;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,7 +16,7 @@ public class ConsoleLogger {
     private boolean closed;
 
     public ConsoleLogger(String filename) throws IOException {
-        this.path = Paths.get(Compat.Path.User.getPath() + toLowerCase(filename));
+        this.path = BuildGdx.cache.getUserDirectory().getPath().resolve(toLowerCase(filename));
         this.out = new BufferedOutputStream(Files.newOutputStream(path));
         this.closed = false;
     }

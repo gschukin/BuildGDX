@@ -26,9 +26,9 @@ import ru.m210projects.Build.Render.Types.Hudtyp;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.font.*;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -228,13 +228,13 @@ public class Polymost2D extends OrphoRenderer {
                     globalpicnum = 0;
                 }
                 engine.setgotpic(globalpicnum);
-                Tile pic = engine.getTile(globalpicnum);
+                ArtEntry pic = engine.getTile(globalpicnum);
 
                 if (!pic.hasSize()) {
                     continue;
                 }
 
-                if (pic.getType() != AnimType.None) {
+                if (pic.getType() != AnimType.NONE) {
                     globalpicnum += engine.animateoffs(globalpicnum, s);
                     pic = engine.getTile(globalpicnum);
                 }
@@ -343,7 +343,7 @@ public class Polymost2D extends OrphoRenderer {
                         spr.setPicnum(0);
                     }
 
-                    Tile pic = engine.getTile(spr.getPicnum());
+                    ArtEntry pic = engine.getTile(spr.getPicnum());
 
                     xoff = (byte) (pic.getOffsetX() + spr.getXoffset());
                     yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
@@ -422,17 +422,17 @@ public class Polymost2D extends OrphoRenderer {
                     globalpicnum = spr.getPicnum();
                     globalpal = spr.getPal(); // GL needs this, software doesn't
                     engine.setgotpic(globalpicnum);
-                    Tile sprpic = engine.getTile(globalpicnum);
+                    ArtEntry sprpic = engine.getTile(globalpicnum);
 
                     if (!sprpic.hasSize()) {
                         continue;
                     }
-                    if (sprpic.getType() != AnimType.None) {
+                    if (sprpic.getType() != AnimType.NONE) {
                         globalpicnum += engine.animateoffs(globalpicnum, s);
                         sprpic = engine.getTile(globalpicnum);
                     }
 
-                    if (sprpic.data == null) {
+                    if (!sprpic.isLoaded()) {
                         engine.loadtile(globalpicnum);
                     }
 
@@ -902,7 +902,7 @@ public class Polymost2D extends OrphoRenderer {
                         }
 
                         // tiled atlas or char tile
-                        Tile charTile = engine.getTile(tile);
+                        ArtEntry charTile = engine.getTile(tile);
                         if (!charTile.isLoaded() && engine.loadtile(tile) == null) {
                             continue;
                         }
@@ -1010,9 +1010,9 @@ public class Polymost2D extends OrphoRenderer {
             return;
         }
 
-        Tile pic = engine.getTile(picnum);
+        ArtEntry pic = engine.getTile(picnum);
 
-        if (pic.getType() != AnimType.None) {
+        if (pic.getType() != AnimType.NONE) {
             picnum += engine.animateoffs(picnum, 0xc000);
             pic = engine.getTile(picnum);
         }
@@ -1081,7 +1081,7 @@ public class Polymost2D extends OrphoRenderer {
 
         method |= 4; // Use OpenGL clamping - dorotatesprite never repeats
 
-        Tile pic = engine.getTile(globalpicnum);
+        ArtEntry pic = engine.getTile(globalpicnum);
 
         int xsiz = pic.getWidth();
         int ysiz = pic.getHeight();
@@ -1204,14 +1204,14 @@ public class Polymost2D extends OrphoRenderer {
         }
 
         engine.setgotpic(globalpicnum);
-        Tile pic = engine.getTile(globalpicnum);
+        ArtEntry pic = engine.getTile(globalpicnum);
 
         int tsizx = pic.getWidth();
         int tsizy = pic.getHeight();
 
-        if (pic.data == null) {
+        if (!pic.isLoaded()) {
             engine.loadtile(globalpicnum);
-            if (pic.data == null) {
+            if (!pic.isLoaded()) {
                 tsizx = tsizy = 1;
                 method = 1;
             }
@@ -1361,7 +1361,7 @@ public class Polymost2D extends OrphoRenderer {
             float fy = (sy) * (1.0f / 65536.0f);
 
             if ((dastat & 16) != 0) {
-                Tile pic = engine.getTile(picnum);
+                ArtEntry pic = engine.getTile(picnum);
 
                 xsiz = pic.getWidth();
                 ysiz = pic.getHeight();

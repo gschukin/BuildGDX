@@ -22,7 +22,7 @@ public class MapHackInfo {
 	}
 
 	public boolean addMapInfo(String map, String mhkscript, String md4) {
-		byte[] bytes = BuildGdx.cache.getBytes(map, 0);
+		byte[] bytes = BuildGdx.cache.getEntry(map, true).getBytes();
 		if(bytes != null && mhkscript != null) {
 			if(md4 == null || MD4.getChecksum(bytes).equals(md4.toUpperCase())) {
 				hacklist.put(toLowerCase(map), toLowerCase(mhkscript));

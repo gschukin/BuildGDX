@@ -3,6 +3,7 @@ package ru.m210projects.Build;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.IntSet;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static java.lang.Math.abs;
 import static ru.m210projects.Build.Engine.MAXSECTORS;
@@ -193,7 +194,7 @@ public class HitScanner {
                 x1 = spr.getX();
                 y1 = spr.getY();
                 z1 = spr.getZ();
-                Tile pic = engine.getTile(spr.getPicnum());
+                ArtEntry pic = engine.getTile(spr.getPicnum());
 
                 switch (spr.getCstat() & 48) {
                     case 0:

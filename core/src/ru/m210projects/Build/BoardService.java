@@ -1,6 +1,5 @@
 package ru.m210projects.Build;
 
-import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.Types.BuildPos;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Sprite;
@@ -9,8 +8,11 @@ import ru.m210projects.Build.Types.collections.LinkedMap;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.Types.collections.SpriteMap;
 import ru.m210projects.Build.Types.collections.ValueSetter;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,36 +34,39 @@ public class BoardService {
         this.spriteSectMap = createSpriteMap(board.getSectorCount(), sprites, MAXSPRITES, Sprite::setSectnum);
     }
 
-    protected Board loadBoard(Resource entry) throws IOException {
-        int version = entry.readInt();
-        if (version != 7) {
-            throw new RuntimeException("Wrong version: " + version);
+    protected Board loadBoard(Entry entry) throws RuntimeException, IOException {
+        try (InputStream is = entry.getInputStream()) {
+            int version = StreamUtils.readInt(is);
+            if (version != 7) {
+                throw new RuntimeException("Wrong version: " + version);
+            }
+
+
+            BuildPos startPos = new BuildPos(StreamUtils.readInt(is),
+                    StreamUtils.readInt(is),
+                    StreamUtils.readInt(is),
+                    StreamUtils.readShort(is),
+                    StreamUtils.readShort(is));
+
+            Sector[] sectors = new Sector[StreamUtils.readShort(is)];
+            for (int i = 0; i < sectors.length; i++) {
+                sectors[i] = new Sector().readObject(is);
+            }
+
+            Wall[] walls = new Wall[StreamUtils.readShort(is)];
+            for (int i = 0; i < walls.length; i++) {
+                walls[i] = new Wall().readObject(is);
+            }
+
+            int numSprites = StreamUtils.readShort(is);
+            List<Sprite> sprites = new ArrayList<>(numSprites * 2);
+
+            for (int i = 0; i < numSprites; i++) {
+                sprites.add(new Sprite().readObject(is));
+            }
+
+            return new Board(startPos, sectors, walls, sprites);
         }
-
-        BuildPos startPos = new BuildPos(entry.readInt(),
-                entry.readInt(),
-                entry.readInt(),
-                entry.readShort(),
-                entry.readShort());
-
-        Sector[] sectors = new Sector[entry.readShort()];
-        for (int i = 0; i < sectors.length; i++) {
-            sectors[i] = new Sector().readObject(entry);
-        }
-
-        Wall[] walls = new Wall[entry.readShort()];
-        for (int i = 0; i < walls.length; i++) {
-            walls[i] = new Wall().readObject(entry);
-        }
-
-        int numSprites = entry.readShort();
-        List<Sprite> sprites = new ArrayList<>(numSprites * 2);
-
-        for (int i = 0; i < numSprites; i++) {
-            sprites.add(new Sprite().readObject(entry));
-        }
-
-        return new Board(startPos, sectors, walls, sprites);
     }
 
     /**

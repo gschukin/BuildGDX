@@ -18,8 +18,8 @@ import ru.m210projects.Build.Pattern.BuildNet;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLPreloadFlag;
-import ru.m210projects.Build.Types.Tile;
-import ru.m210projects.Build.Types.Tile.AnimType;
+import ru.m210projects.Build.Types.AnimType;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public abstract class PrecacheAdapter extends ScreenAdapter {
 
@@ -84,11 +84,11 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 	}
 
 	public void addTile(int tile) {
-		Tile pic = engine.getTile(tile);
-		if (pic.getType() != AnimType.None) {
-			int frames = pic.getFrames();
+		ArtEntry pic = engine.getTile(tile);
+		if (pic.getType() != AnimType.NONE) {
+			int frames = pic.getAnimFrames();
 			for (int i = frames; i >= 0; i--) {
-				if (pic.getType() == AnimType.Backward) {
+				if (pic.getType() == AnimType.BACKWARD) {
                     tiles[(tile - i) >> 3] |= (1 << ((tile - i) & 7));
                 } else {
                     tiles[(tile + i) >> 3] |= (1 << ((tile + i) & 7));
@@ -151,13 +151,13 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 				continue;
 			}
 
-			Tile pic = engine.getTile(i);
+			ArtEntry pic = engine.getTile(i);
 			if ((tiles[i >> 3] & pow2char[i & 7]) != 0) {
-				if (!revalidate && pic.data != null) {
+				if (!revalidate && pic.isLoaded()) {
                     continue;
                 }
 
-				if (pic.data == null) {
+				if (!pic.isLoaded()) {
                     engine.loadtile(i);
                 }
 				if (gl != null) {

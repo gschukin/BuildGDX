@@ -22,20 +22,21 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 
 import ru.m210projects.Build.Audio.MusicSource;
+import ru.m210projects.Build.filehandle.Entry;
 
 public class MidiMusicSource extends MusicSource {
 
 	private final MidiSequencer sequencer;
 	protected Sequence data;
 
-	public MidiMusicSource(MidiSequencer sequencer, byte[] buf) throws Exception
+	public MidiMusicSource(MidiSequencer sequencer, Entry entry) throws Exception
 	{
 		if(sequencer == null || !sequencer.isOpen()) {
 			throw new Exception("Sequencer not ready!");
 		}
 		
 		this.sequencer = sequencer;
-		this.data = MidiSystem.getSequence(new ByteArrayInputStream(buf));
+		this.data = MidiSystem.getSequence(entry.getInputStream());
 	}
 	
 	private void setLooping(boolean looping)

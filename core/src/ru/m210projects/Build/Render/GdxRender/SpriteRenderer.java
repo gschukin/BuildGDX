@@ -21,10 +21,11 @@ import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
+import ru.m210projects.Build.Types.AnimType;
 import ru.m210projects.Build.Types.QuickSort;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
-import ru.m210projects.Build.Types.Tile.AnimType;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class SpriteRenderer {
 
@@ -94,7 +95,7 @@ public class SpriteRenderer {
 			}
 
 			if ((spr.getCstat() & 48) != 32) {
-				Tile pic = engine.getTile(spr.getPicnum());
+				ArtEntry pic = engine.getTile(spr.getPicnum());
 				byte yoff = (byte) (pic.getOffsetY() + spr.getYoffset());
 				spritesz[s] -= ((yoff * spr.getYrepeat()) << 2);
 				int yspan = (pic.getHeight() * spr.getYrepeat() << 2);
@@ -118,11 +119,11 @@ public class SpriteRenderer {
 		int picnum = tspr.getPicnum();
 		int orientation = tspr.getCstat();
 		int spritenum = tspr.getOwner();
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 
 		int xoff = 0, yoff = 0;
 		if ((orientation & 48) != 48) {
-			if (pic.getType() != AnimType.None) {
+			if (pic.getType() != AnimType.NONE) {
 				picnum += engine.animateoffs(picnum, spritenum + 32768);
 				pic = engine.getTile(picnum);
 			}
@@ -574,9 +575,9 @@ public class SpriteRenderer {
 		int pal = tspr.getPal() & 0xFF;
 		int orientation = tspr.getCstat();
 		int spritenum = tspr.getOwner();
-		Tile pic = engine.getTile(picnum);
+		ArtEntry pic = engine.getTile(picnum);
 		if ((orientation & 48) != 48) {
-			if (pic.getType() != AnimType.None) {
+			if (pic.getType() != AnimType.NONE) {
 				picnum += engine.animateoffs(picnum, spritenum + 32768);
 				pic = engine.getTile(picnum);
 			}

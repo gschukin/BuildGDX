@@ -2,7 +2,6 @@ package ru.m210projects.Build.Render.ModelHandle;
 
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
 
-import ru.m210projects.Build.FileHandle.Resource;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDAnimation;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDSkinmap;
 
@@ -38,18 +37,6 @@ public class MDInfo extends ModelInfo {
 		}
 
 		return (-3); // frame name invalid
-	}
-
-	protected String readString(Resource bb, int len) {
-		byte[] buf = new byte[len];
-		bb.read(buf);
-
-		for (int i = 0; i < buf.length; i++) {
-			if (buf[i] == 0) {
-				return new String(buf, 0, i);
-			}
-		}
-		return new String(buf);
 	}
 
 	protected MDSkinmap getSkin(int palnum, int skinnum, int surfnum) {

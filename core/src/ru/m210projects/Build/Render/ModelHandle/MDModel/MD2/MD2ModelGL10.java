@@ -14,6 +14,7 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_COORD_ARRAY;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
 import static ru.m210projects.Build.Render.Types.GL10.GL_VERTEX_ARRAY;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
@@ -34,7 +35,7 @@ public abstract class MD2ModelGL10 extends MDModel {
 
 	protected abstract int bindSkin(final int pal, int skinnum);
 
-	public MD2ModelGL10(MD2Info md) {
+	public MD2ModelGL10(MD2Info md) throws IOException {
 		super(md);
 
 		MD2Builder builder = new MD2Builder(md);

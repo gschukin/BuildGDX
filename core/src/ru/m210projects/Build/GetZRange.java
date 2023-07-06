@@ -3,6 +3,7 @@ package ru.m210projects.Build;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.IntSet;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static ru.m210projects.Build.Engine.MAXSECTORS;
 import static ru.m210projects.Build.Pragmas.*;
@@ -168,7 +169,7 @@ public class GetZRange {
                     continue;
                 }
 
-                Tile pic = engine.getTile(spr.getPicnum());
+                ArtEntry pic = engine.getTile(spr.getPicnum());
                 int x1 = spr.getX();
                 int y1 = spr.getY();
 

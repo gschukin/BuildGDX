@@ -3,6 +3,7 @@ package ru.m210projects.Build;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.BitMap;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,7 +145,7 @@ public class NearScanner {
                         int bot = vx * vx + vy * vy;
                         if (bot != 0) {
                             int intz = zs + scale(vz, topt, bot);
-                            Tile pic = engine.getTile(spr.getPicnum());
+                            ArtEntry pic = engine.getTile(spr.getPicnum());
 
                             int i = pic.getHeight() * spr.getYrepeat();
                             if ((spr.getCstat() & 128) != 0) {

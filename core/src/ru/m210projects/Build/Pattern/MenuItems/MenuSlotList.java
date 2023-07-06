@@ -19,6 +19,7 @@ import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static ru.m210projects.Build.RenderService.*;
 
@@ -187,7 +188,7 @@ public abstract class MenuSlotList extends MenuList
 //			draw.showfade();
 
 			int tile = nBackground;
-			Tile pic = draw.getTile(tile);
+			ArtEntry pic = draw.getTile(tile);
 
 			float kt = xdim / (float) ydim;
 			float kv = pic.getWidth() / (float) pic.getHeight();

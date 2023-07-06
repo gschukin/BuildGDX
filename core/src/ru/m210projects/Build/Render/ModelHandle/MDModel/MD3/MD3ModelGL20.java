@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Render.ModelHandle.MDModel.MD3;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
@@ -17,7 +18,7 @@ public abstract class MD3ModelGL20 extends MDModel {
 	private final MD3Surface[] surfaces;
 	private final int numSurfaces;
 
-	public MD3ModelGL20(MD3Info md) {
+	public MD3ModelGL20(MD3Info md) throws IOException {
 		super(md);
 
 		MD3Builder builder = new MD3Builder(md);

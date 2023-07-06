@@ -6,6 +6,7 @@ import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static ru.m210projects.Build.Pragmas.divscale;
 import static ru.m210projects.Build.Pragmas.mulscale;
@@ -105,7 +106,7 @@ public class DefaultOsdFunc implements OsdFunc {
     @Override
     public void drawlogo(int daydim) {
         if (BGCTILE != -1) {
-            Tile pic = engine.getTile(BGCTILE);
+            ArtEntry pic = engine.getTile(BGCTILE);
 
             int xsiz = pic.getWidth();
             int ysiz = pic.getHeight();
@@ -121,7 +122,7 @@ public class DefaultOsdFunc implements OsdFunc {
         int bits = BITSTH;
         int daydim = (row * font.getSize()) + 5;
 
-        Tile pic = engine.getTile(BGTILE);
+        ArtEntry pic = engine.getTile(BGTILE);
 
         int xsiz = pic.getWidth();
         int ysiz = pic.getHeight();
@@ -165,7 +166,7 @@ public class DefaultOsdFunc implements OsdFunc {
         // fix for TCs like Layre which don't have the BGTILE for
         // some reason
         // most of this is copied from my dummytile stuff in defs.c
-        Tile pic = engine.getTile(BGTILE);
+        ArtEntry pic = engine.getTile(BGTILE);
         if (pic.getWidth() == 0 || pic.getHeight() == 0) {
             engine.allocatepermanenttile(BGTILE, 1, 1);
         }

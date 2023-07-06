@@ -14,6 +14,7 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_COORD_ARRAY;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
 import static ru.m210projects.Build.Render.Types.GL10.GL_VERTEX_ARRAY;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
@@ -33,7 +34,7 @@ public abstract class MD3ModelGL10 extends MDModel {
 	private final MD3Surface[] surfaces;
 	private final int numSurfaces;
 
-	public MD3ModelGL10(MD3Info md) {
+	public MD3ModelGL10(MD3Info md) throws IOException {
 		super(md);
 
 		MD3Builder builder = new MD3Builder(md);

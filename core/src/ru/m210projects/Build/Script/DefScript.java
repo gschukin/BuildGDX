@@ -23,6 +23,7 @@ import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,11 +37,16 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import ru.m210projects.Build.CRC32;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.FileHandle.FileEntry;
-import ru.m210projects.Build.FileHandle.FileUtils;
-import ru.m210projects.Build.FileHandle.Resource;
-import ru.m210projects.Build.FileHandle.Resource.Whence;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.Types.AnimType;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.FileUtils;
+import ru.m210projects.Build.filehandle.StreamUtils;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
+import ru.m210projects.Build.filehandle.art.ArtFile;
+import ru.m210projects.Build.filehandle.art.CachedArtEntry;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Render.ModelHandle.MDInfo;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
@@ -166,17 +172,8 @@ public class DefScript {
 			return false;
 		}
 
-		Resource res = BuildGdx.compat.open(file);
-		byte[] data = res.getBytes();
-		res.close();
-
-		if (data == null) {
-			Console.out.println("File is exists, but data == null! Path:" + file.getPath());
-			return false;
-		}
-
-		Scriptfile script = new Scriptfile(file.getPath(), data);
-		script.path = file.getParent().getRelativePath();
+		Scriptfile script = new Scriptfile(file.getPath().getFileName().toString(), file);
+		script.path = file.getPath().getParent().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
 
 		try {
 			defsparser(script);
@@ -189,14 +186,14 @@ public class DefScript {
 		return true;
 	}
 
-	public boolean loadScript(String name, byte[] buf) {
-		if (buf == null) {
+	public boolean loadScript(String name, Entry entry) {
+		if (entry == null) {
 			Console.out.println("Def error: script not found", OsdColor.RED);
 			return false;
 		}
 
 		try {
-			defsparser(new Scriptfile(name, buf));
+			defsparser(new Scriptfile(name, entry));
 		} catch (Exception e) {
 			e.printStackTrace();
 			Console.out.println("Def error: the script " + name + " has errors", OsdColor.RED);
@@ -330,8 +327,6 @@ public class DefScript {
             }
 
 			texInfo.remove(i, 0);
-
-			engine.getTile(i).data = null;
 			tiles[i] = null;
 		}
 
@@ -345,17 +340,16 @@ public class DefScript {
 
 			for (int i = 0; i < defs.size() / 2; i++) {
 				String fn = defs.get(2 * i + 1);
-				Resource res = BuildGdx.cache.open(fn, 0);
-				if (res == null) {
+				Entry res = BuildGdx.cache.getEntry(fn, true);
+				if (!res.exists()) {
 					Console.out.println("Warning: Failed including " + fn + " as module", OsdColor.RED);
 					continue;
 				}
 
-				Scriptfile included = new Scriptfile(fn, res.getBytes());
+				Scriptfile included = new Scriptfile(fn, res);
 				included.path = defs.get(2 * i);
 
 				defsparser(included);
-				res.close();
 			}
 		}
 
@@ -365,10 +359,10 @@ public class DefScript {
             }
 
 			DefTile tile = tiles[i];
-			Tile pic = engine.getTile(i);
+			ArtEntry pic = engine.getTile(i);
 
 			if (tile.crc32 != 0) {
-				byte[] data = pic.data;
+				byte[] data = pic.getBytes();
 				if (data == null) {
 					data = engine.loadtile(i);
 				}
@@ -394,19 +388,10 @@ public class DefScript {
                 continue;
             }
 
+			CachedArtEntry newPic = new CachedArtEntry(i, tile.waloff, tile.sizx, tile.sizy);
 			engine.getrender().invalidatetile(i, -1, -1);
-
-			pic.data = new byte[tile.waloff.length];
-			System.arraycopy(tile.waloff, 0, pic.data, 0, tile.waloff.length);
-
-			pic.setWidth(tile.sizx);
-			pic.setHeight(tile.sizy);
-
-			pic.anm &= ~0x00FFFF00;
-			pic.anm |= (tile.xoffset & 0xFF) << 8;
-			pic.anm |= (tile.yoffset & 0xFF) << 16;
-
-			engine.setpicsiz(i);
+			newPic.setOffset(tile.xoffset, tile.yoffset);
+			engine.replaceTile(newPic);
 
 			// replace hrp info
 			texInfo.addTexture(i, 0, tile.hrp, (0xFF - (tile.alphacut & 0xFF)) * (1.0f / 255.0f), 1.0f, 1.0f, 1.0f,
@@ -534,8 +519,8 @@ public class DefScript {
 		}
 
 		private void include(DefScript def, String fn, Scriptfile script, int cmdtokptr) {
-			byte[] data = BuildGdx.cache.getBytes(fn, 0);
-			if (data == null) {
+			Entry entry = BuildGdx.cache.getEntry(fn, true);
+			if (!entry.exists()) {
 				if (cmdtokptr == 0) {
 					Console.out.println("Warning: Failed including " + fn + " as module", OsdColor.YELLOW);
 				} else {
@@ -545,7 +530,7 @@ public class DefScript {
 				return;
 			}
 
-			Scriptfile included = new Scriptfile(fn, data);
+			Scriptfile included = new Scriptfile(fn, entry);
 			included.path = script.path;
 			def.defsparser(included);
 		}
@@ -611,10 +596,12 @@ public class DefScript {
 				return BaseToken.Warning;
 			}
 
-			Tile pic = engine.getTile(tile0);
+			ArtEntry pic = engine.getTile(tile0);
 
-			pic.anm &= ~0x0F0000FF;
-			pic.anm |= ((anm & 3) << 6) | ((speed & 15) << 24) | length & 0x3F;
+			pic.disableAnimation();
+			pic.setAnimFrames(length);
+			pic.setAnimType(AnimType.findAnimType((anm & 3) << 6));
+			pic.setAnimSpeed(speed);
 
 			return BaseToken.Ok;
 		}
@@ -792,8 +779,8 @@ public class DefScript {
 				boolean internal) {
 			DefScript def = DefScript.this;
 
-			byte[] data = BuildGdx.cache.getBytes(fn, 0);
-			if (data == null) {
+			byte[] data = BuildGdx.cache.getEntry(fn, true).getBytes();
+			if (data.length == 0) {
 				Console.out.println("ImportTileFromTexture error: file " + fn + " not found!", OsdColor.RED);
 				return null;
 			}
@@ -932,7 +919,6 @@ public class DefScript {
 		public BaseToken parse(Scriptfile script) {
 			ModelTokens token;
 			Object tk;
-			Resource res;
 			Integer ivalue;
 			Double dvalue;
 
@@ -952,17 +938,16 @@ public class DefScript {
 				return BaseToken.Error;
 			}
 
-			res = BuildGdx.cache.open(modelfn, 0);
-			if (res == null) {
+			Entry res = BuildGdx.cache.getEntry(modelfn, true);
+			if (!res.exists()) {
 				Console.out.println("Warning: File not found" + modelfn, OsdColor.YELLOW);
 				script.textptr = modelend + 1;
 				return BaseToken.Warning;
 			}
 
 			ModelInfo m = null;
-			try {
-				int sign = res.readInt();
-				res.seek(0, Whence.Set);
+			try(InputStream is = res.getInputStream()) {
+				int sign = StreamUtils.readInt(is);
 				switch (sign) {
 				case 0x32504449: // IDP2
 					m = new MD2Info(res, modelfn);
@@ -979,7 +964,6 @@ public class DefScript {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			res.close();
 
 			if (m == null) {
 				Console.out.println("Warning: Failed loading model " + modelfn, OsdColor.YELLOW);
@@ -1295,7 +1279,7 @@ public class DefScript {
 						break;
 					}
 
-					if (!BuildGdx.cache.contains(skinfn, 0) || m.getType() == Type.Voxel) {
+					if (!BuildGdx.cache.getEntry(skinfn, true).exists() || m.getType() == Type.Voxel) {
                         break;
                     }
 
@@ -1623,7 +1607,7 @@ public class DefScript {
 						return BaseToken.Error;
 					}
 
-					if (!BuildGdx.cache.contains(tfn, 0)) {
+					if (!BuildGdx.cache.getEntry(tfn, true).exists()) {
 						Console.out.println("Error: file \"" + tfn + "\" not found for texture definition near line "
 								+ script.filename + ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 						return BaseToken.Error;
@@ -1684,8 +1668,8 @@ public class DefScript {
 				return BaseToken.Error;
 			}
 
-			Resource res = BuildGdx.cache.open(fn, 0);
-			if (res == null) {
+			Entry res = BuildGdx.cache.getEntry(fn, true);
+			if (!res.exists()) {
 				Console.out.println("Warning: File not found" + fn, OsdColor.YELLOW);
 				script.textptr = vmodelend + 1;
 				return BaseToken.Warning;
@@ -1697,7 +1681,6 @@ public class DefScript {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			res.close();
 
 			if (vox == null) {
 				Console.out.println("Warning: Failed loading voxel model " + fn, OsdColor.YELLOW);
@@ -1891,7 +1874,7 @@ public class DefScript {
 					return false;
 				}
 
-				if (!BuildGdx.cache.contains(sfn[i], 0)) {
+				if (!BuildGdx.cache.getEntry(sfn[i], true).exists()) {
 					Console.out.println("Error: file \"" + sfn[i] + "\" does not exist", OsdColor.RED);
 					return false;
 				}

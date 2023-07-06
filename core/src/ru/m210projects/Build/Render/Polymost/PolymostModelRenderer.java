@@ -26,6 +26,7 @@ import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.Sprite;
 import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static com.badlogic.gdx.graphics.GL20.*;
 import static java.lang.Math.max;
@@ -219,7 +220,7 @@ public class PolymostModelRenderer {
     }
 
     private void modelPrepare(MDModel m, Sprite tspr) {
-        Tile pic = engine.getTile(tspr.getPicnum());
+        ArtEntry pic = engine.getTile(tspr.getPicnum());
         float f = m.interpol;
         float g = 1 - f;
         float mscale = 0.01f;

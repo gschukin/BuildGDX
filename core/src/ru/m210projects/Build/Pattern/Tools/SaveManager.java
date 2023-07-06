@@ -2,22 +2,22 @@ package ru.m210projects.Build.Pattern.Tools;
 
 import static ru.m210projects.Build.Engine.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.FileHandle.Compat.Path;
+import ru.m210projects.Build.filehandle.fs.Directory;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public class SaveManager {
 
-	private final List<SaveInfo> SavList = new ArrayList<SaveInfo>();
-	private final HashMap<String, SaveInfo> SavHash = new HashMap<String, SaveInfo>();
+	private final List<SaveInfo> SavList = new ArrayList<>();
+	private final HashMap<String, SaveInfo> SavHash = new HashMap<>();
 	public static final int Screenshot = MAXTILES - 1;
 	
-	public class SaveInfo implements Comparable<SaveInfo> {
+	public static class SaveInfo implements Comparable<SaveInfo> {
 		public String name;
 		public long time;
 		public String filename;
@@ -66,14 +66,14 @@ public class SaveManager {
 		}
 	}
 	
-	public void delete(String filename)
-	{
+	public void delete(String filename) {
 		SaveInfo info;
 		if((info = SavHash.get(filename)) != null) {
-			File file = BuildGdx.compat.checkFile(filename, Path.User);
-			if(file != null && file.delete()) {
+			Directory userDir = BuildGdx.cache.getUserDirectory();
+			FileEntry entry = userDir.getEntry(filename);
+			if (entry.exists() && entry.delete()) {
 				SavList.remove(info);
-				BuildGdx.compat.getDirectory(Path.User).checkCacheList();
+				userDir.revalidate();
 			}
 		} 
 	}

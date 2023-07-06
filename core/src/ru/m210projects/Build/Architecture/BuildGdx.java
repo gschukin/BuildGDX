@@ -21,10 +21,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 
 import ru.m210projects.Build.Audio.BuildAudio;
-import ru.m210projects.Build.FileHandle.Cache1D;
-import ru.m210projects.Build.FileHandle.Compat;
 import ru.m210projects.Build.Input.BuildControllers;
 import ru.m210projects.Build.Render.Types.GL10;
+import ru.m210projects.Build.filehandle.Cache;
 
 public class BuildGdx {
 
@@ -39,7 +38,6 @@ public class BuildGdx {
 	public static GL10 gl;
 	public static GL20 gl20;
 	public static GL30 gl30;
-	
-	public static Compat compat;
-	public static Cache1D cache;
+
+	public static Cache cache;
 }

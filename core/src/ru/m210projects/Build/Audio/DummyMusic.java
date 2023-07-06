@@ -17,6 +17,7 @@
 
 package ru.m210projects.Build.Audio;
 
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -47,7 +48,7 @@ public class DummyMusic implements Music {
     }
 
     @Override
-    public MusicSource newMusic(byte[] data) {
+    public MusicSource newMusic(Entry entry) {
 
         return null;
     }

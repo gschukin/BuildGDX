@@ -3,6 +3,7 @@ package ru.m210projects.Build;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.Types.collections.IntSet;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,7 +208,7 @@ public class ClipMover {
 
                 int x1 = spr.getX();
                 int y1 = spr.getY();
-                Tile pic = engine.getTile(spr.getPicnum());
+                ArtEntry pic = engine.getTile(spr.getPicnum());
 
                 switch (cstat & 48) {
                     case 0:

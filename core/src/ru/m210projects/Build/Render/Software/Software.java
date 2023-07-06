@@ -32,6 +32,7 @@ import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.IOverheadMapSettings;
 import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
@@ -43,7 +44,6 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Tables;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.Tile.AnimType;
 import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.osd.OsdColor;
 
@@ -261,15 +261,16 @@ public class Software implements Renderer {
 		updateview();
 	}
 
-	public void setviewtotile(int tilenume, int xsiz, int ysiz) {
+	public void setviewtotile(int tilenume) {
 		// DRAWROOMS TO TILE BACKUP&SET CODE
-		Tile pic = engine.getTile(tilenume);
+		ArtEntry pic = engine.getTile(tilenume);
+		int xsiz = pic.getWidth();
+		int ysiz = pic.getHeight();
 
-		pic.setWidth(xsiz).setHeight(ysiz);
 		bakxsiz[setviewcnt] = (short) xsiz;
 		bakysiz[setviewcnt] = (short) ysiz;
 		bakframeplace[setviewcnt] = a.getframeplace();
-		a.setframeplace(pic.data);
+		a.setframeplace(pic.getBytes());
 		bakwindowx1[setviewcnt] = windowx1;
 		bakwindowy1[setviewcnt] = windowy1;
 		bakwindowx2[setviewcnt] = windowx2;
@@ -393,7 +394,7 @@ public class Software implements Renderer {
 					}
 
 					if ((tspriteptr[k].getCstat() & 48) != 32) {
-						Tile pic = engine.getTile(tspriteptr[k].getPicnum());
+						ArtEntry pic = engine.getTile(tspriteptr[k].getPicnum());
 						yoff = (byte) (pic.getOffsetY() + (tspriteptr[k].getYoffset()));
 						spritesz[k] -= ((yoff * tspriteptr[k].getYrepeat()) << 2);
 						yspan = (pic.getHeight() * tspriteptr[k].getYrepeat() << 2);
@@ -769,13 +770,13 @@ public class Software implements Renderer {
 						globalxpanning = wal.getXpanning() & 0xFF;
 						globalypanning = wal.getYpanning() & 0xFF;
 						globalshiftval = (short) (picsiz[globalpicnum] >> 4);
-						Tile pic = engine.getTile(globalpicnum);
+						ArtEntry pic = engine.getTile(globalpicnum);
 
 						if (pow2long[globalshiftval] != pic.getHeight()) {
 							globalshiftval++;
 						}
 						globalshiftval = (short) (32 - globalshiftval);
-						if (pic.getType() != AnimType.None) {
+						if (pic.getType() != AnimType.NONE) {
 							globalpicnum += engine.animateoffs(globalpicnum, (short) wallnum + 16384);
 						}
 						globalshade = wal.getShade();
@@ -876,7 +877,7 @@ public class Software implements Renderer {
 							}
 							globalxpanning = wal.getXpanning() & 0xFF;
 							globalypanning = wal.getYpanning() & 0xFF;
-							if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+							if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 							}
 							globalshade = wal.getShade();
@@ -891,7 +892,7 @@ public class Software implements Renderer {
 							}
 							globalxpanning = wal.getXpanning() & 0xFF;
 							globalypanning = wal.getYpanning() & 0xFF;
-							if (engine.getTile(globalpicnum).getType() != AnimType.None) {
+							if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 							}
 							globalshade = wal.getShade();
@@ -1004,9 +1005,9 @@ public class Software implements Renderer {
 				}
 				globalxpanning = wal.getXpanning() & 0xFF;
 				globalypanning = wal.getYpanning() & 0xFF;
-				Tile pic = engine.getTile(globalpicnum);
+				ArtEntry pic = engine.getTile(globalpicnum);
 
-				if (pic.getType() != AnimType.None) {
+				if (pic.getType() != AnimType.NONE) {
 					globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 					pic = engine.getTile(globalpicnum);
 				}
@@ -1080,8 +1081,8 @@ public class Software implements Renderer {
 		short spritenum = tspr.getOwner();
 		short cstat = tspr.getCstat();
 
-		Tile pic = engine.getTile(tilenum);
-		if (pic.getType() != AnimType.None) {
+		ArtEntry pic = engine.getTile(tilenum);
+		if (pic.getType() != AnimType.NONE) {
 			tilenum += engine.animateoffs(tilenum, spritenum + 32768);
 			pic = engine.getTile(tilenum);
 		}
@@ -2005,11 +2006,11 @@ public class Software implements Renderer {
 				globalpicnum = 0;
 			}
 
-			if (pic.data == null) {
+			if (!pic.isLoaded()) {
 				engine.loadtile(globalpicnum);
 			}
 			engine.setgotpic(globalpicnum);
-			globalbufplc = pic.data;
+			globalbufplc = pic.getBytes();
 
 			globvis = mulscale(globalhisibility, viewingrange, 16);
 			if (sec.getVisibility() != 0) {
@@ -2631,8 +2632,8 @@ public class Software implements Renderer {
 		globalxpanning = wal.getXpanning() & 0xFF;
 		globalypanning = wal.getYpanning() & 0xFF;
 
-		Tile pic = engine.getTile(globalpicnum);
-		if (pic.getType() != AnimType.None) {
+		ArtEntry pic = engine.getTile(globalpicnum);
+		if (pic.getType() != AnimType.NONE) {
 			globalpicnum += engine.animateoffs(globalpicnum, thewall[z] + 16384);
 			pic = engine.getTile(globalpicnum);
 		}
@@ -2719,13 +2720,13 @@ public class Software implements Renderer {
 
 	private void transmaskwallscan(int x1, int x2) {
 		engine.setgotpic(globalpicnum);
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		if (!pic.hasSize()) {
 			return;
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
 
@@ -2758,13 +2759,13 @@ public class Software implements Renderer {
 		int vinc = swall[x] * globalyscale;
 		int vplc = globalzd + vinc * (y1v - (int) globalhoriz + 1);
 
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		int i = lwall[x] + globalxpanning;
 		if (i >= pic.getWidth()) {
 			i %= pic.getWidth();
 		}
-		byte[] bufplc = pic.data;
+		byte[] bufplc = pic.getBytes();
 		int bufoffs = i * pic.getHeight();
 
 		int p = ylookup[y1v] + x + frameoffset;
@@ -2855,7 +2856,7 @@ public class Software implements Renderer {
 		int x, startx;
 		int y1ve, y2ve, tsizx, tsizy, cnt;
 
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		tsizx = pic.getWidth();
 		tsizy = pic.getHeight();
@@ -2870,7 +2871,7 @@ public class Software implements Renderer {
 			return;
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
 
@@ -2917,7 +2918,7 @@ public class Software implements Renderer {
 			vince = swal[x] * globalyscale;
 			vplce = globalzd + vince * (y1ve - (int) globalhoriz + 1);
 			cnt = y2ve - y1ve - 1;
-			a.mvlineasm1(vince, palookup[globalpal], shade, cnt, vplce, pic.data, bufplce,
+			a.mvlineasm1(vince, palookup[globalpal], shade, cnt, vplce, pic.getBytes(), bufplce,
 					x + frameoffset + ylookup[y1ve]);
 		}
 
@@ -2930,7 +2931,7 @@ public class Software implements Renderer {
 		boolean xnice;
 		int y1ve, y2ve;
 
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		int tsizx = pic.getWidth();
 		int tsizy = pic.getHeight();
@@ -2945,7 +2946,7 @@ public class Software implements Renderer {
 			return;
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
 
@@ -2988,7 +2989,7 @@ public class Software implements Renderer {
 			int vince = swal[x] * globalyscale;
 			int vplce = globalzd + vince * (y1ve - (int) globalhoriz + 1);
 
-			a.vlineasm1(vince, palookup[fpalookup], shade, y2ve - y1ve - 1, vplce, pic.data, bufplce,
+			a.vlineasm1(vince, palookup[fpalookup], shade, y2ve - y1ve - 1, vplce, pic.getBytes(), bufplce,
 					x + frameoffset + ylookup[y1ve]);
 		}
 
@@ -3014,20 +3015,20 @@ public class Software implements Renderer {
 			globalpicnum = 0;
 		}
 		engine.setgotpic(globalpicnum);
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 
 		if (!pic.hasSize()) {
 			return;
 		}
-		if (pic.getType() != AnimType.None) {
+		if (pic.getType() != AnimType.NONE) {
 			globalpicnum += engine.animateoffs(globalpicnum, sectnum);
 			pic = engine.getTile(globalpicnum);
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
-		globalbufplc = pic.data;
+		globalbufplc = pic.getBytes();
 
 		globalshade = sec.getFloorshade();
 		globvis = globalcisibility;
@@ -3265,8 +3266,8 @@ public class Software implements Renderer {
 			globalpicnum = 0;
 		}
 
-		Tile pic = engine.getTile(globalpicnum);
-		if (pic.getType() != AnimType.None) {
+		ArtEntry pic = engine.getTile(globalpicnum);
+		if (pic.getType() != AnimType.NONE) {
 			globalpicnum += engine.animateoffs(globalpicnum, sectnum);
 			pic = engine.getTile(globalpicnum);
 		}
@@ -3481,8 +3482,8 @@ public class Software implements Renderer {
 			daz = sec.getFloorz();
 		}
 
-		Tile pic = engine.getTile(globalpicnum);
-		if (pic.getType() != AnimType.None) {
+		ArtEntry pic = engine.getTile(globalpicnum);
+		if (pic.getType() != AnimType.NONE) {
 			globalpicnum += engine.animateoffs(globalpicnum, sectnum);
 			pic = engine.getTile(globalpicnum);
 		}
@@ -3491,7 +3492,7 @@ public class Software implements Renderer {
 		if (!pic.hasSize()) {
 			return;
 		}
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
 
@@ -3592,7 +3593,7 @@ public class Software implements Renderer {
 		globvis = mulscale(globvis, xdimscale, 16);
 
 		j = globalpal;
-		a.setupslopevlin((picsiz[globalpicnum] & 15) + (((picsiz[globalpicnum] >> 4)) << 8), pic.data, -ylookup[1],
+		a.setupslopevlin((picsiz[globalpicnum] & 15) + (((picsiz[globalpicnum] >> 4)) << 8), pic.getBytes(), -ylookup[1],
 				-(globalzd >> (16 - BITSOFPRECISION)));
 
 		l = (globalzd >> 16);
@@ -3674,20 +3675,20 @@ public class Software implements Renderer {
 			globalpicnum = 0;
 		}
 
-		Tile pic = engine.getTile(globalpicnum);
+		ArtEntry pic = engine.getTile(globalpicnum);
 		engine.setgotpic(globalpicnum);
 		if (!pic.hasSize()) {
 			return;
 		}
-		if (pic.getType() != AnimType.None) {
+		if (pic.getType() != AnimType.NONE) {
 			globalpicnum += engine.animateoffs(globalpicnum, sectnum);
 			pic = engine.getTile(globalpicnum);
 		}
 
-		if (pic.data == null) {
+		if (!pic.isLoaded()) {
 			engine.loadtile(globalpicnum);
 		}
-		globalbufplc = pic.data;
+		globalbufplc = pic.getBytes();
 
 		globalshade = sec.getCeilingshade();
 		globvis = globalcisibility;

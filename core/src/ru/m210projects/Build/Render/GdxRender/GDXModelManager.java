@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager.Shader;
 import ru.m210projects.Build.Render.ModelHandle.GLModel;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
@@ -36,6 +36,8 @@ import ru.m210projects.Build.Render.TextureHandle.PixmapTileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.osd.OsdColor;
+
+import java.io.IOException;
 
 public class GDXModelManager extends ModelManager {
 
@@ -93,44 +95,48 @@ public class GDXModelManager extends ModelManager {
 
 	@Override
 	public GLModel allocateModel(ModelInfo modelInfo) {
-		switch (modelInfo.getType()) {
-		case Md2:
-			return new MD2ModelGL20((MD2Info) modelInfo) {
-				@Override
-				public ShaderProgram getShader() {
-					return parent.manager.getProgram();
-				}
+		try {
+			switch (modelInfo.getType()) {
+				case Md2:
+					return new MD2ModelGL20((MD2Info) modelInfo) {
+						@Override
+						public ShaderProgram getShader() {
+							return parent.manager.getProgram();
+						}
 
-				@Override
-				protected int bindSkin(int pal, int skinnum) {
-					return bindMDSkin(this, pal, skinnum, 0);
-				}
+						@Override
+						protected int bindSkin(int pal, int skinnum) {
+							return bindMDSkin(this, pal, skinnum, 0);
+						}
 
-				@Override
-				protected GLTile loadTexture(String skinfile, int palnum) {
-					return loadMDTexture(this, skinfile, palnum);
-				}
-			};
-		case Md3:
-			return new MD3ModelGL20((MD3Info) modelInfo) {
-				@Override
-				public ShaderProgram getShader() {
-					return parent.manager.getProgram();
-				}
+						@Override
+						protected GLTile loadTexture(String skinfile, int palnum) {
+							return loadMDTexture(this, skinfile, palnum);
+						}
+					};
+				case Md3:
+					return new MD3ModelGL20((MD3Info) modelInfo) {
+						@Override
+						public ShaderProgram getShader() {
+							return parent.manager.getProgram();
+						}
 
-				@Override
-				protected int bindSkin(int pal, int skinnum, int surfnum) {
-					return bindMDSkin(this, pal, skinnum, surfnum);
-				}
+						@Override
+						protected int bindSkin(int pal, int skinnum, int surfnum) {
+							return bindMDSkin(this, pal, skinnum, surfnum);
+						}
 
-				@Override
-				protected GLTile loadTexture(String skinfile, int palnum) {
-					return loadMDTexture(this, skinfile, palnum);
-				}
-			};
-		default:
-			return null;
+						@Override
+						protected GLTile loadTexture(String skinfile, int palnum) {
+							return loadMDTexture(this, skinfile, palnum);
+						}
+					};
+			}
+		} catch (IOException e) {
+			Console.out.println(e.getMessage(), OsdColor.RED);
 		}
+
+		return null;
 	}
 
 	protected GLTile loadMDTexture(MDModel m, String skinfile, int palnum) {
@@ -139,8 +145,8 @@ public class GDXModelManager extends ModelManager {
 			return texidx;
 		}
 
-		Resource res = BuildGdx.cache.open(skinfile, 0);
-		if (res == null) {
+		Entry res = BuildGdx.cache.getEntry(skinfile, true);
+		if (!res.exists()) {
 			Console.out.println("Skin " + skinfile + " not found.", OsdColor.YELLOW);
 			return null;
 		}
@@ -157,8 +163,6 @@ public class GDXModelManager extends ModelManager {
 		} catch (Exception e) {
 			Console.out.println("Couldn't load file: " + skinfile, OsdColor.YELLOW);
 			return null;
-		} finally {
-			res.close();
 		}
 		texidx.setupTextureWrap(TextureWrap.Repeat);
 

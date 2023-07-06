@@ -33,6 +33,8 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.font.BitmapFont;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TileFontData;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
@@ -228,9 +230,10 @@ public class TextureManager {
 		// clamping);
 		if (hicr != null) {
 			String fn = checkResource(hicr, dapicnum, skybox);
-			byte[] data = BuildGdx.cache.getBytes(fn, 0);
-			if (data != null) {
+			Entry entry = BuildGdx.cache.getEntry(fn, true); //getBytes(fn, 0);
+			if (entry.exists()) {
 				try {
+					byte[] data = entry.getBytes();
 					return new PixmapTileData(new Pixmap(data, 0, data.length), clamping, expand.get());
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -263,7 +266,7 @@ public class TextureManager {
 			fn = hicr.filename;
 		}
 
-		if (!BuildGdx.cache.contains(fn, 0)) {
+		if (!BuildGdx.cache.getEntry(fn, true).exists()) {
 			Console.out.println("Hightile[" + dapic + "]: File \"" + fn + "\" not found");
 			if (facen > 0) {
 				hicr.skybox.ignore = 1;
@@ -333,7 +336,7 @@ public class TextureManager {
 				tile.scalex = tile.getWidth() / 64.0f;
 				tile.scaley = tile.getHeight() / 64.0f;
 			} else {
-				Tile pic = engine.getTile(dapicnum);
+				ArtEntry pic = engine.getTile(dapicnum);
 				if (data instanceof PixmapTileData) {
 					tile.width = ((PixmapTileData) data).getTileWidth();
 					tile.height = ((PixmapTileData) data).getTileHeight();

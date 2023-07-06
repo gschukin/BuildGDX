@@ -1,6 +1,7 @@
 package ru.m210projects.Build;
 
-import ru.m210projects.Build.FileHandle.Resource;
+import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class Tables {
     protected final byte[] textfont;
     protected final byte[] smalltextfont;
 
-    public Tables(Resource res) throws IOException {
+    public Tables(Entry entry) throws IOException {
         sqrtable = new short[4096];
         shlookup = new short[4096 + 256];
         sintable = new short[2048];
@@ -42,43 +43,24 @@ public class Tables {
             }
         }
 
-        read(res);
+        read(entry);
     }
 
-    protected void read(Resource res) throws IOException {
-        if(res == null) {
+    protected void read(Entry entry) throws IOException {
+        if(!entry.exists()) {
             throw new FileNotFoundException("Failed to load \"tables.dat\"!");
         }
 
-        byte[] buf = new byte[2048 * 2];
-        res.read(buf);
-        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
+        try(InputStream is = entry.getInputStream()) {
+            ByteBuffer.wrap(StreamUtils.readBytes(is, sintable.length * 2)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
+            ByteBuffer.wrap(StreamUtils.readBytes(is, radarang.length)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0,  radarang.length / 2);
+            StreamUtils.readBytes(is, textfont, 1024);
+            StreamUtils.readBytes(is, smalltextfont, 1024);
+        }
 
-        buf = new byte[640 * 2];
-        res.read(buf);
-        ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0, 640);
         for (int i = 0; i < 640; i++) {
             radarang[1279 - i] = (short) -radarang[i];
         }
-
-        res.read(textfont, 0, 1024);
-        res.read(smalltextfont, 0, 1024);
-
-//        try(InputStream is = entry.getInputStream()) {
-//            ByteBuffer.wrap(StreamUtils.readBytes(is, sintable.length * 2)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sintable);
-//            ByteBuffer.wrap(StreamUtils.readBytes(is, radarang.length)).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(radarang, 0,  radarang.length / 2);
-//            this.textfont = StreamUtils.readBytes(is, 1024);
-//            this.smalltextfont = StreamUtils.readBytes(is, 1024);
-//        }
-        res.close();
-    }
-
-    public byte[] getTextFont() {
-        return textfont;
-    }
-
-    public byte[] getSmallTextFont() {
-        return smalltextfont;
     }
 
     public int sin(int angle) {
