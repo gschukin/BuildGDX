@@ -22,6 +22,7 @@ import static ru.m210projects.Build.Engine.RESERVEDPALS;
 
 import ru.m210projects.Build.Render.TextureHandle.Hicreplctyp;
 import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.filehandle.Entry;
 
 public class TextureHDInfo {
 
@@ -106,9 +107,9 @@ public class TextureHDInfo {
 		return cache[picnum] != null;
 	}
 
-	public boolean addTexture(int picnum, int palnum, String filen, float alphacut, float xscale, float yscale,
-			float specpower, float specfactor, int flags) {
-		if (filen == null || picnum >= MAXTILES || palnum >= MAXPALOOKUPS) {
+	public boolean addTexture(int picnum, int palnum, Entry file, float alphacut, float xscale, float yscale,
+							  float specpower, float specfactor, int flags) {
+		if (file == null || !file.exists() || picnum >= MAXTILES || palnum >= MAXPALOOKUPS) {
 			return false;
 		}
 
@@ -119,7 +120,7 @@ public class TextureHDInfo {
 		}
 
 		// store into hicreplc the details for this replacement
-		hr.filename = filen;
+		hr.filename = file;
 		hr.ignore = 0;
 		hr.alphacut = Math.min(alphacut, 1.0f);
 		hr.xscale = xscale;

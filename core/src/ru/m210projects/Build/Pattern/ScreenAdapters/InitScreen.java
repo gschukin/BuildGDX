@@ -17,9 +17,12 @@
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
 import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
+import static ru.m210projects.Build.Strhandler.toLowerCase;
+import static ru.m210projects.Build.filehandle.CacheResourceMap.CachePriority.NORMAL;
 
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.nio.file.Path;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -39,9 +42,11 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Pattern.BuildFactory;
+import ru.m210projects.Build.filehandle.CacheResourceMap;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.fs.Directory;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
 import ru.m210projects.Build.osd.CommandResponse;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.ConsoleLogger;
@@ -92,9 +97,15 @@ public class InitScreen extends ScreenAdapter {
 			@Override
 			public CommandResponse execute(String[] argv) {
 				for (Group g : BuildGdx.cache.getGroups()) {
-					Console.out.println("group: " + g.getName());
+					Console.out.println(String.format("group: \"%s\" priority: %s", g.getName(), BuildGdx.cache.getPriority(g)), OsdColor.BLUE);
 					for (Entry res : g.getEntries()) {
-						Console.out.println("\t   file: " + res.getName());
+						String descr;
+						if (res.isDirectory()) {
+							descr = "directory";
+						} else {
+							descr = "file";
+						}
+						Console.out.println(String.format("\t    %s: \"%s\"", descr, res));
 					}
 				}
 				return CommandResponse.SILENT_RESPONSE;
@@ -114,10 +125,24 @@ public class InitScreen extends ScreenAdapter {
 		this.game = game;
 		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
-		Directory gameDirectory = BuildGdx.cache.getGameDirectory();
+
+		Directory gameDirectory;
+		Directory userDirectory;
+		try {
+			gameDirectory = new Directory(cfg.gamePath);
+			userDirectory = new Directory(cfg.cfgPath);
+		} catch (IOException e) {
+			BuildGdx.message.show("Build Engine Initialization Error!",
+					"There was a problem initialising the Build engine: \r\n" + e.getMessage(), MessageType.Info);
+			System.exit(1);
+			return;
+		}
+
+		game.initCache(gameDirectory, userDirectory);
 
 		try {
-			Console.out.setLogger(new ConsoleLogger(game.appname + ".log"));
+			Path path = userDirectory.getPath().resolve(toLowerCase(game.appname + ".log"));
+			Console.out.setLogger(new ConsoleLogger(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -135,17 +160,10 @@ public class InitScreen extends ScreenAdapter {
 
 		Console.out.println("Initializing resource archives");
 
-		for (int i = 0; i < factory.resources.length; i++) {
-			try {
-				Entry entry = gameDirectory.getEntry(factory.resources[i]);
-				if (entry.exists() && !entry.isDirectory()) {
-					BuildGdx.cache.add(entry);
-				}
-			} catch (Exception e) {
-				BuildGdx.message.show("Init error!", "Resource initialization error! \r\n" + e.getMessage(),
-						MessageType.Info);
-				System.exit(1);
-				return;
+		for (String res : factory.resources) {
+			Entry entry = gameDirectory.getEntry(res);
+			if (entry.exists() && !entry.isDirectory()) {
+				BuildGdx.cache.addGroup(entry, NORMAL);
 			}
 		}
 
@@ -163,10 +181,9 @@ public class InitScreen extends ScreenAdapter {
 		}
 
 		if (engine.loadpics() == 0) {
-			// FIXME:
-//			BuildGdx.message.show("Build Engine Initialization Error!",
-//					"ART files not found " + new File(Path.Game.getPath() + engine.tilesPath).getAbsolutePath(),
-//					MessageType.Info);
+			BuildGdx.message.show("Build Engine Initialization Error!",
+					"ART files not found " + gameDirectory.getPath().resolve(engine.tilesPath).toString(),
+					MessageType.Info);
 			System.exit(1);
 			return;
 		}

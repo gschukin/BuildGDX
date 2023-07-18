@@ -2,6 +2,7 @@ package ru.m210projects.Build.filehandle.grp;
 
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.EntryInputStream;
+import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.InputStreamProvider;
 
 import java.io.EOFException;
@@ -15,6 +16,7 @@ public class GrpEntry implements Entry {
     private final String name;
     private final String extension;
     private final InputStreamProvider provider;
+    Group parent;
 
     public GrpEntry(InputStreamProvider provider, String name, int offset, int size) {
         this.provider = provider;
@@ -22,7 +24,7 @@ public class GrpEntry implements Entry {
         this.size = size;
         this.name = name;
         if (name.contains(".")) {
-            this.extension = name.substring(name.lastIndexOf(".") + 1);
+            this.extension = name.substring(name.lastIndexOf(".") + 1).toUpperCase();
         } else {
             this.extension = "";
         }
@@ -58,12 +60,18 @@ public class GrpEntry implements Entry {
     }
 
     @Override
+    public Group getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(Group parent) {
+        this.parent = parent;
+    }
+
+    @Override
     public String toString() {
-        return "GrpEntry{" +
-                "name='" + name + '\'' +
-                ", offset=" + offset +
-                ", size=" + size +
-                '}';
+        return String.format("%s size=%d", name, size);
     }
 
     @Override

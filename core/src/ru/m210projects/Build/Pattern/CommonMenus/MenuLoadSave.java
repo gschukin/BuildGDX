@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
@@ -30,6 +29,8 @@ import ru.m210projects.Build.Pattern.MenuItems.MenuText;
 import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
 import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.filehandle.fs.Directory;
+import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public abstract class MenuLoadSave extends BuildMenu {
 
@@ -48,7 +49,7 @@ public abstract class MenuLoadSave extends BuildMenu {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
 				MenuSlotList pSlot = (MenuSlotList) pItem;
-				if (loadData(pSlot.FileName())) {
+				if (loadData(pSlot.getFileEntry())) {
 					picnum.nTile = SaveManager.Screenshot;
 				} else {
 					picnum.nTile = picnum.defTile;
@@ -58,8 +59,8 @@ public abstract class MenuLoadSave extends BuildMenu {
 		
 		list = new MenuSlotList(app.pEngine, app.pSavemgr, style, posx, posy, posyHelp, width, nItems, updateCallback, confirm, listPal, specPal, nBackground, saveMenu) {
 			@Override
-			public boolean checkFile(String filename) {
-				return MenuLoadSave.this.checkFile(filename);
+			public boolean checkFile(FileEntry entry) {
+				return MenuLoadSave.this.checkFile(entry);
 			}
 		};
 		slider = new MenuScroller(app.pSlider, list, width + posx - app.pSlider.getScrollerWidth());
@@ -71,11 +72,11 @@ public abstract class MenuLoadSave extends BuildMenu {
 		addItem(slider, false);
 	}
 	
-	public boolean checkFile(String filename) {
-		return BuildGdx.cache.getUserDirectory().getEntry(filename).exists();
+	public boolean checkFile(FileEntry entry) {
+		return entry.exists();
 	}
 	
-	public abstract boolean loadData(String filename);
+	public abstract boolean loadData(FileEntry entry);
 	
 	public abstract MenuTitle getTitle(BuildGame app, String text);
 	

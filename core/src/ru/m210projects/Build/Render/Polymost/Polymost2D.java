@@ -239,10 +239,6 @@ public class Polymost2D extends OrphoRenderer {
                     pic = engine.getTile(globalpicnum);
                 }
 
-                if (!pic.isLoaded()) {
-                    engine.loadtile(globalpicnum);
-                }
-
                 globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
                 if ((globalorientation & 64) == 0) {
@@ -275,8 +271,8 @@ public class Polymost2D extends OrphoRenderer {
                     globalx2 = mulscale(globalx2, i, 12);
                     globaly2 = mulscale(globaly2, i, 12);
                 }
-                int globalxshift = (8 - (picsiz[globalpicnum] & 15));
-                int globalyshift = (8 - (picsiz[globalpicnum] >> 4));
+                int globalxshift = (8 - pic.getSizex());
+                int globalyshift = (8 - pic.getSizey());
                 if ((globalorientation & 8) != 0) {
                     globalxshift++;
                     globalyshift++;
@@ -432,10 +428,6 @@ public class Polymost2D extends OrphoRenderer {
                         sprpic = engine.getTile(globalpicnum);
                     }
 
-                    if (!sprpic.isLoaded()) {
-                        engine.loadtile(globalpicnum);
-                    }
-
                     // 'loading' the tile doesn't actually guarantee that it's there afterwards.
                     // This can really happen when drawing the second frame of a floor-aligned
                     // 'storm icon' sprite (4894+1)
@@ -467,9 +459,7 @@ public class Polymost2D extends OrphoRenderer {
                     globalx2 = mulscale(dmulscale(ox, bakgxvect, oy, bakgyvect, 10), i, 10);
                     globaly2 = mulscale(dmulscale(ox, bakgyvect, -oy, bakgxvect, 10), i, 10);
 
-                    ox = picsiz[globalpicnum];
-                    oy = ((ox >> 4) & 15);
-                    ox &= 15;
+                    ox = pic.getSizex();
                     if (pow2long[ox] != xspan) {
                         ox++;
                         globalx1 = mulscale(globalx1, xspan, ox);
@@ -903,7 +893,7 @@ public class Polymost2D extends OrphoRenderer {
 
                         // tiled atlas or char tile
                         ArtEntry charTile = engine.getTile(tile);
-                        if (!charTile.isLoaded() && engine.loadtile(tile) == null) {
+                        if (!charTile.exists()) {
                             continue;
                         }
 
@@ -1209,12 +1199,9 @@ public class Polymost2D extends OrphoRenderer {
         int tsizx = pic.getWidth();
         int tsizy = pic.getHeight();
 
-        if (!pic.isLoaded()) {
-            engine.loadtile(globalpicnum);
-            if (!pic.isLoaded()) {
-                tsizx = tsizy = 1;
-                method = 1;
-            }
+        if (!pic.exists()) {
+            tsizx = tsizy = 1;
+            method = 1;
         }
 
         GLTile pth = parent.bind(parent.getTextureFormat(), globalpicnum, globalpal, globalshade, 0, method);

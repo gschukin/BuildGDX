@@ -21,6 +21,8 @@ import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.art.ArtFile;
+import ru.m210projects.Build.filehandle.art.CachedArtEntry;
+import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.DefaultOsdFunc;
 
@@ -37,6 +39,7 @@ import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Strhandler.buildString;
+import static ru.m210projects.Build.filehandle.art.ArtFile.DUMMY_ART_FILE;
 
 public abstract class Engine {
 
@@ -173,16 +176,10 @@ public abstract class Engine {
     // tiles
     public String tilesPath = "tilesXXX.art";
     protected ArtEntry[] tiles;
-    public static int[] picsiz;
-    private final char[] artfilename = new char[12];
-    protected int[] tilefilenum;
-    protected int[] tilefileoffs;
 
     protected int randomseed;
     public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
     public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
-
-    private Console console;
 
     // Engine.c
 
@@ -199,9 +196,6 @@ public abstract class Engine {
 
         pHitInfo = new Hitscan();
         neartag = new Neartag();
-        picsiz = new int[MAXTILES];
-        tilefilenum = new int[MAXTILES];
-        tilefileoffs = new int[MAXTILES];
 
         Arrays.fill(show2dsector, (byte) 0);
         Arrays.fill(show2dsprite, (byte) 0);
@@ -265,10 +259,10 @@ public abstract class Engine {
 
         try (InputStream is = entry.getInputStream()) {
             System.out.println("Loading palettes");
-            this.palette = StreamUtils.readBytes(is, 768);
+            palette = StreamUtils.readBytes(is, 768);
             numshades = (short) StreamUtils.readShort(is);
             System.out.println("Loading palookup tables");
-            this.palookup[0] = StreamUtils.readBytes(is, numshades << 8);
+            palookup[0] = StreamUtils.readBytes(is, numshades << 8);
             System.out.println("Loading translucency table");
             transluc = StreamUtils.readBytes(is, 65536);
         }
@@ -318,11 +312,9 @@ public abstract class Engine {
         return System.currentTimeMillis();
     }
 
-    public boolean loadpic(String filename) // gdxBuild
-    {
-        Entry entry = BuildGdx.cache.getEntry(filename, true);
-        if (entry.exists()) {
-            ArtFile art = new ArtFile(entry.getName(), entry::getInputStream);
+    public boolean loadpic(Entry artFile) { // gdxBuild
+        if (artFile.exists()) {
+            ArtFile art = new ArtFile(artFile.getName(), artFile::getInputStream);
             for (Entry artEntry : art.getEntries()) {
                 ArtEntry tile = ((ArtEntry) artEntry);
                 tiles[tile.getNum()] = tile;
@@ -346,7 +338,7 @@ public abstract class Engine {
             artFileName[6] = (char) (((k / 10) % 10) + 48);
             artFileName[5] = (char) (((k / 100) % 10) + 48);
             String name = String.copyValueOf(artFileName);
-            if (loadpic(name)) {
+            if (!loadpic(BuildGdx.cache.getEntry(name, true))) {
                 break;
             }
             numtilefiles++;
@@ -356,23 +348,20 @@ public abstract class Engine {
     }
 
     public byte[] loadtile(int tilenume) { // jfBuild
-        if (tilenume >= MAXTILES) {
-            return null;
-        }
-
         ArtEntry pic = getTile(tilenume);
         return pic.getBytes();
     }
 
-    public byte[] allocatepermanenttile(int tilenume, int xsiz, int ysiz) { // jfBuild
-        if ((xsiz <= 0) || (ysiz <= 0) || (tilenume >= MAXTILES)) {
+    public CachedArtEntry allocatepermanenttile(int tilenume, int xsiz, int ysiz) { // jfBuild
+        if ((xsiz < 0) || (ysiz < 0) || (tilenume >= MAXTILES)) {
             return null;
         }
 
         int dasiz = xsiz * ysiz;
         byte[] data = new byte[dasiz];
-        tiles[tilenume] = new ArtEntry(tilenume, data, xsiz, ysiz);
-        return data;
+        CachedArtEntry entry = new CachedArtEntry(this, tilenume, data, xsiz, ysiz);
+        tiles[tilenume] = entry;
+        return entry;
     }
 
     public int nextsectorneighborz(int sectnum, int thez, int topbottom, int direction) { // jfBuild
@@ -709,13 +698,10 @@ public abstract class Engine {
             palookupfog[palnum][2] = (byte) b;
         }
 
-        BuildGdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                final GLRenderer gl = glrender();
-                if (gl != null) {
-                    gl.getTextureManager().invalidatepalookup(palnum);
-                }
+        BuildGdx.app.postRunnable(() -> {
+            final GLRenderer gl = glrender();
+            if (gl != null) {
+                gl.getTextureManager().invalidatepalookup(palnum);
             }
         });
     }
@@ -883,15 +869,12 @@ public abstract class Engine {
     public void initkeys() { // gdxBuild
         input = new KeyInput();
     }
+
     public ArtEntry getTile(int tilenum) {
         if (tilenum < 0 || tilenum >= tiles.length || tiles[tilenum] == null) {
-            return null; // FIXME;
+            return DUMMY_ART_FILE;
         }
         return tiles[tilenum];
-    }
-
-    public void replaceTile(ArtEntry tilenum) {
-        tiles[tilenum.getNum()] = tilenum;
     }
 
     public void setDefs(DefScript defs) {
@@ -1204,8 +1187,8 @@ public abstract class Engine {
         renderService.setbrightness(dabrightness, dapal, flags);
     }
 
-    public String screencapture(String fn) { // jfBuild + gdxBuild (screenshot)
-        return renderService.screencapture(fn);
+    public String screencapture(Directory dir, String fn) { // jfBuild + gdxBuild (screenshot)
+        return renderService.screencapture(dir, fn);
     }
 
     protected byte[] setviewbuf() { // gdxBuild

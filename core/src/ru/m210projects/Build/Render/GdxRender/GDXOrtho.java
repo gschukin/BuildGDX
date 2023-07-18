@@ -320,10 +320,6 @@ public class GDXOrtho extends OrphoRenderer {
         }
 
 		engine.setgotpic(picnum);
-		if (!pic.isLoaded()) {
-            engine.loadtile(picnum);
-        }
-
 		GLTile pth = parent.textureCache.get(parent.getTexFormat(), picnum, dapalnum, 0, method);
 		if (pth == null) {
             return;
@@ -871,10 +867,6 @@ public class GDXOrtho extends OrphoRenderer {
 					globalpicnum += engine.animateoffs(globalpicnum, s);
 					pic = engine.getTile(globalpicnum);
 				}
-
-				if (!pic.isLoaded()) {
-                    engine.loadtile(globalpicnum);
-                }
 
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 

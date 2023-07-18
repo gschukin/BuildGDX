@@ -1,7 +1,6 @@
 package ru.m210projects.Build.filehandle.fs;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.osd.Console;
@@ -14,6 +13,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public class Directory implements Group {
+
     public static final FileEntry DUMMY_ENTRY = new FileEntry(Paths.get("DUMMY"), "dummy", -1) {
         @Override
         public InputStream getInputStream() {
@@ -30,6 +30,7 @@ public class Directory implements Group {
             return false;
         }
     };
+
     public static final Directory DUMMY_DIRECTORY = new Directory() {
         @Override
         public List<Entry> getEntries() {
@@ -55,17 +56,17 @@ public class Directory implements Group {
     private final Map<String, FileEntry> entries = new HashMap<>();
     private final Map<String, Directory> directories = new HashMap<>();
     private final Path path;
+    FileEntry directoryEntry = DUMMY_ENTRY;
 
-    private Directory() {
+    protected Directory() {
         this.path = DUMMY_ENTRY.getPath();
+        this.directoryEntry = DUMMY_ENTRY;
     }
 
     public Directory(Path dir) throws IOException {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             this.path = dir;
-            for (Path path : stream) {
-                addEntry(path);
-            }
+            stream.forEach(this::addEntry);
         }
     }
 
@@ -79,7 +80,7 @@ public class Directory implements Group {
 
     @Override
     public String getName() {
-        return path.toString();
+        return path.getFileName().toString();
     }
 
     public Path getPath() {
@@ -91,9 +92,8 @@ public class Directory implements Group {
         return new ArrayList<>(entries.values());
     }
 
-    @Nullable
-    public Path getParent() {
-        return path.getParent();
+    public FileEntry getDirectoryEntry() {
+        return directoryEntry;
     }
 
     @NotNull
@@ -110,10 +110,10 @@ public class Directory implements Group {
     }
 
     @Override
-    public synchronized FileEntry getEntry(Path path) {
+    public synchronized FileEntry getEntry(Path relPath) {
         Directory dir = this;
         FileEntry result = DUMMY_ENTRY;
-        for (Path p : path) {
+        for (Path p : relPath) {
             FileEntry entry = dir.getEntry(p.toString());
             if (!entry.exists()) {
                 return DUMMY_ENTRY;
@@ -126,11 +126,14 @@ public class Directory implements Group {
         }
         return result;
     }
-
     @NotNull
     public Directory getDirectory(FileEntry dirEntry) {
         Directory directory = DUMMY_DIRECTORY;
         if (dirEntry != null && dirEntry.isDirectory()) {
+            if (this.path.equals(dirEntry.getPath())) {
+                return this;
+            }
+
             try {
                 Path relPath = this.path.relativize(dirEntry.getPath());
                 Directory dir = this;
@@ -140,12 +143,14 @@ public class Directory implements Group {
 
                     // if key is not exists and directory contains this entry, add entry to map
                     if (!directories.containsKey(key) && dir.entries.containsValue(dirEntry)) {
-                        directories.put(key, new Directory(dirEntry.getPath()));
+                        Directory subDir = new Directory(dirEntry.getPath());
+                        subDir.directoryEntry = dirEntry;
+                        directories.put(key, subDir);
                     }
-                    dir = directories.get(key);
+                    dir = directories.getOrDefault(key, DUMMY_DIRECTORY);
                 }
                 directory = dir;
-            } catch (IOException ignored) {
+            } catch (Exception ignored) {
                 return DUMMY_DIRECTORY;
             }
         }
@@ -154,33 +159,38 @@ public class Directory implements Group {
 
     @NotNull
     private Directory addDirectory(FileEntry entry) {
-        Directory dir = this;
-        try {
-            String key = entry.getName().toUpperCase();
-            dir = directories.getOrDefault(key, new Directory(entry.getPath()));
-            directories.putIfAbsent(key, dir);
-        } catch (IOException ignored) {
-        }
-        return dir;
+        String key = entry.getName().toUpperCase();
+        return directories.computeIfAbsent(key, e -> {
+            try {
+                Directory subDir = new Directory(entry.getPath());
+                subDir.directoryEntry = entry;
+                return subDir;
+            } catch (IOException ignored) {
+            }
+            return DUMMY_DIRECTORY;
+        });
     }
 
     public void addEntry(Path path) {
         FileEntry entry = newEntry(path);
         if (entry.exists()) {
             entries.put(entry.getName().toUpperCase(), entry);
+            entry.setParent(this);
         }
     }
 
     public boolean revalidate() {
         int files = entries.size();
-        directories.clear();
-        entries.clear();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-            for (Path path : stream) {
-                addEntry(path);
+
+        String[] list = path.toFile().list();
+        if (list != null && list.length != files) {
+            directories.clear();
+            entries.clear();
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+                stream.forEach(this::addEntry);
+            } catch (IOException e) {
+                Console.out.println(String.format("Directory %s invalidate failed!", path), OsdColor.RED);
             }
-        } catch (IOException e) {
-            Console.out.println(String.format("Directory %s revalidate failed!", path), OsdColor.RED);
         }
         return files != entries.size();
     }
@@ -195,5 +205,23 @@ public class Directory implements Group {
             e.printStackTrace();
         }
         return DUMMY_ENTRY;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Directory)) return false;
+        Directory directory = (Directory) o;
+        return Objects.equals(path, directory.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
+    }
+
+    @Override
+    public String toString() {
+        return path.toString();
     }
 }

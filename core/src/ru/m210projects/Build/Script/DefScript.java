@@ -25,6 +25,8 @@ import static ru.m210projects.Build.Strhandler.toLowerCase;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +68,7 @@ public class DefScript {
 	public final MapHackInfo mapInfo;
 	protected final Engine engine;
 
-	protected FileEntry currentAddon;
+	protected Entry currentAddon;
 	protected HashMap<String, List<String>> addonsIncludes;
 
 	protected static class DefTile {
@@ -74,7 +76,7 @@ public class DefScript {
 		public byte[] waloff;
 		public short sizx, sizy;
 		public byte xoffset, yoffset;
-		public String hrp;
+		public Entry hrp;
 		public byte alphacut;
 		public final boolean internal;
 		public int optional;
@@ -119,7 +121,7 @@ public class DefScript {
 
 	protected DefTile[] tiles = new DefTile[MAXTILES];
 
-	public DefScript(DefScript src, FileEntry addon) {
+	public DefScript(DefScript src, Entry addon) {
 		this.disposable = true;
 		this.texInfo = new TextureHDInfo(src.texInfo);
 		this.mdInfo = new ModelsInfo(src.mdInfo, src.disposable);
@@ -135,7 +137,7 @@ public class DefScript {
 		}
 
 		if (src.addonsIncludes != null) {
-			addonsIncludes = new HashMap<String, List<String>>();
+			addonsIncludes = new HashMap<>();
 
 			for (String key : src.addonsIncludes.keySet()) {
 				List<String> list = src.addonsIncludes.get(key);
@@ -149,8 +151,8 @@ public class DefScript {
 		this.currentAddon = addon;
 	}
 
-	public DefScript(BuildEngine engine, boolean disposable) {
-		this.disposable = disposable;
+	public DefScript(BuildEngine engine) {
+		this.disposable = false;
 		texInfo = new TextureHDInfo();
 		mdInfo = new ModelsInfo();
 		audInfo = new AudioInfo();
@@ -166,20 +168,22 @@ public class DefScript {
 		return new MapHackInfo();
 	}
 
-	public boolean loadScript(FileEntry file) {
+	public boolean loadScript(Entry file) {
 		if (file == null) {
 			Console.out.println("Def error: script not found", OsdColor.RED);
 			return false;
 		}
 
-		Scriptfile script = new Scriptfile(file.getPath().getFileName().toString(), file);
-		script.path = file.getPath().getParent().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
+		Scriptfile script = new Scriptfile(file.getName(), file);
+		if (file instanceof FileEntry) {
+			script.path = ((FileEntry) file).getPath().getParent().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
+		}
 
 		try {
 			defsparser(script);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Console.out.println("Def error: the script " + file.getPath() + " has errors", OsdColor.RED);
+			Console.out.println("Def error: the script " + file + " has errors", OsdColor.RED);
 			return false;
 		}
 
@@ -269,9 +273,9 @@ public class DefScript {
         }
 
 		fn = FileUtils.getCorrectPath(fn);
-		if (script.path != null) {
-			fn = script.path + File.separator + fn;
-		}
+//		if (script.path != null) {
+//			fn = script.path + File.separator + fn;
+//		}
 
 		return fn;
 	}
@@ -363,9 +367,6 @@ public class DefScript {
 
 			if (tile.crc32 != 0) {
 				byte[] data = pic.getBytes();
-				if (data == null) {
-					data = engine.loadtile(i);
-				}
 
 				long crc32 = data != null ? CRC32.getChecksum(data) : -1;
 				if (crc32 != tile.crc32) {
@@ -388,10 +389,11 @@ public class DefScript {
                 continue;
             }
 
-			CachedArtEntry newPic = new CachedArtEntry(i, tile.waloff, tile.sizx, tile.sizy);
-			engine.getrender().invalidatetile(i, -1, -1);
+			int flags = pic.getFlags();
+			CachedArtEntry newPic = engine.allocatepermanenttile(i, tile.sizx, tile.sizy);
+			newPic.copyData(tile.waloff);
+			newPic.setFlags(flags);
 			newPic.setOffset(tile.xoffset, tile.yoffset);
-			engine.replaceTile(newPic);
 
 			// replace hrp info
 			texInfo.addTexture(i, 0, tile.hrp, (0xFF - (tile.alphacut & 0xFF)) * (1.0f / 255.0f), 1.0f, 1.0f, 1.0f,
@@ -753,7 +755,7 @@ public class DefScript {
 			}
 
 			String ext = FileUtils.getExtension(script.filename);
-			DefTile texstatus = ImportTileFromTexture(fn, tile, tilecrc, talphacut, istexture,
+			DefTile texstatus = ImportTileFromTexture(BuildGdx.cache.getEntry(fn, true), tile, tilecrc, talphacut, istexture,
 					ext != null && ext.equals("dat"));
 			if (texstatus == null) {
                 return null;
@@ -775,11 +777,11 @@ public class DefScript {
 			return texstatus;
 		}
 
-		protected DefTile ImportTileFromTexture(String fn, int tile, long crc32, int alphacut, boolean istexture,
+		protected DefTile ImportTileFromTexture(Entry fn, int tile, long crc32, int alphacut, boolean istexture,
 				boolean internal) {
 			DefScript def = DefScript.this;
 
-			byte[] data = BuildGdx.cache.getEntry(fn, true).getBytes();
+			byte[] data = fn.getBytes();
 			if (data.length == 0) {
 				Console.out.println("ImportTileFromTexture error: file " + fn + " not found!", OsdColor.RED);
 				return null;
@@ -956,7 +958,7 @@ public class DefScript {
 					m = new MD3Info(res, modelfn);
 					break;
 				default:
-					if (res.getExtension().equals("kvx")) {
+					if (res.isExtension("kvx")) {
 						m = new ModelInfo(modelfn, Type.Voxel);
 					}
 					break;
@@ -1493,7 +1495,7 @@ public class DefScript {
 				case SPECULAR:
 				case NORMAL:
 					Integer tpal = -1;
-					String tfn = null;
+					Entry tfn = null;
 					double alphacut = -1.0, xscale = 1.0, yscale = 1.0, specpower = 1.0, specfactor = 1.0;
 					int flags = 0;
 					int palend;
@@ -1521,7 +1523,12 @@ public class DefScript {
 						default:
 							break;
 						case FILE:
-							tfn = getFile(script);
+							Path filePath = Paths.get(getFile(script));
+							if (currentAddon != null) {
+								tfn = currentAddon.getParent().getEntry(filePath);
+							} else {
+								tfn = BuildGdx.cache.getEntry(filePath, true);
+							}
 							break;
 						case ALPHACUT:
 							if (token != TextureTokens.PAL) {
@@ -1607,7 +1614,7 @@ public class DefScript {
 						return BaseToken.Error;
 					}
 
-					if (!BuildGdx.cache.getEntry(tfn, true).exists()) {
+					if (!tfn.exists()) {
 						Console.out.println("Error: file \"" + tfn + "\" not found for texture definition near line "
 								+ script.filename + ":" + script.getlinum(script.ltextptr), OsdColor.RED);
 						return BaseToken.Error;

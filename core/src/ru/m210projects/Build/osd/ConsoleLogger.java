@@ -5,7 +5,6 @@ import ru.m210projects.Build.Architecture.BuildGdx;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
@@ -15,8 +14,8 @@ public class ConsoleLogger {
     private final Path path;
     private boolean closed;
 
-    public ConsoleLogger(String filename) throws IOException {
-        this.path = BuildGdx.cache.getUserDirectory().getPath().resolve(toLowerCase(filename));
+    public ConsoleLogger(Path path) throws IOException {
+        this.path = path;
         this.out = new BufferedOutputStream(Files.newOutputStream(path));
         this.closed = false;
     }

@@ -20,6 +20,7 @@ import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLPreloadFlag;
 import ru.m210projects.Build.Types.AnimType;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
+import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 
 public abstract class PrecacheAdapter extends ScreenAdapter {
 
@@ -151,17 +152,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 				continue;
 			}
 
-			ArtEntry pic = engine.getTile(i);
 			if ((tiles[i >> 3] & pow2char[i & 7]) != 0) {
-				if (!revalidate && pic.isLoaded()) {
-                    continue;
-                }
-
-				if (!pic.isLoaded()) {
-                    engine.loadtile(i);
-                }
 				if (gl != null) {
-                    gl.precache(i, 0, method);
+                    gl.precache(i, 0, method << 2);
                 }
 			}
 		}

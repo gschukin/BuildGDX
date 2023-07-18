@@ -20,15 +20,24 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 
+import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_DIRECTORY;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
 public class RffFile implements Group {
 
     private static final String RFF_HEADER = "RFF";
-    private final List<Entry> entryList;
-    private final String name;
-    private final Map<String, Map<String, Integer>> names;
-    private final Map<String, Map<Integer, Integer>> ids;
+    protected final List<Entry> entryList;
+    protected final String name;
+    protected final Map<String, Map<String, Integer>> names;
+    protected final Map<String, Map<Integer, Integer>> ids;
+
+    // cached rff file
+    public RffFile(String name) {
+        this.name = name;
+        this.entryList = new ArrayList<>();
+        this.names = new HashMap<>();
+        this.ids = new HashMap<>();
+    }
 
     public RffFile(String name, InputStreamProvider provider) throws IOException {
         this.name = name;
@@ -62,23 +71,24 @@ public class RffFile implements Group {
                     int size = StreamUtils.readInt(is);
                     int packedSize = StreamUtils.readInt(is);
                     LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(StreamUtils.readInt(is) * 1000L), ZoneId.of("GMT"));
-                    int flags = is.read();
+                    int flags = StreamUtils.readSignedByte(is);
                     String fmt = StreamUtils.readString(is, 3);
                     String filaName = StreamUtils.readString(is, 8);
                     int id = StreamUtils.readInt(is);
                     RffEntry entry = new RffEntry(provider, id, offset, size, packedSize, date, flags, filaName, fmt);
 
-                    entryList.add(entry);
-                    int entryIndex = entryList.size() - 1;
-                    if (entry.isIDUsed()) {
-                        Map<Integer, Integer> entryMap = ids.getOrDefault(fmt, new HashMap<>());
-                        entryMap.put(id, entryIndex);
-                        ids.putIfAbsent(fmt, entryMap);
-                    }
-
-                    Map<String, Integer> entryMap = names.getOrDefault(fmt, new HashMap<>());
-                    entryMap.put(filaName, entryIndex);
-                    names.putIfAbsent(fmt, entryMap);
+                    addEntry(entry);
+//                    entryList.add(entry);
+//                    int entryIndex = entryList.size() - 1;
+//                    if (entry.isIDUsed()) {
+//                        Map<Integer, Integer> entryMap = ids.getOrDefault(fmt, new HashMap<>());
+//                        entryMap.put(id, entryIndex);
+//                        ids.putIfAbsent(fmt, entryMap);
+//                    }
+//
+//                    Map<String, Integer> entryMap = names.getOrDefault(fmt, new HashMap<>());
+//                    entryMap.put(filaName, entryIndex);
+//                    names.putIfAbsent(fmt, entryMap);
                 }
             } catch (IOException e) {
                 throw new RuntimeException("RFF dictionary corrupted");
@@ -100,7 +110,7 @@ public class RffFile implements Group {
     public Entry getEntry(String name) {
         if (name.contains(".")) {
             String[] split = name.split("\\.");
-            return getEntry(split[0], split[1]);
+            return getEntry(name, split[1]);
         }
         return getEntry(name, "");
     }
@@ -114,7 +124,7 @@ public class RffFile implements Group {
     public synchronized Entry getEntry(String name, String fmt) {
         Map<String, Integer> entryMap = names.get(fmt.toUpperCase());
         if (entryMap != null) {
-            int entryIndex = entryMap.getOrDefault(name, -1);
+            int entryIndex = entryMap.getOrDefault(name.toUpperCase(), -1);
             if (entryIndex != -1) {
                 return entryList.get(entryIndex);
             }
@@ -131,6 +141,21 @@ public class RffFile implements Group {
             }
         }
         return DUMMY_ENTRY;
+    }
+
+    public void addEntry(RffEntry entry) {
+        String fmt = entry.getExtension();
+        entry.parent = this;
+
+        entryList.add(entry);
+        int entryIndex = entryList.size() - 1;
+        if (entry.isIDUsed()) {
+            Map<Integer, Integer> entryMap = ids.computeIfAbsent(fmt, e -> new HashMap<>());
+            entryMap.put(entry.getId(), entryIndex);
+        }
+
+        Map<String, Integer> entryMap = names.computeIfAbsent(fmt, e -> new HashMap<>());
+        entryMap.put(entry.getName(), entryIndex);
     }
 
     private int getCryptoKey(int revision, long offset) {

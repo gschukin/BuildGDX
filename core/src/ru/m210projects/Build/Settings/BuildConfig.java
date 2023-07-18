@@ -19,17 +19,17 @@ package ru.m210projects.Build.Settings;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 import static ru.m210projects.Build.Net.Mmulti.NETPORT;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import ru.m210projects.Build.Input.ButtonMap;
 import ru.m210projects.Build.Input.Keymap;
+import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.Tools.IniFile;
 import ru.m210projects.Build.Render.Renderer.RenderType;
-import ru.m210projects.Build.osd.OsdColor;
 
 public abstract class BuildConfig extends IniFile {
 
@@ -38,19 +38,6 @@ public abstract class BuildConfig extends IniFile {
 
 	public final int cfgVersion = 1901; // year XX, num XX
 	public boolean isInited;
-
-    public void setKey(int l_nFocus, int up) {
-    }
-
-	public void setButton(KeyType keyType, int kb) {
-	}
-
-    public void InitKeymap() {
-    }
-
-	public boolean InitConfig(boolean b) {
-		return false;
-	}
 
 	public interface KeyType {
 
@@ -128,8 +115,8 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	public String path;
-	public String cfgPath;
+	public Path gamePath;
+	public Path cfgPath;
 	public File soundBank;
 	public int version;
 	public boolean startup = true;
@@ -211,22 +198,19 @@ public abstract class BuildConfig extends IniFile {
 	public RenderType renderType = RenderType.Polymost;
 	public boolean gPrecache = true;
 
-	public BuildConfig(String path, String name) {
+	public BuildConfig(String cfgPath, String name) {
 		super();
 
-		this.cfgPath = path;
+		this.cfgPath = Paths.get(cfgPath);
 		this.keymap = getKeyMap();
 		this.name = toLowerCase(name);
 		byte[] data = null;
 
-		try {
-			RandomAccessFile raf = new RandomAccessFile(path + this.name, "r");
-			data = new byte[(int) raf.length()];
-			raf.read(data);
+		try(InputStream is = Files.newInputStream(this.cfgPath.resolve(name))) {
+			data = StreamUtils.readBytes(is, is.available());
 			init(data);
-			raf.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found: " + path + this.name);
+			System.out.println("File not found: " + this.cfgPath.resolve(name));
 		} catch (IOException e) {
 			System.out.println("Read file error: " + e.getMessage());
 		}
@@ -243,14 +227,12 @@ public abstract class BuildConfig extends IniFile {
 		LoadMain();
 
 		if (version != cfgVersion && data != null) {
-			try {
-				int index = name.lastIndexOf(".");
-				String cfgname = name.substring(0, index);
-				RandomAccessFile raf = new RandomAccessFile(path + cfgname + ".old", "rw");
-				raf.write(data);
-				raf.close();
+			int index = name.lastIndexOf(".");
+			String cfgname = name.substring(0, index);
+			try(OutputStream os = Files.newOutputStream(this.cfgPath.resolve(cfgname + ".old"))) {
+				os.write(data);
 			} catch (Exception e) {
-				System.out.println("Old config file error: " + e.getMessage());
+				System.out.println("Old config file error: " + e);
 			}
 		}
 	}
@@ -287,7 +269,7 @@ public abstract class BuildConfig extends IniFile {
 				userfolder = GetKeyInt("UseHomeFolder") == 1;
 				String respath = GetKeyString("Path");
 				if (respath != null && !respath.isEmpty()) {
-					this.path = respath;
+					this.gamePath = Paths.get(respath);
 				}
 				String bank = GetKeyString("SoundBank");
 				if (bank != null && !bank.isEmpty()) {
@@ -602,79 +584,92 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	/*
-	public void saveConfig(Compat compat, String path) {
-		if (!isInited) { // has saving from launcher
-			FileResource fil = compat.open(cfgPath + name, Path.Absolute, Mode.Write);
-			if (fil != null) {
-				SaveUninited(fil);
-				fil.close();
-			}
-			return;
-		}
+	public void saveBoolean(OutputStream os, String name, boolean var) throws IOException {
+		String line = name + " = " + (var ? 1 : 0) + "\r\n";
+		StreamUtils.writeString(os, line);
+	}
 
-		FileResource fil = compat.open(cfgPath + name, Path.Absolute, Mode.Write);
-		if (fil != null) {
-			SaveMain(fil, path);
-			SaveCommon(fil);
-			SaveConfig(fil);
-			fil.close();
+	public void saveInteger(OutputStream os, String name, int var) throws IOException {
+		String line = name + " = " + var + "\r\n";
+		StreamUtils.writeString(os, line);
+	}
+
+	public void saveString(OutputStream os, String text) throws IOException {
+		StreamUtils.writeString(os, text);
+	}
+
+	public void saveString(OutputStream os, String name, String var) throws IOException {
+		String line = name + " = " + var + "\r\n";
+		StreamUtils.writeString(os, line);
+	}
+	
+	public void saveConfig(String path) {
+		try(OutputStream os = Files.newOutputStream(cfgPath.resolve(name))) {
+			if (!isInited) { // has saving from launcher
+				SaveUninited(os);
+			} else {
+				SaveMain(os, path);
+				SaveCommon(os);
+				SaveConfig(os);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	public void SaveCommon(FileResource fil) {
-		saveString(fil, "[KeyDefinitions]\r\n");
+	public void SaveCommon(OutputStream os) throws IOException {
+		saveString(os, "[KeyDefinitions]\r\n");
 		for (int i = 0; i < keymap.length; i++) {
 			String line = keymap[i] + " = \"" + Keymap.toString(primarykeys[i]) + "\", \""
 					+ Keymap.toString(secondkeys[i]) + "\", \"" + Keymap.toString(mousekeys[i]) + "\", \""
 					+ ButtonMap.buttonName(gpadkeys[i]) + "\"\r\n";
-			saveString(fil, line);
+			saveString(os, line);
 		}
-		saveString(fil, ";\r\n");
-		saveString(fil, "MouseDigitalAxes0_0 "
+		saveString(os, ";\r\n");
+		saveString(os, "MouseDigitalAxes0_0 "
 				+ ((mouseaxis[AXISLEFT] != -1) ? ("= " + keymap[mouseaxis[AXISLEFT]]) : "= \"N/A\"") + "\r\n");
-		saveString(fil, "MouseDigitalAxes0_1 "
+		saveString(os, "MouseDigitalAxes0_1 "
 				+ ((mouseaxis[AXISRIGHT] != -1) ? ("= " + keymap[mouseaxis[AXISRIGHT]]) : "= \"N/A\"") + "\r\n");
-		saveString(fil, "MouseDigitalAxes1_0 "
+		saveString(os, "MouseDigitalAxes1_0 "
 				+ ((mouseaxis[AXISUP] != -1) ? ("= " + keymap[mouseaxis[AXISUP]]) : "= \"N/A\"") + "\r\n");
-		saveString(fil, "MouseDigitalAxes1_1 "
+		saveString(os, "MouseDigitalAxes1_1 "
 				+ ((mouseaxis[AXISDOWN] != -1) ? ("= " + keymap[mouseaxis[AXISDOWN]]) : "= \"N/A\"") + "\r\n");
-		saveString(fil, ";\r\n");
-		saveString(fil, "[JoyDefinitions]\r\n");
+		saveString(os, ";\r\n");
+		saveString(os, "[JoyDefinitions]\r\n");
 		for (int i = 0; i < joymap.length; i++) {
 			String line = joymap[i] + " = \"" + ButtonMap.buttonName(gJoyMenukeys[((MenuKeys) joymap[i]).getJoyNum()])
 					+ "\"\r\n";
-			saveString(fil, line);
+			saveString(os, line);
 		}
-		saveString(fil, ";\r\n;\r\n");
+		saveString(os, ";\r\n;\r\n");
 
-		saveString(fil, "[Controls]\r\n");
+		saveString(os, "[Controls]\r\n");
 		// Controls
 
-		saveBoolean(fil, "UseMouse", useMouse);
-		saveBoolean(fil, "UseMouseInMenu", menuMouse);
-		saveInteger(fil, "MouseSensitivity", gSensitivity);
-		saveBoolean(fil, "MouseAiming", gMouseAim);
-		saveBoolean(fil, "MouseAimingFlipped", gInvertmouse);
-		saveInteger(fil, "MouseTurnSpeed", gMouseTurnSpeed);
-		saveInteger(fil, "MouseLookSpeed", gMouseLookSpeed);
-		saveInteger(fil, "MouseMoveSpeed", gMouseMoveSpeed);
-		saveInteger(fil, "MouseStrafeSpeed", gMouseStrafeSpeed);
-		saveInteger(fil, "MouseCursor", gMouseCursor);
-		saveInteger(fil, "MouseCursorSize", gMouseCursorSize);
-		saveInteger(fil, "JoyDevice", gJoyDevice);
-		saveInteger(fil, "JoyTurnAxis", gJoyTurnAxis);
-		saveInteger(fil, "JoyMoveAxis", gJoyMoveAxis);
-		saveInteger(fil, "JoyStrafeAxis", gJoyStrafeAxis);
-		saveInteger(fil, "JoyLookAxis", gJoyLookAxis);
-		saveInteger(fil, "JoyTurnSpeed", gJoyTurnSpeed);
-		saveInteger(fil, "JoyLookSpeed", gJoyLookSpeed);
-		saveBoolean(fil, "JoyInvertLook", gJoyInvert);
-		saveInteger(fil, "JoyDeadZone", gJoyDeadZone);
-		saveString(fil, ";\r\n;\r\n");
+		saveBoolean(os, "UseMouse", useMouse);
+		saveBoolean(os, "UseMouseInMenu", menuMouse);
+		saveInteger(os, "MouseSensitivity", gSensitivity);
+		saveBoolean(os, "MouseAiming", gMouseAim);
+		saveBoolean(os, "MouseAimingFlipped", gInvertmouse);
+		saveInteger(os, "MouseTurnSpeed", gMouseTurnSpeed);
+		saveInteger(os, "MouseLookSpeed", gMouseLookSpeed);
+		saveInteger(os, "MouseMoveSpeed", gMouseMoveSpeed);
+		saveInteger(os, "MouseStrafeSpeed", gMouseStrafeSpeed);
+		saveInteger(os, "MouseCursor", gMouseCursor);
+		saveInteger(os, "MouseCursorSize", gMouseCursorSize);
+		saveInteger(os, "JoyDevice", gJoyDevice);
+		saveInteger(os, "JoyTurnAxis", gJoyTurnAxis);
+		saveInteger(os, "JoyMoveAxis", gJoyMoveAxis);
+		saveInteger(os, "JoyStrafeAxis", gJoyStrafeAxis);
+		saveInteger(os, "JoyLookAxis", gJoyLookAxis);
+		saveInteger(os, "JoyTurnSpeed", gJoyTurnSpeed);
+		saveInteger(os, "JoyLookSpeed", gJoyLookSpeed);
+		saveBoolean(os, "JoyInvertLook", gJoyInvert);
+		saveInteger(os, "JoyDeadZone", gJoyDeadZone);
+		saveString(os, ";\r\n;\r\n");
 	}
 
-	public void SaveMain(FileResource fil, String path) {
+	public void SaveMain(OutputStream fil, String path) throws IOException {
 		saveString(fil, "[Main]\r\n");
 		saveInteger(fil, "ConfigVersion", cfgVersion);
 		saveBoolean(fil, "Startup", startup);
@@ -682,8 +677,7 @@ public abstract class BuildConfig extends IniFile {
 		saveBoolean(fil, "AutoloadFolder", autoloadFolder);
 		saveBoolean(fil, "UseHomeFolder", userfolder);
 		saveString(fil, "Path = ");
-		byte[] buf = path.getBytes(); // without this path can be distorted
-		fil.writeBytes(buf, buf.length);
+		saveString(fil, path);
 
 		if (soundBank != null) {
 			saveString(fil, "\r\nSoundBank = " + soundBank.getAbsolutePath() + "\r\n");
@@ -739,7 +733,7 @@ public abstract class BuildConfig extends IniFile {
 		saveString(fil, ";\r\n;\r\n");
 	}
 
-	public abstract void SaveConfig(FileResource fil);
+	public abstract void SaveConfig(OutputStream os) throws IOException;
 
 	public abstract boolean InitConfig(boolean isDefault);
 
@@ -796,26 +790,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	public void saveBoolean(FileResource fil, String name, boolean var) {
-		String line = name + " = " + (var ? 1 : 0) + "\r\n";
-		fil.writeBytes(line.toCharArray(), line.length());
-	}
-
-	public void saveInteger(FileResource fil, String name, int var) {
-		String line = name + " = " + var + "\r\n";
-		fil.writeBytes(line.toCharArray(), line.length());
-	}
-
-	public void saveString(FileResource fil, String text) {
-		fil.writeBytes(text.toCharArray(), text.length());
-	}
-
-	public void saveString(FileResource fil, String name, String var) {
-		String line = name + " = " + var + "\r\n";
-		fil.writeBytes(line.toCharArray(), line.length());
-	}
-
-	public void SaveUninited(FileResource fil) {
+	public void SaveUninited(OutputStream fil) throws IOException {
 		if (data == null) {
 			return;
 		}
@@ -828,9 +803,8 @@ public abstract class BuildConfig extends IniFile {
 		saveBoolean(fil, "AutoloadFolder", autoloadFolder);
 		saveBoolean(fil, "UseHomeFolder", userfolder);
 		saveString(fil, "Path = ");
-		if (path != null) {
-			byte[] buf = path.getBytes(); // without this path can be distorted
-			fil.writeBytes(buf, buf.length);
+		if (gamePath != null) {
+			saveString(fil, gamePath.toString());
 		}
 
 		if (soundBank != null) {
@@ -894,8 +868,7 @@ public abstract class BuildConfig extends IniFile {
 		int index = gamePart.indexOf("[KeyDefinitions]");
 		if (index != -1) {
 			gamePart = gamePart.substring(index);
-			fil.writeBytes(gamePart.toCharArray(), gamePart.length());
+			saveString(fil, gamePart);
 		}
 	}
-	*/
 }

@@ -664,11 +664,7 @@ public class GDXRenderer implements GLRenderer {
 		}
 
 		ArtEntry pic = engine.getTile(picnum);
-		if (!pic.isLoaded()) {
-			engine.loadtile(picnum);
-		}
-
-		if (!pic.isLoaded()) {
+		if (!pic.exists()) {
 			method = 1; // invalid data, HOM
 		}
 
@@ -705,12 +701,8 @@ public class GDXRenderer implements GLRenderer {
 			}
 
 			ArtEntry pic = engine.getTile(picnum);
-			if (!pic.isLoaded()) {
-				engine.loadtile(picnum);
-			}
-
 			int method = surf.getMethod();
-			if (!pic.isLoaded()) {
+			if (!pic.exists()) {
 				method = 1; // invalid data, HOM
 			}
 
@@ -1282,7 +1274,7 @@ public class GDXRenderer implements GLRenderer {
 			break;
 		}
 
-		if (tilenum != -1 && !engine.getTile(tilenum).isLoaded()) {
+		if (!engine.getTile(tilenum).exists()) {
 			alpha = 0.01f; // Hack to update Z-buffer for invalid mirror textures
 		}
 

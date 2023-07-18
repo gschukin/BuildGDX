@@ -25,6 +25,9 @@ public abstract class LinkedMap<T> {
         fill(0);
     }
 
+    /**
+     * used in fill method for each new line
+     */
     protected abstract T getInstance();
 
     public int insert(int value) {
@@ -139,7 +142,7 @@ public abstract class LinkedMap<T> {
 
     @SuppressWarnings("unchecked")
     protected MapNode<T>[] buildNodeArray(int size) {
-        return new MapNode[size];
+        return new MapNode[Math.max(1, size)];
     }
 
 }

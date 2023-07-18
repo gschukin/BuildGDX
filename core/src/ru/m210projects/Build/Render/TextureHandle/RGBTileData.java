@@ -97,7 +97,7 @@ public class RGBTileData extends TileData {
 				}
 			}
 
-			if (data != null && hasalpha && !GLSettings.textureFilter.get().retro) {
+			if (hasalpha && !GLSettings.textureFilter.get().retro) {
 				fixtransparency(buffer, tsizx, tsizy, xsiz, ysiz, clamped);
 			}
 		}

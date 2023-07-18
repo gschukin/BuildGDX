@@ -395,9 +395,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 					pic = engine.getTile(globalpicnum);
 				}
 
-				if (!pic.isLoaded()) {
-					engine.loadtile(globalpicnum);
-				}
+//				if (!pic.isLoaded()) {
+//					engine.loadtile(globalpicnum);
+//				}
 
 				parent.globalbufplc = pic.getBytes();
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
@@ -432,8 +432,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = mulscale(globalx2, i, 12);
 					globaly2 = mulscale(globaly2, i, 12);
 				}
-				int globalxshift = (8 - (picsiz[globalpicnum] & 15));
-				int globalyshift = (8 - (picsiz[globalpicnum] >> 4));
+				int globalxshift = (8 - pic.getSizex());
+				int globalyshift = (8 - pic.getSizey());
 				if ((globalorientation & 8) != 0) {
 					globalxshift++;
 					globalyshift++;
@@ -603,9 +603,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 						sprpic = engine.getTile(globalpicnum);
 					}
 
-					if (!sprpic.isLoaded()) {
-						engine.loadtile(globalpicnum);
-					}
+//					if (!sprpic.isLoaded()) {
+//						engine.loadtile(globalpicnum);
+//					}
 
 					parent.globalbufplc = sprpic.getBytes();
 
@@ -648,9 +648,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 					globalx2 = mulscale(dmulscale(ox, bakgxvect, oy, bakgyvect, 10), i, 10);
 					globaly2 = mulscale(dmulscale(ox, bakgyvect, -oy, bakgxvect, 10), i, 10);
 
-					ox = picsiz[globalpicnum];
-					oy = ((ox >> 4) & 15);
-					ox &= 15;
+					ox = pic.getSizex();
+					oy = pic.getSizey();
 					if (pow2long[ox] != xspan) {
 						ox++;
 						globalx1 = mulscale(globalx1, xspan, ox);
@@ -970,8 +969,8 @@ public class SoftwareOrpho extends OrphoRenderer {
 	private void fillpolygon(int npoints) {
 		int z, zz, x1, y1, x2, y2, miny, maxy, y, xinc, cnt;
 		int ox, oy, bx, by, p, day1, day2;
-
-		parent.getA().sethlinesizes(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4, parent.globalbufplc);
+		ArtEntry pic = engine.getTile(globalpicnum);
+		parent.getA().sethlinesizes(pic.getSizex(), pic.getSizey(), parent.globalbufplc);
 
 		miny = 0x7fffffff;
 		maxy = 0x80000000;
@@ -1417,9 +1416,9 @@ public class SoftwareOrpho extends OrphoRenderer {
 			nextv = v;
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(picnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(picnum);
+//		}
 		engine.setgotpic(picnum);
 		byte[] bufplc = pic.getBytes();
 

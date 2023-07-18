@@ -135,7 +135,6 @@ public class Polymost implements GLRenderer {
 	public GLFog globalfog;
 	public static float MAXDRUNKANGLE = 2.5f;
 
-	public static long TexDebug = -1;
 	public static int r_parallaxskyclamping = 1; // OSD CVAR XXX
 	public static int r_parallaxskypanning = 0; // XXX
 	public static int r_vertexarrays = 1; // Vertex Array model drawing cvar
@@ -376,7 +375,7 @@ public class Polymost implements GLRenderer {
 				break;
 			}
 
-			if (!engine.getTile(tilenum).isLoaded()) {
+			if (!engine.getTile(tilenum).exists()) {
                 alpha = 0.01f; // Hack to update Z-buffer for invalid mirror textures
             }
 
@@ -437,7 +436,7 @@ public class Polymost implements GLRenderer {
 				}
 			}
 
-			if (!engine.getTile(tilenum).isLoaded()) {
+			if (!engine.getTile(tilenum).exists()) {
                 c.a = 0.01f; // Hack to update Z-buffer for invalid mirror textures
             }
 			BuildGdx.gl.glColor4f(c.r, c.g, c.b, c.a); // GL30 exception
@@ -792,20 +791,9 @@ public class Polymost implements GLRenderer {
         }
 
 		boolean HOM = false;
-		if (!pic.isLoaded()) {
-			if (TexDebug != -1) {
-                TexDebug = System.nanoTime();
-            }
-
-			if (engine.loadtile(globalpicnum) == null) {
-				tsizx = tsizy = 1;
-				HOM = true;
-			}
-
-			if (TexDebug != -1) {
-                System.out.println(
-                        "Loading tile " + globalpicnum + " [" + ((System.nanoTime() - TexDebug) / 1000000f) + " ms]");
-            }
+		if (!pic.exists()) {
+			tsizx = tsizy = 1;
+			HOM = true;
 		}
 
 		j = 0;
@@ -884,13 +872,9 @@ public class Polymost implements GLRenderer {
 		}
 
 		if (GLInfo.texnpot == 0) {
-			for (xx = 1; xx < tsizx; xx += xx) {
-                ;
-            }
+			for (xx = 1; xx < tsizx; xx += xx);
 			ox2 = 1.0 / xx;
-			for (yy = 1; yy < tsizy; yy += yy) {
-                ;
-            }
+			for (yy = 1; yy < tsizy; yy += yy);
 			oy2 = 1.0 / yy;
 		} else {
 			xx = tsizx;
@@ -1206,8 +1190,9 @@ public class Polymost implements GLRenderer {
 		}
 
 		// Texture panning
-		fx = global_cf_xpanning * (1 << (picsiz[globalpicnum] & 15)) / 256.0;
-		fy = global_cf_ypanning * (1 << (picsiz[globalpicnum] >> 4)) / 256.0;
+		ArtEntry art = engine.getTile(globalpicnum);
+		fx = global_cf_xpanning * (1 << art.getSizex()) / 256.0;
+		fy = global_cf_ypanning * (1 << art.getSizey()) / 256.0;
 
 		if ((globalorientation & (2 + 64)) == (2 + 64)) // Hack for panning for slopes w/ relative alignment
 		{
@@ -1321,7 +1306,7 @@ public class Polymost implements GLRenderer {
 		double t = ((gdx * x0 + gdo) * yrepeat) / ((x1 - x0) * ryp0 * 2048.f);
 
 		ArtEntry pic = engine.getTile(globalpicnum);
-		int i = (1 << (picsiz[globalpicnum] >> 4));
+		int i = (1 << pic.getSizey());
 		if (i < pic.getHeight()) {
             i <<= 1;
         }
@@ -1932,7 +1917,7 @@ public class Polymost implements GLRenderer {
 				* ((pic.getHeight() >> 1)
 						+ ((floor && r_parallaxskypanning == 1) ? parallaxyoffs - pic.getHeight() : parallaxyoffs))
 				- drawalls_vv[1] * ghoriz;
-		int i = (1 << (picsiz[globalpicnum] >> 4));
+		int i = (1 << pic.getSizey());
 		if (i != pic.getHeight()) {
             i += i;
         }
@@ -4277,6 +4262,7 @@ public class Polymost implements GLRenderer {
 				@Override
 				public void bindPalookup(int unit, int pal) {
 					BuildGdx.gl.glActiveTexture(unit);
+					// FIXME getPalookup == null at initscreen
 					textureCache.getPalookup(pal).bind(0);
 				}
 			};

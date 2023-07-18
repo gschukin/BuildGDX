@@ -107,12 +107,13 @@ public class DefaultOsdFunc implements OsdFunc {
     public void drawlogo(int daydim) {
         if (BGCTILE != -1) {
             ArtEntry pic = engine.getTile(BGCTILE);
+            if (pic != null) {
+                int xsiz = pic.getWidth();
+                int ysiz = pic.getHeight();
 
-            int xsiz = pic.getWidth();
-            int ysiz = pic.getHeight();
-
-            if (pic.hasSize()) {
-                engine.rotatesprite((xdim - xsiz) << 15, (daydim - ysiz) << 16, 65536, 0, BGCTILE, SHADE - 32, PALETTE, BITSTL, 0, 0, xdim, daydim);
+                if (pic.hasSize()) {
+                    engine.rotatesprite((xdim - xsiz) << 15, (daydim - ysiz) << 16, 65536, 0, BGCTILE, SHADE - 32, PALETTE, BITSTL, 0, 0, xdim, daydim);
+                }
             }
         }
     }

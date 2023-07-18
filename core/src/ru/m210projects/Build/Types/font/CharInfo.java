@@ -1,5 +1,7 @@
 package ru.m210projects.Build.Types.font;
 
+import ru.m210projects.Build.filehandle.art.ArtEntry;
+
 public class CharInfo {
 
     public int tile = -1;
@@ -19,8 +21,10 @@ public class CharInfo {
         this.xOffset = (short) xOffset;
         this.yOffset = (short) yOffset;
         this.cellSize = (short) cellSize;
-        if (tile != -1) {
-            this.width = (short) parent.engine.getTile(tile).getWidth();
+
+        ArtEntry artEntry = parent.engine.getTile(tile);
+        if (artEntry.exists() && artEntry.getWidth() > 0) {
+            this.width = (short) artEntry.getWidth();
         } else {
             this.width = (short) cellSize;
         }

@@ -1,6 +1,7 @@
 package ru.m210projects.Build.filehandle;
 
 import org.jetbrains.annotations.NotNull;
+import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 import ru.m210projects.Build.filehandle.grp.GrpFile;
@@ -9,8 +10,13 @@ import ru.m210projects.Build.filehandle.zip.ZipFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import static ru.m210projects.Build.filehandle.CacheResourceMap.CachePriority.*;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_DIRECTORY;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
@@ -28,127 +34,113 @@ public class Cache {
      * удалить группу по ссылке
      */
 
-    public enum GroupType {
-        NONE, DIRECTORY, RFF, GRP, ZIP
-    }
-
-    private final Directory gameDirectory;
-    private final List<Group> groups = new ArrayList<>();
-    private final Map<String, Integer> groupMap = new HashMap<>();
+    protected final CacheResourceMap cacheResourceMap = new CacheResourceMap();
 
     public Cache(@NotNull Directory gameDirectory) {
-        this.gameDirectory = gameDirectory;
+        cacheResourceMap.addGroup(gameDirectory, HIGH);
     }
 
-    public boolean add(Group group) {
+    public boolean addGroup(Group group, CacheResourceMap.CachePriority priority) {
         if (Objects.nonNull(group) && group.getSize() > 0) {
-            groups.add(group);
-            groupMap.put(group.getName().toUpperCase(), groups.size() - 1);
+            cacheResourceMap.addGroup(group, priority);
             return true;
         }
         return false;
     }
 
+    public boolean isGameDirectory(Group group) {
+        if (!(group instanceof Directory) || group.equals(DUMMY_DIRECTORY)) {
+            return false;
+        }
+
+        return group.equals(getGameDirectory());
+    }
+
+    public boolean removeGroup(Group group) {
+        return cacheResourceMap.removeGroup(group);
+    }
+
     @NotNull
     public Directory getGameDirectory() {
-        return gameDirectory;
+        Group group = cacheResourceMap.getGroup(0);
+        if (group instanceof Directory) {
+            return (Directory) group;
+        }
+        return DUMMY_DIRECTORY;
+    }
+
+    public CacheResourceMap.CachePriority getPriority(Group group) {
+        return cacheResourceMap.getPriority(group);
+    }
+
+    public boolean addGroup(Entry groupEntry, CacheResourceMap.CachePriority priority) {
+        Group group = newGroup(groupEntry);
+        return addGroup(group, priority);
     }
 
     @NotNull
-    public Directory getUserDirectory() {
-        return null;
-    }
-
-    public boolean add(Entry entry) {
-        Group group = newGroup(entry);
-        return add(group);
+    public Entry getEntry(Path path, boolean searchFirst) {
+        Entry entry = DUMMY_ENTRY;
+        int i = searchFirst ? HIGHEST.getLevel() : NORMAL.getLevel();
+        for (; i >= NORMAL.getLevel(); i--) {
+            for (MapNode<Group> node = cacheResourceMap.getFirst(i); node != null; node = node.getNext()) {
+                entry = node.get().getEntry(path);
+                if (entry.exists()) {
+                    return entry;
+                }
+            }
+        }
+        return entry;
     }
 
     @NotNull
     public Entry getEntry(String name, boolean searchFirst) {
-        Entry entry = DUMMY_ENTRY;
-        if (searchFirst) {
-            // search in dynamic groups and external files
-
-            // Search in dynamic groups first
-//            for (int k = groups.size() - 1; k >= 0; k--) {
-//                Group<? extends Entry> group = groups.get(k);
-//                if (/*(group.flags & DYNAMIC) != 0 && */group.contains(name)) {
-//                    return true;
-//                }
-//            }
-
-            entry = gameDirectory.getEntry(name);
-            if (entry.exists()) {
-                return entry;
-            }
-        }
-
-        // search in groups
-        for (int k = groups.size() - 1; k >= 0; k--) {
-            entry = groups.get(k).getEntry(name);
-            if (entry.exists()) {
-                return entry;
-            }
-        }
-
-        return entry;
+        return getEntry(Paths.get(name), searchFirst);
     }
 
-    public boolean contains(String groupName) {
-        return groupMap.containsKey(groupName.toUpperCase());
+    public boolean containsGroup(String groupName) {
+        return cacheResourceMap.containsGroup(groupName);
     }
 
     @NotNull
     public Group newGroup(Entry entry) {
         Group group = DUMMY_DIRECTORY;
 
-        if (Objects.nonNull(entry)) {
-            GroupType type = getGroupType(entry);
-            try {
-                switch (type) {
-                    case DIRECTORY:
-                        group = gameDirectory.getDirectory((FileEntry) entry);
-                        break;
-                    case GRP:
-                        group = new GrpFile(entry.getName(), entry::getInputStream);
-                        break;
-                    case RFF:
-                        group = new RffFile(entry.getName(), entry::getInputStream);
-                        break;
-                    case ZIP:
-                        group = new ZipFile(entry.getName(), entry::getInputStream);
-                        break;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        GroupType type = getGroupType(entry);
+        try {
+            switch (type) {
+                case DIRECTORY:
+                    group = getGameDirectory().getDirectory((FileEntry) entry);
+                    break;
+                case GRP:
+                    group = new GrpFile(entry.getName(), entry::getInputStream);
+                    break;
+                case RFF:
+                    group = new RffFile(entry.getName(), entry::getInputStream);
+                    break;
+                case ZIP:
+                    group = new ZipFile(entry.getName(), entry::getInputStream);
+                    break;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return group;
     }
 
     @NotNull
     public Group getGroup(String groupName) {
-        if (groupName.equals(gameDirectory.getName())) {
-            return gameDirectory;
+        Group group = cacheResourceMap.getGroup(groupName);
+        if (group.getSize() > 0) {
+            return group;
         }
-
-        int index = groupMap.getOrDefault(groupName.toUpperCase(), -1);
-        if (index != -1) {
-            return groups.get(index);
-        }
-
-        FileEntry directoryEntry = gameDirectory.getEntry(groupName);
-        if (directoryEntry.isDirectory()) {
-            return gameDirectory.getDirectory(directoryEntry);
-        }
-
         return DUMMY_DIRECTORY;
     }
 
     @NotNull
     public GroupType getGroupType(Entry entry) {
-        if (entry instanceof FileEntry && ((FileEntry) entry).isDirectory()) {
+        if (entry instanceof FileEntry && entry.isDirectory()) {
             return GroupType.DIRECTORY;
         }
 
@@ -157,7 +149,7 @@ public class Cache {
         }
 
         try (InputStream is = entry.getInputStream()) {
-            switch (is.read()) {
+            switch (StreamUtils.readSignedByte(is)) {
                 case 'K':
                     String value = StreamUtils.readString(is, 11);
                     if (value.equals("enSilverman")) {
@@ -165,12 +157,12 @@ public class Cache {
                     }
                     break;
                 case 'R':
-                    if (is.read() == 'F' && is.read() == 'F' && is.read() == 0x1A) {
+                    if (StreamUtils.readSignedByte(is) == 'F' && StreamUtils.readSignedByte(is) == 'F' && StreamUtils.readSignedByte(is) == 0x1A) {
                         return GroupType.RFF;
                     }
                     break;
                 case 'P':
-                    if (is.read() == 'K' && is.read() == 0x03 && is.read() == 0x04) {
+                    if (StreamUtils.readSignedByte(is) == 'K' && StreamUtils.readSignedByte(is) == 0x03 && StreamUtils.readSignedByte(is) == 0x04) {
                         return GroupType.ZIP;
                     }
                     break;
@@ -181,6 +173,16 @@ public class Cache {
     }
 
     public List<Group> getGroups() {
-        return groups;
+        List<Group> list = new ArrayList<>();
+        for (int i = NORMAL.getLevel(); i <= HIGHEST.getLevel(); i++) {
+            for (MapNode<Group> node = cacheResourceMap.getFirst(i); node != null; node = node.getNext()) {
+                list.add(node.get());
+            }
+        }
+        return list;
+    }
+
+    public enum GroupType {
+        NONE, DIRECTORY, RFF, GRP, ZIP
     }
 }

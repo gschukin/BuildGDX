@@ -28,6 +28,7 @@ import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
+import org.jetbrains.annotations.Nullable;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.font.BitmapFont;
@@ -229,8 +230,7 @@ public class TextureManager {
 		// System.err.println("loadPic " + dapicnum + " " + dapalnum + " clamping: " +
 		// clamping);
 		if (hicr != null) {
-			String fn = checkResource(hicr, dapicnum, skybox);
-			Entry entry = BuildGdx.cache.getEntry(fn, true); //getBytes(fn, 0);
+			Entry entry = checkResource(hicr, dapicnum, skybox);
 			if (entry.exists()) {
 				try {
 					byte[] data = entry.getBytes();
@@ -250,12 +250,12 @@ public class TextureManager {
 		return new RGBTileData(engine.getTile(dapicnum), dapalnum, clamping, alpha, expand.get());
 	}
 
-	protected String checkResource(Hicreplctyp hicr, int dapic, int facen) {
+	protected Entry checkResource(Hicreplctyp hicr, int dapic, int facen) {
 		if (hicr == null) {
 			return null;
 		}
 
-		String fn = null;
+		Entry fn = null;
 		if (facen > 0) {
 			if (hicr.skybox == null || facen > 6 || hicr.skybox.face[facen - 1] == null) {
 				return null;
@@ -266,7 +266,7 @@ public class TextureManager {
 			fn = hicr.filename;
 		}
 
-		if (!BuildGdx.cache.getEntry(fn, true).exists()) {
+		if (!fn.exists()) {
 			Console.out.println("Hightile[" + dapic + "]: File \"" + fn + "\" not found");
 			if (facen > 0) {
 				hicr.skybox.ignore = 1;
@@ -474,6 +474,7 @@ public class TextureManager {
 		return palette;
 	}
 
+	@Nullable
 	public GLTile getPalookup(int pal) {
 		if (palookups[pal] == null || palookups[pal].isInvalidated()) {
 			if (Engine.palookup[pal] == null) {

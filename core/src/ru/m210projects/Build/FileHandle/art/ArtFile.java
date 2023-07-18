@@ -4,28 +4,38 @@ import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.InputStreamProvider;
 import ru.m210projects.Build.filehandle.StreamUtils;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
 public class ArtFile implements Group {
-    private static final String HEADER = "BUILDART";
-    private final int tileStart;
-    private final boolean valid;
-    private final String name;
-    private final List<ArtEntry> entries;
+
+    public static final ArtEntry DUMMY_ART_FILE = new ArtEntry(() -> new ByteArrayInputStream(new byte[0]), MAXTILES, 0, 0, 0, 0) {
+        @Override
+        public boolean exists() {
+            return false;
+        }
+    };
+
+    protected static final String HEADER = "BUILDART";
+    protected final int tileStart;
+    protected final String name;
+    protected final List<ArtEntry> entries;
 
     public ArtFile(String name, InputStreamProvider provider) {
         this.name = name;
         List<ArtEntry> entries = null;
         int tileStart = -1;
-        boolean valid = false;
 
         try (InputStream is = new BufferedInputStream(provider.newInputStream())) {
             int version = checkVersion(is);
@@ -60,14 +70,12 @@ public class ArtFile implements Group {
             for (int i = 0; i < numTiles; i++) {
                 int width = sizx[i];
                 int height = sizy[i];
-                ArtEntry entry = new ArtEntry(provider, num++, offset, width, height, flags[i]);
+                ArtEntry entry = createArtEntry(provider, num++, offset, width, height, flags[i]);
                 entries.add(entry);
                 offset += entry.getSize();
             }
-
-            valid = true;
         } catch(Exception e) {
-            System.err.println("Can't load ART file: " + e.getMessage());
+            Console.out.println("Can't load ART file: " + e.getMessage(), OsdColor.RED);
             if(entries == null) {
                 entries = Collections.unmodifiableList(new ArrayList<>(0));
             }
@@ -75,7 +83,10 @@ public class ArtFile implements Group {
 
         this.entries = entries;
         this.tileStart = tileStart;
-        this.valid = valid;
+    }
+
+    protected ArtEntry createArtEntry(InputStreamProvider provider, int num, int offset, int width, int height, int flags) {
+        return new ArtEntry(provider, num, offset, width, height, flags);
     }
 
     @Override
@@ -107,15 +118,15 @@ public class ArtFile implements Group {
     }
 
     private int checkVersion(InputStream is) throws IOException {
-        int b = is.read();
+        int b = StreamUtils.readSignedByte(is);
         if (b == 1) {
-            if ((is.read() | is.read() | is.read()) == 0) {
+            if ((StreamUtils.readSignedByte(is) | StreamUtils.readSignedByte(is) | StreamUtils.readSignedByte(is)) == 0) {
                 return 1;
             }
         } else if (b == HEADER.charAt(0)) {
             int c = 1;
             while (c < HEADER.length()) {
-                if (HEADER.charAt(c) != is.read()) {
+                if (HEADER.charAt(c) != StreamUtils.readSignedByte(is)) {
                     break;
                 }
                 c++;
@@ -126,10 +137,6 @@ public class ArtFile implements Group {
             }
         }
         return -1;
-    }
-
-    public boolean isValid() {
-        return valid;
     }
 }
 

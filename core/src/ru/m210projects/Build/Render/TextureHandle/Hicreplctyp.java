@@ -6,26 +6,28 @@
 
 package ru.m210projects.Build.Render.TextureHandle;
 
+import ru.m210projects.Build.filehandle.Entry;
+
 public class Hicreplctyp {
 
 	public static class Hicskybox {
 		public int ignore;
-	    public final String[] face;
+	    public final Entry[] face;
 
 	    public Hicskybox()
 	    {
-	    	face = new String[6];
+	    	face = new Entry[6];
 	    }
 
 	    public Hicskybox(Hicskybox src)
 	    {
-	    	this.face = new String[6];
+	    	this.face = new Entry[6];
 	    	System.arraycopy(src.face, 0, face, 0, 6);
 	    	this.ignore = src.ignore;
 	    }
 	}
 
-	public String filename;
+	public Entry filename;
 	public Hicskybox skybox;
     public int palnum, ignore, flags;
     public float alphacut, xscale, yscale, specpower, specfactor;

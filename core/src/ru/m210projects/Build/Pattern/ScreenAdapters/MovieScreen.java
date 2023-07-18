@@ -106,12 +106,10 @@ public abstract class MovieScreen extends SkippableAdapter {
 		}
 
 		ArtEntry pic = engine.getTile(TILE_MOVIE);
-		if (pic instanceof CachedArtEntry) {
-			if (pic.getWidth() != mvfil.getWidth() || pic.getHeight() != mvfil.getHeight()) {
-				engine.replaceTile(new CachedArtEntry(TILE_MOVIE, new byte[mvfil.getWidth() * mvfil.getHeight()], mvfil.getWidth(), mvfil.getHeight()));
-			} else {
-				((CachedArtEntry) pic).clearData();
-			}
+		if (!(pic instanceof CachedArtEntry) || pic.getWidth() != mvfil.getWidth() || pic.getHeight() != mvfil.getHeight()) {
+			pic = engine.allocatepermanenttile(TILE_MOVIE, mvfil.getWidth(), mvfil.getHeight());
+		} else {
+			((CachedArtEntry) pic).clearData();
 		}
 
 		float kt = pic.getHeight() / (float) pic.getWidth();
@@ -218,8 +216,6 @@ public abstract class MovieScreen extends SkippableAdapter {
 			if (mvtime >= tick) {
 				if (frame < mvfil.getFrames()) {
 					pic.copyData(DoDrawFrame(frame));
-					engine.getrender().invalidatetile(TILE_MOVIE, 0, -1); // JBF 20031228
-
 					frame++;
 				} else {
 					return false;

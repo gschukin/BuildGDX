@@ -3,6 +3,7 @@ package ru.m210projects.Build.filehandle.art;
 import ru.m210projects.Build.Types.AnimType;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.EntryInputStream;
+import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.InputStreamProvider;
 
 import java.io.ByteArrayInputStream;
@@ -15,23 +16,15 @@ import static ru.m210projects.Build.Engine.pow2long;
 
 public class ArtEntry implements Entry {
 
-    private final int num;
-    private final int offset;
-    private final int width;
-    private final int height;
-    private final int sizex;
-    private final int sizey;
-    private int flags;
+    protected final int num;
+    protected final int offset;
+    protected final int width;
+    protected final int height;
+    protected final int sizex;
+    protected final int sizey;
+    protected int flags;
     private final InputStreamProvider provider;
-    private final int size;
-
-    private byte[] data; //get rid of this in future
-
-    // allocated tile
-    public ArtEntry(int num, byte[] data, int width, int height) {
-        this(() -> new ByteArrayInputStream(data), num, 0, width, height, 0);
-        this.data = data;
-    }
+    protected final int size;
 
     public ArtEntry(InputStreamProvider provider, int num, int offset, int width, int height, int flags) {
         this.provider = provider;
@@ -61,24 +54,9 @@ public class ArtEntry implements Entry {
         return new EntryInputStream(is, size);
     }
 
-    @Override
-    public byte[] getBytes() {
-        if (!isLoaded()) {
-            data = Entry.super.getBytes();
-        }
-
-        return data;
-    }
-
-    public boolean isLoaded() {
-        return data != null;
-    }
-
     public boolean hasSize() {
         return size != 0;
     }
-
-
     @Override
     public String getName() {
         return "";
@@ -91,7 +69,16 @@ public class ArtEntry implements Entry {
 
     @Override
     public boolean exists() {
-        return true;
+        return size != 0;
+    }
+
+    @Override
+    public Group getParent() {
+        return null;
+    }
+
+    @Override
+    public void setParent(Group parent) {
     }
 
     public int getNum() {
@@ -151,7 +138,7 @@ public class ArtEntry implements Entry {
     }
 
     public void disableAnimation() {
-        flags &= ~0xFF0000FF;
+        flags &= ~0x700000FF;
     }
 
     public boolean hasXOffset() {
@@ -168,16 +155,17 @@ public class ArtEntry implements Entry {
         flags |= (y & 0xFF) << 16;
     }
 
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
     @Override
     public String toString() {
-        return "ArtEntry{" +
-                "num=" + num +
-                ", offset=" + offset +
-                ", width=" + width +
-                ", height=" + height +
-                ", flags=" + flags +
-                ", size=" + size +
-                '}';
+        return String.format("tile %d, %dx%d, size=%d", num, width, height, size);
     }
 
     @Override

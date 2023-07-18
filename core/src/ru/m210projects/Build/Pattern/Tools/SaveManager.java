@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public class SaveManager {
@@ -20,20 +18,17 @@ public class SaveManager {
 	public static class SaveInfo implements Comparable<SaveInfo> {
 		public String name;
 		public long time;
-		public String filename;
+		public FileEntry entry;
 
-		public SaveInfo(String name, long time, String filename)
-		{
-			this.name = name;
-			this.time = time;
-			this.filename = filename;
+		public SaveInfo(String name, long time, FileEntry entry) {
+			update(name, time, entry);
 		}
 		
-		public void update(String name, long time, String filename)
+		public void update(String name, long time, FileEntry entry)
 		{
 			this.name = name;
 			this.time = time;
-			this.filename = filename;
+			this.entry = entry;
 		}
 
 		@Override
@@ -52,36 +47,35 @@ public class SaveManager {
 		return SavList;
 	}
 	
-	public void add(String savname, long time, String filename)
+	public void add(String savname, long time, FileEntry entry)
 	{
+		String filename = entry.getName();
 		SaveInfo info;
 		if((info = SavHash.get(filename)) == null) {
-			info = new SaveInfo(savname, time, filename);
+			info = new SaveInfo(savname, time, entry);
 			SavList.add(0, info);
 			SavHash.put(filename, info);
 		} else {
 			SavList.remove(info);
-			info.update(savname, time, filename);
+			info.update(savname, time, entry);
 			SavList.add(0, info);
 		}
 	}
 	
-	public void delete(String filename) {
+	public void delete(FileEntry entry) {
 		SaveInfo info;
-		if((info = SavHash.get(filename)) != null) {
-			Directory userDir = BuildGdx.cache.getUserDirectory();
-			FileEntry entry = userDir.getEntry(filename);
+		if((info = SavHash.get(entry.getName())) != null) {
 			if (entry.exists() && entry.delete()) {
 				SavList.remove(info);
-				userDir.revalidate();
+				entry.getParent().revalidate();
 			}
 		} 
 	}
 	
-	public String getLast()
+	public FileEntry getLast()
 	{
 		if(SavList.size() > 0) {
-			return SavList.get(0).filename;
+			return SavList.get(0).entry;
 		}
 		return null;
 	}

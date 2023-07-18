@@ -658,13 +658,11 @@ public class RenderService {
         render.completemirror();
     }
 
-    public String screencapture(String fn) { // jfBuild + gdxBuild (screenshot)
+    public String screencapture(Directory dir, String fn) { // jfBuild + gdxBuild (screenshot)
         int a, b, c, d;
         fn = fn.replaceAll("[^a-zA-Z0-9_. \\[\\]-]", "");
 
         fn = fn.substring(0, fn.lastIndexOf('.') - 4);
-
-        Directory userDir = BuildGdx.cache.getUserDirectory();
 
         int capturecount = 0;
         do { // JBF 2004022: So we don't overwrite existing screenshots
@@ -677,7 +675,7 @@ public class RenderService {
             c = ((capturecount / 10) % 10);
             d = (capturecount % 10);
 
-            if(!userDir.getEntry(fn + a + b + c + d + ".png").exists()) {
+            if(!dir.getEntry(fn + a + b + c + d + ".png").exists()) {
                 break;
             }
 
@@ -690,9 +688,9 @@ public class RenderService {
             capture = new Pixmap(w, h, Pixmap.Format.RGB888);
             ByteBuffer pixels = capture.getPixels();
             pixels.put(render.getFrame(TileData.PixelFormat.Rgb, xdim, -ydim));
-            Path path = userDir.getPath().resolve(fn + a + b + c + d + ".png");
+            Path path = dir.getPath().resolve(fn + a + b + c + d + ".png");
             PixmapIO.writePNG(new FileHandle(path.toFile()), capture);
-            userDir.addEntry(path);
+            dir.revalidate();
             capture.dispose();
             return fn + a + b + c + d + ".png";
         } catch (Throwable e) {

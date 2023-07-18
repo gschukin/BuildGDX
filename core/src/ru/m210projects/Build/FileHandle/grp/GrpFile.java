@@ -11,11 +11,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_DIRECTORY;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
 public class GrpFile implements Group {
     private static final String GRP_HEADER = "KenSilverman";
-    private final Map<String, Entry> entries;
+    protected final Map<String, Entry> entries;
     private final String name;
     public GrpFile(String name) {
         this.entries = new LinkedHashMap<>();
@@ -39,6 +40,7 @@ public class GrpFile implements Group {
                     String fileName = StreamUtils.readString(is, 12);
                     int size = StreamUtils.readInt(is);
                     GrpEntry entry = new GrpEntry(provider, fileName, offset, size);
+                    entry.parent = this;
                     entries.put(fileName.toUpperCase(), entry);
                     offset += size;
                 }
@@ -53,9 +55,23 @@ public class GrpFile implements Group {
         GrpEntry entry;
         synchronized (this) {
             entry = new GrpEntry(() -> new ByteArrayInputStream(data), name, -1, data.length);
+            entry.parent = this;
             entries.put(name.toUpperCase(), entry);
         }
         return entry;
+    }
+
+    public boolean addEntry(Entry entry) {
+        Objects.requireNonNull(entry, "entry");
+        synchronized (this) {
+            if (entry.exists()) {
+                if (entries.put(entry.getName().toUpperCase(), entry) != null) {
+                    entry.setParent(this);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public Entry removeEntry(String name) {
@@ -63,6 +79,7 @@ public class GrpFile implements Group {
         Entry entry;
         synchronized (this) {
             entry = entries.remove(name.toUpperCase());
+            entry.setParent(DUMMY_DIRECTORY);
         }
         return entry;
     }

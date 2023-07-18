@@ -2,7 +2,10 @@ package ru.m210projects.Build.filehandle.rff;
 
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.EntryInputStream;
+import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.InputStreamProvider;
+import ru.m210projects.Build.osd.Console;
+import ru.m210projects.Build.osd.OsdColor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +13,7 @@ import java.time.LocalDateTime;
 
 public class RffEntry implements Entry {
 
-    private enum DictFlags {
+    protected enum DictFlags {
         ID(1),
         EXTERNAL(1 << 1),
         PRELOAD(1 << 2),
@@ -26,6 +29,10 @@ public class RffEntry implements Entry {
         public int getBit() {
             return bit;
         }
+
+        public boolean checkBit(int flags) {
+            return (flags & bit) != 0;
+        }
     }
 
     private final InputStreamProvider provider;
@@ -37,6 +44,7 @@ public class RffEntry implements Entry {
     private final int flags;
     private final String name;
     private final String fmt;
+    Group parent;
 
     public RffEntry(InputStreamProvider provider, int id, int offset, int size, int packedSize, LocalDateTime date, int flags, String name, String fmt) {
         this.provider = provider;
@@ -45,9 +53,12 @@ public class RffEntry implements Entry {
         this.size = size;
         this.packedSize = packedSize;
         this.date = date;
+        if (id != 0 && !DictFlags.ID.checkBit(flags)) {
+            flags |= DictFlags.ID.getBit();
+        }
         this.flags = flags;
-        this.name = name.trim();
-        this.fmt = fmt;
+        this.name = String.format("%s.%s",name.trim(), fmt).toUpperCase();
+        this.fmt = fmt.toUpperCase();
     }
 
     @Override
@@ -65,10 +76,23 @@ public class RffEntry implements Entry {
     }
 
     @Override
+    public Group getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(Group parent) {
+        this.parent = parent;
+    }
+
+    @Override
     public long getSize() {
         return size;
     }
 
+    /**
+     * @return name without path and extension
+     */
     @Override
     public String getName() {
         return name;
@@ -105,14 +129,6 @@ public class RffEntry implements Entry {
 
     @Override
     public String toString() {
-        return "RffEntry{" +
-                "name='" + name + '\'' +
-                ", fmt='" + fmt + '\'' +
-                ", flags=" + flags +
-                ", offset=" + offset +
-                ", size=" + size +
-                ", date=" + date +
-                ", id=" + id +
-                '}';
+        return String.format("%s id=%d, size=%d", name, id, size);
     }
 }

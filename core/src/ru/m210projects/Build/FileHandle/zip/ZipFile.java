@@ -4,12 +4,16 @@ import org.jetbrains.annotations.NotNull;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.InputStreamProvider;
+import ru.m210projects.Build.filehandle.StreamUtils;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.zip.InflaterInputStream;
 import java.util.zip.ZipInputStream;
 
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
@@ -26,9 +30,21 @@ public class ZipFile implements Group {
         this.directories = new LinkedHashMap<>();
     }
 
+    protected Entry newEntry(InputStreamProvider provider, String name, java.util.zip.ZipEntry entry, ZipInputStream zis) throws IOException {
+//        byte[] data = StreamUtils.readBytes(zis, (int) entry.getSize());
+//        return new ZipEntry(provider, name, entry) {
+//            @Override
+//            public InputStream getInputStream() {
+//                return new ByteArrayInputStream(data);
+//            }
+//        };
+        return new ZipEntry(provider, name, entry);
+    }
+
     public ZipFile(String name, InputStreamProvider provider) throws IOException {
         this.name = name;
-        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(provider.newInputStream()))) {
+
+        try (FastZipInputStream zis = new FastZipInputStream(new BufferedInputStream(provider.newInputStream()))) {
             this.entries = new LinkedHashMap<>();
             this.directories = new LinkedHashMap<>();
 
@@ -38,9 +54,12 @@ public class ZipFile implements Group {
                 Path file = path.getFileName();
 
                 if (path.getParent() == null) {
-                    entries.put(file.toString().toUpperCase(), new ZipEntry(provider, file.toString(), entry));
+                    Entry zip = entries.put(file.toString().toUpperCase(), newEntry(provider, file.toString(), entry, zis));
+                    if (zip != null) {
+                        zip.setParent(this);
+                    }
                 } else {
-                    ZipEntry zipEntry = new ZipEntry(provider, file.toString(), entry);
+                    Entry zipEntry = newEntry(provider, file.toString(), entry, zis);
 
                     ZipFile dir = this;
                     for (Path p : path) {
@@ -57,8 +76,10 @@ public class ZipFile implements Group {
                     }
 
                     dir.entries.put(zipEntry.getName().toUpperCase(), zipEntry);
+                    zipEntry.setParent(dir);
                 }
-                zis.closeEntry();
+
+                zis.skipEntry();
             }
         }
     }
@@ -73,18 +94,13 @@ public class ZipFile implements Group {
         return name;
     }
 
-    @Override
-    public synchronized List<Entry> getEntries() {
-        return new ArrayList<>(entries.values());
-    }
-
     @NotNull
     @Override
     public Entry getEntry(Path path) {
         ZipFile dir = this;
         Entry result = DUMMY_ENTRY;
         for (Path p : path) {
-            Entry entry = dir.getEntry(p.toString());
+            Entry entry = dir.entries.getOrDefault(p.toString().toUpperCase(), DUMMY_ENTRY);
             if (!entry.exists()) {
                 return DUMMY_ENTRY;
             }
@@ -101,11 +117,20 @@ public class ZipFile implements Group {
     @NotNull
     @Override
     public Entry getEntry(String name) {
-        Objects.requireNonNull(name, "name");
-        Entry entry;
-        synchronized (this) {
-            entry = entries.getOrDefault(name.toUpperCase(), DUMMY_ENTRY);
+        return getEntry(Paths.get(name));
+    }
+
+    private void fillList(ZipFile dir, List<Entry> list) {
+        list.addAll(dir.entries.values());
+        for (ZipFile zip : dir.directories.values()) {
+            fillList(zip, list);
         }
-        return entry;
+    }
+
+    @Override
+    public synchronized List<Entry> getEntries() {
+        List<Entry> list = new ArrayList<>();
+        fillList(this, list);
+        return list;
     }
 }

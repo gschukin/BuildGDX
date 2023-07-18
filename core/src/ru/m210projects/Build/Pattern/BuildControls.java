@@ -212,6 +212,10 @@ public abstract class BuildControls {
 
 	public boolean ctrlGetInputKey(KeyType keyName, boolean once) {
 		final KeyInput input = getInput();
+		if (!pCfg.isInited) {
+			return false;
+		}
+
 		final int key1 = pCfg.primarykeys[keyName.getNum()];
 		final int key2 = pCfg.secondkeys[keyName.getNum()];
 		final int keyM = pCfg.mousekeys[keyName.getNum()];

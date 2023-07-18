@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import ru.m210projects.Build.Types.PropertyIgnoreCase;
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 
 public class IniFile {
@@ -36,18 +37,18 @@ public class IniFile {
 	protected StringReader reader;
 	protected String name;
 	protected byte[] data;
-	private FileEntry file;
+	protected Entry file;
 	
 	protected IniFile() { /* extends */	}
 
- 	public IniFile(byte[] data, String name, FileEntry file) {
+ 	public IniFile(byte[] data, String name, Entry file) {
 		this.name = toLowerCase(name);
 		this.file = file;
 		
 		init(data);
 	}
 	
-	public FileEntry getFile()
+	public Entry getFile()
 	{
 		return file;
 	}

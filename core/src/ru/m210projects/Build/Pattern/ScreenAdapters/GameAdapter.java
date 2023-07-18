@@ -27,6 +27,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
+import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
@@ -100,32 +101,26 @@ public abstract class GameAdapter extends ScreenAdapter {
 
 	public abstract void sndHandlePause(boolean pause);
 
-	protected abstract boolean prepareboard(String map);
+	protected abstract boolean prepareboard(Entry entry);
 
 	public GameAdapter setTitle(String title) {
 		load.setTitle(title);
 		return this;
 	}
 
-	public GameAdapter loadboard(final String map, final Runnable prestart) {
+	public GameAdapter loadboard(final Entry mapEntry, final Runnable prestart) {
 		pNet.ready2send = false;
 		game.changeScreen(load);
 		load.init(new Runnable() {
 			@Override
 			public void run() {
-				if (prepareboard(map)) {
+				if (prepareboard(mapEntry)) {
 					if (prestart != null) {
 						prestart.run();
 					}
 
-					String mapname = map;
-					int index = toLowerCase(mapname).indexOf(".map");
-					if (index == -1) {
-						mapname = mapname + ".map";
-					}
-
-					if (game.currentDef.mapInfo.load(mapname)) {
-						System.err.println("Maphack loaded for map: " + mapname);
+					if (game.currentDef.mapInfo.load(mapEntry.getName())) {
+						System.err.println("Maphack loaded for map: " + mapEntry.getName());
 					}
 
 					startboard(startboard);

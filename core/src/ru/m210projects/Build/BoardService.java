@@ -34,13 +34,12 @@ public class BoardService {
         this.spriteSectMap = createSpriteMap(board.getSectorCount(), sprites, MAXSPRITES, Sprite::setSectnum);
     }
 
-    protected Board loadBoard(Entry entry) throws RuntimeException, IOException {
+    protected Board loadBoard(Entry entry) throws IOException {
         try (InputStream is = entry.getInputStream()) {
             int version = StreamUtils.readInt(is);
             if (version != 7) {
                 throw new RuntimeException("Wrong version: " + version);
             }
-
 
             BuildPos startPos = new BuildPos(StreamUtils.readInt(is),
                     StreamUtils.readInt(is),

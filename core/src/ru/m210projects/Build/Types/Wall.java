@@ -65,12 +65,12 @@ public class Wall {
         setCstat(StreamUtils.readShort(is));
         setPicnum(StreamUtils.readShort(is));
         setOverpicnum(StreamUtils.readShort(is));
-        setShade(is.read());
-        setPal(is.read());
-        setXrepeat(is.read());
-        setYrepeat(is.read());
-        setXpanning(is.read());
-        setYpanning(is.read());
+        setShade(StreamUtils.readSignedByte(is));
+        setPal(StreamUtils.readSignedByte(is));
+        setXrepeat(StreamUtils.readSignedByte(is));
+        setYrepeat(StreamUtils.readSignedByte(is));
+        setXpanning(StreamUtils.readSignedByte(is));
+        setYpanning(StreamUtils.readSignedByte(is));
         setLotag(StreamUtils.readShort(is));
         setHitag(StreamUtils.readShort(is));
         setExtra(StreamUtils.readShort(is));

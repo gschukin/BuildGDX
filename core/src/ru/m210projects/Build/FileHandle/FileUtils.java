@@ -32,7 +32,11 @@ public class FileUtils {
 	
 	public static String getNameWithoutExtension(String filename)
 	{
-		return filename.substring(0, filename.lastIndexOf('.'));
+		int index = filename.lastIndexOf('.');
+		if (index != -1) {
+			return filename.substring(0, filename.lastIndexOf('.'));
+		}
+		return filename;
 	}
 
 	public static String getFullName(String path) {

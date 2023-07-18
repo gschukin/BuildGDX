@@ -767,10 +767,10 @@ public class Software implements Renderer {
 						if (globalpicnum >= MAXTILES) {
 							globalpicnum = 0;
 						}
+						ArtEntry pic = engine.getTile(globalpicnum);
 						globalxpanning = wal.getXpanning() & 0xFF;
 						globalypanning = wal.getYpanning() & 0xFF;
-						globalshiftval = (short) (picsiz[globalpicnum] >> 4);
-						ArtEntry pic = engine.getTile(globalpicnum);
+						globalshiftval = (short) pic.getSizey();
 
 						if (pow2long[globalshiftval] != pic.getHeight()) {
 							globalshiftval++;
@@ -867,6 +867,7 @@ public class Software implements Renderer {
 							}
 						}
 
+						ArtEntry art;
 						if ((wal.getCstat() & 2) > 0) {
 							wallnum = wal.getNextwall();
 							wal = boardService.getWall(wallnum);
@@ -875,9 +876,10 @@ public class Software implements Renderer {
 							if (globalpicnum >= MAXTILES) {
 								globalpicnum = 0;
 							}
+							art = engine.getTile(globalpicnum);
 							globalxpanning = wal.getXpanning() & 0xFF;
 							globalypanning = wal.getYpanning() & 0xFF;
-							if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
+							if (art.getType() != AnimType.NONE) {
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 							}
 							globalshade = wal.getShade();
@@ -890,9 +892,10 @@ public class Software implements Renderer {
 							if (globalpicnum >= MAXTILES) {
 								globalpicnum = 0;
 							}
+							art = engine.getTile(globalpicnum);
 							globalxpanning = wal.getXpanning() & 0xFF;
 							globalypanning = wal.getYpanning() & 0xFF;
-							if (engine.getTile(globalpicnum).getType() != AnimType.NONE) {
+							if (art.getType() != AnimType.NONE) {
 								globalpicnum += engine.animateoffs(globalpicnum, wallnum + 16384);
 							}
 							globalshade = wal.getShade();
@@ -905,8 +908,8 @@ public class Software implements Renderer {
 						if (sec.getVisibility() != 0) {
 							globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 						}
-						globalshiftval = (short) (picsiz[globalpicnum] >> 4);
-						if (pow2long[globalshiftval] != engine.getTile(globalpicnum).getHeight()) {
+						globalshiftval = (short) (art.getSizey());
+						if (pow2long[globalshiftval] != art.getHeight()) {
 							globalshiftval++;
 						}
 						globalshiftval = (short) (32 - globalshiftval);
@@ -1020,7 +1023,7 @@ public class Software implements Renderer {
 				if (palookup[globalpal] == null) {
 					globalpal = 0; // JBF: fixes crash
 				}
-				globalshiftval = (short) (picsiz[globalpicnum] >> 4);
+				globalshiftval = (short) (pic.getSizey());
 				if (pow2long[globalshiftval] != pic.getHeight()) {
 					globalshiftval++;
 				}
@@ -1321,7 +1324,7 @@ public class Software implements Renderer {
 			if (sec.getVisibility() != 0) {
 				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 			}
-			globalshiftval = (short) (picsiz[globalpicnum] >> 4);
+			globalshiftval = (short) (pic.getSizey());
 			if (pow2long[globalshiftval] != pic.getHeight()) {
 				globalshiftval++;
 			}
@@ -1519,7 +1522,7 @@ public class Software implements Renderer {
 			if (sec.getVisibility() != 0) {
 				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 			}
-			globalshiftval = (short) (picsiz[globalpicnum] >> 4);
+			globalshiftval = (short) (pic.getSizey());
 			if (pow2long[globalshiftval] != pic.getHeight()) {
 				globalshiftval++;
 			}
@@ -2006,9 +2009,9 @@ public class Software implements Renderer {
 				globalpicnum = 0;
 			}
 
-			if (!pic.isLoaded()) {
-				engine.loadtile(globalpicnum);
-			}
+//			if (!pic.isLoaded()) {
+//				engine.loadtile(globalpicnum);
+//			}
 			engine.setgotpic(globalpicnum);
 			globalbufplc = pic.getBytes();
 
@@ -2017,9 +2020,8 @@ public class Software implements Renderer {
 				globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 			}
 
-			x = picsiz[globalpicnum];
-			y = ((x >> 4) & 15);
-			x &= 15;
+			x = pic.getSizex();
+			y = pic.getSizey();
 			if (pow2long[x] != xspan) {
 				x++;
 				globalx1 = mulscale(globalx1, xspan, x);
@@ -2643,7 +2645,7 @@ public class Software implements Renderer {
 			globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 		}
 		globalpal = wal.getPal();
-		globalshiftval = (short) (picsiz[globalpicnum] >> 4);
+		globalshiftval = (short) pic.getSizey();
 		if (pow2long[globalshiftval] != pic.getHeight()) {
 			globalshiftval++;
 		}
@@ -2726,9 +2728,9 @@ public class Software implements Renderer {
 			return;
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 
 		a.setuptvlineasm(globalshiftval);
 
@@ -2871,19 +2873,19 @@ public class Software implements Renderer {
 			return;
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 
 		startx = x1;
 
-		boolean xnice = (pow2long[picsiz[globalpicnum] & 15] == tsizx);
+		boolean xnice = (pow2long[pic.getSizex()] == tsizx);
 		if (xnice) {
 			tsizx = (tsizx - 1);
 		}
-		boolean ynice = (pow2long[picsiz[globalpicnum] >> 4] == tsizy);
+		boolean ynice = (pow2long[pic.getSizey()] == tsizy);
 		if (ynice) {
-			tsizy = (picsiz[globalpicnum] >> 4);
+			tsizy = pic.getSizey();
 		}
 
 		a.setupmvlineasm(globalshiftval);
@@ -2946,17 +2948,17 @@ public class Software implements Renderer {
 			return;
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 
-		xnice = (pow2long[picsiz[globalpicnum] & 15] == tsizx);
+		xnice = (pow2long[pic.getSizex()] == tsizx);
 		if (xnice) {
 			tsizx--;
 		}
-		ynice = (pow2long[picsiz[globalpicnum] >> 4] == tsizy);
+		ynice = (pow2long[pic.getSizey()] == tsizy);
 		if (ynice) {
-			tsizy = (picsiz[globalpicnum] >> 4);
+			tsizy = pic.getSizey();
 		}
 
 		fpalookup = globalpal;
@@ -3025,9 +3027,9 @@ public class Software implements Renderer {
 			pic = engine.getTile(globalpicnum);
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 		globalbufplc = pic.getBytes();
 
 		globalshade = sec.getFloorshade();
@@ -3070,8 +3072,8 @@ public class Software implements Renderer {
 		}
 		globalx2 = mulscale(globalx2, viewingrangerecip, 16);
 		globaly1 = mulscale(globaly1, viewingrangerecip, 16);
-		globalxshift = (byte) (8 - (picsiz[globalpicnum] & 15));
-		globalyshift = (byte) (8 - (picsiz[globalpicnum] >> 4));
+		globalxshift = (byte) (8 - pic.getSizex());
+		globalyshift = (byte) (8 - pic.getSizey());
 		if ((globalorientation & 8) != 0) {
 			globalxshift++;
 			globalyshift++;
@@ -3109,7 +3111,7 @@ public class Software implements Renderer {
 		globaly1 = (-globalx1 - globaly1) * halfxdimen;
 		globalx2 = (globalx2 - globaly2) * halfxdimen;
 
-		a.sethlinesizes(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4, globalbufplc);
+		a.sethlinesizes(pic.getSizex(), pic.getSizey(), globalbufplc);
 
 		globalx2 += globaly2 * (x1 - 1);
 		globaly1 += globalx1 * (x1 - 1);
@@ -3169,15 +3171,15 @@ public class Software implements Renderer {
 
 		switch (globalorientation & 0x180) {
 		case 128:
-			a.msethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.msethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		case 256:
 			a.settransnormal();
-			a.tsethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.tsethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		case 384:
 			a.settransreverse();
-			a.tsethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.tsethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		}
 
@@ -3272,7 +3274,7 @@ public class Software implements Renderer {
 			pic = engine.getTile(globalpicnum);
 		}
 
-		globalshiftval = (short) (picsiz[globalpicnum] >> 4);
+		globalshiftval = (short) (pic.getSizey());
 		if (pow2long[globalshiftval] != pic.getHeight()) {
 			globalshiftval++;
 		}
@@ -3280,7 +3282,7 @@ public class Software implements Renderer {
 		globalzd = (((pic.getHeight() >> 1) + parallaxyoffs) << globalshiftval) + (globalypanning << 24);
 		globalyscale = (8 << (globalshiftval - 19));
 
-		k = 11 - (picsiz[globalpicnum] & 15) - pskybits;
+		k = 11 - (pic.getSizex()) - pskybits;
 		x = -1;
 
 		for (z = bunchfirst[bunch]; z >= 0; z = p2[z]) {
@@ -3321,7 +3323,7 @@ public class Software implements Renderer {
 				}
 			} else if (x >= 0) {
 				l = globalpicnum;
-				m = (picsiz[globalpicnum] & 15);
+				m = (pic.getSizex());
 				globalpicnum = (short) (l + pskyoff[(lplc[x] >> m)]);
 
 				if (((lplc[x] ^ lplc[(xb1[z] - 1)]) >> m) == 0) {
@@ -3349,7 +3351,7 @@ public class Software implements Renderer {
 
 		if (x >= 0) {
 			l = globalpicnum;
-			m = (picsiz[globalpicnum] & 15);
+			m = (pic.getSizex());
 			globalpicnum = (short) (l + pskyoff[(lplc[x] >> m)]);
 			if (((lplc[x] ^ lplc[xb2[bunchlast[bunch]]]) >> m) == 0) {
 				wallscan(x, xb2[bunchlast[bunch]], topptr, botptr, swplc, lplc);
@@ -3492,9 +3494,9 @@ public class Software implements Renderer {
 		if (!pic.hasSize()) {
 			return;
 		}
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 
 		wal = boardService.getWall(sec.getWallptr());
 		wx = boardService.getWall(wal.getPoint2()).getX() - wal.getX();
@@ -3564,8 +3566,8 @@ public class Software implements Renderer {
 		globaly2 = mulscale(globaly2, -daz, 20);
 		globaly = mulscale(globaly, -daz, 28);
 
-		i = 8 - (picsiz[globalpicnum] & 15);
-		j = 8 - (picsiz[globalpicnum] >> 4);
+		i = 8 - (pic.getSizex());
+		j = 8 - (pic.getSizey());
 		if ((globalorientation & 8) != 0) {
 			i++;
 			j++;
@@ -3593,7 +3595,7 @@ public class Software implements Renderer {
 		globvis = mulscale(globvis, xdimscale, 16);
 
 		j = globalpal;
-		a.setupslopevlin((picsiz[globalpicnum] & 15) + (((picsiz[globalpicnum] >> 4)) << 8), pic.getBytes(), -ylookup[1],
+		a.setupslopevlin((pic.getSizex()) + (((pic.getSizey())) << 8), pic.getBytes(), -ylookup[1],
 				-(globalzd >> (16 - BITSOFPRECISION)));
 
 		l = (globalzd >> 16);
@@ -3685,9 +3687,9 @@ public class Software implements Renderer {
 			pic = engine.getTile(globalpicnum);
 		}
 
-		if (!pic.isLoaded()) {
-			engine.loadtile(globalpicnum);
-		}
+//		if (!pic.isLoaded()) {
+//			engine.loadtile(globalpicnum);
+//		}
 		globalbufplc = pic.getBytes();
 
 		globalshade = sec.getCeilingshade();
@@ -3730,8 +3732,8 @@ public class Software implements Renderer {
 		}
 		globalx2 = mulscale(globalx2, viewingrangerecip, 16);
 		globaly1 = mulscale(globaly1, viewingrangerecip, 16);
-		globalxshift = (byte) (8 - (picsiz[globalpicnum] & 15));
-		globalyshift = (byte) (8 - (picsiz[globalpicnum] >> 4));
+		globalxshift = (byte) (8 - (pic.getSizex()));
+		globalyshift = (byte) (8 - (pic.getSizey()));
 		if ((globalorientation & 8) != 0) {
 			globalxshift++;
 			globalyshift++;
@@ -3769,7 +3771,7 @@ public class Software implements Renderer {
 		globaly1 = (-globalx1 - globaly1) * halfxdimen;
 		globalx2 = (globalx2 - globaly2) * halfxdimen;
 
-		a.sethlinesizes(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4, globalbufplc);
+		a.sethlinesizes(pic.getSizex(), pic.getSizey(), globalbufplc);
 
 		globalx2 += globaly2 * (x1 - 1);
 		globaly1 += globalx1 * (x1 - 1);
@@ -3830,15 +3832,15 @@ public class Software implements Renderer {
 		int forswitch = globalorientation & 0x180;
 		switch (forswitch) {
 		case 128:
-			a.msethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.msethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		case 256:
 			a.settransnormal();
-			a.tsethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.tsethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		case 384:
 			a.settransreverse();
-			a.tsethlineshift(picsiz[globalpicnum] & 15, picsiz[globalpicnum] >> 4);
+			a.tsethlineshift(pic.getSizex(), pic.getSizey());
 			break;
 		}
 

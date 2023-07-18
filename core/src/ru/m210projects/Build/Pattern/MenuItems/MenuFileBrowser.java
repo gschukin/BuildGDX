@@ -16,21 +16,11 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.Strhandler.*;
-import static ru.m210projects.Build.Engine.*;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
+import ru.m210projects.Build.Pattern.Tools.NaturalComparator;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.CharInfo;
@@ -40,522 +30,524 @@ import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+
+import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Gameutils.*;
+import static ru.m210projects.Build.Strhandler.toCharArray;
+
 public abstract class MenuFileBrowser extends MenuItem {
 
-	private class StringList extends LinkedList<String> {
-		private static final long serialVersionUID = 1L;
-	}
+    protected final int nListItems;
+    protected final int nItemHeight;
+    private final int DIRECTORY = 0; // left part of filebrowser
+    private final int FILE = 1; // right part of filebrowser
+    private final int[] scrollX = new int[2];
+    private final BuildEngine draw;
+    private final SliderDrawable slider;
+    public String back = "..";
+    public boolean[] scrollTouch = new boolean[2];
+    public String path;
+    public int topPal, pathPal, listPal, backgroundPal;
+    public int transparent = 1;
+    protected List<FileEntry> fileList;
+    protected List<Directory> dirList;
+    protected HashMap<String, ExtProp> extensionProperties = new HashMap<>();
+    protected HashMap<Class<?>, ExtProp> classProperties = new HashMap<>();
+    private final Comparator<FileEntry> fileComparator = (o1, o2) -> {
+        ExtProp p1 = getPropertie(o1);
+        ExtProp p2 = getPropertie(o2);
+        if (p1 != null && p2 != null) {
+            int c = p2.priority - p1.priority;
+            if (c != 0) {
+                return c;
+            }
+        }
+        return o1.compareTo(o2);
+    };
+    protected char[] dirs = "Directories".toCharArray();
+    protected char[] ffs = "Files".toCharArray();
+    protected int[] l_nMin;
+    protected int[] l_nFocus;
+    protected int currColumn;
+    protected Directory currDir;
+    protected Font topFont, pathFont;
+    protected char[] buffer = new char[40];
+    private int touchY;
+    private int nBackground;
+    private int scrollerHeight;
+    private long checkDirectory; // checking for new files
 
-	protected StringList[] list = new StringList[2];
+    public MenuFileBrowser(BuildGame app, Font font, Font topFont, Font pathFont, int x, int y, int width, int nItemHeight, int nListItems, int nBackground) {
+        super(null, font);
 
-	private class ExtProp {
-		int pal;
-		int priority;
+        this.dirList = new ArrayList<>();
+        this.fileList = new ArrayList<>();
 
-		public ExtProp(int pal, int priority) {
-			this.pal = pal;
-			this.priority = priority;
-		}
-	}
+        this.flags = 3 | 4;
+        this.draw = app.pEngine;
+        this.slider = app.pSlider;
 
-	private final Comparator<String> fileComparator = new Comparator<String>() {
-		@Override
-		public int compare(String s1, String s2) {
-			Object o1 = fileUnit.get(s1);
-			Object o2 = fileUnit.get(s2);
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.nItemHeight = nItemHeight;
+        this.nListItems = nListItems;
+        this.topFont = topFont;
+        this.pathFont = pathFont;
+        this.nBackground = nBackground;
 
-			ExtProp p1 = getPropertie(o1);
-			ExtProp p2 = getPropertie(o2);
-			if (p1 != null && p2 != null) {
-				int c = p2.priority - p1.priority;
-				if (c != 0) {
-					return c;
-				}
-			}
+        this.l_nMin = new int[2];
+        this.l_nFocus = new int[2];
+        this.currColumn = FILE;
 
-			if (o1 instanceof FileEntry && o2 instanceof FileEntry) {
-				return ((FileEntry) o1).compareTo((FileEntry) o2);
-			}
+        init();
+        changeDir(BuildGdx.cache.getGameDirectory());
+    }
 
-			return s1.compareTo(s2);
-		}
-	};
+    public void registerExtension(String ext, int pal, int priority) {
+        extensionProperties.put(ext.toUpperCase(), new ExtProp(pal, priority));
+    }
 
-	protected HashMap<String, Object> fileUnit = new HashMap<String, Object>();
-	protected HashMap<String, ExtProp> extensionProperties = new HashMap<String, ExtProp>();
-	protected HashMap<Class<?>, ExtProp> classProperties = new HashMap<Class<?>, ExtProp>();
+    public void registerClass(Class<?> cl, int pal, int priority) {
+        classProperties.put(cl, new ExtProp(pal, priority));
+    }
 
-	private final int DIRECTORY = 0;
-	private final int FILE = 1;
-	public String back = "..";
-	protected char[] dirs = "Directories".toCharArray();
-	protected char[] ffs = "Files".toCharArray();
+    public abstract void init();
 
-	private int touchY;
-	private final int[] scrollX = new int[2];
-	public boolean[] scrollTouch = new boolean[2];
+    public abstract void handleFile(FileEntry file);
 
-	protected int[] l_nMin;
-	protected int[] l_nFocus;
-	protected final int nListItems;
-	protected final int nItemHeight;
+    public abstract void invoke(FileEntry fil);
 
-	public String path;
-	protected int currColumn;
-	protected Directory currDir;
+    public abstract void handleDirectory(Directory dir);
 
-	private final BuildEngine draw;
-	private final SliderDrawable slider;
-	private int nBackground;
-	private int scrollerHeight;
-	protected Font topFont, pathFont;
-	public int topPal, pathPal, listPal, backgroundPal;
-	public int transparent = 1;
+    public int getListSize(int column) {
+        if (column == FILE) {
+            return fileList.size();
+        }
+        return dirList.size();
+    }
 
-	private long checkDirectory; // checking for new files
+    public String getFileName() {
+        return fileList.get(l_nFocus[FILE]).getName();
+    }
 
-	public void registerExtension(String ext, int pal, int priority) {
-		extensionProperties.put(ext, new ExtProp(pal, priority));
-	}
+    public Directory getDirectory() {
+        return currDir;
+    }
 
-	public void registerClass(Class<?> cl, int pal, int priority) {
-		classProperties.put(cl, new ExtProp(pal, priority));
-	}
+    public int mFontOffset() {
+        return font.getSize() + nItemHeight;
+    }
 
-	public MenuFileBrowser(BuildGame app, Font font, Font topFont, Font pathFont, int x, int y,
-						   int width, int nItemHeight, int nListItems, int nBackground) {
-		super(null, font);
+    private void changeDir(Directory dir) {
+        if (dir instanceof BackDirectory) {
+            dir = ((BackDirectory) dir).getDirectory();
+        }
 
-		list[DIRECTORY] = new StringList();
-		list[FILE] = new StringList();
+        if (dir.equals(Directory.DUMMY_DIRECTORY) || !dir.revalidate() && currDir == dir) {
+            return;
+        }
 
-		this.flags = 3 | 4;
-		this.draw = app.pEngine;
-		this.slider = app.pSlider;
+        dirList.clear();
+        fileList.clear();
 
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.nItemHeight = nItemHeight;
-		this.nListItems = nListItems;
-		this.topFont = topFont;
-		this.pathFont = pathFont;
-		this.nBackground = nBackground;
+        currDir = dir;
+        path = File.separator;
+        if (!BuildGdx.cache.isGameDirectory(currDir)) {
+            Path relativePath = currDir.getDirectoryEntry().getRelativePath();
+            path += relativePath;
+        }
 
-		this.l_nMin = new int[2];
-		this.l_nFocus = new int[2];
-		this.currColumn = FILE;
+        for (Entry entry : dir.getEntries()) {
+            if (entry instanceof FileEntry && entry.isDirectory()) {
+                dirList.add(((FileEntry) entry).getDirectory());
+            }
+        }
 
-		init();
-		changeDir(BuildGdx.cache.getGameDirectory());
-	}
+        dirList.sort((a, b) -> NaturalComparator.compare(a.getName(), b.getName()));
+        if (!BuildGdx.cache.isGameDirectory(dir)) {
+            dirList.add(0, getBackDirectory(currDir));
+        }
 
-	public abstract void init();
+        handleDirectory(dir);
 
-	public abstract void handleFile(FileEntry file);
+        for (Entry entry : dir.getEntries()) {
+            if (entry instanceof FileEntry && !entry.isDirectory()) {
+                if (extensionProperties.get(entry.getExtension()) != null) {
+                    handleFile((FileEntry) entry);
+                }
+            }
+        }
 
-	public abstract void invoke(Object fil);
+        sortFiles();
 
-	public abstract void handleDirectory(Directory dir);
+        l_nFocus[DIRECTORY] = l_nMin[DIRECTORY] = 0;
+        l_nFocus[FILE] = l_nMin[FILE] = 0;
+    }
 
-	public String getFileName() {
-		return list[FILE].get(l_nFocus[FILE]);
-	}
+    public void addFile(FileEntry file) {
+        fileList.add(file);
+    }
 
-	public Directory getDirectory() {
-		return currDir;
-	}
+    public void sortFiles() {
+        fileList.sort(fileComparator);
+    }
 
-	public int mFontOffset() {
-		return font.getSize() + nItemHeight;
-	}
+    protected void drawHeader(int x1, int x2, int y) {
+        /* directories */
+        topFont.drawTextScaled(x1, y, dirs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
+        /* files */
+        topFont.drawTextScaled(x2, y, ffs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
+    }
 
-	private void changeDir(Directory dir) {
-		if (!dir.revalidate() && currDir == dir) {
-			return;
-		}
+    protected void drawPath(int x, int y) {
+        brDrawText(pathFont, toCharArray("path: " + path), x, y, -32, pathPal, 0, this.x + this.width);
+    }
 
-		list[DIRECTORY].clear();
-		fileUnit.clear();
-		list[FILE].clear();
+    @Override
+    public void draw(MenuHandler handler) {
+        int yColNames = y + 3;
+        int yPath = yColNames + topFont.getSize() + 2;
+        int yList = yPath + pathFont.getSize() + 2;
+        int scrollerWidth = slider.getScrollerWidth();
 
-		currDir = dir;
-		path = currDir.getPath().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
-		for (Entry entry : dir.getEntries()) {
-			if (entry instanceof FileEntry && entry.isDirectory()) {
-				list[DIRECTORY].add(toLowerCase(entry.getName()));
-			}
-		}
+        draw.rotatesprite(x << 16, y << 16, 65536, 0, nBackground, 127, backgroundPal, 10 | 16 | transparent, 0, 0, coordsConvertXScaled(x + width, ConvertType.Normal), coordsConvertYScaled(yList + nListItems * mFontOffset() + 6));
 
-		Collections.sort(list[DIRECTORY]);
-		if (dir.getParent() != null) {
-			list[DIRECTORY].add(0, back);
-		}
+        int px = x + 3;
+        drawHeader(px, x - 3 + width - topFont.getWidth(ffs, 1.0f), yColNames);
+        px += scrollerWidth + 3;
+        drawPath(px, yPath);
 
-		handleDirectory(dir);
+        int py = yList;
+        for (int i = l_nMin[DIRECTORY]; i >= 0 && i < l_nMin[DIRECTORY] + nListItems && i < dirList.size(); i++) {
+            int pal = listPal; // handler.getPal(font, item); //listPal;
+            int shade = handler.getShade(currColumn == DIRECTORY && i == l_nFocus[DIRECTORY] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
+            if (currColumn == DIRECTORY && i == l_nFocus[DIRECTORY]) {
+                pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+            }
 
-		for (Entry entry : dir.getEntries()) {
-			if (entry instanceof FileEntry && !entry.isDirectory()) {
-				if (extensionProperties.get(entry.getExtension()) != null) {
-					handleFile((FileEntry) entry);
-				}
-			}
-		}
-
-		sortFiles();
-
-		l_nFocus[DIRECTORY] = l_nMin[DIRECTORY] = 0;
-		l_nFocus[FILE] = l_nMin[FILE] = 0;
-	}
-
-	public void addFile(Object file, String name) {
-		fileUnit.put(name, file);
-		list[FILE].add(name);
-	}
-
-	public void sortFiles() {
-		Collections.sort(list[FILE], fileComparator);
-	}
-
-	protected void drawHeader(int x1, int x2, int y) {
-		/* directories */ topFont.drawTextScaled(x1, y, dirs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
-		/* files */ topFont.drawTextScaled(x2, y, ffs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
-	}
-
-	protected void drawPath(int x, int y) {
-		brDrawText(pathFont, toCharArray("path: " + path), x, y, -32, pathPal, 0, this.x + this.width);
-	}
-
-	@Override
-	public void draw(MenuHandler handler) {
-		int yColNames = y + 3;
-		int yPath = yColNames + topFont.getSize() + 2;
-		int yList = yPath + pathFont.getSize() + 2;
-		int scrollerWidth = slider.getScrollerWidth();
-
-		draw.rotatesprite(x << 16, y << 16, 65536, 0, nBackground, 127, backgroundPal, 10 | 16 | transparent, 0, 0,
-				coordsConvertXScaled(x + width, ConvertType.Normal),
-				coordsConvertYScaled(yList + nListItems * mFontOffset() + 6));
-
-		int px = x + 3;
-		drawHeader(px, x - 3 + width - topFont.getWidth(ffs, 1.0f), yColNames);
-		px += scrollerWidth + 3;
-		drawPath(px, yPath);
-
-		int py = yList;
-		for (int i = l_nMin[DIRECTORY]; i >= 0 && i < l_nMin[DIRECTORY] + nListItems
-				&& i < list[DIRECTORY].size(); i++) {
-			int pal = listPal; // handler.getPal(font, item); //listPal;
-			int shade = handler.getShade(
-					currColumn == DIRECTORY && i == l_nFocus[DIRECTORY] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
-			if (currColumn == DIRECTORY && i == l_nFocus[DIRECTORY]) {
-				pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
-			}
-
-			text = toCharArray(list[DIRECTORY].get(i));
+            text = toCharArray(dirList.get(i).getName());
 //			if(list[DIRECTORY].get(i).equals(back))
 //				pal = backPal;
-			brDrawText(font, text, px, py, shade, pal, 0, this.x + this.width / 2 - 4);
-			py += mFontOffset();
-		}
+            brDrawText(font, text, px, py, shade, pal, 0, this.x + this.width / 2 - 4);
+            py += mFontOffset();
+        }
 
-		py = yList;
-		for (int i = l_nMin[FILE]; i >= 0 && i < l_nMin[FILE] + nListItems && i < list[FILE].size(); i++) {
-			int pal = listPal;
-			if (currColumn == FILE && i == l_nFocus[FILE]) {
-				pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
-			}
-			int shade = handler
-					.getShade(currColumn == FILE && i == l_nFocus[FILE] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
+        py = yList;
+        for (int i = l_nMin[FILE]; i >= 0 && i < l_nMin[FILE] + nListItems && i < fileList.size(); i++) {
+            int pal = listPal;
+            if (currColumn == FILE && i == l_nFocus[FILE]) {
+                pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
+            }
+            int shade = handler.getShade(currColumn == FILE && i == l_nFocus[FILE] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
 
-//			Object obj = list[FILE].get(i);
-//			text = toChars(fileUnit.get(obj));
+            FileEntry obj = fileList.get(i);
+            text = toChars(obj.getName());
+            ExtProp p = getPropertie(obj);
+            if (p != null) {
+                int itemPal = p.pal;
+                if (itemPal != 0) {
+                    pal = itemPal;
+                }
+            }
 
-			String name = list[FILE].get(i);
-			text = toChars(name);
-			Object obj = fileUnit.get(name);
-			ExtProp p = getPropertie(obj);
-			if (p != null) {
-				int itemPal = p.pal;
-				if (itemPal != 0) {
-					pal = itemPal;
-				}
-			}
+            px = x + width - font.getWidth(text, 1.0f) - scrollerWidth - 5;
+            brDrawText(font, text, px, py, shade, pal, this.x + this.width / 2 + 4, this.x + this.width);
+            py += mFontOffset();
+        }
 
-			px = x + width - font.getWidth(text, 1.0f) - scrollerWidth - 5;
-			brDrawText(font, text, px, py, shade, pal, this.x + this.width / 2 + 4, this.x + this.width);
-			py += mFontOffset();
-		}
+        scrollerHeight = nListItems * mFontOffset();
 
-		scrollerHeight = nListItems * mFontOffset();
+        // Files scroll
+        int nList = BClipLow(fileList.size() - nListItems, 1);
+        int posy = yList + (scrollerHeight - slider.getScrollerHeight()) * l_nMin[FILE] / nList;
 
-		// Files scroll
-		int nList = BClipLow(list[FILE].size() - nListItems, 1);
-		int posy = yList + (scrollerHeight - slider.getScrollerHeight()) * l_nMin[FILE] / nList;
+        scrollX[FILE] = x + width - scrollerWidth - 1;
+        slider.drawScrollerBackground(scrollX[FILE], yList, scrollerHeight, 0, 0);
+        slider.drawScroller(scrollX[FILE], posy, handler.getShade(currColumn == FILE ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
 
-		scrollX[FILE] = x + width - scrollerWidth - 1;
-		slider.drawScrollerBackground(scrollX[FILE], yList, scrollerHeight, 0, 0);
-		slider.drawScroller(scrollX[FILE], posy,
-				handler.getShade(currColumn == FILE ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
+        // Directory scroll
+        nList = BClipLow(dirList.size() - nListItems, 1);
+        posy = yList + (scrollerHeight - slider.getScrollerHeight()) * l_nMin[DIRECTORY] / nList;
 
-		// Directory scroll
-		nList = BClipLow(list[DIRECTORY].size() - nListItems, 1);
-		posy = yList + (scrollerHeight - slider.getScrollerHeight()) * l_nMin[DIRECTORY] / nList;
+        scrollX[DIRECTORY] = x + 2;
+        slider.drawScrollerBackground(scrollX[DIRECTORY], yList, scrollerHeight, 0, 0);
+        slider.drawScroller(scrollX[DIRECTORY], posy, handler.getShade(currColumn == DIRECTORY ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
 
-		scrollX[DIRECTORY] = x + 2;
-		slider.drawScrollerBackground(scrollX[DIRECTORY], yList, scrollerHeight, 0, 0);
-		slider.drawScroller(scrollX[DIRECTORY], posy,
-				handler.getShade(currColumn == DIRECTORY ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
+        if (System.currentTimeMillis() - checkDirectory >= 2000) {
+            if (currDir.revalidate()) {
+                refreshList();
+            }
+            checkDirectory = System.currentTimeMillis();
+        }
+    }
 
-		if (System.currentTimeMillis() - checkDirectory >= 2000) {
-			if (currDir.revalidate()) {
-				refreshList();
-			}
-			checkDirectory = System.currentTimeMillis();
-		}
-	}
+    protected void brDrawText(Font font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
+        int tptr = 0;
+        while (tptr < text.length && text[tptr] != 0) {
+            CharInfo charInfo = font.getCharInfo(text[tptr]);
+            if (x > x1 && x <= x2) {
+                x += font.drawCharScaled(x, y, text[tptr], 1.0f, shade, pal, Transparent.None, ConvertType.Normal, fontShadow);
+            } else {
+                x += charInfo.getWidth();
+            }
 
-	protected void brDrawText(Font font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
-		int tptr = 0;
-		while (tptr < text.length && text[tptr] != 0) {
-			CharInfo charInfo = font.getCharInfo(text[tptr]);
-			if (x > x1 && x <= x2) {
-				x += font.drawCharScaled(x, y, text[tptr], 1.0f, shade, pal, Transparent.None, ConvertType.Normal, fontShadow);
-			} else {
-				x += charInfo.getWidth();
-			}
+            tptr++;
+        }
+    }
 
-			tptr++;
-		}
-	}
-
-	protected char[] buffer = new char[40];
-
-	protected char[] toChars(String text) {
-		int symbols = 0;
-		int pos = text.length() - 1;
-		int len = Math.min(text.length(), buffer.length - 1);
-		Arrays.fill(buffer, (char) 0);
-		while (pos >= 1 && symbols < len - 1 && text.charAt(pos - 1) != File.separatorChar) {
-			symbols++;
-			pos--;
-		}
-		text.getChars(pos, pos + symbols + 1, buffer, 0);
+    protected char[] toChars(String text) {
+        int symbols = 0;
+        int pos = text.length() - 1;
+        int len = Math.min(text.length(), buffer.length - 1);
+        Arrays.fill(buffer, (char) 0);
+        while (pos >= 1 && symbols < len - 1 && text.charAt(pos - 1) != File.separatorChar) {
+            symbols++;
+            pos--;
+        }
+        text.getChars(pos, pos + symbols + 1, buffer, 0);
 
 //		int symbols = 0;
 //		int pos = text.length();
 //		int len = Math.min(text.length(), buffer.length - 1);
-//		Arrays.fill(buffer, (char) 0); 
+//		Arrays.fill(buffer, (char) 0);
 //		while(pos-- >= 0 && ++symbols < len && text.charAt(pos) != File.separatorChar);
 //		if(text.charAt(pos) == File.separatorChar) { pos++; symbols--; }
 //		System.err.println(pos + " " + symbols);
 //		text.getChars(pos, pos + symbols, buffer, 0);
 //		System.err.println(new String(buffer));
 
-		return buffer;
-	}
+        return buffer;
+    }
 
-	@Override
-	public boolean callback(MenuHandler handler, MenuOpt opt) {
-		switch (opt) {
-		case MWUP:
-			if (l_nMin[currColumn] > 0) {
-				l_nMin[currColumn]--;
-			}
-			return false;
-		case MWDW:
-			if (l_nMin[currColumn] < list[currColumn].size() - nListItems) {
-				l_nMin[currColumn]++;
-			}
-			return false;
-		case UP:
-			l_nFocus[currColumn]--;
-			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
-				if (l_nMin[currColumn] > 0) {
-					l_nMin[currColumn]--;
-				}
-			}
-			if (l_nFocus[currColumn] < 0) {
-				l_nFocus[currColumn] = list[currColumn].size() - 1;
-				l_nMin[currColumn] = list[currColumn].size() - nListItems;
-				if (l_nMin[currColumn] < 0) {
-					l_nMin[currColumn] = 0;
-				}
-			}
-			return false;
-		case DW:
-			l_nFocus[currColumn]++;
-			if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems
-					&& l_nFocus[currColumn] < list[currColumn].size()) {
-				l_nMin[currColumn]++;
-			}
-			if (l_nFocus[currColumn] >= list[currColumn].size()) {
-				l_nFocus[currColumn] = 0;
-				l_nMin[currColumn] = 0;
-			}
-			return false;
-		case LEFT:
-			if (list[DIRECTORY].size() > 0) {
-				currColumn = DIRECTORY;
-			}
-			return false;
-		case RIGHT:
-			if (list[FILE].size() > 0) {
-				currColumn = FILE;
-			}
-			return false;
-		case ENTER:
-		case LMB:
-			if (opt == MenuOpt.LMB && scrollTouch[FILE] || scrollTouch[DIRECTORY]) {
-				if (list[currColumn].size() <= nListItems) {
-					return false;
-				}
+    @Override
+    public boolean callback(MenuHandler handler, MenuOpt opt) {
+        switch (opt) {
+            case MWUP:
+                if (l_nMin[currColumn] > 0) {
+                    l_nMin[currColumn]--;
+                }
+                return false;
+            case MWDW:
+                if (l_nMin[currColumn] < getListSize(currColumn) - nListItems) {
+                    l_nMin[currColumn]++;
+                }
+                return false;
+            case UP:
+                l_nFocus[currColumn]--;
+                if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
+                    if (l_nMin[currColumn] > 0) {
+                        l_nMin[currColumn]--;
+                    }
+                }
+                if (l_nFocus[currColumn] < 0) {
+                    l_nFocus[currColumn] = getListSize(currColumn) - 1;
+                    l_nMin[currColumn] = getListSize(currColumn) - nListItems;
+                    if (l_nMin[currColumn] < 0) {
+                        l_nMin[currColumn] = 0;
+                    }
+                }
+                return false;
+            case DW:
+                l_nFocus[currColumn]++;
+                if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems && l_nFocus[currColumn] < getListSize(currColumn)) {
+                    l_nMin[currColumn]++;
+                }
+                if (l_nFocus[currColumn] >= getListSize(currColumn)) {
+                    l_nFocus[currColumn] = 0;
+                    l_nMin[currColumn] = 0;
+                }
+                return false;
+            case LEFT:
+                if (dirList.size() > 0) {
+                    currColumn = DIRECTORY;
+                }
+                return false;
+            case RIGHT:
+                if (fileList.size() > 0) {
+                    currColumn = FILE;
+                }
+                return false;
+            case ENTER:
+            case LMB:
+                if (opt == MenuOpt.LMB && scrollTouch[FILE] || scrollTouch[DIRECTORY]) {
+                    if (getListSize(currColumn) <= nListItems) {
+                        return false;
+                    }
 
-				int nList = BClipLow(list[currColumn].size() - nListItems, 1);
-				int nRange = scrollerHeight;
+                    int nList = BClipLow(getListSize(currColumn) - nListItems, 1);
+                    int nRange = scrollerHeight;
 
-				int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
+                    int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
 
-				l_nFocus[currColumn] = -1;
-				l_nMin[currColumn] = BClipRange(((touchY - py) * nList) / nRange, 0, nList);
+                    l_nFocus[currColumn] = -1;
+                    l_nMin[currColumn] = BClipRange(((touchY - py) * nList) / nRange, 0, nList);
 
-				return false;
-			}
-			if (list[DIRECTORY].size() > 0 && currColumn == DIRECTORY) {
-				if (l_nFocus[DIRECTORY] == -1) {
-					return false;
-				}
-				String dirName = list[DIRECTORY].get(l_nFocus[DIRECTORY]);
-				if (dirName.equals(back)) {
-					//changeDir(currDir.getParent()); fixme
-				} else {
-					//changeDir(currDir.checkDirectory(dirName)); fixme
-				}
-			} else if (list[FILE].size() > 0 && currColumn == FILE) {
+                    return false;
+                }
+                if (dirList.size() > 0 && currColumn == DIRECTORY) {
+                    if (l_nFocus[DIRECTORY] == -1) {
+                        return false;
+                    }
 
-				if (l_nFocus[FILE] == -1) {
-					return false;
-				}
+                    changeDir(dirList.get(l_nFocus[DIRECTORY]));
+                } else if (fileList.size() > 0 && currColumn == FILE) {
 
-				invoke(fileUnit.get(getFileName()));
-			}
-			getInput().resetKeyStatus();
-			return false;
-		case ESC:
-		case RMB:
-			return true;
-		case BSPACE:
-			if (currDir.getParent() != null) {
-//				changeDir(currDir.getParent()); fixme
-			}
-			return false;
-		case PGUP:
-			l_nFocus[currColumn] -= (nListItems - 1);
-			if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
-				if (l_nMin[currColumn] > 0) {
-					l_nMin[currColumn] -= (nListItems - 1);
-				}
-			}
-			if (l_nFocus[currColumn] < 0 || l_nMin[currColumn] < 0) {
-				l_nFocus[currColumn] = 0;
-				l_nMin[currColumn] = 0;
-			}
-			return false;
-		case PGDW:
-			l_nFocus[currColumn] += (nListItems - 1);
-			if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems
-					&& l_nFocus[currColumn] < list[currColumn].size()) {
-				l_nMin[currColumn] += (nListItems - 1);
-			}
-			if (l_nFocus[currColumn] >= list[currColumn].size()
-					|| l_nMin[currColumn] > list[currColumn].size() - nListItems) {
-				l_nFocus[currColumn] = list[currColumn].size() - 1;
-				if (list[currColumn].size() >= nListItems) {
-					l_nMin[currColumn] = list[currColumn].size() - nListItems;
-				} else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
-					l_nMin[currColumn] = list[currColumn].size() - 1;
-				}
-			}
-			return false;
-		case HOME:
-			l_nFocus[currColumn] = 0;
-			l_nMin[currColumn] = 0;
-			return false;
-		case END:
-			l_nFocus[currColumn] = list[currColumn].size() - 1;
-			if (list[currColumn].size() >= nListItems) {
-				l_nMin[currColumn] = list[currColumn].size() - nListItems;
-			} else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
-				l_nMin[currColumn] = list[currColumn].size() - 1;
-			}
-			return false;
-		default:
-			return false;
-		}
-	}
+                    if (l_nFocus[FILE] == -1) {
+                        return false;
+                    }
 
-	@Override
-	public boolean mouseAction(int mx, int my) {
-		if (mx >= x + width / 2) {
-			currColumn = 1;
-		} else {
-			currColumn = 0;
-		}
+                    invoke(fileList.get(l_nFocus[FILE]));
+                }
+                getInput().resetKeyStatus();
+                return false;
+            case ESC:
+            case RMB:
+                return true;
+            case BSPACE:
+                if (!BuildGdx.cache.isGameDirectory(currDir)) {
+                    changeDir(getBackDirectory(currDir));
+                }
+                return false;
+            case PGUP:
+                l_nFocus[currColumn] -= (nListItems - 1);
+                if (l_nFocus[currColumn] >= 0 && l_nFocus[currColumn] < l_nMin[currColumn]) {
+                    if (l_nMin[currColumn] > 0) {
+                        l_nMin[currColumn] -= (nListItems - 1);
+                    }
+                }
+                if (l_nFocus[currColumn] < 0 || l_nMin[currColumn] < 0) {
+                    l_nFocus[currColumn] = 0;
+                    l_nMin[currColumn] = 0;
+                }
+                return false;
+            case PGDW:
+                l_nFocus[currColumn] += (nListItems - 1);
+                if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems && l_nFocus[currColumn] < getListSize(currColumn)) {
+                    l_nMin[currColumn] += (nListItems - 1);
+                }
+                if (l_nFocus[currColumn] >= getListSize(currColumn) || l_nMin[currColumn] > getListSize(currColumn) - nListItems) {
+                    l_nFocus[currColumn] = getListSize(currColumn) - 1;
+                    if (getListSize(currColumn) >= nListItems) {
+                        l_nMin[currColumn] = getListSize(currColumn) - nListItems;
+                    } else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
+                        l_nMin[currColumn] = getListSize(currColumn) - 1;
+                    }
+                }
+                return false;
+            case HOME:
+                l_nFocus[currColumn] = 0;
+                l_nMin[currColumn] = 0;
+                return false;
+            case END:
+                l_nFocus[currColumn] = getListSize(currColumn) - 1;
+                if (getListSize(currColumn) >= nListItems) {
+                    l_nMin[currColumn] = getListSize(currColumn) - nListItems;
+                } else if (l_nFocus[currColumn] >= l_nMin[currColumn] + nListItems) {
+                    l_nMin[currColumn] = getListSize(currColumn) - 1;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
 
-		if (!BuildGdx.input.isTouched()) {
-			scrollTouch[DIRECTORY] = false;
-			scrollTouch[FILE] = false;
-		}
+    @Override
+    public boolean mouseAction(int mx, int my) {
+        if (mx >= x + width / 2) {
+            currColumn = 1;
+        } else {
+            currColumn = 0;
+        }
 
-		touchY = my;
-		if (mx > scrollX[currColumn] && mx < scrollX[currColumn] + slider.getScrollerWidth()) {
-			scrollTouch[currColumn] = BuildGdx.input.isTouched();
-			return true;
-		}
+        if (!BuildGdx.input.isTouched()) {
+            scrollTouch[DIRECTORY] = false;
+            scrollTouch[FILE] = false;
+        }
 
-		if ((!scrollTouch[DIRECTORY] && !scrollTouch[FILE]) && list[currColumn].size() > 0) {
-			int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
+        touchY = my;
+        if (mx > scrollX[currColumn] && mx < scrollX[currColumn] + slider.getScrollerWidth()) {
+            scrollTouch[currColumn] = BuildGdx.input.isTouched();
+            return true;
+        }
 
-			for (int i = l_nMin[currColumn]; i >= 0 && i < l_nMin[currColumn] + nListItems
-					&& i < list[currColumn].size(); i++) {
-				if (mx > x && mx < scrollX[FILE]) {
-					if (my > py && my < py + font.getSize()) {
-						l_nFocus[currColumn] = i;
-						return true;
-					}
-				}
+        if ((!scrollTouch[DIRECTORY] && !scrollTouch[FILE]) && getListSize(currColumn) > 0) {
+            int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
 
-				py += mFontOffset();
-			}
-		}
-		return false;
-	}
+            for (int i = l_nMin[currColumn]; i >= 0 && i < l_nMin[currColumn] + nListItems && i < getListSize(currColumn); i++) {
+                if (mx > x && mx < scrollX[FILE]) {
+                    if (my > py && my < py + font.getSize()) {
+                        l_nFocus[currColumn] = i;
+                        return true;
+                    }
+                }
 
-	private ExtProp getPropertie(Object obj) {
-		if (obj instanceof FileEntry) {
-			return extensionProperties.get(((FileEntry) obj).getExtension());
-		} else if (obj != null) {
-			return classProperties.get(obj.getClass());
-		}
+                py += mFontOffset();
+            }
+        }
+        return false;
+    }
 
-		return null;
-	}
+    private Directory getBackDirectory(Directory dir) {
+        return new BackDirectory(dir.getDirectoryEntry().getParent());
+    }
 
-	public void refreshList() {
-		Directory dir = currDir;
-		currDir = null;
-		changeDir(dir);
-	}
+    private ExtProp getPropertie(Object obj) {
+        if (obj instanceof FileEntry) {
+            return extensionProperties.get(((FileEntry) obj).getExtension());
+        } else if (obj != null) {
+            return classProperties.get(obj.getClass());
+        }
 
-	@Override
-	public void open() {
-	}
+        return null;
+    }
 
-	@Override
-	public void close() {
-		for (int i = 0; i < 2; i++) {
-			l_nFocus[i] = l_nMin[i] = 0;
-		}
-	}
+    public void refreshList() {
+        Directory dir = currDir;
+        currDir = null;
+        changeDir(dir);
+    }
+
+    @Override
+    public void open() {
+    }
+
+    @Override
+    public void close() {
+        for (int i = 0; i < 2; i++) {
+            l_nFocus[i] = l_nMin[i] = 0;
+        }
+    }
+
+    private static class ExtProp {
+        int pal;
+        int priority;
+
+        public ExtProp(int pal, int priority) {
+            this.pal = pal;
+            this.priority = priority;
+        }
+    }
+
+    private class BackDirectory extends Directory {
+        private final Directory dir;
+
+        public BackDirectory(Directory dir) {
+            super();
+            this.dir = dir;
+        }
+
+        @Override
+        public String getName() {
+            return back;
+        }
+
+        public Directory getDirectory() {
+            return dir;
+        }
+    }
 
 }

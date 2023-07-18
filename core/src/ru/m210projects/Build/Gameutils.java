@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.MathUtils;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.ConvertType;
+import ru.m210projects.Build.filehandle.CacheResourceMap;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.zip.ZipFile;
 
@@ -35,6 +36,7 @@ import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.Pragmas.scale;
 import static ru.m210projects.Build.RenderService.xdim;
 import static ru.m210projects.Build.RenderService.ydim;
+import static ru.m210projects.Build.filehandle.CacheResourceMap.CachePriority.NORMAL;
 
 public class Gameutils {
 
@@ -269,13 +271,14 @@ public class Gameutils {
             byte[] finalData = data;
             try {
                 ZipFile zipFile = new ZipFile(filename, () -> new ByteArrayInputStream(finalData));
-                if (BuildGdx.cache.add(zipFile)) {
+                if (BuildGdx.cache.addGroup(zipFile, NORMAL)) {
                     Entry def = zipFile.getEntry(appdef);
                     if (def.exists()) {
                         baseDef.loadScript(filename, def);
                     }
                 }
             } catch (IOException ignored) {
+                ignored.printStackTrace();
             }
         }
     }

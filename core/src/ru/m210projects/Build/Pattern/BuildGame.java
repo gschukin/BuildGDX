@@ -34,9 +34,12 @@ import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.LittleEndian;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Types.font.Font;
+import ru.m210projects.Build.filehandle.Cache;
+import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -76,6 +79,8 @@ public abstract class BuildGame extends Game {
     public DefScript baseDef;
     public DefScript currentDef;
     public NetMode nNetMode;
+    public Cache cache;
+    private Directory userDirectory;
     private Screen gCurrScreen;
     private Screen gPrevScreen;
     private String name = null;
@@ -95,6 +100,24 @@ public abstract class BuildGame extends Game {
         InitScreen scr = new InitScreen(this);
         setScreen(scr);
         scr.start();
+    }
+
+    public Cache createFileCache(Directory gameDirectory) {
+        return new Cache(gameDirectory);
+    }
+
+    public void initCache(Directory gameDirectory, Directory userDirectory) {
+        this.userDirectory = userDirectory;
+        cache = createFileCache(gameDirectory);
+        BuildGdx.cache = cache;
+    }
+
+    public Directory getUserDirectory() {
+        return userDirectory;
+    }
+
+    public Cache getCache() {
+        return cache;
     }
 
     public abstract BuildFactory getFactory();

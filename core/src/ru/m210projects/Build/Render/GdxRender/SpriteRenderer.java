@@ -24,7 +24,6 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Types.AnimType;
 import ru.m210projects.Build.Types.QuickSort;
 import ru.m210projects.Build.Types.Sprite;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class SpriteRenderer {
@@ -581,10 +580,6 @@ public class SpriteRenderer {
 				picnum += engine.animateoffs(picnum, spritenum + 32768);
 				pic = engine.getTile(picnum);
 			}
-		}
-
-		if (!pic.isLoaded()) {
-			engine.loadtile(picnum);
 		}
 
 		int tsizx = pic.getWidth();
