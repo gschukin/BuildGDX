@@ -21,10 +21,10 @@ public class CachedArtEntry extends ArtEntry {
     }
 
     public void copyData(byte[] data) {
-        if (data.length != size) {
+        if (data.length < size) {
             throw new RuntimeException("Wrong tile data length");
         }
-        System.arraycopy(data, 0, this.data, 0, data.length);
+        System.arraycopy(data, 0, this.data, 0, size);
         engine.getrender().invalidatetile(num, -1, -1); // JBF 20031228
     }
 

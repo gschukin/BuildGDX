@@ -95,6 +95,9 @@ public class Cache {
 
     @NotNull
     public Entry getEntry(String name, boolean searchFirst) {
+        if (name == null) {
+            return DUMMY_ENTRY;
+        }
         return getEntry(Paths.get(name), searchFirst);
     }
 

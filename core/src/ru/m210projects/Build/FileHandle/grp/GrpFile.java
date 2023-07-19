@@ -20,11 +20,11 @@ public class GrpFile implements Group {
     private final String name;
     public GrpFile(String name) {
         this.entries = new LinkedHashMap<>();
-        this.name = name;
+        this.name = name.toUpperCase();
     }
 
     public GrpFile(String name, InputStreamProvider provider) throws IOException {
-        this.name = name;
+        this.name = name.toUpperCase();
         try (InputStream is = new BufferedInputStream(provider.newInputStream())) {
             String header = StreamUtils.readString(is, 12);
             if (header.compareTo(GRP_HEADER) != 0) {

@@ -18,6 +18,10 @@ public class EntryInputStream extends BufferedInputStream {
 
     @Override
     public synchronized int read(byte @NotNull [] b, int off, int len) throws IOException {
+        if (remaining == 0) {
+            return -1;
+        }
+
         if (len > remaining) {
             len = remaining;
         }

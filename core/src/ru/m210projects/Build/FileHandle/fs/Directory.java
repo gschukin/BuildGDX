@@ -29,6 +29,21 @@ public class Directory implements Group {
         public boolean isDirectory() {
             return false;
         }
+
+        @Override
+        public Path getRelativePath() {
+            return getPath();
+        }
+
+        @Override
+        public Directory getParent() {
+            return DUMMY_DIRECTORY;
+        }
+
+        @Override
+        public Path getPath() {
+            return Paths.get("");
+        }
     };
 
     public static final Directory DUMMY_DIRECTORY = new Directory() {
