@@ -145,10 +145,7 @@ public class StreamUtils {
     }
 
     public static void writeString(OutputStream out, String v, int len) throws IOException {
-        final byte[] data = new byte[len];
-        final byte[] string = v.getBytes();
-        System.arraycopy(string, 0, data, 0, Math.min(len, string.length));
-        out.write(data);
+        writeBytes(out, v.getBytes(), len);
     }
 
     public static void writeBytes(OutputStream out, byte[] data) throws IOException {
@@ -157,5 +154,11 @@ public class StreamUtils {
 
     public static void writeFloat(OutputStream os, float v) throws IOException {
         writeInt(os, Float.floatToRawIntBits(v));
+    }
+
+    public static void writeBytes(OutputStream out, byte[] data, int len) throws IOException {
+        final byte[] buf = new byte[len];
+        System.arraycopy(data, 0, buf, 0, Math.min(len, data.length));
+        out.write(buf);
     }
 }

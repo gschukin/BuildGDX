@@ -91,7 +91,7 @@ public class MidiMusicModule implements Music {
 	
 	@Override
 	public MusicSource newMusic(String name) {
-		Resource res = BuildGdx.cache.open(name, 0);
+		Resource res = BuildGdx.cache.getEntry(name, 0);
 		if(res == null) return null;
 		
 		byte[] data = res.getBytes();

@@ -198,10 +198,10 @@ public abstract class BuildConfig extends IniFile {
 	public RenderType renderType = RenderType.Polymost;
 	public boolean gPrecache = true;
 
-	public BuildConfig(String cfgPath, String name) {
+	public BuildConfig(Path cfgPath, String name) {
 		super();
 
-		this.cfgPath = Paths.get(cfgPath);
+		this.cfgPath = cfgPath;
 		this.keymap = getKeyMap();
 		this.name = toLowerCase(name);
 		byte[] data = null;

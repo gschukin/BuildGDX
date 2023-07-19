@@ -121,7 +121,11 @@ public class DefScript {
 
 	protected DefTile[] tiles = new DefTile[MAXTILES];
 
-	public DefScript(DefScript src, Entry addon) {
+	/**
+	 * @param src baseDef
+	 * @param entry group file or file entry
+	 */
+	public DefScript(DefScript src, Entry entry) {
 		this.disposable = true;
 		this.texInfo = new TextureHDInfo(src.texInfo);
 		this.mdInfo = new ModelsInfo(src.mdInfo, src.disposable);
@@ -148,7 +152,7 @@ public class DefScript {
 			}
 		}
 
-		this.currentAddon = addon;
+		this.currentAddon = entry;
 	}
 
 	public DefScript(BuildEngine engine) {

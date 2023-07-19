@@ -89,7 +89,7 @@ public class ALMusicDrv implements Music {
 	public MusicSource newMusic(String name) {
 		if(drv.noDevice || !inited) return null;
 		
-		Resource res = BuildGdx.cache.open(name, 0);
+		Resource res = BuildGdx.cache.getEntry(name, 0);
 		if(res == null) {
 			Console.out.println("OpenAL Music: Unable to load " + name, OsdColor.RED);
 			return null;
