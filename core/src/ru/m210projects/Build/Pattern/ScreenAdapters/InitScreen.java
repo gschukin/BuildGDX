@@ -217,18 +217,18 @@ public class InitScreen extends ScreenAdapter {
 			}
 		}
 
-		Gdx.input.setInputProcessor(new InputAdapter() {
-			@Override
-			public boolean keyDown(int keycode) {
-				return true;
-			}
-
-			@Override
-			public boolean keyTyped(char character) {
-				System.out.println(character);
-				return super.keyTyped(character);
-			}
-		});
+//		Gdx.input.setInputProcessor(new InputAdapter() {
+//			@Override
+//			public boolean keyDown(int keycode) {
+//				return true;
+//			}
+//
+//			@Override
+//			public boolean keyTyped(char character) {
+//				System.out.println(character);
+//				return super.keyTyped(character);
+//			}
+//		});
 
 		thread = new Thread(new Runnable() {
 			@Override

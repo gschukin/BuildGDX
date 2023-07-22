@@ -17,6 +17,9 @@ import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.*;
+import ru.m210projects.Build.Types.collections.IntSet;
+import ru.m210projects.Build.Types.collections.LinkedList;
+import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
@@ -409,7 +412,6 @@ public abstract class Engine {
     }
 
     public int neartag(int xs, int ys, int zs, int sectnum, int ange, Neartag near, int neartagrange, int tagsearch) { // jfBuild
-
         int result = nearScanner.scan(xs, ys, zs, sectnum, ange, neartagrange, tagsearch);
         NearInfo info = nearScanner.getInfo();
 
@@ -482,7 +484,7 @@ public abstract class Engine {
 //                if ((x1 - xs) * (y2 - ys) < (x2 - xs) * (y1 - ys))
 //                    continue;
 //
-//                if (lintersect(xs, ys, zs, xe, ye, ze, x1, y1, x2, y2, rx, ry, rz)) {
+//                if (lIntersect(xs, ys, zs, xe, ye, ze, x1, y1, x2, y2, rx, ry, rz)) {
 //                    if (good != 0) {
 //                        if ((good & 1) != 0)
 //                            near.tagsector = nextsector;
@@ -500,7 +502,7 @@ public abstract class Engine {
 //                }
 //            }
 //
-//            for (SpriteNode node = spriteSectMap.getFirst(dasector); node != null; node = node.getNext()) {
+//            for (MapNode<Sprite> node = boardService.getSectNode(dasector); node != null; node = node.getNext()) {
 //                int z = node.getIndex();
 //                Sprite spr = boardService.getSprite(z);
 //
@@ -519,11 +521,11 @@ public abstract class Engine {
 //                        bot = vx * vx + vy * vy;
 //                        if (bot != 0) {
 //                            int intz = zs + scale(vz, topt, bot);
-//                            Tile pic = getTile(spr.getPicnum());
+//                            ArtEntry pic = getTile(spr.getPicnum());
 //                            i = pic.getHeight() * spr.getYrepeat();
 //                            if ((spr.getCstat() & 128) != 0)
 //                                z1 += (i << 1);
-//                            if ((pic.anm & 0x00ff0000) != 0)
+//                            if ((pic.hasYOffset()))
 //                                z1 -= (pic.getOffsetY() * spr.getYrepeat() << 2);
 //                            if ((intz <= z1) && (intz >= z1 - (i << 2))) {
 //                                topu = vx * (y1 - ys) - vy * (x1 - xs);

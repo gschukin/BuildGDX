@@ -180,7 +180,7 @@ public class DefScript {
 
 		Scriptfile script = new Scriptfile(file.getName(), file);
 		if (file instanceof FileEntry) {
-			script.path = ((FileEntry) file).getPath().getParent().relativize(BuildGdx.cache.getGameDirectory().getPath()).toString();
+			script.path = ((FileEntry) file).getRelativePath().toString();
 		}
 
 		try {

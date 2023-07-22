@@ -145,6 +145,10 @@ public class StreamUtils {
     }
 
     public static void writeString(OutputStream out, String v, int len) throws IOException {
+        if (v == null) {
+            writeBytes(out, new byte[len], len);
+            return;
+        }
         writeBytes(out, v.getBytes(), len);
     }
 
