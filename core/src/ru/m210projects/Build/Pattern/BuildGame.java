@@ -129,7 +129,7 @@ public abstract class BuildGame extends Game {
     @Override
     public void dispose() {
         Console.out.getLogger().close();
-//    FIXME:     pCfg.saveConfig(BuildGdx.compat, Path.Game.getPath());
+        pCfg.saveConfig(BuildGdx.cache.getGameDirectory().getPath());
         if (getScreen() instanceof InitScreen) {
             getScreen().dispose();
         }

@@ -68,6 +68,9 @@ public class DefScript {
 	public final MapHackInfo mapInfo;
 	protected final Engine engine;
 
+	/**
+	 * Used for check "includeif" by addon name and search files in addon parent directory (group)
+	 */
 	protected Entry currentAddon;
 	protected HashMap<String, List<String>> addonsIncludes;
 

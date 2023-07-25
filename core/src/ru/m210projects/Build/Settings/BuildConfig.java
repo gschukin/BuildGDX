@@ -603,12 +603,12 @@ public abstract class BuildConfig extends IniFile {
 		StreamUtils.writeString(os, line);
 	}
 	
-	public void saveConfig(String path) {
+	public void saveConfig(Path gamePath) {
 		try(OutputStream os = Files.newOutputStream(cfgPath.resolve(name))) {
 			if (!isInited) { // has saving from launcher
 				SaveUninited(os);
 			} else {
-				SaveMain(os, path);
+				SaveMain(os, gamePath);
 				SaveCommon(os);
 				SaveConfig(os);
 			}
@@ -669,7 +669,7 @@ public abstract class BuildConfig extends IniFile {
 		saveString(os, ";\r\n;\r\n");
 	}
 
-	public void SaveMain(OutputStream fil, String path) throws IOException {
+	public void SaveMain(OutputStream fil, Path path) throws IOException {
 		saveString(fil, "[Main]\r\n");
 		saveInteger(fil, "ConfigVersion", cfgVersion);
 		saveBoolean(fil, "Startup", startup);
@@ -677,7 +677,7 @@ public abstract class BuildConfig extends IniFile {
 		saveBoolean(fil, "AutoloadFolder", autoloadFolder);
 		saveBoolean(fil, "UseHomeFolder", userfolder);
 		saveString(fil, "Path = ");
-		saveString(fil, path);
+		saveString(fil, path.toString());
 
 		if (soundBank != null) {
 			saveString(fil, "\r\nSoundBank = " + soundBank.getAbsolutePath() + "\r\n");

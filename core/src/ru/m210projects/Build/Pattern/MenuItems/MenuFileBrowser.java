@@ -36,6 +36,7 @@ import java.util.*;
 
 import static ru.m210projects.Build.Engine.getInput;
 import static ru.m210projects.Build.Gameutils.*;
+import static ru.m210projects.Build.RenderService.ydim;
 import static ru.m210projects.Build.Strhandler.toCharArray;
 
 public abstract class MenuFileBrowser extends MenuItem {
@@ -203,8 +204,23 @@ public abstract class MenuFileBrowser extends MenuItem {
         topFont.drawTextScaled(x2, y, ffs, 1.0f, -32, topPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
     }
 
-    protected void drawPath(int x, int y) {
-        brDrawText(pathFont, toCharArray("path: " + path), x, y, -32, pathPal, 0, this.x + this.width);
+    protected void drawPath(int x, int y, String path) {
+        font.drawTextScaled(x, y, calcTextBounds(path, this.width - (2 * slider.getScrollerWidth()) - 7), 1.0f, -32, pathPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
+    }
+
+    protected String calcTextBounds(String text, int allowWidth) {
+        int textWidth = font.getWidth(text, 1.0f);
+        if (allowWidth < textWidth) {
+            int delta = textWidth - allowWidth;
+            int symbols = delta / font.getCharInfo('a').getCellSize();
+
+            text = text.substring(symbols);
+            if (text.length() > 6) {
+                text = "..." + text.substring(3);
+            }
+        }
+
+        return text;
     }
 
     @Override
@@ -219,7 +235,7 @@ public abstract class MenuFileBrowser extends MenuItem {
         int px = x + 3;
         drawHeader(px, x - 3 + width - topFont.getWidth(ffs, 1.0f), yColNames);
         px += scrollerWidth + 3;
-        drawPath(px, yPath);
+        drawPath(px, yPath, "path: " + path);
 
         int py = yList;
         for (int i = l_nMin[DIRECTORY]; i >= 0 && i < l_nMin[DIRECTORY] + nListItems && i < dirList.size(); i++) {
@@ -229,10 +245,10 @@ public abstract class MenuFileBrowser extends MenuItem {
                 pal = handler.getPal(font, m_pMenu.m_pItems[m_pMenu.m_nFocus]);
             }
 
-            text = toCharArray(dirList.get(i).getName());
 //			if(list[DIRECTORY].get(i).equals(back))
 //				pal = backPal;
-            brDrawText(font, text, px, py, shade, pal, 0, this.x + this.width / 2 - 4);
+
+            font.drawTextScaled(px, py, calcTextBounds(dirList.get(i).getName(), (this.width / 2) - slider.getScrollerWidth() - 4), 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
             py += mFontOffset();
         }
 
@@ -245,7 +261,7 @@ public abstract class MenuFileBrowser extends MenuItem {
             int shade = handler.getShade(currColumn == FILE && i == l_nFocus[FILE] ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
 
             FileEntry obj = fileList.get(i);
-            text = toChars(obj.getName());
+            String text = obj.getName();
             ExtProp p = getPropertie(obj);
             if (p != null) {
                 int itemPal = p.pal;
@@ -254,8 +270,8 @@ public abstract class MenuFileBrowser extends MenuItem {
                 }
             }
 
-            px = x + width - font.getWidth(text, 1.0f) - scrollerWidth - 5;
-            brDrawText(font, text, px, py, shade, pal, this.x + this.width / 2 + 4, this.x + this.width);
+            px = x + width - scrollerWidth - 5;
+            font.drawTextScaled(px, py, calcTextBounds(text, (this.width / 2) - slider.getScrollerWidth()), 1.0f, shade, pal, TextAlign.Right, Transparent.None, ConvertType.Normal, fontShadow);
             py += mFontOffset();
         }
 
@@ -282,20 +298,6 @@ public abstract class MenuFileBrowser extends MenuItem {
                 refreshList();
             }
             checkDirectory = System.currentTimeMillis();
-        }
-    }
-
-    protected void brDrawText(Font font, char[] text, int x, int y, int shade, int pal, int x1, int x2) {
-        int tptr = 0;
-        while (tptr < text.length && text[tptr] != 0) {
-            CharInfo charInfo = font.getCharInfo(text[tptr]);
-            if (x > x1 && x <= x2) {
-                x += font.drawCharScaled(x, y, text[tptr], 1.0f, shade, pal, Transparent.None, ConvertType.Normal, fontShadow);
-            } else {
-                x += charInfo.getWidth();
-            }
-
-            tptr++;
         }
     }
 
