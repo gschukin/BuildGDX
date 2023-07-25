@@ -231,6 +231,8 @@ public abstract class Engine {
         randomseed = 1; // random for voxels
     }
 
+    public abstract void faketimerhandler();
+
     protected RenderService createRenderService() {
         return new RenderService(this);
     }
@@ -293,22 +295,6 @@ public abstract class Engine {
 
         BuildGdx.audio.dispose();
         BuildGdx.message.dispose();
-    }
-
-    public void inittimer(int tickspersecond) { // jfBuild
-        this.timer = new Timer(tickspersecond);
-    }
-
-    public Timer getTimer() {
-        return timer;
-    }
-
-    public int getTotalClock() {
-        return timer.getTotalClock();
-    }
-
-    public void sampletimer() { // jfBuild
-        timer.update();
     }
 
     public long getticks() { // gdxBuild
@@ -803,60 +789,6 @@ public abstract class Engine {
         }
     }
 
-    public abstract void faketimerhandler();
-
-    public enum Clockdir {
-        CW(0), CCW(1);
-
-        private final int value;
-
-        Clockdir(int val) {
-            this.value = val;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
-    public Clockdir clockdir(int wallstart) // Returns: 0 is CW, 1 is CCW
-    {
-        int minx = 0x7fffffff;
-        int themin = -1;
-        int i = wallstart - 1;
-        do {
-            if (!boardService.isValidWall(++i)) {
-                break;
-            }
-
-            if (boardService.getWall(boardService.getWall(i).getPoint2()).getX() < minx) {
-                minx = boardService.getWall(boardService.getWall(i).getPoint2()).getX();
-                themin = i;
-            }
-        } while (boardService.getWall(i).getPoint2() != wallstart);
-
-        int x0 = boardService.getWall(themin).getX();
-        int y0 = boardService.getWall(themin).getY();
-        int x1 = boardService.getWall(boardService.getWall(themin).getPoint2()).getX();
-        int y1 = boardService.getWall(boardService.getWall(themin).getPoint2()).getY();
-        int x2 = boardService.getWall(boardService.getWall(boardService.getWall(themin).getPoint2()).getPoint2()).getX();
-        int y2 = boardService.getWall(boardService.getWall(boardService.getWall(themin).getPoint2()).getPoint2()).getY();
-
-        if ((y1 >= y2) && (y1 <= y0)) {
-            return Clockdir.CW;
-        }
-        if ((y1 >= y0) && (y1 <= y2)) {
-            return Clockdir.CCW;
-        }
-
-        int templong = (x0 - x1) * (y2 - y1) - (x2 - x1) * (y0 - y1);
-        if (templong < 0) {
-            return Clockdir.CW;
-        } else {
-            return Clockdir.CCW;
-        }
-    }
-
     public static KeyInput getInput() // gdxBuild
     {
         return input;
@@ -898,6 +830,21 @@ public abstract class Engine {
 
 
 
+    public void inittimer(int tickspersecond) { // jfBuild
+        this.timer = new Timer(tickspersecond);
+    }
+
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public int getTotalClock() {
+        return timer.getTotalClock();
+    }
+
+    public void sampletimer() { // jfBuild
+        timer.update();
+    }
 
     public boolean rIntersect(int xs, int ys, int zs, int vx, int vy, int vz, int x1, int y1, int x2, int y2, Variable rx, Variable ry, Variable rz) {
         return engineService.rIntersect(xs, ys, zs, vx, vy, vz, x1, y1, x2, y2, rx, ry, rz);

@@ -2,13 +2,26 @@ package ru.m210projects.Build.Render.GdxRender.Scanner;
 
 import ru.m210projects.Build.Board;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Engine.Clockdir;
 import ru.m210projects.Build.Types.Sector;
 import ru.m210projects.Build.Types.Wall;
 
 import static ru.m210projects.Build.Engine.*;
 
 public class SectorInfo {
+
+	public enum Clockdir {
+		CW(0), CCW(1);
+
+		private final int value;
+
+		Clockdir(int val) {
+			this.value = val;
+		}
+
+		public int getValue() {
+			return value;
+		}
+	}
 
 	public Clockdir[] loopinfo = new Clockdir[MAXWALLS];
 	public boolean[] isOccluder = new boolean[MAXWALLS];
@@ -23,7 +36,7 @@ public class SectorInfo {
 			Sector sec = board.getSector(i);
 
 			hasOccluders[i] = false;
-			Clockdir dir = engine.clockdir(sec.getWallptr());
+			Clockdir dir = clockdir(sec, sec.getWallptr());
 			boolean hasContour = false;
 			int numloops = 0;
 			int startwall = sec.getWallptr();
@@ -31,7 +44,7 @@ public class SectorInfo {
 			int z = startwall;
 			while (z <= endwall) {
 				Wall wal = board.getWall(z);
-				loopinfo[z] = dir == null ? (dir = engine.clockdir(z)) : dir;
+				loopinfo[z] = dir == null ? (dir = clockdir(sec, z)) : dir;
 				int nextsector = wal.getNextsector();
 				if (dir == Clockdir.CCW && nextsector == -1) {
 					isOccluder[z] = true;
@@ -59,6 +72,51 @@ public class SectorInfo {
 			} else {
 				isCorrupt[i] = false;
 			}
+		}
+	}
+
+	public Clockdir clockdir(Sector sec, int wallstart) { // Returns: 0 is CW, 1 is CCW
+		Wall[] walls = sec.getWalls();
+
+		int minx = Integer.MAX_VALUE;
+		Wall themin = null;
+		int i = wallstart - sec.getWallptr() - 1;
+		if (i < 0) {
+			i += sec.getWallnum();
+		}
+
+		if (i < 0 || i >= walls.length) {
+			return Clockdir.CW;
+		}
+
+		do {
+			Wall wal = walls[i++];
+			int x = wal.getWall2().getX();
+			if (x < minx) {
+				minx = x;
+				themin = wal;
+			}
+		} while (walls[i].getPoint2() != wallstart);
+
+		int x0 = themin.getX();
+		int y0 = themin.getY();
+		int x1 = themin.getWall2().getX();
+		int y1 = themin.getWall2().getY();
+		int x2 = themin.getWall2().getWall2().getX();
+		int y2 = themin.getWall2().getWall2().getY();
+
+		if ((y1 >= y2) && (y1 <= y0)) {
+			return Clockdir.CW;
+		}
+		if ((y1 >= y0) && (y1 <= y2)) {
+			return Clockdir.CCW;
+		}
+
+		int templong = (x0 - x1) * (y2 - y1) - (x2 - x1) * (y0 - y1);
+		if (templong < 0) {
+			return Clockdir.CW;
+		} else {
+			return Clockdir.CCW;
 		}
 	}
 
