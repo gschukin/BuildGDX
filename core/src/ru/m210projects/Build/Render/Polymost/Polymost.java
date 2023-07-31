@@ -86,7 +86,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Application.ApplicationType;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Vector2;
@@ -118,7 +117,7 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Render.Types.GLFilter;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
@@ -130,7 +129,7 @@ import ru.m210projects.Build.osd.OsdColor;
 
 public class Polymost implements GLRenderer {
 
-	protected final Color polyColor = new Color();
+	protected final com.badlogic.gdx.graphics.Color polyColor = new com.badlogic.gdx.graphics.Color();
 	public Rendering rendering = Rendering.Nothing;
 	public GLFog globalfog;
 	public static float MAXDRUNKANGLE = 2.5f;
@@ -226,10 +225,12 @@ public class Polymost implements GLRenderer {
 	protected ModelManager modelManager;
 	protected IndexedShader texshader;
 	protected final Engine engine;
+	protected final PaletteManager paletteManager;
 
 	public Polymost(Engine engine, IOverheadMapSettings settings) {
 		this.engine = engine;
 		this.textureCache = getTextureManager();
+		this.paletteManager = EngineUtils.getPaletteManager();
 		this.modelManager = new PolymostModelManager(this);
 
 		this.clipper = new PolyClipper(this);
@@ -417,18 +418,18 @@ public class Polymost implements GLRenderer {
 				}
 			}
 
-			Color c = getshadefactor(shade, method);
+			com.badlogic.gdx.graphics.Color c = getshadefactor(shade, method);
 			if (defs != null && tile.isHighTile() && defs.texInfo != null) {
 				if (tile.getPal() != pal) {
 					// apply tinting for replaced textures
 
-					Palette p = defs.texInfo.getTints(pal);
+					Color p = defs.texInfo.getTints(pal);
 					c.r *= p.r / 255.0f;
 					c.g *= p.g / 255.0f;
 					c.b *= p.b / 255.0f;
 				}
 
-				Palette pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
+				Color pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
 				if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
 					c.r *= pdetail.r / 255.0f;
 					c.g *= pdetail.g / 255.0f;
@@ -443,7 +444,8 @@ public class Polymost implements GLRenderer {
 		}
 	}
 
-	public Color getshadefactor(int shade, int method) {
+	public com.badlogic.gdx.graphics.Color getshadefactor(int shade, int method) {
+		int numshades = paletteManager.getShadeCount();
 		float fshade = min(max(shade * 1.04f, 0), numshades);
 		float f = (numshades - fshade) / numshades;
 
@@ -511,7 +513,7 @@ public class Polymost implements GLRenderer {
 			if (texshader == null) {
 				texshader = allocIndexedShader();
 				if (texshader != null) {
-					textureCache.changePalette(curpalette.getBytes());
+					textureCache.changePalette(paletteManager.getCurrentPalette().getBytes());
 					isChanged = true;
 				}
 			}
@@ -786,7 +788,7 @@ public class Polymost implements GLRenderer {
 		tsizx = pic.getWidth();
 		tsizy = pic.getHeight();
 
-		if (palookup[globalpal] == null) {
+		if (!paletteManager.isValidPalette(globalpal)) {
             globalpal = 0;
         }
 
@@ -2942,7 +2944,7 @@ public class Polymost implements GLRenderer {
 			// NOTE: yoff not negated not for y flipping, unlike wall and floor
 			// aligned sprites.
 
-			dist = engine.qdist(globalposx - tspr.getX(), globalposy - tspr.getY());
+			dist = EngineUtils.qdist(globalposx - tspr.getX(), globalposy - tspr.getY());
 			ang = (EngineUtils.getAngle(tspr.getX() - globalposx, tspr.getY() - globalposy) + 1024) & 2047;
 			foffs = TSPR_OFFSET(tspr, dist);
 			dist *= (dist >> 7);
@@ -3197,7 +3199,7 @@ public class Polymost implements GLRenderer {
                 gl.glDepthMask(false);
             }
 
-			dist = engine.qdist(globalposx - tspr.getX(), globalposy - tspr.getY());
+			dist = EngineUtils.qdist(globalposx - tspr.getX(), globalposy - tspr.getY());
 			dist *= (dist >> 7);
 
 			if (spritewall[tspr.getOwner()] != -1 && dist > 0) {
@@ -3453,7 +3455,7 @@ public class Polymost implements GLRenderer {
 		// basically this just means walls are repeating
 		// while sprites are clamped
 
-		if ((palookup[dapalnum] == null) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
+		if ((!paletteManager.isValidPalette(dapalnum)) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
             return;
         }
 
@@ -3817,6 +3819,7 @@ public class Polymost implements GLRenderer {
 
 	@Override
 	public void clearview(int dacol) {
+		Palette curpalette = paletteManager.getCurrentPalette();
 		gl.glClearColor(curpalette.getRed(dacol) / 255.0f, curpalette.getGreen(dacol) / 255.0f,
 				curpalette.getBlue(dacol) / 255.0f, 0);
 		gl.glClear(GL_COLOR_BUFFER_BIT);
@@ -3904,6 +3907,9 @@ public class Polymost implements GLRenderer {
                 indexbuffer = BufferUtils.newByteBuffer(xsiz * ysiz);
             }
 
+			byte[] basePalette = paletteManager.getBasePalette();
+			FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
+
 			int base = 0, r, g, b;
 			if (reverse) {
 				for (int x, y = 0; y < ysiz; y++) {
@@ -3912,7 +3918,7 @@ public class Polymost implements GLRenderer {
 						r = (rgbbuffer.get(base++) & 0xFF) >> 2;
 						g = (rgbbuffer.get(base++) & 0xFF) >> 2;
 						b = (rgbbuffer.get(base++) & 0xFF) >> 2;
-						indexbuffer.put(engine.getclosestcol(palette, r, g, b));
+						indexbuffer.put(fastColorLookup.getClosestColorIndex(basePalette, r, g, b));
 					}
 				}
 			} else {
@@ -3923,7 +3929,7 @@ public class Polymost implements GLRenderer {
 					if (byteperpixel == 4) {
                         base++; // Android
                     }
-					indexbuffer.put(engine.getclosestcol(palette, r, g, b));
+					indexbuffer.put(fastColorLookup.getClosestColorIndex(basePalette, r, g, b));
 				}
 			}
 
@@ -3948,6 +3954,9 @@ public class Polymost implements GLRenderer {
             byteperpixel = 4;
         }
 
+		byte[] basePalette = paletteManager.getBasePalette();
+		FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
+
 		int base;
 		for (int fx, fy = 0; fy < dheigth; fy++) {
 			base = mulscale(fy, yf, 16) * xdim;
@@ -3958,7 +3967,7 @@ public class Polymost implements GLRenderer {
 				int g = (frame.get() & 0xFF) >> 2;
 				int b = (frame.get() & 0xFF) >> 2;
 
-				capture[dheigth * fx + fy] = engine.getclosestcol(palette, r, g, b);
+				capture[dheigth * fx + fy] = fastColorLookup.getClosestColorIndex(basePalette, r, g, b);
 			}
 		}
 
@@ -4156,7 +4165,7 @@ public class Polymost implements GLRenderer {
 		Wall wal = boardService.getWall(boardService.getSector(sectnum).getWallptr());
 		int dx = boardService.getWall(wal.getPoint2()).getX() - wal.getX();
 		int dy = boardService.getWall(wal.getPoint2()).getY() - wal.getY();
-		long i = (EngineUtils.sqrt(dx * dx + dy * dy) << 5);
+		long i = ((long) EngineUtils.sqrt(dx * dx + dy * dy) << 5);
 		if (i == 0) {
             return (boardService.getSector(sectnum).getFloorz());
         }

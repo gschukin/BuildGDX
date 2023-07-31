@@ -1,7 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -25,7 +24,7 @@ import ru.m210projects.Build.Render.TextureHandle.GLTile;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.Hudtyp;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.*;
@@ -58,7 +57,7 @@ public class GDXOrtho extends OrphoRenderer {
 	protected boolean drawing = false;
 	protected final Matrix4 projectionMatrix = new Matrix4();
 	protected boolean blendingDisabled = false;
-	protected float color = Color.WHITE_FLOAT_BITS;
+	protected float color = com.badlogic.gdx.graphics.Color.WHITE_FLOAT_BITS;
 	protected final GDXRenderer parent;
 	protected int cx1, cy1, cx2, cy2;
 
@@ -127,7 +126,7 @@ public class GDXOrtho extends OrphoRenderer {
 //        }
 //
 //		if (font.type == FontType.Tilemap) {
-//			if (palookup[col] == null) {
+//			if (!EngineUtils.getPaletteManager().isValidPalette(col)) {
 //                col = 0;
 //            }
 //
@@ -219,6 +218,7 @@ public class GDXOrtho extends OrphoRenderer {
             return;
         }
 
+		byte[][] palookup = EngineUtils.getPaletteManager().getPalookupBuffer();
 		col = palookup[0][col] & 0xFF;
 
 		Gdx.gl.glDisable(GL_CULL_FACE);
@@ -230,6 +230,7 @@ public class GDXOrtho extends OrphoRenderer {
 		setType(GL20.GL_LINES);
 		switchShader(Shader.BitmapShader);
 		switchTexture(lineTile);
+		ru.m210projects.Build.Types.Palette curpalette = EngineUtils.getPaletteManager().getCurrentPalette();
 		setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f, curpalette.getBlue(col) / 255.0f,
 				1.0f);
 		disableBlending();
@@ -315,7 +316,9 @@ public class GDXOrtho extends OrphoRenderer {
 		if (picnum >= MAXTILES) {
             picnum = 0;
         }
-		if (palookup[dapalnum & 0xFF] == null) {
+
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		if (!paletteManager.isValidPalette(dapalnum & 0xFF)) {
             dapalnum = 0;
         }
 
@@ -354,6 +357,7 @@ public class GDXOrtho extends OrphoRenderer {
 		setType(GL20.GL_TRIANGLES);
 		setViewport(cx1, cy1, cx2, cy2);
 		if (pth.getPixelFormat() != PixelFormat.Pal8) {
+			int numshades = paletteManager.getShadeCount();
 			float shade = (numshades - min(max(dashade, 0), numshades)) / (float) numshades;
 			float r = shade, g = shade, b = shade;
 
@@ -362,13 +366,13 @@ public class GDXOrtho extends OrphoRenderer {
 					if (pth.getPal() != dapalnum) {
 						// apply tinting for replaced textures
 
-						Palette p = parent.defs.texInfo.getTints(dapalnum);
+						Color p = parent.defs.texInfo.getTints(dapalnum);
 						r *= p.r / 255.0f;
 						g *= p.g / 255.0f;
 						b *= p.b / 255.0f;
 					}
 
-					Palette pdetail = parent.defs.texInfo.getTints(MAXPALOOKUPS - 1);
+					Color pdetail = parent.defs.texInfo.getTints(MAXPALOOKUPS - 1);
 					if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
 						r *= pdetail.r / 255.0f;
 						g *= pdetail.g / 255.0f;
@@ -868,7 +872,7 @@ public class GDXOrtho extends OrphoRenderer {
 					pic = engine.getTile(globalpicnum);
 				}
 
-				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
+				globalshade = max(min(sec.getFloorshade(), EngineUtils.getPaletteManager().getShadeCount() - 1), 0);
 
 				GLSurface flor = parent.world.getFloor(s);
 				if (flor != null) {

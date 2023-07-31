@@ -4,14 +4,13 @@ import static com.badlogic.gdx.graphics.GL20.GL_RGB;
 import static com.badlogic.gdx.graphics.GL20.GL_RGBA;
 import static com.badlogic.gdx.graphics.GL20.GL_UNSIGNED_BYTE;
 import static java.lang.Math.min;
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.palookup;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.Palette;
+import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class RGBTileData extends TileData {
@@ -146,6 +145,10 @@ public class RGBTileData extends TileData {
 	}
 
 	protected int getColor(int dacol, int dapal, boolean alphaMode) {
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		Palette curpalette = paletteManager.getCurrentPalette();
+		byte[][] palookup = paletteManager.getPalookupBuffer();
+
 		dacol &= 0xFF;
 		if (alphaMode && dacol == 255) {
 			return curpalette.getRGBA(0, (byte) 0);

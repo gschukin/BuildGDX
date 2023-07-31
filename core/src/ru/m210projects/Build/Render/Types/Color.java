@@ -16,33 +16,32 @@
 
 package ru.m210projects.Build.Render.Types;
 
-public class Palette {
-	public short r;
-	public short g;
-	public short b;
-	public byte f;
+public class Color {
+	public final short r;
+	public final short g;
+	public final short b;
+	public final byte f;
 
-	public Palette() {
-	}
-
-	public Palette(Palette src) {
-		this.r = src.r;
-		this.g = src.g;
-		this.b = src.b;
-		this.f = src.f;
-	}
-
-	public Palette(int r, int g, int b, int f) {
+	public Color(int r, int g, int b, int f) {
 		this.r = (short) r;
 		this.g = (short) g;
 		this.b = (short) b;
 		this.f = (byte) f;
 	}
 
-	public void update(int r, int g, int b, int f) {
-		this.r = (short) r;
-		this.g = (short) g;
-		this.b = (short) b;
-		this.f = (byte) f;
+	public int getRed() {
+		return r;
+	}
+
+	public int getGreen() {
+		return g;
+	}
+
+	public int getBlue() {
+		return b;
+	}
+
+	public int getF() {
+		return f & 0xFF;
 	}
 }

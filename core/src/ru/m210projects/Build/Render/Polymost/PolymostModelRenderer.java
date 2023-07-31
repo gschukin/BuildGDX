@@ -10,7 +10,6 @@
  */
 package ru.m210projects.Build.Render.Polymost;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import ru.m210projects.Build.BoardService;
@@ -21,11 +20,10 @@ import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.GLVoxel;
 import ru.m210projects.Build.Render.Types.GL10;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.Sprite;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 import static com.badlogic.gdx.graphics.GL20.*;
@@ -42,7 +40,7 @@ public class PolymostModelRenderer {
     private final Engine engine;
     private final BoardService boardService;
     private GL10 gl;
-    private final Color polyColor = new Color();
+    private final com.badlogic.gdx.graphics.Color polyColor = new com.badlogic.gdx.graphics.Color();
     private final float[][] matrix = new float[4][4];
 
     private final Vector3 dvoxm0 = new Vector3(), modela0 = new Vector3();
@@ -189,11 +187,12 @@ public class PolymostModelRenderer {
         }
 
         parent.globalfog.apply();
+        int numshades = EngineUtils.getPaletteManager().getShadeCount();
         polyColor.r = polyColor.g = polyColor.b = (numshades
                 - min(max((globalshade * parent.shadescale)/* + m.shadeoff */, 0), numshades)) / (numshades);
 
         if (parent.defs != null) {
-            Palette p = parent.defs.texInfo.getTints(globalpal);
+            Color p = parent.defs.texInfo.getTints(globalpal);
             polyColor.r *= p.r / 255.0f;
             polyColor.g *= p.g / 255.0f;
             polyColor.b *= p.b / 255.0f;
@@ -343,6 +342,7 @@ public class PolymostModelRenderer {
 
         gl.glEnable(GL_TEXTURE_2D);
 
+        int numshades = EngineUtils.getPaletteManager().getShadeCount();
         polyColor.r = polyColor.g = polyColor.b = (numshades
                 - min(max((globalshade * parent.shadescale) + m.getShadeOff(), 0), numshades)) / (numshades);
 
@@ -350,12 +350,12 @@ public class PolymostModelRenderer {
         if (defs != null) {
             if (m.isTintAffected()
                     || (!(tspr.getOwner() >= MAXSPRITES) && boardService.getSector(boardService.getSprite(tspr.getOwner()).getSectnum()).getFloorpal() != 0)) {
-                Palette p = defs.texInfo.getTints(globalpal);
+                Color p = defs.texInfo.getTints(globalpal);
                 polyColor.r *= p.r / 255.0f;
                 polyColor.g *= p.g / 255.0f;
                 polyColor.b *= p.b / 255.0f;
 
-                Palette pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
+                Color pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
                 if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
                     polyColor.r *= pdetail.r / 255.0f;
                     polyColor.g *= pdetail.g / 255.0f;

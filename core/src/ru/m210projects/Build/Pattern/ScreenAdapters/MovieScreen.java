@@ -4,11 +4,12 @@ import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Input.Keymap.ANYKEY;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Settings.BuildSettings;
-import ru.m210projects.Build.Types.Tile;
+import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
@@ -55,6 +56,9 @@ public abstract class MovieScreen extends SkippableAdapter {
 		super(game);
 
 		TILE_MOVIE = nTile;
+
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		byte[][] palookup = paletteManager.getPalookupBuffer();
 		opalookup = new byte[palookup[0].length];
 		System.arraycopy(palookup[0], 0, opalookup, 0, opalookup.length);
 	}
@@ -86,7 +90,10 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	@Override
 	public void hide() {
-		engine.setbrightness(BuildSettings.paletteGamma.get(), palette, GLInvalidateFlag.All);
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		engine.setbrightness(BuildSettings.paletteGamma.get(), paletteManager.getBasePalette(), GLInvalidateFlag.All);
+
+
 	}
 
 	public MovieScreen setCallback(Runnable callback) {
@@ -144,9 +151,12 @@ public abstract class MovieScreen extends SkippableAdapter {
 //        nPosX = (xdim / 2) - (int) (tilesizy[TILE_MOVIE] / 2.0f * scale);
 //        nPosY = (ydim / 2) - (int) (tilesizx[TILE_MOVIE] / 2.0f * scale);
 
-		for (int i = 0; i < MAXPALOOKUPS; i++) {
-			palookup[0][i] = (byte) i;
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		byte[] remapbuf = new byte[256];
+		for (int i = 0; i < remapbuf.length; i++) {
+			remapbuf[i] = (byte) i;
 		}
+		paletteManager.makePalookup(0, remapbuf, 0, 0, 0, 1);
 
 		changepalette(mvfil.getPalette());
 
@@ -171,8 +181,8 @@ public abstract class MovieScreen extends SkippableAdapter {
 			return;
 		}
 
-//		engine.setbrightness(BuildSettings.paletteGamma.get(), pal, 2);
-		engine.changepalette(pal);
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		paletteManager.changePalette(pal);
 
 		int white = -1;
 		int k = 0;
@@ -191,7 +201,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 		int palnum = MAXPALOOKUPS - RESERVEDPALS - 1;
 		byte[] remapbuf = new byte[768];
 		Arrays.fill(remapbuf, (byte) white);
-		engine.makepalookup(palnum, remapbuf, 0, 1, 0, 1);
+		paletteManager.makePalookup(palnum, remapbuf, 0, 1, 0, 1);
 
 		Font font = GetFont();
 		for (char i = 0; i < 256; i++) {
@@ -269,7 +279,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	protected void close() {
 		if (mvfil != null) {
-			System.arraycopy(opalookup, 0, palookup[0], 0, opalookup.length);
+			System.arraycopy(opalookup, 0, EngineUtils.getPaletteManager().getPalookupBuffer()[0], 0, opalookup.length);
 			final GLRenderer gl = engine.glrender();
 			if (gl != null) {
 				gl.gltexinvalidateall(GLInvalidateFlag.Palookup);

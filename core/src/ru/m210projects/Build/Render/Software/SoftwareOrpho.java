@@ -75,7 +75,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 //		}
 //
 //		if (font.type == FontType.Tilemap) {
-//			if (palookup[col] == null) {
+//			if (!EngineUtils.getPaletteManager().isValidPalette(col)) {
 //				col = 0;
 //			}
 //
@@ -158,7 +158,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 	public void drawline256(int x1, int y1, int x2, int y2, int c) {
 		int dx, dy, i, j, inc, plc, daend;
 
-		byte col = palookup[0][c];
+		byte col = (byte) parent.paletteManager.getColorIndex(0, c);
 
 		dx = x2 - x1;
 		dy = y2 - y1;
@@ -376,7 +376,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 				globalpal = sec.getFloorpal();
 				if (sec.getFloorpal() != parent.globalpalwritten) {
 					parent.globalpalwritten = sec.getFloorpal();
-					parent.getA().setpalookupaddress(palookup[parent.globalpalwritten]);
+					parent.getA().setpalookupaddress(parent.paletteManager.getPalookupBuffer()[parent.globalpalwritten]);
 				}
 
 				globalpicnum = sec.getFloorpicnum();
@@ -400,6 +400,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 //				}
 
 				parent.globalbufplc = pic.getBytes();
+				int numshades = EngineUtils.getPaletteManager().getShadeCount();
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
 				if ((globalorientation & 64) == 0) {
@@ -618,6 +619,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					} else {
 						globalshade = (boardService.getSector(spr.getSectnum()).getFloorshade());
 					}
+					int numshades = EngineUtils.getPaletteManager().getShadeCount();
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
 					parent.globvis = parent.globalhisibility;
@@ -626,7 +628,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					}
 					globalpolytype = ((spr.getCstat() & 2) >> 1) + 1;
 
-					parent.getA().setuphline(palookup[spr.getPal()], globalshade << 8);
+					parent.getA().setuphline(parent.paletteManager.getPalookupBuffer()[spr.getPal()], globalshade << 8);
 
 					// relative alignment stuff
 					ox = x2 - x1;
@@ -1248,7 +1250,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			int cx1, int cy1, int cx2, int cy2, int uniqid) {
 		int x, y;
 
-		if (dapalnum < 0 || dapalnum >= palookup.length || palookup[dapalnum] == null) {
+		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 
@@ -1422,7 +1424,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 		engine.setgotpic(picnum);
 		byte[] bufplc = pic.getBytes();
 
-		int palookupshade = engine.getpalookup(0, dashade) << 8;
+		int palookupshade = parent.paletteManager.getPalookup(0, dashade) << 8;
 
 		i = divscale(1, z, 32);
 		xv = mulscale(sinang, i, 14);
@@ -1453,12 +1455,12 @@ public class SoftwareOrpho extends OrphoRenderer {
 
 		if ((dastat & 1) == 0) {
 			if ((dastat & 64) != 0) {
-				parent.getA().setupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
+				parent.getA().setupspritevline(parent.paletteManager.getPalookupBuffer()[dapalnum], palookupshade, xv, yv, ysiz);
 			} else {
-				parent.getA().msetupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
+				parent.getA().msetupspritevline(parent.paletteManager.getPalookupBuffer()[dapalnum], palookupshade, xv, yv, ysiz);
 			}
 		} else {
-			parent.getA().tsetupspritevline(palookup[dapalnum], palookupshade, xv, yv, ysiz);
+			parent.getA().tsetupspritevline(parent.paletteManager.getPalookupBuffer()[dapalnum], palookupshade, xv, yv, ysiz);
 			if ((dastat & 32) != 0) {
 				parent.getA().settransreverse();
 			} else {

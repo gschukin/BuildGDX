@@ -5,7 +5,6 @@ import static ru.m210projects.Build.Engine.GLOWPAL;
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
 import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.Engine.RESERVEDPALS;
-import static ru.m210projects.Build.Engine.palookup;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager.Shader;
 import ru.m210projects.Build.Render.ModelHandle.GLModel;
@@ -54,7 +54,7 @@ public class GDXModelManager extends ModelManager {
 			@Override
 			public GLTile getSkin(int pal) {
 				PixelFormat fmt = parent.getTexFormat();
-				if (palookup[pal] == null || fmt == PixelFormat.Pal8) {
+				if (!EngineUtils.getPaletteManager().isValidPalette(pal) || fmt == PixelFormat.Pal8) {
 					pal = 0;
 				}
 

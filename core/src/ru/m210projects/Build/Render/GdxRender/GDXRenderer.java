@@ -61,6 +61,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
@@ -94,7 +95,7 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Render.Types.FadeEffect.FadeShader;
 import ru.m210projects.Build.Render.Types.GLFilter;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Script.ModelsInfo.SpriteAnim;
@@ -216,7 +217,7 @@ public class GDXRenderer implements GLRenderer {
 				return;
 			}
 
-			this.textureCache.changePalette(curpalette.getBytes());
+			this.textureCache.changePalette(EngineUtils.getPaletteManager().getCurrentPalette().getBytes());
 
 			Console.out.println("Polygdx renderer is initialized", OsdColor.GREEN);
 			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
@@ -669,7 +670,7 @@ public class GDXRenderer implements GLRenderer {
 		}
 
 		engine.setgotpic(picnum);
-		if (palookup[palnum] == null) {
+		if (!EngineUtils.getPaletteManager().isValidPalette(palnum)) {
 			palnum = 0;
 		}
 
@@ -737,13 +738,13 @@ public class GDXRenderer implements GLRenderer {
 						if (pth.getPal() != surf.getPal()) {
 							// apply tinting for replaced textures
 
-							Palette p = defs.texInfo.getTints(surf.getPal());
+							Color p = defs.texInfo.getTints(surf.getPal());
 							r *= p.r / 255.0f;
 							g *= p.g / 255.0f;
 							b *= p.b / 255.0f;
 						}
 
-						Palette pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
+						Color pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
 						if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
 							r *= pdetail.r / 255.0f;
 							g *= pdetail.g / 255.0f;
@@ -779,25 +780,29 @@ public class GDXRenderer implements GLRenderer {
 	protected void calcFog(int pal, int shade, float combvis) {
 		float start = FULLVIS_BEGIN;
 		float end = FULLVIS_END;
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
 		if (combvis != 0) {
-			if (shade >= numshades - 1) {
+			if (shade >= paletteManager.getShadeCount() - 1) {
 				start = -1;
 				end = 0.001f;
 			} else {
 				start = (shade > 0) ? 0 : -(FOGDISTCONST * shade) / combvis;
-				end = (FOGDISTCONST * (numshades - 1 - shade)) / combvis;
+				end = (FOGDISTCONST * (paletteManager.getShadeCount() - 1 - shade)) / combvis;
 			}
 		}
 
-		float r = (palookupfog[pal][0] / 63.f);
-		float g = (palookupfog[pal][1] / 63.f);
-		float b = (palookupfog[pal][2] / 63.f);
+		Color palookupfog = paletteManager.getFogColor(pal);
+		float r = (palookupfog.r / 63.f);
+		float g = (palookupfog.g / 63.f);
+		float b = (palookupfog.b / 63.f);
 
 		manager.fog(true, start, end, r, g, b);
 	}
 
 	@Override
 	public void clearview(int dacol) {
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		Palette curpalette = paletteManager.getCurrentPalette();
 		gl.glClearColor(curpalette.getRed(dacol) / 255.0f, //
 				curpalette.getGreen(dacol) / 255.0f, //
 				curpalette.getBlue(dacol) / 255.0f, 0); //
@@ -930,6 +935,10 @@ public class GDXRenderer implements GLRenderer {
 				pix8buffer = BufferUtils.newByteBuffer(xsiz * ysiz);
 			}
 
+			PaletteManager paletteManager = EngineUtils.getPaletteManager();
+			byte[] basePalette = paletteManager.getBasePalette();
+			FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
+
 			int base = 0, r, g, b;
 			if (reverse) {
 				for (int x, y = 0; y < ysiz; y++) {
@@ -938,7 +947,7 @@ public class GDXRenderer implements GLRenderer {
 						r = (pix32buffer.get(base++) & 0xFF) >> 2;
 						g = (pix32buffer.get(base++) & 0xFF) >> 2;
 						b = (pix32buffer.get(base++) & 0xFF) >> 2;
-						pix8buffer.put(engine.getclosestcol(palette, r, g, b));
+						pix8buffer.put(fastColorLookup.getClosestColorIndex(basePalette, r, g, b));
 					}
 				}
 			} else {
@@ -949,7 +958,7 @@ public class GDXRenderer implements GLRenderer {
 					if (byteperpixel == 4) {
 						base++; // Android
 					}
-					pix8buffer.put(engine.getclosestcol(palette, r, g, b));
+					pix8buffer.put(fastColorLookup.getClosestColorIndex(basePalette, r, g, b));
 				}
 			}
 
@@ -974,6 +983,10 @@ public class GDXRenderer implements GLRenderer {
 			byteperpixel = 4;
 		}
 
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		byte[] basePalette = paletteManager.getBasePalette();
+		FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
+
 		int base;
 		for (int fx, fy = 0; fy < newheight; fy++) {
 			base = mulscale(fy, yf, 16) * xdim;
@@ -984,7 +997,7 @@ public class GDXRenderer implements GLRenderer {
 				int g = (frame.get() & 0xFF) >> 2;
 				int b = (frame.get() & 0xFF) >> 2;
 
-				capture[newheight * fx + fy] = engine.getclosestcol(palette, r, g, b);
+				capture[newheight * fx + fy] = fastColorLookup.getClosestColorIndex(basePalette, r, g, b);
 			}
 		}
 
@@ -1104,7 +1117,7 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void precache(int dapicnum, int dapalnum, int datype) {
-		if ((palookup[dapalnum] == null) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
+		if ((!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
 			return;
 		}
 
@@ -1227,7 +1240,7 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bind(int dapicnum, int dapalnum, int dashade, int skybox, int method) {
-		if (palookup[dapalnum] == null) {
+		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 
@@ -1246,7 +1259,7 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bindSky(int dapicnum, int dapalnum, int dashade, int method) {
-		if (palookup[dapalnum] == null) {
+		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 
@@ -1314,6 +1327,7 @@ public class GDXRenderer implements GLRenderer {
 			}
 
 			float r, b, g;
+			int numshades = EngineUtils.getPaletteManager().getShadeCount();
 			float fshade = min(max(shade * 1.04f, 0), numshades);
 			r = g = b = (numshades - fshade) / numshades;
 
@@ -1321,13 +1335,13 @@ public class GDXRenderer implements GLRenderer {
 				if (tile.getPal() != pal) {
 					// apply tinting for replaced textures
 
-					Palette p = defs.texInfo.getTints(pal);
+					Color p = defs.texInfo.getTints(pal);
 					r *= p.r / 255.0f;
 					g *= p.g / 255.0f;
 					b *= p.b / 255.0f;
 				}
 
-				Palette pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
+				Color pdetail = defs.texInfo.getTints(MAXPALOOKUPS - 1);
 				if (pdetail.r != 255 || pdetail.g != 255 || pdetail.b != 255) {
 					r *= pdetail.r / 255.0f;
 					g *= pdetail.g / 255.0f;

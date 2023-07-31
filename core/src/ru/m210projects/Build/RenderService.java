@@ -61,8 +61,6 @@ public class RenderService {
     public static int curbrightness = 0;
     public static int xdimen = -1, halfxdimen, xdimenscale, xdimscale;
     public static int wx1, wy1, wx2, wy2, ydimen;
-    protected static byte[][] britable; // JBF 20040207: full 8bit precision
-    public static byte[] transluc; //software renderer
     public static int parallaxyoffs, parallaxyscale;
     public static int globalposx, globalposy, globalposz; // polymost
     public static float globalhoriz, globalang;
@@ -100,7 +98,6 @@ public class RenderService {
     private long fpstime = 0;
     private int fpsx, fpsy;
 
-    protected Byte[] palcache = new Byte[0x40000]; // buffer 256kb
     protected byte[] temppal = new byte[768];
 
     public RenderService(Engine engine) {
@@ -123,8 +120,6 @@ public class RenderService {
         bakwindowx2 = new int[4];
         bakwindowy2 = new int[4];
 
-        calcbritable();
-
         parallaxyoffs = 0;
         parallaxyscale = 65536;
 
@@ -137,19 +132,6 @@ public class RenderService {
 
     public void setgotpic(int tilenume) { // jfBuild
         gotpic[tilenume >> 3] |= pow2char[tilenume & 7];
-    }
-
-    protected void calcbritable() { // jfBuild
-        britable = new byte[16][256];
-
-        float a, b;
-        for (int i = 0, j; i < 16; i++) {
-            a = 8.0f / (i + 8);
-            b = (float) (255.0f / pow(255.0f, a));
-            for (j = 0; j < 256; j++) {// JBF 20040207: full 8bit precision
-                britable[i][j] = (byte) (pow(j, a) * b);
-            }
-        }
     }
 
     public int animateoffs(int tilenum, int nInfo) { // jfBuild + gdxBuild
@@ -189,129 +171,6 @@ public class RenderService {
             }
         }
         return (int) index;
-    }
-
-    public void initfastcolorlookup(int rscale, int gscale, int bscale) { // jfBuild
-        int i, x, y, z;
-
-        int j = 0;
-        for (i = 64; i >= 0; i--) {
-            rdist[i] = rdist[128 - i] = j * rscale;
-            gdist[i] = gdist[128 - i] = j * gscale;
-            bdist[i] = bdist[128 - i] = j * bscale;
-            j += 129 - (i << 1);
-        }
-
-        Arrays.fill(colhere, (byte) 0);
-        Arrays.fill(colhead, (byte) 0);
-
-        int pal1 = 768 - 3;
-        for (i = 255; i >= 0; i--, pal1 -= 3) {
-            int r = palette[pal1] & 0xFF;
-            int g = palette[pal1 + 1] & 0xFF;
-            int b = palette[pal1 + 2] & 0xFF;
-            j = (r >> 3) * FASTPALGRIDSIZ * FASTPALGRIDSIZ + (g >> 3) * FASTPALGRIDSIZ + (b >> 3)
-                    + FASTPALGRIDSIZ * FASTPALGRIDSIZ + FASTPALGRIDSIZ + 1;
-            if ((colhere[j >> 3] & pow2char[j & 7]) != 0) {
-                colnext[i] = (short) (colhead[j] & 0xFF);
-            } else {
-                colnext[i] = -1;
-            }
-
-            colhead[j] = (byte) i;
-            colhere[j >> 3] |= pow2char[j & 7];
-        }
-
-        i = 0;
-        for (x = -FASTPALGRIDSIZ * FASTPALGRIDSIZ; x <= FASTPALGRIDSIZ * FASTPALGRIDSIZ; x += FASTPALGRIDSIZ
-                * FASTPALGRIDSIZ) {
-            for (y = -FASTPALGRIDSIZ; y <= FASTPALGRIDSIZ; y += FASTPALGRIDSIZ) {
-                for (z = -1; z <= 1; z++) {
-                    colscan[i++] = x + y + z;
-                }
-            }
-        }
-        i = colscan[13];
-        colscan[13] = colscan[26];
-        colscan[26] = i;
-    }
-
-    public byte getclosestcol(byte[] palette, int r, int g, int b) { // jfBuild
-        int i, k, dist;
-        byte retcol;
-        int pal1;
-
-        int j = (r >> 3) * FASTPALGRIDSIZ * FASTPALGRIDSIZ + (g >> 3) * FASTPALGRIDSIZ + (b >> 3)
-                + FASTPALGRIDSIZ * FASTPALGRIDSIZ + FASTPALGRIDSIZ + 1;
-
-        int rgb = ((r << 12) | (g << 6) | b);
-
-        int mindist = min(rdist[(coldist[r & 7] & 0xFF) + 64 + 8], gdist[(coldist[g & 7] & 0xFF) + 64 + 8]);
-        mindist = min(mindist, bdist[(coldist[b & 7] & 0xFF) + 64 + 8]);
-        mindist++;
-
-        Byte out = palcache[rgb & (palcache.length - 1)];
-        if (out != null) {
-            return out;
-        }
-
-        r = 64 - r;
-        g = 64 - g;
-        b = 64 - b;
-
-        retcol = -1;
-        for (k = 26; k >= 0; k--) {
-            i = colscan[k] + j;
-            if ((colhere[i >> 3] & pow2char[i & 7]) == 0) {
-                continue;
-            }
-
-            i = colhead[i] & 0xFF;
-            do {
-                pal1 = i * 3;
-                dist = gdist[(palette[pal1 + 1] & 0xFF) + g];
-                if (dist < mindist) {
-                    dist += rdist[(palette[pal1] & 0xFF) + r];
-                    if (dist < mindist) {
-                        dist += bdist[(palette[pal1 + 2] & 0xFF) + b];
-                        if (dist < mindist) {
-                            mindist = dist;
-                            retcol = (byte) i;
-                        }
-                    }
-                }
-                i = colnext[i];
-            } while (i >= 0);
-        }
-        if (retcol >= 0) {
-            palcache[rgb & (palcache.length - 1)] = retcol;
-            return retcol;
-        }
-
-        mindist = 0x7fffffff;
-        for (i = 255; i >= 0; i--) {
-            pal1 = i * 3;
-            dist = gdist[(palette[pal1 + 1] & 0xFF) + g];
-            if (dist >= mindist) {
-                continue;
-            }
-
-            dist += rdist[(palette[pal1] & 0xFF) + r];
-            if (dist >= mindist) {
-                continue;
-            }
-
-            dist += bdist[(palette[pal1 + 2] & 0xFF) + b];
-            if (dist >= mindist) {
-                continue;
-            }
-
-            mindist = dist;
-            retcol = (byte) i;
-        }
-
-        palcache[rgb & (palcache.length - 1)] = retcol;
-        return retcol;
     }
 
     public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, int dacursectnum) { // eDuke32
@@ -376,7 +235,7 @@ public class RenderService {
         ydim = daydim;
 
         setview(0, 0, xdim - 1, ydim - 1);
-        setbrightness(curbrightness, palette, GLRenderer.GLInvalidateFlag.All);
+        setbrightness(curbrightness, EngineUtils.getPaletteManager().getBasePalette(), GLRenderer.GLInvalidateFlag.All);
 
         Console.out.revalidate();
 
@@ -517,10 +376,11 @@ public class RenderService {
     }
 
     public void setbrightness(int dabrightness, byte[] dapal, GLRenderer.GLInvalidateFlag flags) {
-        final GLRenderer gl = glrender();
         curbrightness = BClipRange(dabrightness, 0, 15);
+        PaletteManager paletteManager = EngineUtils.getPaletteManager();
+        byte[][] britable = paletteManager.getBritableBuffer();
 
-        if ((gl == null || gl.getType().getFrameType() != BuildFrame.FrameType.GL) && curbrightness != 0) {
+        if (render instanceof Software && curbrightness != 0) {
             for (int i = 0; i < dapal.length; i++) {
                 temppal[i] = britable[curbrightness][(dapal[i] & 0xFF) << 2];
             }
@@ -536,31 +396,14 @@ public class RenderService {
 //			}
         }
 
-        if (changepalette(temppal)) {
-            if (gl != null) {
-                gl.gltexinvalidateall(flags);
+        if (EngineUtils.getPaletteManager().changePalette(temppal)) {
+            if (render instanceof GLRenderer) {
+                ((GLRenderer) render).gltexinvalidateall(flags);
             }
 
             palfadergb.r = palfadergb.g = palfadergb.b = 0;
             palfadergb.a = 0;
         }
-    }
-
-    public boolean changepalette(final byte[] palette) {
-        if (render.getType() != Renderer.RenderType.Software && CRC32.getChecksum(palette) == curpalette.getCrc32()) {
-            return false;
-        }
-
-        curpalette.update(palette);
-        Arrays.fill(palcache, null);
-
-        BuildGdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                render.changepalette(palette);
-            }
-        });
-        return true;
     }
 
     public void setpalettefade(int r, int g, int b, int offset) { // jfBuild
@@ -569,6 +412,7 @@ public class RenderService {
         palfadergb.b = min(63, b) << 2;
         palfadergb.a = (min(63, offset) << 2);
 
+        Palette curpalette = EngineUtils.getPaletteManager().getCurrentPalette();
         if (glrender() == null) { // if 8bit renderer
             int k = 0;
             for (int i = 0; i < 256; i++) {

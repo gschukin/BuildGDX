@@ -25,11 +25,12 @@ public class CachedArtEntry extends ArtEntry {
             throw new RuntimeException("Wrong tile data length");
         }
         System.arraycopy(data, 0, this.data, 0, size);
-        engine.getrender().invalidatetile(num, -1, -1); // JBF 20031228
+        engine.getrender().invalidatetile(num, -1, -1);
     }
 
     public void clearData() {
         Arrays.fill(data, (byte) 0);
+        engine.getrender().invalidatetile(num, -1, -1);
     }
 
 }

@@ -21,27 +21,25 @@ import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.Engine.RESERVEDPALS;
 
 import ru.m210projects.Build.Render.TextureHandle.Hicreplctyp;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.filehandle.Entry;
 
 public class TextureHDInfo {
 
 //	public static final int HICEFFECTMASK = (1 | 2);
 
-	private final Palette[] tinting = new Palette[MAXPALOOKUPS];
+	private static final Color DEFAULT_COLOR = new Color(0xff, 0xff, 0xff, 0);
+	private final Color[] tinting = new Color[MAXPALOOKUPS];
 	private final Hicreplctyp[] cache = new Hicreplctyp[MAXTILES];
 
-	public TextureHDInfo() {
-		for (int i = 0; i < MAXPALOOKUPS; i++) // all tints should be 100%
-		{
-			tinting[i] = new Palette(0xff, 0xff, 0xff, 0);
-		}
-	}
-
-	public TextureHDInfo(TextureHDInfo src) {
+	public TextureHDInfo setFrom(TextureHDInfo src) {
 		for (int i = 0; i < MAXPALOOKUPS; i++) {
-			this.tinting[i] = new Palette(src.tinting[i]);
+			Color c = src.tinting[i];
+			if (c != null) {
+				this.tinting[i] = new Color(c.r, c.g, c.b, c.f);
+			}
 		}
+
 		for (int i = 0; i < MAXTILES; i++) {
 			if (src.cache[i] == null) {
 				continue;
@@ -50,13 +48,14 @@ public class TextureHDInfo {
 				add(new Hicreplctyp(hr), i);
 			}
 		}
+		return this;
 	}
 
 	public void setPaletteTint(int palnum, int r, int g, int b, int effect) {
-		if (palnum >= MAXPALOOKUPS) {
+		if (palnum >= tinting.length) {
 			return;
 		}
-		tinting[palnum].update(r, g, b, effect & 3);
+		tinting[palnum] = new Color(r, g, b, effect & 3);
 	}
 
 //	public int getPaletteEffect(int palnum)
@@ -65,8 +64,11 @@ public class TextureHDInfo {
 //	    return tinting[palnum].f & HICEFFECTMASK;
 //	}
 
-	public Palette getTints(int palnum) {
-		return tinting[palnum];
+	public Color getTints(int palnum) {
+		if (palnum >= 0 && palnum < tinting.length && tinting[palnum] != null) {
+			return tinting[palnum];
+		}
+		return DEFAULT_COLOR;
 	}
 
 	private Hicreplctyp get(int picnum, int palnum) {

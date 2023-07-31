@@ -82,6 +82,9 @@ public class FileEntry implements Entry, Comparable<FileEntry> {
     @Override
     public boolean exists() {
         try {
+            if (isDirectory) {
+                return true;
+            }
             return Files.exists(path);
         } catch (Exception e) {
             return false;

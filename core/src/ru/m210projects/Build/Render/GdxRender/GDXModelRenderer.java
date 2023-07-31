@@ -7,7 +7,6 @@ import static com.badlogic.gdx.graphics.GL20.GL_CW;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static ru.m210projects.Build.RenderService.*;
-import static ru.m210projects.Build.Engine.numshades;
 import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT1;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT2;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.math.Matrix4;
 
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.GdxRender.Shaders.ShaderManager;
@@ -25,12 +25,11 @@ import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.GLVoxel;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
-import ru.m210projects.Build.Render.Types.Palette;
+import ru.m210projects.Build.Render.Types.Color;
 import ru.m210projects.Build.Render.Types.Spriteext;
 import ru.m210projects.Build.Render.Types.Tile2model;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.Sprite;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 
 public class GDXModelRenderer {
@@ -88,10 +87,11 @@ public class GDXModelRenderer {
 		int pal = tspr.getPal() & 0xFF;
 
 		float r, g, b, alpha = 1.0f;
+		int numshades = EngineUtils.getPaletteManager().getShadeCount();
 		r = g = b = (numshades - min(max((shade), 0), numshades)) / (float) numshades;
 
 		if (parent.defs != null) {
-			Palette p = parent.defs.texInfo.getTints(pal);
+			Color p = parent.defs.texInfo.getTints(pal);
 			r *= p.r / 255.0f;
 			g *= p.g / 255.0f;
 			b *= p.b / 255.0f;

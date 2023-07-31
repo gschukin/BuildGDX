@@ -160,11 +160,13 @@ public class Software implements Renderer {
 	public boolean isInited = false;
 
 	protected SoftwareOrpho ortho;
+	protected PaletteManager paletteManager;
 
 	public Software(Engine engine, IOverheadMapSettings settings) {
 
 		this.engine = engine;
 		this.boardService = engine.getBoardService();
+		this.paletteManager = EngineUtils.getPaletteManager();
 
 		ortho = allocOrphoRenderer(settings);
 
@@ -199,7 +201,7 @@ public class Software implements Renderer {
 
 			globalpalwritten = 0;
 
-			changepalette(curpalette.getBytes());
+			changepalette(paletteManager.getCurrentPalette().getBytes());
 
 			j = 0;
 			for (int i = 0; i <= ydim; i++) {
@@ -220,8 +222,8 @@ public class Software implements Renderer {
 			a = new Ac(xdim, ydim, reciptable);
 			a.setvlinebpl(bytesperline);
 
-			a.fixtransluscence(transluc);
-			a.setpalookupaddress(palookup[globalpalwritten]);
+			a.fixtransluscence(paletteManager.getTranslucBuffer());
+			a.setpalookupaddress(paletteManager.getPalookupBuffer()[globalpalwritten]);
 
 			Console.out.println("Software renderer is initialized", OsdColor.GREEN);
 			isInited = true;
@@ -785,7 +787,7 @@ public class Software implements Renderer {
 							globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 						}
 						globalpal = wal.getPal();
-						if (palookup[globalpal] == null) {
+						if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
 							globalpal = 0; // JBF: fixes crash
 						}
 						globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
@@ -901,7 +903,7 @@ public class Software implements Renderer {
 							globalshade = wal.getShade();
 							globalpal = wal.getPal();
 						}
-						if (palookup[globalpal] == null) {
+						if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
 							globalpal = 0; // JBF: fixes crash
 						}
 						globvis = globalvisibility;
@@ -1020,7 +1022,7 @@ public class Software implements Renderer {
 					globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 				}
 				globalpal = wal.getPal();
-				if (palookup[globalpal] == null) {
+				if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
 					globalpal = 0; // JBF: fixes crash
 				}
 				globalshiftval = (short) (pic.getSizey());
@@ -1110,7 +1112,7 @@ public class Software implements Renderer {
 		short sectnum = tspr.getSectnum();
 		Sector sec = boardService.getSector(sectnum);
 		globalpal = tspr.getPal();
-		if (palookup[globalpal] == null) {
+		if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
 			globalpal = 0; // JBF: fixes null-pointer crash
 		}
 		globalshade = tspr.getShade();
@@ -2205,7 +2207,7 @@ public class Software implements Renderer {
 		sprsinang = EngineUtils.sin(dasprang);
 
 		mip = klabs(dmulscale(dasprx - globalposx, cosang, daspry - globalposy, sinang, 6));
-		j = engine.getpalookup(mulscale(globvis, mip, 21), dashade) << 8;
+		j = paletteManager.getPalookup(mulscale(globvis, mip, 21), dashade) << 8;
 
 		int trans = 0;
 		if ((globalorientation & 2) != 0) {
@@ -2215,7 +2217,7 @@ public class Software implements Renderer {
 				trans = 1;
 			}
 		}
-		a.setupdrawslab(ylookup[1], palookup[dapal], j, trans);
+		a.setupdrawslab(ylookup[1], paletteManager.getPalookupBuffer()[dapal], j, trans);
 
 		if (!novoxmips) {
 			j = 1310720;
@@ -2772,7 +2774,7 @@ public class Software implements Renderer {
 
 		int p = ylookup[y1v] + x + frameoffset;
 
-		a.tvlineasm1(vinc, palookup[globalpal], (engine.getpalookup(mulscale(swall[x], globvis, 16), globalshade) << 8),
+		a.tvlineasm1(vinc, paletteManager.getPalookupBuffer()[globalpal], (paletteManager.getPalookup(mulscale(swall[x], globvis, 16), globalshade) << 8),
 				y2v - y1v, vplc, bufplc, bufoffs, p);
 	}
 
@@ -2903,7 +2905,7 @@ public class Software implements Renderer {
 				continue;
 			}
 
-			shade = (engine.getpalookup(mulscale(swal[x], globvis, 16), globalshade) << 8);
+			shade = (paletteManager.getPalookup(mulscale(swal[x], globvis, 16), globalshade) << 8);
 			if (bufplce >= tsizx) {
 				if (!xnice) {
 					bufplce %= tsizx;
@@ -2920,7 +2922,7 @@ public class Software implements Renderer {
 			vince = swal[x] * globalyscale;
 			vplce = globalzd + vince * (y1ve - (int) globalhoriz + 1);
 			cnt = y2ve - y1ve - 1;
-			a.mvlineasm1(vince, palookup[globalpal], shade, cnt, vplce, pic.getBytes(), bufplce,
+			a.mvlineasm1(vince, paletteManager.getPalookupBuffer()[globalpal], shade, cnt, vplce, pic.getBytes(), bufplce,
 					x + frameoffset + ylookup[y1ve]);
 		}
 
@@ -2972,7 +2974,7 @@ public class Software implements Renderer {
 				continue;
 			}
 
-			int shade = (engine.getpalookup(mulscale(swal[x], globvis, 16), globalshade) << 8);
+			int shade = (paletteManager.getPalookup(mulscale(swal[x], globvis, 16), globalshade) << 8);
 
 			int bufplce = lwal[x] + globalxpanning;
 			if (bufplce >= tsizx) {
@@ -2991,7 +2993,7 @@ public class Software implements Renderer {
 			int vince = swal[x] * globalyscale;
 			int vplce = globalzd + vince * (y1ve - (int) globalhoriz + 1);
 
-			a.vlineasm1(vince, palookup[fpalookup], shade, y2ve - y1ve - 1, vplce, pic.getBytes(), bufplce,
+			a.vlineasm1(vince, paletteManager.getPalookupBuffer()[fpalookup], shade, y2ve - y1ve - 1, vplce, pic.getBytes(), bufplce,
 					x + frameoffset + ylookup[y1ve]);
 		}
 
@@ -3005,7 +3007,7 @@ public class Software implements Renderer {
 		sec = boardService.getSector(sectnum);
 		if (sec.getFloorpal() != globalpalwritten) {
 			globalpalwritten = sec.getFloorpal();
-			a.setpalookupaddress(palookup[globalpalwritten]);
+			a.setpalookupaddress(paletteManager.getPalookupBuffer()[globalpalwritten]);
 		}
 
 		globalzd = globalposz - sec.getFloorz();
@@ -3445,7 +3447,7 @@ public class Software implements Renderer {
 		by = mulscale(globaly2 * x1 + globaly1, v, 14) + globalypanning;
 
 		a.sethlineincs(mulscale(globalx2, v, 14), mulscale(globaly2, v, 14));
-		a.setuphline(palookup[globalpal], engine.getpalookup(mulscale(klabs(v), globvis, 28), globalshade) << 8);
+		a.setuphline(paletteManager.getPalookupBuffer()[globalpal], paletteManager.getPalookup(mulscale(klabs(v), globvis, 28), globalshade) << 8);
 
 		if ((globalorientation & 2) == 0) {
 			a.mhline(globalbufplc, bx, (x2 - x1) << 16, 0, by, ylookup[y] + x1 + frameoffset);
@@ -3635,17 +3637,17 @@ public class Software implements Renderer {
 				nptr2 = y2 + (shoffs >> 15);
 
 				while (nptr1 <= mptr1) {
-					slopalookup[mptr1--] = engine.getpalookup(mulscale(krecipasm(m1), globvis, 24), globalshade) << 8;
+					slopalookup[mptr1--] = paletteManager.getPalookup(mulscale(krecipasm(m1), globvis, 24), globalshade) << 8;
 					m1 -= l;
 				}
 				while (nptr2 >= mptr2) {
-					slopalookup[mptr2++] = engine.getpalookup(mulscale(krecipasm(m2), globvis, 24), globalshade) << 8;
+					slopalookup[mptr2++] = paletteManager.getPalookup(mulscale(krecipasm(m2), globvis, 24), globalshade) << 8;
 					m2 += l;
 				}
 
 				globalx3 = globalx2 >> 10;
 				globaly3 = globaly2 >> 10;
-				a.slopevlin(ylookup[y2] + x + frameoffset, palookup[j], nptr2, y2 - y1 + 1, globalx1, globaly1,
+				a.slopevlin(ylookup[y2] + x + frameoffset, paletteManager.getPalookupBuffer()[j], nptr2, y2 - y1 + 1, globalx1, globaly1,
 						globalx3, globaly3, slopalookup, mulscale(y2, globalzd, 16) + (globalzx >> 6));
 
 //				if ((x & 15) == 0)
@@ -3665,7 +3667,7 @@ public class Software implements Renderer {
 		sec = boardService.getSector(sectnum);
 		if (sec.getCeilingpal() != globalpalwritten) {
 			globalpalwritten = sec.getCeilingpal();
-			a.setpalookupaddress(palookup[globalpalwritten]);
+			a.setpalookupaddress(paletteManager.getPalookupBuffer()[globalpalwritten]);
 		}
 
 		globalzd = sec.getCeilingz() - globalposz;
@@ -3985,6 +3987,7 @@ public class Software implements Renderer {
 				rgbbuffer = ByteBuffer.allocateDirect(xsiz * ysiz * 3);
 			}
 
+			Palette curpalette = paletteManager.getCurrentPalette();
 			for (int i = 0; i < xsiz * ysiz; i++) {
 				int dacol = frameplace[i] & 0xFF;
 				rgbbuffer.put((byte) curpalette.getRed(dacol));
@@ -4686,7 +4689,7 @@ public class Software implements Renderer {
 		int r = lookups[horizlookup2 + yp - (int) globalhoriz + horizycent];
 		a.sethlineincs(globalx1 * r, globaly2 * r);
 
-		int shade = engine.getpalookup(mulscale(r, globvis, 16), globalshade) << 8;
+		int shade = paletteManager.getPalookup(mulscale(r, globvis, 16), globalshade) << 8;
 
 		a.hlineasm4(xr - xl, 0, shade, globalx2 * r + globalypanning, globaly1 * r + globalxpanning,
 				ylookup[yp] + xr + frameoffset);
@@ -4704,7 +4707,7 @@ public class Software implements Renderer {
 
 		a.sethlineincs(globalx1 * r, globaly2 * r);
 
-		a.setuphline(palookup[globalpalwritten], engine.getpalookup(mulscale(r, globvis, 16), globalshade) << 8);
+		a.setuphline(paletteManager.getPalookupBuffer()[globalpalwritten], paletteManager.getPalookup(mulscale(r, globvis, 16), globalshade) << 8);
 
 		if ((globalorientation & 256) == 0) {
 			a.mhline(globalbufplc, globaly1 * r + globalxpanning - xinc * (xr - xl), (xr - xl) << 16, 0,

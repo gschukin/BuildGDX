@@ -18,11 +18,9 @@ import static ru.m210projects.Build.Engine.MAXTILES;
 import static ru.m210projects.Build.Engine.NORMALPAL;
 import static ru.m210projects.Build.Engine.RESERVEDPALS;
 import static ru.m210projects.Build.Engine.SPECULARPAL;
-import static ru.m210projects.Build.Engine.palette;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -39,12 +37,12 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import ru.m210projects.Build.CRC32;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Types.AnimType;
+import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.FileUtils;
 import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
-import ru.m210projects.Build.filehandle.art.ArtFile;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 import ru.m210projects.Build.osd.Console;
@@ -56,7 +54,6 @@ import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MD2.MD2Info;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MD3.MD3Info;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelData;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.osd.OsdColor;
 
 public class DefScript {
@@ -130,7 +127,7 @@ public class DefScript {
 	 */
 	public DefScript(DefScript src, Entry entry) {
 		this.disposable = true;
-		this.texInfo = new TextureHDInfo(src.texInfo);
+		this.texInfo = new TextureHDInfo().setFrom(src.texInfo);
 		this.mdInfo = new ModelsInfo(src.mdInfo, src.disposable);
 		this.audInfo = new AudioInfo(src.audInfo);
 		this.mapInfo = createMapHackInfo(src.mapInfo);
@@ -814,6 +811,9 @@ public class DefScript {
 
 			ByteBuffer bb = pix.getPixels();
 			byte[] waloff = deftile.waloff;
+			PaletteManager paletteManager = EngineUtils.getPaletteManager();
+			byte[] basePalette = paletteManager.getBasePalette();
+			FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
 
 			for (int y = 0; y < ysiz; y++) {
 				for (int x = 0; x < xsiz; x++) {
@@ -824,10 +824,10 @@ public class DefScript {
 						if (bb.get() == 0) {
                             waloff[x * ysiz + y] = -1;
                         } else {
-							waloff[x * ysiz + y] = def.engine.getclosestcol(palette, r, g, b);
+							waloff[x * ysiz + y] = fastColorLookup.getClosestColorIndex(basePalette, r, g, b);
 						}
 					} else {
-						waloff[x * ysiz + y] = def.engine.getclosestcol(palette, r, g, b);
+						waloff[x * ysiz + y] = fastColorLookup.getClosestColorIndex(basePalette, r, g, b);
 					}
 				}
 			}

@@ -3,8 +3,6 @@ package ru.m210projects.Build.Render;
 import static com.badlogic.gdx.graphics.GL20.GL_DONT_CARE;
 import static com.badlogic.gdx.graphics.GL20.GL_LINEAR;
 import static com.badlogic.gdx.graphics.GL20.GL_NICEST;
-import static ru.m210projects.Build.Engine.numshades;
-import static ru.m210projects.Build.Engine.palookupfog;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_COLOR;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_END;
@@ -13,7 +11,10 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_MODE;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_START;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.TextureHandle.TextureManager;
+import ru.m210projects.Build.Render.Types.Color;
+import ru.m210projects.Build.Types.PaletteManager;
 
 public class GLFog {
 
@@ -58,6 +59,8 @@ public class GLFog {
 	}
 
 	public void calc() {
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		int numshades = paletteManager.getShadeCount();
 		if (combvis == 0) {
 			start = FULLVIS_BEGIN;
 			end = FULLVIS_END;
@@ -69,9 +72,10 @@ public class GLFog {
 			end = (FOGDISTCONST * (numshades - 1 - shade)) / combvis;
 		}
 
-		color[0] = (palookupfog[pal][0] / 63.f);
-		color[1] = (palookupfog[pal][1] / 63.f);
-		color[2] = (palookupfog[pal][2] / 63.f);
+		Color palookupfog = paletteManager.getFogColor(pal);
+		color[0] = (palookupfog.r / 63.f);
+		color[1] = (palookupfog.g / 63.f);
+		color[2] = (palookupfog.b / 63.f);
 		color[3] = 1;
 
 //		if (manager.getShader() != null)

@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 
 public abstract class IndexedShader extends ShaderProgram {
 
@@ -171,7 +172,7 @@ public abstract class IndexedShader extends ShaderProgram {
 //	}
 
 	public void setTextureParams(int pal, int shade) {
-		setUniformi(numshadesloc, numshades);
+		setUniformi(numshadesloc, EngineUtils.getPaletteManager().getShadeCount());
 
 		bindPalette(GL20.GL_TEXTURE1);
 		setUniformi(paletteloc, 1);

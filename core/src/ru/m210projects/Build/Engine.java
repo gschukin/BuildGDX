@@ -17,27 +17,17 @@ import ru.m210projects.Build.Render.Renderer;
 import ru.m210projects.Build.Render.Types.FadeEffect;
 import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.*;
-import ru.m210projects.Build.Types.collections.IntSet;
-import ru.m210projects.Build.Types.collections.LinkedList;
-import ru.m210projects.Build.Types.collections.MapNode;
 import ru.m210projects.Build.filehandle.Entry;
-import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.art.ArtFile;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;
-import ru.m210projects.Build.osd.DefaultOsdFunc;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.Math.*;
 import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
 import static ru.m210projects.Build.Pragmas.*;
 import static ru.m210projects.Build.RenderService.*;
@@ -99,7 +89,7 @@ public abstract class Engine {
      *  	bithandler
      */
 
-    public static final String version = "21.113"; // XX. - year, XX - month, X - build
+    public static final String version = "22.071"; // XX. - year, XX - month, X - build
 
     public static Hitscan pHitInfo;
     public static Neartag neartag;
@@ -122,6 +112,8 @@ public abstract class Engine {
 
     public static int pushmove_x, pushmove_y, pushmove_z;
     public static short pushmove_sectnum;
+
+    protected Point rotatepoint = new Point();
 
     // Constants
 
@@ -153,14 +145,7 @@ public abstract class Engine {
     public static final int MAXPSKYMULTIS = 8;
     public static final int MAXPLAYERS = 16;
 
-    // palette
-    public static short numshades;
-    public static byte[] palette;
-    public static byte[][] palookup;
-    public static byte[][] palookupfog;
-    public static Palette curpalette;
-    public static int paletteloaded = 0;
-
+    // board variables
     public static short[] pskyoff;
     public static short[] zeropskyoff;
     public static short pskybits;
@@ -187,7 +172,6 @@ public abstract class Engine {
     // Engine.c
 
     public void InitArrays() { // gdxBuild
-        palookupfog = new byte[MAXPALOOKUPS][3];
         pskyoff = new short[MAXPSKYTILES];
         zeropskyoff = new short[MAXPSKYTILES];
 
@@ -212,18 +196,15 @@ public abstract class Engine {
     public Engine() throws Exception { // gdxBuild
         InitArrays();
 
-        EngineUtils.init(this); // loadtables
+        EngineUtils.init(this); // loadtables, loadpalette
         this.renderService = createRenderService();
         this.boardService = createBoardService();
 
         parallaxtype = 2;
         pskybits = 0;
-        paletteloaded = 0;
         automapping = 0;
         visibility = 512;
         parallaxvisibility = 512;
-
-        loadpalette();
 
         initkeys();
 
@@ -241,40 +222,8 @@ public abstract class Engine {
         return new BoardService();
     }
 
-
-    public int getpalookup(int davis, int dashade) { // jfBuild
-        return (min(max(dashade + (davis >> 8), 0), numshades - 1));
-    }
-    public void loadpalette() throws Exception // jfBuild
-    {
-        if (paletteloaded != 0) {
-            return;
-        }
-
-        palette = new byte[768];
-        curpalette = new Palette();
-        palookup = new byte[MAXPALOOKUPS][];
-
-        Console.out.println("Loading palettes");
-        Entry entry = BuildGdx.cache.getEntry("palette.dat", true);
-
-        if (!entry.exists()) {
-            throw new Exception("Failed to load \"palette.dat\"!");
-        }
-
-        try (InputStream is = entry.getInputStream()) {
-            System.out.println("Loading palettes");
-            palette = StreamUtils.readBytes(is, 768);
-            numshades = (short) StreamUtils.readShort(is);
-            System.out.println("Loading palookup tables");
-            palookup[0] = StreamUtils.readBytes(is, numshades << 8);
-            System.out.println("Loading translucency table");
-            transluc = StreamUtils.readBytes(is, 65536);
-        }
-
-        initfastcolorlookup(30, 59, 11);
-
-        paletteloaded = 1;
+    public PaletteManager loadpalette() throws Exception { // jfBuild
+        return new DefaultPaletteManager(this, BuildGdx.cache.getEntry("palette.dat", true));
     }
 
     //
@@ -284,13 +233,6 @@ public abstract class Engine {
     public void uninit() // gdxBuild
     {
         renderService.uninit();
-
-        for (int i = 0; i < MAXPALOOKUPS; i++) {
-            if (palookup[i] != null) {
-                palookup[i] = null;
-            }
-        }
-
         uninitmultiplayer();
 
         BuildGdx.audio.dispose();
@@ -540,20 +482,6 @@ public abstract class Engine {
 //        }
 //        return (0);
     }
-
-    public int qdist(long dx, long dy) { // gdxBuild
-        dx = abs(dx);
-        dy = abs(dy);
-
-        if (dx > dy) {
-            dy = (3 * dy) >> 3;
-        } else {
-            dx = (3 * dx) >> 3;
-        }
-
-        return (int) (dx + dy);
-    }
-
     public void dragpoint(int pointhighlight, int dax, int day) { // jfBuild
         boardService.getWall(pointhighlight).setX(dax);
         boardService.getWall(pointhighlight).setY(day);
@@ -601,11 +529,6 @@ public abstract class Engine {
         return (point);
     }
 
-
-
-
-    protected Point rotatepoint = new Point();
-
     public Point rotatepoint(int xpivot, int ypivot, int x, int y, int daang) { // jfBuild
         int dacos = EngineUtils.cos(daang + 2048);
         int dasin = EngineUtils.sin(daang + 2048);
@@ -635,63 +558,6 @@ public abstract class Engine {
     public int rand() // gdxBuild
     {
         return (int) (Math.random() * 32767);
-    }
-
-    public void makepalookup(final int palnum, byte[] remapbuf, int r, int g, int b, int dastat) // jfBuild
-    {
-        if (paletteloaded == 0) {
-            return;
-        }
-
-        // Allocate palookup buffer
-        if (palookup[palnum] == null) {
-            palookup[palnum] = new byte[numshades << 8];
-        }
-
-        if (dastat == 0) {
-            return;
-        }
-        if ((r | g | b | 63) != 63) {
-            return;
-        }
-
-        if ((r | g | b) == 0) {
-            for (int i = 0; i < 256; i++) {
-                for (int j = 0; j < numshades; j++) {
-                    palookup[palnum][i + j * 256] = palookup[0][(remapbuf[i] & 0xFF) + j * 256];
-                }
-            }
-            palookupfog[palnum][0] = 0;
-            palookupfog[palnum][1] = 0;
-            palookupfog[palnum][2] = 0;
-        } else {
-            byte[] pal = new byte[768];
-            System.arraycopy(curpalette.getBytes(), 0, pal, 0, 768);
-            for (int j = 0; j < 768; j++) {
-                pal[j] = (byte) ((pal[j] & 0xFF) >> 2);
-            }
-
-            for (int i = 0; i < numshades; i++) {
-                int palscale = divscale(i, numshades, 16);
-                for (int j = 0; j < 256; j++) {
-                    int rptr = pal[3 * (remapbuf[j] & 0xFF)] & 0xFF;
-                    int gptr = pal[3 * (remapbuf[j] & 0xFF) + 1] & 0xFF;
-                    int bptr = pal[3 * (remapbuf[j] & 0xFF) + 2] & 0xFF;
-
-                    palookup[palnum][j + i * 256] = getclosestcol(pal, rptr + mulscale(r - rptr, palscale, 16), gptr + mulscale(g - gptr, palscale, 16), bptr + mulscale(b - bptr, palscale, 16));
-                }
-            }
-            palookupfog[palnum][0] = (byte) r;
-            palookupfog[palnum][1] = (byte) g;
-            palookupfog[palnum][2] = (byte) b;
-        }
-
-        BuildGdx.app.postRunnable(() -> {
-            final GLRenderer gl = glrender();
-            if (gl != null) {
-                gl.getTextureManager().invalidatepalookup(palnum);
-            }
-        });
     }
 
     public void squarerotatetile(int tilenume) {
@@ -829,6 +695,9 @@ public abstract class Engine {
 
 
 
+    public PaletteManager getPaletteManager() {
+        return EngineUtils.getPaletteManager();
+    }
 
     public void inittimer(int tickspersecond) { // jfBuild
         this.timer = new Timer(tickspersecond);
@@ -1028,10 +897,6 @@ public abstract class Engine {
 
     ////////// RENDERER MANIPULATION FUNCTIONS //////////
 
-    public void initfastcolorlookup(int rscale, int gscale, int bscale) { // jfBuild
-        renderService.initfastcolorlookup(rscale, gscale, bscale);
-    }
-
     public void printfps(float scale) {
         renderService.printfps(scale);
     }
@@ -1044,10 +909,6 @@ public abstract class Engine {
     // fullscreen)
     public boolean setgamemode(int davidoption, int daxdim, int daydim) { // jfBuild + gdxBuild
         return renderService.setgamemode(davidoption, daxdim, daydim);
-    }
-
-    public byte getclosestcol(byte[] palette, int r, int g, int b) { // jfBuild
-        return renderService.getclosestcol(palette, r, g, b);
     }
 
     public int drawrooms(float daposx, float daposy, float daposz, float daang, float dahoriz, int dacursectnum) { // eDuke32
@@ -1102,10 +963,6 @@ public abstract class Engine {
     public void rotatesprite(int sx, int sy, int z, int a, int picnum, // gdxBuild
                              int dashade, int dapalnum, int dastat) {
         renderService.rotatesprite(sx, sy, z, a, picnum, dashade, dapalnum, dastat, 0, 0, xdim - 1, ydim - 1);
-    }
-
-    public boolean changepalette(final byte[] palette) {
-        return renderService.changepalette(palette);
     }
 
     public void setpalettefade(int r, int g, int b, int offset) { // jfBuild

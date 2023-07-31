@@ -1,9 +1,9 @@
 package ru.m210projects.Build.Render.ModelHandle.Voxel;
 
-import static ru.m210projects.Build.Engine.curpalette;
-import static ru.m210projects.Build.Engine.palookup;
-
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.TextureHandle.DummyTileData;
+import ru.m210projects.Build.Types.Palette;
+import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.Types.Tile;
 
 public class VoxelSkin extends DummyTileData {
@@ -13,6 +13,9 @@ public class VoxelSkin extends DummyTileData {
 
 		if (fmt != PixelFormat.Pal8) {
 			int wpptr, wp, dacol;
+			PaletteManager paletteManager = EngineUtils.getPaletteManager();
+			byte[][] palookup = paletteManager.getPalookupBuffer();
+			Palette curpalette = paletteManager.getCurrentPalette();
 			for (int x, y = 0; y < height; y++) {
 				wpptr = y * width;
 				for (x = 0; x < width; x++, wpptr++) {

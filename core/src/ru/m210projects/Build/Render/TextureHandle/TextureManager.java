@@ -31,6 +31,9 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import org.jetbrains.annotations.Nullable;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Types.PaletteManager;
+import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.Types.font.BitmapFont;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TileFontData;
@@ -42,7 +45,6 @@ import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GLFilter;
 import ru.m210projects.Build.Script.TextureHDInfo;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.Tile;
 import ru.m210projects.Build.osd.OsdColor;
 
 import java.nio.ByteBuffer;
@@ -55,8 +57,8 @@ public class TextureManager {
 	protected final GLTileArray cache;
 	protected TextureHDInfo info;
 	private GLTile bindedTile;
-	protected GLTile palette; // to shader
-	protected GLTile[] palookups; // to shader
+	protected GLTile glPalette; // to shader
+	protected GLTile[] glPalookups; // to shader
 	protected int texunits = 0;
 	protected final ExpandTexture expand;
 	protected final Map<Font, GLTile> fontAtlas;
@@ -78,7 +80,7 @@ public class TextureManager {
 	public TextureManager(Engine engine, ExpandTexture opt) {
 		this.engine = engine;
 		this.cache = new GLTileArray(MAXTILES);
-		this.palookups = new GLTile[MAXPALOOKUPS];
+		this.glPalookups = new GLTile[MAXPALOOKUPS];
 		this.expand = opt;
 		this.fontAtlas = new HashMap<>();
 	}
@@ -471,55 +473,56 @@ public class TextureManager {
 	}
 
 	public GLTile getPalette() {
-		return palette;
+		return glPalette;
 	}
 
 	@Nullable
 	public GLTile getPalookup(int pal) {
-		if (palookups[pal] == null || palookups[pal].isInvalidated()) {
-			if (Engine.palookup[pal] == null) {
-				return palookups[0];
+		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		if (glPalookups[pal] == null || glPalookups[pal].isInvalidated()) {
+			if (!paletteManager.isValidPalette(pal)) {
+				return glPalookups[0];
 			}
 
-			TileData dat = new LookupData(Engine.palookup[pal]);
-			if (palookups[pal] != null) {
-				palookups[pal].setInvalidated(false);
-				palookups[pal].update(dat, 0, false);
+			TileData dat = new LookupData(paletteManager.getPalookupBuffer()[pal]);
+			if (glPalookups[pal] != null) {
+				glPalookups[pal].setInvalidated(false);
+				glPalookups[pal].update(dat, 0, false);
 			} else {
-				palookups[pal] = newTile(dat, 0, false);
+				glPalookups[pal] = newTile(dat, 0, false);
 			}
 
-			palookups[pal].unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
+			glPalookups[pal].unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
 		}
 
-		return palookups[pal];
+		return glPalookups[pal];
 	}
 
 	public void disposePalette() {
-		palette.dispose();
-		palette = null;
+		glPalette.dispose();
+		glPalette = null;
 		for (int i = 0; i < MAXPALOOKUPS; i++) {
-			if (palookups[i] != null) {
-				palookups[i].dispose();
-				palookups[i] = null;
+			if (glPalookups[i] != null) {
+				glPalookups[i].dispose();
+				glPalookups[i] = null;
 			}
 		}
 	}
 
 	public void changePalette(byte[] pal) {
 		TileData dat = new PaletteData(pal);
-		if (palette != null) {
-			palette.update(dat, 0, false);
+		if (glPalette != null) {
+			glPalette.update(dat, 0, false);
 		} else {
-			palette = newTile(dat, 0, false);
+			glPalette = newTile(dat, 0, false);
 		}
 
-		palette.unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
+		glPalette.unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);
 	}
 
 	public void invalidatepalookup(int pal) {
-		if (palookups[pal] != null) {
-			palookups[pal].setInvalidated(true);
+		if (glPalookups[pal] != null) {
+			glPalookups[pal].setInvalidated(true);
 		}
 	}
 }

@@ -1,11 +1,10 @@
 package ru.m210projects.Build.Render.GdxRender.Shaders;
 
-import static ru.m210projects.Build.Engine.numshades;
-
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
+import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Render.GdxRender.BuildCamera;
 import ru.m210projects.Build.Render.TextureHandle.IndexedShader;
 
@@ -53,7 +52,7 @@ public abstract class IndexedSkyShaderProgram extends IndexedShader {
 
 	@Override
 	public void setTextureParams(int pal, int shade) {
-		setUniformi(numshadesloc, numshades);
+		setUniformi(numshadesloc, EngineUtils.getPaletteManager().getShadeCount());
 
 		bindPalette(GL20.GL_TEXTURE1);
 		setUniformi(paletteloc, 1);
