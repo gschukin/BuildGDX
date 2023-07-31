@@ -91,7 +91,7 @@ public abstract class Engine {
      *  	bithandler
      */
 
-    public static final String version = "22.071"; // XX. - year, XX - month, X - build
+    public static final String version = "23.071"; // XX. - year, XX - month, X - build
 
     public static Hitscan pHitInfo;
     public static Neartag neartag;
@@ -106,6 +106,9 @@ public abstract class Engine {
     public static int hitscangoalx = (1 << 29) - 1, hitscangoaly = (1 << 29) - 1;
     private final HitScanner scanner = new HitScanner(this);
     private final NearScanner nearScanner = new NearScanner(this);
+
+    protected PaletteManager paletteManager;
+    protected TileManager tileManager;
     private DefScript defs;
 
     public static int zr_ceilz, zr_ceilhit, zr_florz, zr_florhit;
@@ -162,24 +165,15 @@ public abstract class Engine {
 
     // timer
     protected Timer timer;
-
-    // tiles
-    public String tilesPath = "tilesXXX.art";
-    protected ArtEntry[] tiles;
-
     protected int randomseed;
     public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
     public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
-
-    protected PaletteManager paletteManager;
 
     // Engine.c
 
     public void InitArrays() { // gdxBuild
         pskyoff = new short[MAXPSKYTILES];
         zeropskyoff = new short[MAXPSKYTILES];
-
-        tiles = new ArtEntry[MAXTILES];
 
         show2dsector = new byte[(MAXSECTORS + 7) >> 3];
         show2dwall = new byte[(MAXWALLS + 7) >> 3];
@@ -245,58 +239,6 @@ public abstract class Engine {
 
     public long getticks() { // gdxBuild
         return System.currentTimeMillis();
-    }
-
-    public boolean loadpic(Entry artFile) { // gdxBuild
-        if (artFile.exists()) {
-            ArtFile art = new ArtFile(artFile.getName(), artFile::getInputStream);
-            for (Entry artEntry : art.getEntries()) {
-                ArtEntry tile = ((ArtEntry) artEntry);
-                tiles[tile.getNum()] = tile;
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    public int loadpics() {
-        char[] artFileName = tilesPath.toCharArray();
-        Arrays.fill(tiles, null);
-
-        int k;
-        int numtilefiles = 0;
-        do {
-            k = numtilefiles;
-
-            artFileName[7] = (char) ((k % 10) + 48);
-            artFileName[6] = (char) (((k / 10) % 10) + 48);
-            artFileName[5] = (char) (((k / 100) % 10) + 48);
-            String name = String.copyValueOf(artFileName);
-            if (!loadpic(BuildGdx.cache.getEntry(name, true))) {
-                break;
-            }
-            numtilefiles++;
-        } while (k != numtilefiles);
-
-        return (numtilefiles);
-    }
-
-    public byte[] loadtile(int tilenume) { // jfBuild
-        ArtEntry pic = getTile(tilenume);
-        return pic.getBytes();
-    }
-
-    public CachedArtEntry allocatepermanenttile(int tilenume, int xsiz, int ysiz) { // jfBuild
-        if ((xsiz < 0) || (ysiz < 0) || (tilenume >= MAXTILES)) {
-            return null;
-        }
-
-        int dasiz = xsiz * ysiz;
-        byte[] data = new byte[dasiz];
-        CachedArtEntry entry = new CachedArtEntry(this, tilenume, data, xsiz, ysiz);
-        tiles[tilenume] = entry;
-        return entry;
     }
 
     public int nextsectorneighborz(int sectnum, int thez, int topbottom, int direction) { // jfBuild
@@ -674,12 +616,7 @@ public abstract class Engine {
         input = new KeyInput();
     }
 
-    public ArtEntry getTile(int tilenum) {
-        if (tilenum < 0 || tilenum >= tiles.length || tiles[tilenum] == null) {
-            return DUMMY_ART_FILE;
-        }
-        return tiles[tilenum];
-    }
+
 
     public void setDefs(DefScript defs) {
         this.defs = defs;
@@ -696,8 +633,25 @@ public abstract class Engine {
 
 
 
+    public boolean loadpic(Entry artFile) { // gdxBuild
+        return tileManager.loadpic(artFile);
+    }
 
+    public int loadpics() {
+       return tileManager.loadpics();
+    }
 
+    public byte[] loadtile(int tilenume) { // jfBuild
+        return tileManager.loadtile(tilenume);
+    }
+
+    public CachedArtEntry allocatepermanenttile(int tilenume, int xsiz, int ysiz) { // jfBuild
+        return tileManager.allocatepermanenttile(tilenume, xsiz, ysiz);
+    }
+
+    public ArtEntry getTile(int tilenum) {
+        return tileManager.getTile(tilenum);
+    }
 
     public PaletteManager getPaletteManager() {
         return paletteManager;
@@ -810,14 +764,6 @@ public abstract class Engine {
         Arrays.fill(show2dwall, (byte) 0);
 
         return board;
-    }
-
-    public Board loadboard(String filename) throws FileNotFoundException {
-        Entry fil = BuildGdx.cache.getEntry(filename, true);
-        if (!fil.exists()) {
-            throw new FileNotFoundException("Map " + filename + " not found!");
-        }
-        return loadboard(fil);
     }
 
     public BoardService getBoardService() {
