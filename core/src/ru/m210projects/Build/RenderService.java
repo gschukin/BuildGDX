@@ -235,7 +235,7 @@ public class RenderService {
         ydim = daydim;
 
         setview(0, 0, xdim - 1, ydim - 1);
-        setbrightness(curbrightness, EngineUtils.getPaletteManager().getBasePalette(), GLRenderer.GLInvalidateFlag.All);
+        setbrightness(curbrightness, engine.getPaletteManager().getBasePalette(), GLRenderer.GLInvalidateFlag.All);
 
         Console.out.revalidate();
 
@@ -377,7 +377,7 @@ public class RenderService {
 
     public void setbrightness(int dabrightness, byte[] dapal, GLRenderer.GLInvalidateFlag flags) {
         curbrightness = BClipRange(dabrightness, 0, 15);
-        PaletteManager paletteManager = EngineUtils.getPaletteManager();
+        PaletteManager paletteManager = engine.getPaletteManager();
         byte[][] britable = paletteManager.getBritableBuffer();
 
         if (render instanceof Software && curbrightness != 0) {
@@ -396,7 +396,7 @@ public class RenderService {
 //			}
         }
 
-        if (EngineUtils.getPaletteManager().changePalette(temppal)) {
+        if (engine.getPaletteManager().changePalette(temppal)) {
             if (render instanceof GLRenderer) {
                 ((GLRenderer) render).gltexinvalidateall(flags);
             }
@@ -412,7 +412,7 @@ public class RenderService {
         palfadergb.b = min(63, b) << 2;
         palfadergb.a = (min(63, offset) << 2);
 
-        Palette curpalette = EngineUtils.getPaletteManager().getCurrentPalette();
+        Palette curpalette = engine.getPaletteManager().getCurrentPalette();
         if (glrender() == null) { // if 8bit renderer
             int k = 0;
             for (int i = 0; i < 256; i++) {

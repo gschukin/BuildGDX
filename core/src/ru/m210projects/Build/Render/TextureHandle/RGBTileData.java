@@ -20,7 +20,7 @@ public class RGBTileData extends TileData {
 	public final int width, height;
 	public final boolean clamped;
 
-	public RGBTileData(ArtEntry tile, int dapal, boolean clamped, boolean alpha, int expflag) {
+	public RGBTileData(PaletteManager paletteManager, ArtEntry tile, int dapal, boolean clamped, boolean alpha, int expflag) {
 		byte[] data = tile.getBytes();
 		int tsizx = tile.getWidth();
 		int tsizy = tile.getHeight();
@@ -73,7 +73,7 @@ public class RGBTileData extends TileData {
 				for (int i = 0, j; i < tsizx * pix_len; i += pix_len) {
 					dptr = i;
 					for (j = 0; j < tsizy; j++) {
-						buffer.putInt(dptr, getColor(data[sptr++], dapal, alpha));
+						buffer.putInt(dptr, getColor(paletteManager, data[sptr++], dapal, alpha));
 						dptr += xoffs;
 					}
 				}
@@ -84,7 +84,7 @@ public class RGBTileData extends TileData {
 					p = 0;
 					dptr = i;
 					for (j = 0; j < ysiz; j++) {
-						buffer.putInt(dptr, getColor(data[sptr + p++], dapal, alpha));
+						buffer.putInt(dptr, getColor(paletteManager, data[sptr + p++], dapal, alpha));
 						dptr += xoffs;
 						if (p >= tsizy) {
 							p = 0;
@@ -144,8 +144,7 @@ public class RGBTileData extends TileData {
 		return PixelFormat.Rgba;
 	}
 
-	protected int getColor(int dacol, int dapal, boolean alphaMode) {
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+	protected int getColor(PaletteManager paletteManager, int dacol, int dapal, boolean alphaMode) {
 		Palette curpalette = paletteManager.getCurrentPalette();
 		byte[][] palookup = paletteManager.getPalookupBuffer();
 

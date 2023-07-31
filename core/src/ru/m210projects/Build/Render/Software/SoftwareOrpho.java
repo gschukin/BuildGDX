@@ -75,7 +75,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 //		}
 //
 //		if (font.type == FontType.Tilemap) {
-//			if (!EngineUtils.getPaletteManager().isValidPalette(col)) {
+//			if (!engine.getPaletteManager().isValidPalette(col)) {
 //				col = 0;
 //			}
 //
@@ -400,7 +400,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 //				}
 
 				parent.globalbufplc = pic.getBytes();
-				int numshades = EngineUtils.getPaletteManager().getShadeCount();
+				int numshades = engine.getPaletteManager().getShadeCount();
 				globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
 				if ((globalorientation & 64) == 0) {
@@ -619,7 +619,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 					} else {
 						globalshade = (boardService.getSector(spr.getSectnum()).getFloorshade());
 					}
-					int numshades = EngineUtils.getPaletteManager().getShadeCount();
+					int numshades = engine.getPaletteManager().getShadeCount();
 					globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
 					parent.globvis = parent.globalhisibility;
@@ -1250,7 +1250,7 @@ public class SoftwareOrpho extends OrphoRenderer {
 			int cx1, int cy1, int cx2, int cy2, int uniqid) {
 		int x, y;
 
-		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
+		if (!engine.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 

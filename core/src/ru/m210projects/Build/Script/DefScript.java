@@ -811,7 +811,7 @@ public class DefScript {
 
 			ByteBuffer bb = pix.getPixels();
 			byte[] waloff = deftile.waloff;
-			PaletteManager paletteManager = EngineUtils.getPaletteManager();
+			PaletteManager paletteManager = engine.getPaletteManager();
 			byte[] basePalette = paletteManager.getBasePalette();
 			FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
 

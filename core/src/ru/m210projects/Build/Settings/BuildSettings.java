@@ -33,7 +33,7 @@ public class BuildSettings {
 			@Override
 			public void execute(Integer value) { 
 				cfg.paletteGamma = value;
-				engine.setbrightness(cfg.paletteGamma, EngineUtils.getPaletteManager().getBasePalette(), GLInvalidateFlag.All);
+				engine.setbrightness(cfg.paletteGamma, engine.getPaletteManager().getBasePalette(), GLInvalidateFlag.All);
 			}
 		};
 		

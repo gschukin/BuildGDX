@@ -187,7 +187,7 @@ public class PolymostModelRenderer {
         }
 
         parent.globalfog.apply();
-        int numshades = EngineUtils.getPaletteManager().getShadeCount();
+        int numshades = engine.getPaletteManager().getShadeCount();
         polyColor.r = polyColor.g = polyColor.b = (numshades
                 - min(max((globalshade * parent.shadescale)/* + m.shadeoff */, 0), numshades)) / (numshades);
 
@@ -342,7 +342,7 @@ public class PolymostModelRenderer {
 
         gl.glEnable(GL_TEXTURE_2D);
 
-        int numshades = EngineUtils.getPaletteManager().getShadeCount();
+        int numshades = engine.getPaletteManager().getShadeCount();
         polyColor.r = polyColor.g = polyColor.b = (numshades
                 - min(max((globalshade * parent.shadescale) + m.getShadeOff(), 0), numshades)) / (numshades);
 

@@ -107,22 +107,24 @@ public abstract class IndexedShader extends ShaderProgram {
 	protected int lastPal, lastShade, lastVisibility;
 	protected float lastAlpha;
 	protected boolean drawLastIndex;
+	protected int numshades;
 
-	public IndexedShader() throws Exception {
+	public IndexedShader(int numshades) throws Exception {
 		super(defaultVertex, defaultFragment);
-		init();
+		init(numshades);
 	}
 
-	public IndexedShader(String vertexShader, String fragmentShader) throws Exception {
+	public IndexedShader(String vertexShader, String fragmentShader, int numshades) throws Exception {
 		super(vertexShader, fragmentShader);
-		init();
+		init(numshades);
 	}
 
-	protected void init() throws Exception {
+	protected void init(int numshades) throws Exception {
 		if (!isCompiled()) {
 			throw new Exception("Shader compile error: " + getLog());
 		}
 
+		this.numshades = numshades;
 		this.paletteloc = getUniformLocation("u_palette");
 		this.numshadesloc = getUniformLocation("u_numshades");
 		this.visibilityloc = getUniformLocation("u_visibility");
@@ -172,7 +174,7 @@ public abstract class IndexedShader extends ShaderProgram {
 //	}
 
 	public void setTextureParams(int pal, int shade) {
-		setUniformi(numshadesloc, EngineUtils.getPaletteManager().getShadeCount());
+		setUniformi(numshadesloc, numshades);
 
 		bindPalette(GL20.GL_TEXTURE1);
 		setUniformi(paletteloc, 1);

@@ -55,13 +55,13 @@ public class PolymostModelManager extends ModelManager {
 			@Override
 			public GLTile getSkin(int pal) {
 				PixelFormat fmt = parent.getTextureFormat();
-				if (!EngineUtils.getPaletteManager().isValidPalette(pal) || fmt == PixelFormat.Pal8) {
+				if (!parent.paletteManager.isValidPalette(pal) || fmt == PixelFormat.Pal8) {
 					pal = 0;
 				}
 
 				if (texid[pal] == null) {
 //					long startticks = System.nanoTime();
-					TileData dat = new VoxelSkin(fmt, skinData, pal);
+					TileData dat = new VoxelSkin(fmt, parent.paletteManager, skinData, pal);
 					GLTile dst = parent.textureCache.newTile(dat, pal, false);
 
 					dst.unsafeSetFilter(TextureFilter.Nearest, TextureFilter.Nearest, true);

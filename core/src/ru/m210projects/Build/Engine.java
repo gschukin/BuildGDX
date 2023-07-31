@@ -38,6 +38,8 @@ public abstract class Engine {
 
     /*
      * TODO:
+     * Tile in VoxelSkin
+     *
      * Add try/catch to findsaves, load, save in each game
      * Software renderer: and the draw distance for voxel detail is really low
      * Software renderer: You might want to look at wall sprites. I noticed a lot of them clipping through geometry in classic render
@@ -169,6 +171,8 @@ public abstract class Engine {
     public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
     public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
 
+    protected PaletteManager paletteManager;
+
     // Engine.c
 
     public void InitArrays() { // gdxBuild
@@ -196,7 +200,8 @@ public abstract class Engine {
     public Engine() throws Exception { // gdxBuild
         InitArrays();
 
-        EngineUtils.init(this); // loadtables, loadpalette
+        EngineUtils.init(this); // loadtables
+        this.paletteManager = loadpalette();
         this.renderService = createRenderService();
         this.boardService = createBoardService();
 
@@ -208,7 +213,6 @@ public abstract class Engine {
 
         initkeys();
 
-//        Console.setFunction(new DEFOSDFUNC(this));
         randomseed = 1; // random for voxels
     }
 
@@ -696,7 +700,7 @@ public abstract class Engine {
 
 
     public PaletteManager getPaletteManager() {
-        return EngineUtils.getPaletteManager();
+        return paletteManager;
     }
 
     public void inittimer(int tickspersecond) { // jfBuild

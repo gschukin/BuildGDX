@@ -8,12 +8,11 @@ import ru.m210projects.Build.Types.Tile;
 
 public class VoxelSkin extends DummyTileData {
 
-	public VoxelSkin(PixelFormat fmt, Tile tile, int dapal) {
+	public VoxelSkin(PixelFormat fmt, PaletteManager paletteManager, Tile tile, int dapal) {
 		super(fmt, tile.getWidth(), tile.getHeight());
 
 		if (fmt != PixelFormat.Pal8) {
 			int wpptr, wp, dacol;
-			PaletteManager paletteManager = EngineUtils.getPaletteManager();
 			byte[][] palookup = paletteManager.getPalookupBuffer();
 			Palette curpalette = paletteManager.getCurrentPalette();
 			for (int x, y = 0; y < height; y++) {

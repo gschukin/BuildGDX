@@ -167,10 +167,13 @@ public class GDXRenderer implements GLRenderer {
 	protected final float FULLVIS_BEGIN = (float) 2.9e30;
 	protected final float FULLVIS_END = (float) 3.0e30;
 
+	protected final PaletteManager paletteManager;
+
 	public GDXRenderer(Engine engine, IOverheadMapSettings settings) {
 		this.engine = engine;
 		this.boardService = engine.getBoardService();
 		this.textureCache = getTextureManager();
+		this.paletteManager = engine.getPaletteManager();
 		this.modelManager = new GDXModelManager(this);
 		this.manager = new ShaderManager();
 
@@ -212,12 +215,13 @@ public class GDXRenderer implements GLRenderer {
 			gl.glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 			this.cam = new BuildCamera(fov, xdim, ydim, 512, 8192);
-			this.manager.init(textureCache);
+			PaletteManager paletteManager = engine.getPaletteManager();
+			this.manager.init(textureCache, paletteManager.getShadeCount());
 			if (!this.manager.isInited()) {
 				return;
 			}
 
-			this.textureCache.changePalette(EngineUtils.getPaletteManager().getCurrentPalette().getBytes());
+			this.textureCache.changePalette(paletteManager.getCurrentPalette().getBytes());
 
 			Console.out.println("Polygdx renderer is initialized", OsdColor.GREEN);
 			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
@@ -670,7 +674,7 @@ public class GDXRenderer implements GLRenderer {
 		}
 
 		engine.setgotpic(picnum);
-		if (!EngineUtils.getPaletteManager().isValidPalette(palnum)) {
+		if (!engine.getPaletteManager().isValidPalette(palnum)) {
 			palnum = 0;
 		}
 
@@ -780,7 +784,7 @@ public class GDXRenderer implements GLRenderer {
 	protected void calcFog(int pal, int shade, float combvis) {
 		float start = FULLVIS_BEGIN;
 		float end = FULLVIS_END;
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		if (combvis != 0) {
 			if (shade >= paletteManager.getShadeCount() - 1) {
 				start = -1;
@@ -801,7 +805,7 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void clearview(int dacol) {
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		Palette curpalette = paletteManager.getCurrentPalette();
 		gl.glClearColor(curpalette.getRed(dacol) / 255.0f, //
 				curpalette.getGreen(dacol) / 255.0f, //
@@ -935,7 +939,7 @@ public class GDXRenderer implements GLRenderer {
 				pix8buffer = BufferUtils.newByteBuffer(xsiz * ysiz);
 			}
 
-			PaletteManager paletteManager = EngineUtils.getPaletteManager();
+			PaletteManager paletteManager = engine.getPaletteManager();
 			byte[] basePalette = paletteManager.getBasePalette();
 			FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
 
@@ -983,7 +987,7 @@ public class GDXRenderer implements GLRenderer {
 			byteperpixel = 4;
 		}
 
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		byte[] basePalette = paletteManager.getBasePalette();
 		FastColorLookup fastColorLookup = paletteManager.getFastColorLookup();
 
@@ -1117,7 +1121,7 @@ public class GDXRenderer implements GLRenderer {
 
 	@Override
 	public void precache(int dapicnum, int dapalnum, int datype) {
-		if ((!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
+		if ((!engine.getPaletteManager().isValidPalette(dapalnum)) && (dapalnum < (MAXPALOOKUPS - RESERVEDPALS))) {
 			return;
 		}
 
@@ -1240,7 +1244,7 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bind(int dapicnum, int dapalnum, int dashade, int skybox, int method) {
-		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
+		if (!engine.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 
@@ -1259,7 +1263,7 @@ public class GDXRenderer implements GLRenderer {
 	}
 
 	protected GLTile bindSky(int dapicnum, int dapalnum, int dashade, int method) {
-		if (!EngineUtils.getPaletteManager().isValidPalette(dapalnum)) {
+		if (!engine.getPaletteManager().isValidPalette(dapalnum)) {
 			dapalnum = 0;
 		}
 
@@ -1327,7 +1331,7 @@ public class GDXRenderer implements GLRenderer {
 			}
 
 			float r, b, g;
-			int numshades = EngineUtils.getPaletteManager().getShadeCount();
+			int numshades = engine.getPaletteManager().getShadeCount();
 			float fshade = min(max(shade * 1.04f, 0), numshades);
 			r = g = b = (numshades - fshade) / numshades;
 
@@ -1498,7 +1502,7 @@ public class GDXRenderer implements GLRenderer {
 			if (fmt == PixelFormat.Pal8) {
 				dat = new IndexedTileData(engine.getTile(pic), false, false, 0);
 			} else {
-				dat = new RGBTileData(engine.getTile(pic), palnum, false, false, 0);
+				dat = new RGBTileData(engine.getPaletteManager(), engine.getTile(pic), palnum, false, false, 0);
 			}
 			sky.addTile(pic, dat);
 		}

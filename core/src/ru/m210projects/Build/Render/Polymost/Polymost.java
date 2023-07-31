@@ -230,7 +230,7 @@ public class Polymost implements GLRenderer {
 	public Polymost(Engine engine, IOverheadMapSettings settings) {
 		this.engine = engine;
 		this.textureCache = getTextureManager();
-		this.paletteManager = EngineUtils.getPaletteManager();
+		this.paletteManager = engine.getPaletteManager();
 		this.modelManager = new PolymostModelManager(this);
 
 		this.clipper = new PolyClipper(this);
@@ -314,7 +314,7 @@ public class Polymost implements GLRenderer {
 
 			ortho.init();
 			mdrenderer.init();
-			globalfog.init(textureCache);
+			globalfog.init(paletteManager);
 
 			gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -4261,7 +4261,7 @@ public class Polymost implements GLRenderer {
 
 	private IndexedShader allocIndexedShader() {
 		try {
-			return new IndexedShader() {
+			return new IndexedShader(engine.getPaletteManager().getShadeCount()) {
 				@Override
 				public void bindPalette(int unit) {
 					BuildGdx.gl.glActiveTexture(unit);

@@ -249,7 +249,7 @@ public class TextureManager {
 		if (fmt == PixelFormat.Pal8) {
 			return new IndexedTileData(engine.getTile(dapicnum), clamping, alpha, expand.get());
 		}
-		return new RGBTileData(engine.getTile(dapicnum), dapalnum, clamping, alpha, expand.get());
+		return new RGBTileData(engine.getPaletteManager(), engine.getTile(dapicnum), dapalnum, clamping, alpha, expand.get());
 	}
 
 	protected Entry checkResource(Hicreplctyp hicr, int dapic, int facen) {
@@ -478,7 +478,7 @@ public class TextureManager {
 
 	@Nullable
 	public GLTile getPalookup(int pal) {
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		if (glPalookups[pal] == null || glPalookups[pal].isInvalidated()) {
 			if (!paletteManager.isValidPalette(pal)) {
 				return glPalookups[0];

@@ -9,12 +9,10 @@ import static java.lang.Math.abs;
 public class EngineUtils {
 
     protected static Tables tables;
-    private static PaletteManager paletteManager;
     protected static BitmapFont largeFont, smallFont;
 
     public static Tables init(Engine engine) throws Exception {
         tables = engine.loadtables();
-        paletteManager = engine.loadpalette();
 
         largeFont = new BitmapFont(engine, tables.textfont, 128, 128, 16, 16);
         smallFont = new BitmapFont(engine, tables.smalltextfont, 128, 128, 16, 16);
@@ -24,10 +22,6 @@ public class EngineUtils {
 
     public static Tables getTables() {
         return tables;
-    }
-
-    public static PaletteManager getPaletteManager() {
-        return paletteManager;
     }
 
     public static BitmapFont getLargeFont() {

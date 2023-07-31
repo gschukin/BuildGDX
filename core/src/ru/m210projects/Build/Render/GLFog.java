@@ -27,7 +27,7 @@ public class GLFog {
 	public float combvis;
 
 	public boolean nofog, isEnabled;
-	protected TextureManager manager;
+	protected PaletteManager paletteManager;
 
 	protected final float[] color = new float[4];
 	protected float start, end;
@@ -35,15 +35,14 @@ public class GLFog {
 	protected float curend;
 	protected float[] curcolor = new float[4];
 
-	public void init(TextureManager manager) {
+	public void init(PaletteManager paletteManager) {
 		if (BuildGdx.graphics.getGLVersion().getVendorString().compareTo("NVIDIA Corporation") == 0) {
 			BuildGdx.gl.glHint(GL_FOG_HINT, GL_NICEST);
 		} else {
 			BuildGdx.gl.glHint(GL_FOG_HINT, GL_DONT_CARE);
 		}
 		BuildGdx.gl.glFogi(GL_FOG_MODE, GL_LINEAR); // GL_EXP
-
-		this.manager = manager;
+		this.paletteManager = paletteManager;
 	}
 
 	public void copy(GLFog src) {
@@ -59,7 +58,6 @@ public class GLFog {
 	}
 
 	public void calc() {
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
 		int numshades = paletteManager.getShadeCount();
 		if (combvis == 0) {
 			start = FULLVIS_BEGIN;

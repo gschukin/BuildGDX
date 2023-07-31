@@ -87,7 +87,7 @@ public class GDXModelRenderer {
 		int pal = tspr.getPal() & 0xFF;
 
 		float r, g, b, alpha = 1.0f;
-		int numshades = EngineUtils.getPaletteManager().getShadeCount();
+		int numshades = engine.getPaletteManager().getShadeCount();
 		r = g = b = (numshades - min(max((shade), 0), numshades)) / (float) numshades;
 
 		if (parent.defs != null) {

@@ -57,7 +57,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 		TILE_MOVIE = nTile;
 
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		byte[][] palookup = paletteManager.getPalookupBuffer();
 		opalookup = new byte[palookup[0].length];
 		System.arraycopy(palookup[0], 0, opalookup, 0, opalookup.length);
@@ -90,7 +90,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	@Override
 	public void hide() {
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		engine.setbrightness(BuildSettings.paletteGamma.get(), paletteManager.getBasePalette(), GLInvalidateFlag.All);
 
 
@@ -151,7 +151,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 //        nPosX = (xdim / 2) - (int) (tilesizy[TILE_MOVIE] / 2.0f * scale);
 //        nPosY = (ydim / 2) - (int) (tilesizx[TILE_MOVIE] / 2.0f * scale);
 
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		byte[] remapbuf = new byte[256];
 		for (int i = 0; i < remapbuf.length; i++) {
 			remapbuf[i] = (byte) i;
@@ -181,7 +181,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 			return;
 		}
 
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		paletteManager.changePalette(pal);
 
 		int white = -1;
@@ -279,7 +279,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 
 	protected void close() {
 		if (mvfil != null) {
-			System.arraycopy(opalookup, 0, EngineUtils.getPaletteManager().getPalookupBuffer()[0], 0, opalookup.length);
+			System.arraycopy(opalookup, 0, engine.getPaletteManager().getPalookupBuffer()[0], 0, opalookup.length);
 			final GLRenderer gl = engine.glrender();
 			if (gl != null) {
 				gl.gltexinvalidateall(GLInvalidateFlag.Palookup);

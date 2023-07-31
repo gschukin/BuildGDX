@@ -166,7 +166,7 @@ public class Software implements Renderer {
 
 		this.engine = engine;
 		this.boardService = engine.getBoardService();
-		this.paletteManager = EngineUtils.getPaletteManager();
+		this.paletteManager = engine.getPaletteManager();
 
 		ortho = allocOrphoRenderer(settings);
 
@@ -787,7 +787,7 @@ public class Software implements Renderer {
 							globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 						}
 						globalpal = wal.getPal();
-						if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+						if (!engine.getPaletteManager().isValidPalette(globalpal)) {
 							globalpal = 0; // JBF: fixes crash
 						}
 						globalyscale = (wal.getYrepeat() << (globalshiftval - 19));
@@ -903,7 +903,7 @@ public class Software implements Renderer {
 							globalshade = wal.getShade();
 							globalpal = wal.getPal();
 						}
-						if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+						if (!engine.getPaletteManager().isValidPalette(globalpal)) {
 							globalpal = 0; // JBF: fixes crash
 						}
 						globvis = globalvisibility;
@@ -1022,7 +1022,7 @@ public class Software implements Renderer {
 					globvis = mulscale(globvis, (sec.getVisibility() + 16) & 0xFF, 4);
 				}
 				globalpal = wal.getPal();
-				if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+				if (!engine.getPaletteManager().isValidPalette(globalpal)) {
 					globalpal = 0; // JBF: fixes crash
 				}
 				globalshiftval = (short) (pic.getSizey());
@@ -1112,7 +1112,7 @@ public class Software implements Renderer {
 		short sectnum = tspr.getSectnum();
 		Sector sec = boardService.getSector(sectnum);
 		globalpal = tspr.getPal();
-		if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+		if (!engine.getPaletteManager().isValidPalette(globalpal)) {
 			globalpal = 0; // JBF: fixes null-pointer crash
 		}
 		globalshade = tspr.getShade();

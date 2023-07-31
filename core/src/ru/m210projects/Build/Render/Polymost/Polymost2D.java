@@ -239,7 +239,7 @@ public class Polymost2D extends OrphoRenderer {
                     pic = engine.getTile(globalpicnum);
                 }
 
-                int numshades = EngineUtils.getPaletteManager().getShadeCount();
+                int numshades = engine.getPaletteManager().getShadeCount();
                 globalshade = max(min(sec.getFloorshade(), numshades - 1), 0);
 
                 if ((globalorientation & 64) == 0) {
@@ -438,7 +438,7 @@ public class Polymost2D extends OrphoRenderer {
                     } else {
                         globalshade = (boardService.getSector(spr.getSectnum()).getFloorshade());
                     }
-                    int numshades = EngineUtils.getPaletteManager().getShadeCount();
+                    int numshades = engine.getPaletteManager().getShadeCount();
                     globalshade = max(min(globalshade + spr.getShade() + 6, numshades - 1), 0);
 
                     // relative alignment stuff
@@ -518,7 +518,7 @@ public class Polymost2D extends OrphoRenderer {
             }
         }
 
-        if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+        if (!engine.getPaletteManager().isValidPalette(globalpal)) {
             globalpal = 0;
         }
 
@@ -882,15 +882,15 @@ public class Polymost2D extends OrphoRenderer {
                         parent.bind(pth);
 
 //                        shade = (min(max(shade,0),numshades-1));
-//                        if(!EngineUtils.getPaletteManager().isValidPalette(palnum)) {
+//                        if(!engine.getPaletteManager().isValidPalette(palnum)) {
 //                            palnum = 0;
 //                        }
 //                        palnum = palookup[palnum][(shade << 8)];
 
-                        Palette curpalette = EngineUtils.getPaletteManager().getCurrentPalette();
+                        Palette curpalette = engine.getPaletteManager().getCurrentPalette();
                         gl.glColor4ub(curpalette.getRed(palnum), curpalette.getGreen(palnum), curpalette.getBlue(palnum), (int) (polyColor.a * 255));
                     } else {
-                        if (!EngineUtils.getPaletteManager().isValidPalette(palnum)) {
+                        if (!engine.getPaletteManager().isValidPalette(palnum)) {
                             palnum = 0;
                         }
 
@@ -977,7 +977,7 @@ public class Polymost2D extends OrphoRenderer {
             parent.getShader().end();
         }
 
-        PaletteManager paletteManager = EngineUtils.getPaletteManager();
+        PaletteManager paletteManager = engine.getPaletteManager();
         Palette curpalette = paletteManager.getCurrentPalette();
         col = paletteManager.getColorIndex(0, col);
         gl.glBegin(GL_LINES);
@@ -1194,7 +1194,7 @@ public class Polymost2D extends OrphoRenderer {
         if (globalpicnum >= MAXTILES) {
             globalpicnum = 0;
         }
-        if (!EngineUtils.getPaletteManager().isValidPalette(globalpal)) {
+        if (!engine.getPaletteManager().isValidPalette(globalpal)) {
             globalpal = 0;
         }
 

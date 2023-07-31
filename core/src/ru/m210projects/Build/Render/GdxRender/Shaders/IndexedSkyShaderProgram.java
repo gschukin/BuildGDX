@@ -15,12 +15,12 @@ public abstract class IndexedSkyShaderProgram extends IndexedShader {
 	protected int transformloc;
 	protected int mirrorloc;
 
-	public IndexedSkyShaderProgram() throws Exception {
-		super(SkyShader.vertex, SkyShader.fragment);
+	public IndexedSkyShaderProgram(int numshades) throws Exception {
+		super(SkyShader.vertex, SkyShader.fragment, numshades);
 	}
 
 	@Override
-	protected void init() throws Exception {
+	protected void init(int numshades) throws Exception {
 		if (!isCompiled()) {
 			throw new Exception("Shader compile error: " + getLog());
 		}
@@ -52,7 +52,7 @@ public abstract class IndexedSkyShaderProgram extends IndexedShader {
 
 	@Override
 	public void setTextureParams(int pal, int shade) {
-		setUniformi(numshadesloc, EngineUtils.getPaletteManager().getShadeCount());
+		setUniformi(numshadesloc, numshades);
 
 		bindPalette(GL20.GL_TEXTURE1);
 		setUniformi(paletteloc, 1);

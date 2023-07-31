@@ -126,7 +126,7 @@ public class GDXOrtho extends OrphoRenderer {
 //        }
 //
 //		if (font.type == FontType.Tilemap) {
-//			if (!EngineUtils.getPaletteManager().isValidPalette(col)) {
+//			if (!engine.getPaletteManager().isValidPalette(col)) {
 //                col = 0;
 //            }
 //
@@ -218,7 +218,7 @@ public class GDXOrtho extends OrphoRenderer {
             return;
         }
 
-		byte[][] palookup = EngineUtils.getPaletteManager().getPalookupBuffer();
+		byte[][] palookup = engine.getPaletteManager().getPalookupBuffer();
 		col = palookup[0][col] & 0xFF;
 
 		Gdx.gl.glDisable(GL_CULL_FACE);
@@ -230,7 +230,7 @@ public class GDXOrtho extends OrphoRenderer {
 		setType(GL20.GL_LINES);
 		switchShader(Shader.BitmapShader);
 		switchTexture(lineTile);
-		ru.m210projects.Build.Types.Palette curpalette = EngineUtils.getPaletteManager().getCurrentPalette();
+		ru.m210projects.Build.Types.Palette curpalette = engine.getPaletteManager().getCurrentPalette();
 		setColor(curpalette.getRed(col) / 255.0f, curpalette.getGreen(col) / 255.0f, curpalette.getBlue(col) / 255.0f,
 				1.0f);
 		disableBlending();
@@ -317,7 +317,7 @@ public class GDXOrtho extends OrphoRenderer {
             picnum = 0;
         }
 
-		PaletteManager paletteManager = EngineUtils.getPaletteManager();
+		PaletteManager paletteManager = engine.getPaletteManager();
 		if (!paletteManager.isValidPalette(dapalnum & 0xFF)) {
             dapalnum = 0;
         }
@@ -872,7 +872,7 @@ public class GDXOrtho extends OrphoRenderer {
 					pic = engine.getTile(globalpicnum);
 				}
 
-				globalshade = max(min(sec.getFloorshade(), EngineUtils.getPaletteManager().getShadeCount() - 1), 0);
+				globalshade = max(min(sec.getFloorshade(), engine.getPaletteManager().getShadeCount() - 1), 0);
 
 				GLSurface flor = parent.world.getFloor(s);
 				if (flor != null) {
