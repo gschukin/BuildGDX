@@ -162,105 +162,16 @@ public class Console {
 //						Console.out.setCaptureKey(cfg.secondkeys[consolekey], 1);
 //						Console.out.setCaptureKey(cfg.mousekeys[consolekey], 2);
 //						Console.out.setCaptureKey(cfg.gpadkeys[consolekey], 3);
-            if (getInputController().keyStatusOnce(68)) {
-                toggle();
+            if (getInputController().keyStatusOnce(Input.Keys.GRAVE)) {
+                onToggle();
                 return;
             }
         }
 
-        if (!isCaptured()) {
-            return;
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.ESCAPE)) {
-            onClose();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.PAGE_UP)) {
-            onPageUp();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.PAGE_DOWN)) {
-            onPageDown();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.HOME)) {
-            if (prompt.isCtrlPressed()) {
-                onFirstPage();
-            } else {
-                prompt.onFirstPosition();
-            }
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.END)) {
-            if (prompt.isCtrlPressed()) {
-                onLastPage();
-            } else {
-                prompt.onLastPosition();
-            }
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.INSERT)) {
-            prompt.toggleOverType();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.LEFT)) {
-            prompt.onLeft();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.RIGHT)) {
-            prompt.onRight();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.UP)) {
-            prompt.historyPrev();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.DOWN)) {
-            prompt.historyNext();
-        }
-
         prompt.setShiftPressed(getInputController().keyStatus(Input.Keys.SHIFT_LEFT) || getInputController().keyStatus(Input.Keys.SHIFT_RIGHT));
         prompt.setCtrlPressed(getInputController().keyStatus(Input.Keys.CONTROL_LEFT) || getInputController().keyStatus(Input.Keys.CONTROL_RIGHT));
-        if(getInputController().keyStatusOnce(KEY_CAPSLOCK)) {
-            prompt.setCapsLockPressed(!prompt.isCapsLockPressed());
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.DEL)) { //backspace
-            prompt.onDelete();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.ENTER)) {
-            prompt.onEnter();
-        }
-
-        if (getInputController().keyStatusOnce(Input.Keys.TAB)) {
-            String input = prompt.getTextInput();
-            if (!finder.isListPresent()) {
-                List<String> commands = finder.getCommands(input);
-                if (commands.size() > 1) {
-                    printCommandList(commands, String.format("Found %d possible completions for \"%s\"", commands.size(), input), "Press TAB again to cycle through matches");
-                } else if (commands.size() == 1) {
-                    prompt.setTextInput(commands.get(0));
-                }
-            } else {
-                prompt.setTextInput(finder.getNextTabCommand());
-            }
-        }
-
         getInputController().putMessage(ch -> {
-            if (ch < 128) {
-                if (prompt.isShiftPressed()) {
-                    ch = gdxscantoascwithshift[ch];
-                } else {
-                    ch = gdxscantoasc[ch];
-                }
-
-                if (ch != 0) {
-                    prompt.append((char) ch);
-                    finder.reset();
-                }
-            }
+            onKeyPressed(ch);
             return 0;
         }, false);
     }
@@ -366,37 +277,6 @@ public class Console {
         return osdDraw;
     }
 
-    void onClose() {
-        osdScroll = -1;
-        osdRowsCur--;
-        prompt.captureInput(false);
-        osdScrTime = getTicks();
-    }
-
-    void onPageUp() {
-        if (!isOnLastLine()) {
-            if (osdHead != null && osdHead.getNext() != null) {
-                osdHead = osdHead.getNext();
-            }
-        }
-    }
-
-    void onPageDown() {
-        if (!isOnFirstLine()) {
-            if (osdHead != null && osdHead.getPrev() != null) {
-                osdHead = osdHead.getPrev();
-            }
-        }
-    }
-
-    void onFirstPage() {
-        osdHead = osdTextList.getLast();
-    }
-
-    void onLastPage() {
-        osdHead = osdTextList.getFirst();
-    }
-
     public void revalidate() {
         osdCols = func.getcolumnwidth(osdTextScale);
         osdMaxRows = func.getrowheight(osdTextScale) - 2;
@@ -451,20 +331,6 @@ public class Console {
             row -= func.drawosdstr(0, row, node.get(), osdCols, osdTextShade, osdTextPal, osdTextScale);
         }
         prompt.draw();
-    }
-
-    public void toggle() {
-        osdScroll = -osdScroll;
-        if (osdRowsCur == -1) {
-            osdScroll = 1;
-        } else if (osdRowsCur == osdRows) {
-            osdScroll = -1;
-        }
-        osdRowsCur += osdScroll;
-        prompt.captureInput(osdScroll == 1);
-        func.showOsd(osdScroll == 1);
-        getInputController().initMessageInput(null);
-        osdScrTime = getTicks();
     }
 
     public boolean isCaptured() {
@@ -564,7 +430,7 @@ public class Console {
     private MapNode<OsdString> newLine() {
         MapNode<OsdString> last;
         if (osdTextList.getSize() < MAX_LINES) {
-            last = new MapNode<OsdString>(osdTextList.getSize()) {
+            last = new MapNode<>(osdTextList.getSize()) {
                 final OsdString value = new OsdString();
                 @Override
                 public OsdString get() {
@@ -658,5 +524,182 @@ public class Console {
 
     private long getTicks() {
         return System.currentTimeMillis();
+    }
+
+    // Controller
+
+    public void onToggle() {
+        osdScroll = -osdScroll;
+        if (osdRowsCur == -1) {
+            osdScroll = 1;
+        } else if (osdRowsCur == osdRows) {
+            osdScroll = -1;
+        }
+        osdRowsCur += osdScroll;
+        prompt.captureInput(osdScroll == 1);
+        func.showOsd(osdScroll == 1);
+        getInputController().initMessageInput(null);
+        osdScrTime = getTicks();
+    }
+
+    void onClose() {
+        osdScroll = -1;
+        osdRowsCur--;
+        prompt.captureInput(false);
+        osdScrTime = getTicks();
+    }
+
+    void onPageUp() {
+        if (!isOnLastLine()) {
+            if (osdHead != null && osdHead.getNext() != null) {
+                osdHead = osdHead.getNext();
+            }
+        }
+    }
+
+    void onPageDown() {
+        if (!isOnFirstLine()) {
+            if (osdHead != null && osdHead.getPrev() != null) {
+                osdHead = osdHead.getPrev();
+            }
+        }
+    }
+
+    void onFirstPage() {
+        osdHead = osdTextList.getLast();
+    }
+
+    void onLastPage() {
+        osdHead = osdTextList.getFirst();
+    }
+
+    void onTabPressed() {
+        String input = prompt.getTextInput();
+        if (!finder.isListPresent()) {
+            List<String> commands = finder.getCommands(input);
+            if (commands.size() > 1) {
+                printCommandList(commands, String.format("Found %d possible completions for \"%s\"", commands.size(), input), "Press TAB again to cycle through matches");
+            } else if (commands.size() == 1) {
+                prompt.setTextInput(commands.get(0));
+            }
+        } else {
+            prompt.setTextInput(finder.getNextTabCommand());
+        }
+    }
+
+    void onKeyPressed(int keyId) {
+        if (!isCaptured()) {
+            return;
+        }
+
+        switch (keyId) {
+            case Input.Keys.GRAVE: // FIXME: from config
+                onToggle();
+                return;
+            case Input.Keys.ESCAPE:
+                onClose();
+                return;
+            case Input.Keys.TAB:
+                onTabPressed();
+                return;
+            case Input.Keys.ENTER:
+                onEnterPressed();
+                return;
+            case Input.Keys.DEL: //backspace
+                onDeletePressed();
+                return;
+            case KEY_CAPSLOCK:
+                onCapsLockPressed();
+                return;
+            case Input.Keys.DOWN:
+                onNextHistory();
+                return;
+            case Input.Keys.UP:
+                onPrevHistory();
+                return;
+            case Input.Keys.RIGHT:
+                onRightPressed();
+                return;
+            case Input.Keys.LEFT:
+                onLeftPressed();
+                return;
+            case Input.Keys.INSERT:
+                onToggleOverType();
+                return;
+            case Input.Keys.END:
+                if (prompt.isCtrlPressed()) {
+                    onLastPage();
+                } else {
+                    onLastPosition();
+                }
+                return;
+            case Input.Keys.HOME:
+                if (prompt.isCtrlPressed()) {
+                    onFirstPage();
+                } else {
+                    onFirstPosition();
+                }
+                return;
+            case Input.Keys.PAGE_UP:
+                onPageUp();
+                return;
+            case Input.Keys.PAGE_DOWN:
+                onPageDown();
+                return;
+            default:
+                if (keyId < 128) {
+                    if (prompt.isShiftPressed()) {
+                        keyId = gdxscantoascwithshift[keyId];
+                    } else {
+                        keyId = gdxscantoasc[keyId];
+                    }
+
+                    if (keyId != 0) {
+                        prompt.append((char) keyId);
+                        finder.reset();
+                    }
+                }
+                break;
+        }
+    }
+
+    void onFirstPosition() {
+        prompt.onFirstPosition();
+    }
+
+    void onLastPosition() {
+        prompt.onLastPosition();
+    }
+
+    void onToggleOverType() {
+        prompt.toggleOverType();
+    }
+
+    void onLeftPressed() {
+        prompt.onLeft();
+    }
+
+    void onRightPressed() {
+        prompt.onRight();
+    }
+
+    void onPrevHistory() {
+        prompt.historyPrev();
+    }
+
+    void onNextHistory() {
+        prompt.historyNext();
+    }
+
+    void onCapsLockPressed() {
+        prompt.setCapsLockPressed(!prompt.isCapsLockPressed());
+    }
+
+    void onDeletePressed() {
+        prompt.onDelete();
+    }
+
+    void onEnterPressed() {
+        prompt.onEnter();
     }
 }
