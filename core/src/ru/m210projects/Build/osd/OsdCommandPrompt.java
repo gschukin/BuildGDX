@@ -5,38 +5,38 @@ import ru.m210projects.Build.osd.commands.OsdValueRange;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
 
 public class OsdCommandPrompt {
 
-    private final Console parent;
-    private String osdVersionText;
-    private int osdVersionShade;
-    private OsdColor osdVersionPal = OsdColor.DEFAULT;
-    private OsdColor osdPromptPal = OsdColor.DEFAULT;
-    private int osdPromptShade;
-    private OsdColor osdEditPal = OsdColor.DEFAULT;
-    private int osdEditShade;
-    private final ConsoleHistory inputHistory;
-    private CommandFinder finder;
     private static final int OSD_EDIT_LENGTH = 511;
+    private final ConsoleHistory inputHistory;
     private final StringBuilder osdEditBuf = new StringBuilder(OSD_EDIT_LENGTH);
-    private int osdEditCursor = 0; // position of cursor in edit buffer
+    private final OsdCommandPromptUI ui;
+    //    private final Console parent;
+    protected String osdVersionText;
+    protected int osdVersionShade;
+    protected OsdColor osdVersionPal = OsdColor.DEFAULT;
+    protected OsdColor osdPromptPal = OsdColor.DEFAULT;
+    protected int osdPromptShade;
+    protected OsdColor osdEditPal = OsdColor.DEFAULT;
+    protected int osdEditShade;
+    protected int osdEditCursor = 0; // position of cursor in edit buffer
     private boolean osdCaptureInput = false;
     private boolean osdShift = false;
     private boolean osdCtrl = false;
     private boolean osdCapsLock = false;
     private boolean osdOverType = false;
+    private ActionListener actionListener;
 
-    public OsdCommandPrompt(Console parent) {
-        this.parent = parent;
+    public OsdCommandPrompt(OsdCommandPromptUI ui) {
         this.inputHistory = new ConsoleHistory(32);
+        this.ui = ui;
     }
 
-    protected void setCommandFinder(Console parent) {
-        this.finder = new CommandFinder(parent.osdVars);
+    public void setActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
     protected void registerDefaultCommands(Console parent) {
@@ -173,10 +173,8 @@ public class OsdCommandPrompt {
         if (!isEmpty()) {
             String input = osdEditBuf.toString();
             inputHistory.add(input);
-            parent.dispatch(input);
         }
-        parent.setFirstLine();
-        finder.reset();
+        actionListener.onEnter(getTextInput());
         clear();
     }
 
@@ -203,22 +201,7 @@ public class OsdCommandPrompt {
         osdEditCursor = osdEditBuf.length();
     }
 
-    public void onTab() {
-        String input = osdEditBuf.toString();
-        if (!finder.isListPresent()) {
-            List<String> commands = finder.getCommands(input);
-            if (commands.size() > 1) {
-                parent.printCommandList(commands, String.format("Found %d possible completions for \"%s\"", commands.size(), input), "Press TAB again to cycle through matches");
-            } else if (commands.size() == 1) {
-                fillEditBuf(commands.get(0));
-            }
-        } else {
-            fillEditBuf(finder.getNextTabCommand());
-        }
-    }
-
     public void append(char ch) {
-        finder.reset();
         if (osdEditBuf.length() < OSD_EDIT_LENGTH) {
             if (osdEditCursor < osdEditBuf.length()) {
                 if (osdOverType) {
@@ -232,7 +215,11 @@ public class OsdCommandPrompt {
         }
     }
 
-    private void fillEditBuf(String text) {
+    public String getTextInput() {
+        return osdEditBuf.toString();
+    }
+
+    public void setTextInput(String text) {
         clear();
         osdEditBuf.append(text);
         onLastPosition();
@@ -254,87 +241,46 @@ public class OsdCommandPrompt {
         osdOverType = !osdOverType;
     }
 
+    public boolean isOsdOverType() {
+        return osdOverType;
+    }
+
     public void onResize() {
     }
 
-    public void draw(OsdFunc func) {
-        int ypos = parent.osdRowsCur;
-        int textScale = parent.osdTextScale;
-
-        int shade = osdPromptShade;
-        if (shade == 0) {
-            shade = func.getPulseShade(4);
-        }
-
-        if (parent.isOnLastLine()) {
-            func.drawchar(0, ypos, '~', shade, osdPromptPal, textScale);
-        } else if (!parent.isOnFirstLine()) {
-            func.drawchar(0, ypos, '^', shade, osdPromptPal, textScale);
-        }
-
-        int offset = 0;
-        if (osdCapsLock) {
-            if (parent.isOnFirstLine()) {
-                offset = 1;
-            }
-            func.drawchar(offset, ypos, 'C', shade, osdPromptPal, textScale);
-        }
-
-        if (osdShift) {
-            offset = 1;
-            if ((osdCapsLock && parent.isOnFirstLine())) {
-                offset = 2;
-            }
-            func.drawchar(offset, ypos, 'H', shade, osdPromptPal, textScale);
-        }
-
-        offset = 0;
-        if (osdCapsLock && osdShift && parent.isOnFirstLine()) {
-            offset = 1;
-        }
-        func.drawchar(2 + offset, ypos, '>', shade, osdPromptPal, textScale);
-
-        int len = Math.min(parent.osdCols - 1 - 3 - offset, osdEditBuf.length());
-        for (int x = len - 1; x >= 0; x--) {
-            func.drawchar(3 + x + offset, ypos, osdEditBuf.charAt(x), osdEditShade << 1, osdEditPal, textScale);
-        }
-
-        offset += 3 + osdEditCursor;
-
-        func.drawcursor(offset, ypos, osdOverType, textScale);
-
-        if (osdVersionText != null) {
-            int xpos = parent.osdCols - osdVersionText.length() + 2;
-            func.drawstr(parent.osdCols - osdVersionText.length() + 2, ypos - ((offset >= xpos) ? 1 : 0),
-                    osdVersionText, func.getPulseShade(4), osdVersionPal, textScale);
-        }
+    public void draw() {
+        ui.draw();
     }
 
     public boolean isCaptured() {
         return osdCaptureInput;
     }
 
-    public void setShiftPressed(boolean osdShift) {
-        this.osdShift = osdShift;
-    }
-
-    public void setCtrlPressed(boolean osdCtrl) {
-        this.osdCtrl = osdCtrl;
+    public boolean isCapsLockPressed() {
+        return osdCapsLock;
     }
 
     public void setCapsLockPressed(boolean osdCapsLock) {
         this.osdCapsLock = osdCapsLock;
     }
 
-    public boolean isCapsLockPressed() {
-        return osdCapsLock;
-    }
-
     public boolean isShiftPressed() {
         return osdShift;
     }
 
+    public void setShiftPressed(boolean osdShift) {
+        this.osdShift = osdShift;
+    }
+
     public boolean isCtrlPressed() {
         return osdCtrl;
+    }
+
+    public void setCtrlPressed(boolean osdCtrl) {
+        this.osdCtrl = osdCtrl;
+    }
+
+    public interface ActionListener {
+        void onEnter(String input);
     }
 }

@@ -29,6 +29,8 @@ public class Console {
     // TODO сделать OSDString сегментами (сегмент цвета и кусок текста)
     private final MapList<OsdString> osdTextList = new MapList<>();
     protected final OsdCommandPrompt prompt;
+
+    protected final CommandFinder finder;
     /**
      * width of onscreen display in text columns
      */
@@ -63,9 +65,18 @@ public class Console {
 
     public Console() {
         this.osdVars = new HashMap<>();
-        this.prompt = new OsdCommandPrompt(this);
+        this.prompt = new OsdCommandPrompt(new OsdConsolePromptUI(this));
         prompt.registerDefaultCommands(this);
         registerDefaultCommands();
+        finder = new CommandFinder(osdVars);
+
+        prompt.setActionListener(input -> {
+            if (!input.isEmpty()) {
+                dispatch(input);
+            }
+            setFirstLine();
+            finder.reset();
+        });
     }
 
     protected void registerDefaultCommands() {
@@ -224,23 +235,34 @@ public class Console {
         }
 
         if (getInputController().keyStatusOnce(Input.Keys.TAB)) {
-            prompt.onTab();
+            String input = prompt.getTextInput();
+            if (!finder.isListPresent()) {
+                List<String> commands = finder.getCommands(input);
+                if (commands.size() > 1) {
+                    printCommandList(commands, String.format("Found %d possible completions for \"%s\"", commands.size(), input), "Press TAB again to cycle through matches");
+                } else if (commands.size() == 1) {
+                    prompt.setTextInput(commands.get(0));
+                }
+            } else {
+                prompt.setTextInput(finder.getNextTabCommand());
+            }
         }
 
-//        getInputController().putMessage(ch -> {
-//            if (ch < 128) {
-//                if (prompt.isShiftPressed()) {
-//                    ch = gdxscantoascwithshift[ch];
-//                } else {
-//                    ch = gdxscantoasc[ch];
-//                }
-//
-//                if (ch != 0) {
-//                    prompt.append((char) ch);
-//                }
-//            }
-//            return 0;
-//        }, false);
+        getInputController().putMessage(ch -> {
+            if (ch < 128) {
+                if (prompt.isShiftPressed()) {
+                    ch = gdxscantoascwithshift[ch];
+                } else {
+                    ch = gdxscantoasc[ch];
+                }
+
+                if (ch != 0) {
+                    prompt.append((char) ch);
+                    finder.reset();
+                }
+            }
+            return 0;
+        }, false);
     }
 
     public void registerCommand(OsdCommand cmd) {
@@ -428,7 +450,7 @@ public class Console {
         for (; node != null && row > 0; node = node.getNext()) {
             row -= func.drawosdstr(0, row, node.get(), osdCols, osdTextShade, osdTextPal, osdTextScale);
         }
-        prompt.draw(func);
+        prompt.draw();
     }
 
     public void toggle() {
