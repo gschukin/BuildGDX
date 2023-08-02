@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.desktop.Controllers;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Input.Keymap.ANYKEY;
 
 import java.lang.reflect.Method;
@@ -170,7 +170,7 @@ public class GdxController implements BuildController {
 		if(value >= 0.9f) {
 			buttonPressed = true;
 			if(!hitButton[num]) {
-				getInput().setKey(ANYKEY, 1);
+				getInputController().setKey(ANYKEY, 1);
 				buttonStatus[num] = true;
 				hitButton[num] = true;
 			}
@@ -182,7 +182,7 @@ public class GdxController implements BuildController {
 		if(value <= -0.9f) {
 			buttonPressed = true;
 			if(!hitButton[num + 1]) {
-				getInput().setKey(ANYKEY, 1);
+				getInputController().setKey(ANYKEY, 1);
 				buttonStatus[num + 1] = true;
 				hitButton[num + 1] = true;
 			}
@@ -206,7 +206,7 @@ public class GdxController implements BuildController {
 					{
 						buttonPressed = true;
 						if(!hitButton[num + d]) {
-							getInput().setKey(ANYKEY, 1);
+							getInputController().setKey(ANYKEY, 1);
 							buttonStatus[num + d] = true;
 							hitButton[num + d] = true;
 						}
@@ -222,7 +222,7 @@ public class GdxController implements BuildController {
 					int sbut = (num + 2) + d % 2; //left right
 					if(dir == directions[d + 4])
 					{
-						getInput().setKey(ANYKEY, 1);
+						getInputController().setKey(ANYKEY, 1);
 						buttonStatus[fbut] = true;
 						hitButton[fbut] = true;
 						
@@ -250,7 +250,7 @@ public class GdxController implements BuildController {
 			if (controller.getButton(i)) {
 				buttonPressed = true;
 				if (!hitButton[i]) {
-					getInput().setKey(ANYKEY, 1);
+					getInputController().setKey(ANYKEY, 1);
 					buttonStatus[i] = true;
 					hitButton[i] = true;
 				}

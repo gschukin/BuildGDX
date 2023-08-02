@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.BClipLow;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 
@@ -186,7 +186,7 @@ public abstract class MenuJoyList extends MenuKeyboardList {
 					callback.run(handler, this);
 				}
 				
-				getInput().resetKeyStatus();
+				getInputController().resetKeyStatus();
 				return false;
 			case DELETE:
 				if(l_nFocus == -1) {

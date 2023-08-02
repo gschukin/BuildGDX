@@ -61,7 +61,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Gameutils;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
@@ -829,7 +828,7 @@ public class GDXRenderer implements GLRenderer {
 		textureCache.unbind();
 
 		omdtims = mdtims;
-		mdtims = engine.getticks();
+		mdtims = engine.getCurrentTimeMillis();
 
 		for (int i = 0; i < MAXSPRITES; i++) {
 			if (mdpause != 0) {

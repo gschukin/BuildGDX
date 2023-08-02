@@ -17,13 +17,12 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Pattern.Tools.NaturalComparator;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
-import ru.m210projects.Build.Types.font.CharInfo;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.filehandle.Entry;
@@ -34,10 +33,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.RenderService.ydim;
-import static ru.m210projects.Build.Strhandler.toCharArray;
 
 public abstract class MenuFileBrowser extends MenuItem {
 
@@ -46,7 +43,7 @@ public abstract class MenuFileBrowser extends MenuItem {
     private final int DIRECTORY = 0; // left part of filebrowser
     private final int FILE = 1; // right part of filebrowser
     private final int[] scrollX = new int[2];
-    private final BuildEngine draw;
+    private final Engine draw;
     private final SliderDrawable slider;
     public String back = "..";
     public boolean[] scrollTouch = new boolean[2];
@@ -404,7 +401,7 @@ public abstract class MenuFileBrowser extends MenuItem {
 
                     invoke(fileList.get(l_nFocus[FILE]));
                 }
-                getInput().resetKeyStatus();
+                getInputController().resetKeyStatus();
                 return false;
             case ESC:
             case RMB:

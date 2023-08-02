@@ -378,7 +378,7 @@ public abstract class BuildNet {
 				}
 
 				Timer timer = game.pEngine.getTimer();
-				timer.setTotalClock(timer.getTotalClock() - game.pEngine.ticks * i);
+				timer.setTotalClock(timer.getTotalClock() - game.pEngine.getTimer().getFrameTicks() * i);
 	            otherMinLag += i;
 
 				for ( int nPlayer = connecthead; nPlayer >= 0; nPlayer = connectpoint2[nPlayer] ) {
@@ -484,10 +484,8 @@ public abstract class BuildNet {
 		ready2send = false;
 	}
 	
-	public void ResetTimers()
-	{
-		game.pEngine.sampletimer(); //update timer before reset
-
+	public void ResetTimers() {
+		game.pEngine.getTimer().update(); //update timer before reset
 		game.pEngine.getTimer().reset();
 		ototalclock = 0;
 		gNetFifoMasterTail = 0;

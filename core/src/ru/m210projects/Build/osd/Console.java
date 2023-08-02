@@ -1,8 +1,6 @@
 package ru.m210projects.Build.osd;
 
 import com.badlogic.gdx.Input;
-import org.jetbrains.annotations.NotNull;
-import ru.m210projects.Build.Pattern.BuildFactory;
 import ru.m210projects.Build.StringUtils;
 import ru.m210projects.Build.Types.collections.MapList;
 import ru.m210projects.Build.Types.collections.MapNode;
@@ -15,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Input.KeyInput.gdxscantoasc;
 import static ru.m210projects.Build.Input.KeyInput.gdxscantoascwithshift;
 import static ru.m210projects.Build.Input.Keymap.KEY_CAPSLOCK;
@@ -30,7 +28,7 @@ public class Console {
     OsdFunc func;
     // TODO сделать OSDString сегментами (сегмент цвета и кусок текста)
     private final MapList<OsdString> osdTextList = new MapList<>();
-    private final OsdCommandPrompt prompt;
+    protected final OsdCommandPrompt prompt;
     /**
      * width of onscreen display in text columns
      */
@@ -63,10 +61,14 @@ public class Console {
     private int osdTextShade = 0;
     private ConsoleLogger logger;
 
-    private Console() {
+    public Console() {
         this.osdVars = new HashMap<>();
         this.prompt = new OsdCommandPrompt(this);
+        prompt.registerDefaultCommands(this);
+        registerDefaultCommands();
+    }
 
+    protected void registerDefaultCommands() {
         registerCommand(new OsdCallback("osd_color_test", "", args -> {
             int len = MAXPALOOKUPS;
 
@@ -149,7 +151,7 @@ public class Console {
 //						Console.out.setCaptureKey(cfg.secondkeys[consolekey], 1);
 //						Console.out.setCaptureKey(cfg.mousekeys[consolekey], 2);
 //						Console.out.setCaptureKey(cfg.gpadkeys[consolekey], 3);
-            if (getInput().keyStatusOnce(68)) {
+            if (getInputController().keyStatusOnce(68)) {
                 toggle();
                 return;
             }
@@ -159,19 +161,19 @@ public class Console {
             return;
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.ESCAPE)) {
+        if (getInputController().keyStatusOnce(Input.Keys.ESCAPE)) {
             onClose();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.PAGE_UP)) {
+        if (getInputController().keyStatusOnce(Input.Keys.PAGE_UP)) {
             onPageUp();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.PAGE_DOWN)) {
+        if (getInputController().keyStatusOnce(Input.Keys.PAGE_DOWN)) {
             onPageDown();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.HOME)) {
+        if (getInputController().keyStatusOnce(Input.Keys.HOME)) {
             if (prompt.isCtrlPressed()) {
                 onFirstPage();
             } else {
@@ -179,7 +181,7 @@ public class Console {
             }
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.END)) {
+        if (getInputController().keyStatusOnce(Input.Keys.END)) {
             if (prompt.isCtrlPressed()) {
                 onLastPage();
             } else {
@@ -187,58 +189,58 @@ public class Console {
             }
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.INSERT)) {
+        if (getInputController().keyStatusOnce(Input.Keys.INSERT)) {
             prompt.toggleOverType();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.LEFT)) {
+        if (getInputController().keyStatusOnce(Input.Keys.LEFT)) {
             prompt.onLeft();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.RIGHT)) {
+        if (getInputController().keyStatusOnce(Input.Keys.RIGHT)) {
             prompt.onRight();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.UP)) {
+        if (getInputController().keyStatusOnce(Input.Keys.UP)) {
             prompt.historyPrev();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.DOWN)) {
+        if (getInputController().keyStatusOnce(Input.Keys.DOWN)) {
             prompt.historyNext();
         }
 
-        prompt.setShiftPressed(getInput().keyStatus(Input.Keys.SHIFT_LEFT) || getInput().keyStatus(Input.Keys.SHIFT_RIGHT));
-        prompt.setCtrlPressed(getInput().keyStatus(Input.Keys.CONTROL_LEFT) || getInput().keyStatus(Input.Keys.CONTROL_RIGHT));
-        if(getInput().keyStatusOnce(KEY_CAPSLOCK)) {
+        prompt.setShiftPressed(getInputController().keyStatus(Input.Keys.SHIFT_LEFT) || getInputController().keyStatus(Input.Keys.SHIFT_RIGHT));
+        prompt.setCtrlPressed(getInputController().keyStatus(Input.Keys.CONTROL_LEFT) || getInputController().keyStatus(Input.Keys.CONTROL_RIGHT));
+        if(getInputController().keyStatusOnce(KEY_CAPSLOCK)) {
             prompt.setCapsLockPressed(!prompt.isCapsLockPressed());
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.DEL)) { //backspace
+        if (getInputController().keyStatusOnce(Input.Keys.DEL)) { //backspace
             prompt.onDelete();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.ENTER)) {
+        if (getInputController().keyStatusOnce(Input.Keys.ENTER)) {
             prompt.onEnter();
         }
 
-        if (getInput().keyStatusOnce(Input.Keys.TAB)) {
+        if (getInputController().keyStatusOnce(Input.Keys.TAB)) {
             prompt.onTab();
         }
 
-        getInput().putMessage(ch -> {
-            if (ch < 128) {
-                if (prompt.isShiftPressed()) {
-                    ch = gdxscantoascwithshift[ch];
-                } else {
-                    ch = gdxscantoasc[ch];
-                }
-
-                if (ch != 0) {
-                    prompt.append((char) ch);
-                }
-            }
-            return 0;
-        }, false);
+//        getInputController().putMessage(ch -> {
+//            if (ch < 128) {
+//                if (prompt.isShiftPressed()) {
+//                    ch = gdxscantoascwithshift[ch];
+//                } else {
+//                    ch = gdxscantoasc[ch];
+//                }
+//
+//                if (ch != 0) {
+//                    prompt.append((char) ch);
+//                }
+//            }
+//            return 0;
+//        }, false);
     }
 
     public void registerCommand(OsdCommand cmd) {
@@ -438,7 +440,8 @@ public class Console {
         }
         osdRowsCur += osdScroll;
         prompt.captureInput(osdScroll == 1);
-        getInput().initMessageInput(null);
+        func.showOsd(osdScroll == 1);
+        getInputController().initMessageInput(null);
         osdScrTime = getTicks();
     }
 

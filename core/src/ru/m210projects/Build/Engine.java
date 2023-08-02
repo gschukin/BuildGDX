@@ -9,8 +9,14 @@
 
 package ru.m210projects.Build;
 
+import com.badlogic.gdx.Screen;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Input.KeyInput;
+import ru.m210projects.Build.Pattern.BuildGame;
+import ru.m210projects.Build.Pattern.BuildNet;
+import ru.m210projects.Build.Pattern.ScreenAdapters.GameAdapter;
+import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
+import ru.m210projects.Build.Pattern.ScreenAdapters.LoadingAdapter;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Render.Renderer;
@@ -19,22 +25,18 @@ import ru.m210projects.Build.Script.DefScript;
 import ru.m210projects.Build.Types.*;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
-import ru.m210projects.Build.filehandle.art.ArtFile;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;
 
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
-import static ru.m210projects.Build.Pragmas.*;
-import static ru.m210projects.Build.RenderService.*;
-import static ru.m210projects.Build.Strhandler.buildString;
-import static ru.m210projects.Build.filehandle.art.ArtFile.DUMMY_ART_FILE;
+import static ru.m210projects.Build.Net.Mmulti.*;
+import static ru.m210projects.Build.RenderService.xdim;
+import static ru.m210projects.Build.RenderService.ydim;
 
-public abstract class Engine {
+public class Engine {
 
     /*
      * TODO:
@@ -92,43 +94,10 @@ public abstract class Engine {
      */
 
     public static final String version = "23.071"; // XX. - year, XX - month, X - build
-
-    public static Hitscan pHitInfo;
-    public static Neartag neartag;
-    private static KeyInput input; // FIXME static
-    public static int clipmoveboxtracenum = 3;
-    protected final GetZRange getZRange = new GetZRange(this);
-    protected ClipMover clipmove = new ClipMover(this);
-    protected final EngineService engineService = new EngineService(this);
-    protected final PushMover pushMover = new PushMover(this);
-    protected final BoardService boardService;
-    protected final RenderService renderService;
-    public static int hitscangoalx = (1 << 29) - 1, hitscangoaly = (1 << 29) - 1;
-    private final HitScanner scanner = new HitScanner(this);
-    private final NearScanner nearScanner = new NearScanner(this);
-
-    protected PaletteManager paletteManager;
-    protected TileManager tileManager;
-    private DefScript defs;
-
-    public static int zr_ceilz, zr_ceilhit, zr_florz, zr_florhit;
-    public static int clipmove_x, clipmove_y, clipmove_z;
-    public static short clipmove_sectnum;
-
-    public static int pushmove_x, pushmove_y, pushmove_z;
-    public static short pushmove_sectnum;
-
-    protected Point rotatepoint = new Point();
-
-    // Constants
-
-    public static Object lock = new Object();
     public static final int CLIPMASK0 = (((1) << 16) + 1);
     public static final int CLIPMASK1 = (((256) << 16) + 64);
     public static final int MAXPSKYTILES = 256;
     public static final int MAXPALOOKUPS = 256;
-    public static int USERTILES = 256;
-    public static int MAXTILES = 9216 + USERTILES;
     public static final int MAXSTATUS = 1024;
     public static final int DETAILPAL = (MAXPALOOKUPS - 1);
     public static final int GLOWPAL = (MAXPALOOKUPS - 2);
@@ -141,35 +110,81 @@ public abstract class Engine {
     public static final int MAXSECTORSV7 = 1024;
     public static final int MAXWALLSV7 = 8192;
     public static final int MAXSPRITESV7 = 4096;
-    public static int MAXSECTORS = MAXSECTORSV7;
-    public static int MAXWALLS = MAXWALLSV7;
-    public static int MAXSPRITES = MAXSPRITESV7;
     public static final int MAXSPRITESONSCREEN = 1024;
-    public static final int MAXVOXELS = MAXSPRITES;
     public static final int MAXUNIQHUDID = 256; // Extra slots so HUD models can store animation state without messing game sprites
     public static final int MAXPSKYMULTIS = 8;
     public static final int MAXPLAYERS = 16;
+    public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
+    public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
 
+    // Constants
+    public static Hitscan pHitInfo;
+    public static Neartag neartag;
+    public static int clipmoveboxtracenum = 3;
+    public static int hitscangoalx = (1 << 29) - 1, hitscangoaly = (1 << 29) - 1;
+    public static int zr_ceilz, zr_ceilhit, zr_florz, zr_florhit;
+    public static int clipmove_x, clipmove_y, clipmove_z;
+    public static short clipmove_sectnum;
+    public static int pushmove_x, pushmove_y, pushmove_z;
+    public static short pushmove_sectnum;
+    public static Object lock = new Object();
+    public static int USERTILES = 256;
+    public static int MAXTILES = 9216 + USERTILES;
+    public static int MAXSECTORS = MAXSECTORSV7;
+    public static int MAXWALLS = MAXWALLSV7;
+    public static int MAXSPRITES = MAXSPRITESV7;
+    public static final int MAXVOXELS = MAXSPRITES;
     // board variables
     public static short[] pskyoff;
     public static short[] zeropskyoff;
     public static short pskybits;
     public static byte parallaxtype;
     public static int visibility, parallaxvisibility;
-
     // automapping
     public static byte automapping;
     public static byte[] show2dsector;
     public static byte[] show2dwall;
     public static byte[] show2dsprite;
-
+    protected static int SETSPRITEZ = 0;
+    private static KeyInput input; // FIXME static
+    protected final GetZRange getZRange = new GetZRange(this);
+    protected final EngineService engineService = new EngineService(this);
+    protected final PushMover pushMover = new PushMover(this);
+    protected final BoardService boardService;
+    protected final RenderService renderService;
+    private final HitScanner scanner = new HitScanner(this);
+    private final NearScanner nearScanner = new NearScanner(this);
+    protected ClipMover clipmove = new ClipMover(this);
+    protected PaletteManager paletteManager;
+    protected TileManager tileManager;
+    protected final BuildGame game;
     // timer
     protected Timer timer;
-    protected int randomseed;
-    public static final short[] pow2char = {1, 2, 4, 8, 16, 32, 64, 128};
-    public static final int[] pow2long = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483647,};
 
     // Engine.c
+    protected int randomseed;
+    private DefScript defs;
+
+    public Engine(BuildGame game) throws Exception { // gdxBuild
+        InitArrays();
+        this.game = game;
+        this.tileManager = loadTileManager();
+        this.paletteManager = loadpalette();
+        this.renderService = createRenderService();
+        this.boardService = createBoardService();
+
+        EngineUtils.init(this); // loadtables
+
+        parallaxtype = 2;
+        pskybits = 0;
+        automapping = 0;
+        visibility = 512;
+        parallaxvisibility = 512;
+
+        initkeys();
+
+        randomseed = 1; // random for voxels
+    }
 
     public void InitArrays() { // gdxBuild
         pskyoff = new short[MAXPSKYTILES];
@@ -191,30 +206,40 @@ public abstract class Engine {
         return new Tables(BuildGdx.cache.getEntry("tables.dat", true));
     }
 
-    public Engine() throws Exception { // gdxBuild
-        InitArrays();
-
-        EngineUtils.init(this); // loadtables
-        this.paletteManager = loadpalette();
-        this.renderService = createRenderService();
-        this.boardService = createBoardService();
-
-        parallaxtype = 2;
-        pskybits = 0;
-        automapping = 0;
-        visibility = 512;
-        parallaxvisibility = 512;
-
-        initkeys();
-
-        randomseed = 1; // random for voxels
+    protected TileManager loadTileManager() {
+        return new TileManager(this);
     }
 
-    public abstract void faketimerhandler();
+    public void faketimerhandler() {
+        BuildNet net = game.pNet;
+        if (net == null) {
+            return; // not initialized yet
+        }
+
+        Screen current = game.getScreen();
+        if (!(current instanceof GameAdapter) && !(current instanceof LoadingAdapter)
+                && !(current instanceof InitScreen)) {
+            handleevents();
+        }
+
+        if (timer.getTotalClock() < net.ototalclock || !net.ready2send) {
+            return;
+        }
+
+        net.ototalclock += timer.getFrameTicks();
+        timer.resetsmoothticks();
+        game.pInt.requestResetting();
+        handleevents();
+        GetInput(net);
+    }
 
     protected RenderService createRenderService() {
         return new RenderService(this);
     }
+
+    //
+    // Exported Engine Functions
+    //
 
     protected BoardService createBoardService() {
         return new BoardService();
@@ -223,10 +248,6 @@ public abstract class Engine {
     public PaletteManager loadpalette() throws Exception { // jfBuild
         return new DefaultPaletteManager(this, BuildGdx.cache.getEntry("palette.dat", true));
     }
-
-    //
-    // Exported Engine Functions
-    //
 
     public void uninit() // gdxBuild
     {
@@ -237,7 +258,7 @@ public abstract class Engine {
         BuildGdx.message.dispose();
     }
 
-    public long getticks() { // gdxBuild
+    public long getCurrentTimeMillis() { // gdxBuild
         return System.currentTimeMillis();
     }
 
@@ -283,6 +304,52 @@ public abstract class Engine {
         Console.out.draw();
         BuildGdx.audio.update();
         renderService.nextpage();
+    }
+
+    public static KeyInput getInputController() // gdxBuild
+    {
+        return input;
+    }
+
+    // called by faketimehandler (30 times per sec)
+    protected void GetInput(BuildNet net) {
+        if (numplayers > 1) {
+            net.GetPackets();
+        }
+
+        for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
+            if (i != myconnectindex && net.gNetFifoHead[myconnectindex] - 200 > net.gNetFifoHead[i]) {
+                return;
+            }
+        }
+
+        if (!game.pMenu.gShowMenu && !Console.out.isShowing()) {
+            game.pInput.ctrlMouseHandler();
+            game.pInput.ctrlJoyHandler();
+        }
+        game.pInput.ctrlGetInput(game.pNet.gInput);
+
+        if ((net.gNetFifoHead[myconnectindex] & (net.MovesPerPacket - 1)) != 0) {
+            net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex]
+                    .Copy(net.gFifoInput[(net.gNetFifoHead[myconnectindex] - 1) & 0xFF][myconnectindex]);
+            net.gNetFifoHead[myconnectindex]++;
+            return;
+        }
+
+        net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex].Copy(net.gInput);
+        net.gNetFifoHead[myconnectindex]++;
+
+        if (game.nNetMode == BuildGame.NetMode.Multiplayer && numplayers < 2) {
+            for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
+                if (i != myconnectindex) {
+                    net.ComputerInput(i);
+                    net.gNetFifoHead[i]++;
+                }
+            }
+            return;
+        }
+
+        net.GetNetworkInput();
     }
 
     public int neartag(int xs, int ys, int zs, int sectnum, int ange, Neartag near, int neartagrange, int tagsearch) { // jfBuild
@@ -428,34 +495,6 @@ public abstract class Engine {
 //        }
 //        return (0);
     }
-    public void dragpoint(int pointhighlight, int dax, int day) { // jfBuild
-        boardService.getWall(pointhighlight).setX(dax);
-        boardService.getWall(pointhighlight).setY(day);
-
-        int cnt = MAXWALLS;
-        int tempshort = pointhighlight; // search points CCW
-        do {
-            if (boardService.getWall(tempshort).getNextwall() >= 0) {
-                tempshort = boardService.getWall(boardService.getWall(tempshort).getNextwall()).getPoint2();
-                boardService.getWall(tempshort).setX(dax);
-                boardService.getWall(tempshort).setY(day);
-            } else {
-                tempshort = pointhighlight; // search points CW if not searched all the way around
-                do {
-                    if (boardService.getWall(lastwall(tempshort)).getNextwall() >= 0) {
-                        tempshort = boardService.getWall(lastwall(tempshort)).getNextwall();
-                        boardService.getWall(tempshort).setX(dax);
-                        boardService.getWall(tempshort).setY(day);
-                    } else {
-                        break;
-                    }
-                    cnt--;
-                } while ((tempshort != pointhighlight) && (cnt > 0));
-                break;
-            }
-            cnt--;
-        } while ((tempshort != pointhighlight) && (cnt > 0));
-    }
 
     public int lastwall(int point) { // jfBuild
         if ((point > 0) && (boardService.getWall(point - 1).getPoint2() == point)) {
@@ -473,17 +512,6 @@ public abstract class Engine {
             cnt--;
         } while (cnt > 0);
         return (point);
-    }
-
-    public Point rotatepoint(int xpivot, int ypivot, int x, int y, int daang) { // jfBuild
-        int dacos = EngineUtils.cos(daang + 2048);
-        int dasin = EngineUtils.sin(daang + 2048);
-        x -= xpivot;
-        y -= ypivot;
-        rotatepoint.x = dmulscale(x, dacos, -y, dasin, 14) + xpivot;
-        rotatepoint.y = dmulscale(y, dacos, x, dasin, 14) + ypivot;
-
-        return rotatepoint;
     }
 
     public void srand(int seed) // gdxBuild
@@ -506,117 +534,20 @@ public abstract class Engine {
         return (int) (Math.random() * 32767);
     }
 
-    public void squarerotatetile(int tilenume) {
-        ArtEntry pic = getTile(tilenume);
-        int xsiz = pic.getWidth();
-        int ysiz = pic.getHeight();
-
-        // supports square tiles only for rotation part
-        if (xsiz == ysiz) {
-            int k = (xsiz << 1);
-            int ptr1, ptr2;
-            for (int i = xsiz - 1, j; i >= 0; i--) {
-                ptr1 = i * (xsiz + 1);
-                ptr2 = ptr1;
-                if ((i & 1) != 0) {
-                    ptr1--;
-                    ptr2 -= xsiz;
-                    squarerotatetileswap(tilenume, ptr1, ptr2);
-                }
-                for (j = (i >> 1) - 1; j >= 0; j--) {
-                    ptr1 -= 2;
-                    ptr2 -= k;
-                    squarerotatetileswap(tilenume, ptr1, ptr2);
-                    squarerotatetileswap(tilenume, ptr1 + 1, ptr2 + xsiz);
-                }
-            }
-        }
-    }
-
-    private void squarerotatetileswap(int tilenume, int p1, int p2) {
-        ArtEntry pic = getTile(tilenume);
-        if (pic != null) {
-            byte[] data = pic.getBytes();
-
-            if (p1 < data.length && p2 < data.length) {
-                byte tmp = data[p1];
-                data[p1] = data[p2];
-                data[p2] = tmp;
-            }
-        }
-    }
-
-    public int loopnumofsector(int sectnum, int wallnum) { // jfBuild
-        int numloops = 0;
-        int startwall = boardService.getSector(sectnum).getWallptr();
-        int endwall = startwall + boardService.getSector(sectnum).getWallnum();
-        for (int i = startwall; i < endwall; i++) {
-            if (i == wallnum) {
-                return (numloops);
-            }
-            if (boardService.getWall(i).getPoint2() < i) {
-                numloops++;
-            }
-        }
-        return (-1);
-    }
-
-    public void copytilepiece(int tilenume1, int sx1, int sy1, int xsiz, int ysiz, // jfBuild
-                              int tilenume2, int sx2, int sy2) {
-
-        ArtEntry pic1 = getTile(tilenume1);
-        ArtEntry pic2 = getTile(tilenume2);
-
-        int xsiz1 = pic1.getWidth();
-        int ysiz1 = pic1.getHeight();
-        int xsiz2 = pic2.getWidth();
-        int ysiz2 = pic2.getHeight();
-        if ((xsiz1 > 0) && (ysiz1 > 0) && (xsiz2 > 0) && (ysiz2 > 0)) {
-            byte[] data1 = pic1.getBytes();
-            byte[] data2 = pic2.getBytes();
-
-            int x1 = sx1;
-            for (int i = 0; i < xsiz; i++) {
-                int y1 = sy1;
-                for (int j = 0; j < ysiz; j++) {
-                    int x2 = sx2 + i;
-                    int y2 = sy2 + j;
-                    if ((x2 >= 0) && (y2 >= 0) && (x2 < xsiz2) && (y2 < ysiz2)) {
-                        byte ptr = data1[x1 * ysiz1 + y1];
-                        if (ptr != (byte) 255) {
-                            data2[x2 * ysiz2 + y2] = ptr;
-                        }
-                    }
-
-                    y1++;
-                    if (y1 >= ysiz1) {
-                        y1 = 0;
-                    }
-                }
-                x1++;
-                if (x1 >= xsiz1) {
-                    x1 = 0;
-                }
-            }
-        }
-    }
-
-    public static KeyInput getInput() // gdxBuild
-    {
-        return input;
-    }
-
     public void handleevents() { // gdxBuild
         input.handleevents();
         Console.out.handleevents();
-        sampletimer();
+        timer.update();
+        game.pInput.getGPManager().handler();
     }
 
     public void initkeys() { // gdxBuild
         input = new KeyInput();
     }
 
-
+    public DefScript getDefs() {
+        return defs;
+    }
 
     public void setDefs(DefScript defs) {
         this.defs = defs;
@@ -626,19 +557,50 @@ public abstract class Engine {
         getrender().setDefs(defs);
     }
 
-    public DefScript getDefs() {
-        return defs;
+    public void dragpoint(int pointhighlight, int dax, int day) {
+        Wall wal =  boardService.getWall(pointhighlight);
+        game.pInt.setwallinterpolate(pointhighlight, wal);
+        wal.setX(dax);
+        wal.setY(day);
+
+        int cnt = MAXWALLS;
+        int tempshort = pointhighlight; // search points CCW
+        do {
+            Wall wal2 = boardService.getWall(tempshort);
+            if (wal2.getNextwall() >= 0) {
+                tempshort = boardService.getWall(wal2.getNextwall()).getPoint2();
+                wal2 = boardService.getWall(tempshort);
+                game.pInt.setwallinterpolate(tempshort, wal2);
+                wal2.setX(dax);
+                wal2.setY(day);
+            } else {
+                tempshort = pointhighlight; // search points CW if not searched all the way around
+                do {
+                    Wall lastWall = boardService.getWall(lastwall(tempshort));
+                    if (lastWall.getNextwall() >= 0) {
+                        tempshort = lastWall.getNextwall();
+                        wal2 = boardService.getWall(tempshort);
+                        game.pInt.setwallinterpolate(tempshort, wal2);
+                        wal2.setX(dax);
+                        wal2.setY(day);
+                    } else {
+                        break;
+                    }
+
+                    cnt--;
+                } while ((tempshort != pointhighlight) && (cnt > 0));
+                break;
+            }
+            cnt--;
+        } while ((tempshort != pointhighlight) && (cnt > 0));
     }
-
-
-
 
     public boolean loadpic(Entry artFile) { // gdxBuild
         return tileManager.loadpic(artFile);
     }
 
     public int loadpics() {
-       return tileManager.loadpics();
+        return tileManager.loadpics();
     }
 
     public byte[] loadtile(int tilenume) { // jfBuild
@@ -653,12 +615,16 @@ public abstract class Engine {
         return tileManager.getTile(tilenum);
     }
 
+    public TileManager getTileManager() {
+        return tileManager;
+    }
+
     public PaletteManager getPaletteManager() {
         return paletteManager;
     }
 
-    public void inittimer(int tickspersecond) { // jfBuild
-        this.timer = new Timer(tickspersecond);
+    public void inittimer(int tickspersecond, int frameTicks) { // jfBuild
+        this.timer = new Timer(tickspersecond, frameTicks);
     }
 
     public Timer getTimer() {
@@ -667,10 +633,6 @@ public abstract class Engine {
 
     public int getTotalClock() {
         return timer.getTotalClock();
-    }
-
-    public void sampletimer() { // jfBuild
-        timer.update();
     }
 
     public boolean rIntersect(int xs, int ys, int zs, int vx, int vy, int vz, int x1, int y1, int x2, int y2, Variable rx, Variable ry, Variable rz) {
@@ -737,6 +699,8 @@ public abstract class Engine {
         return result;
     }
 
+    ////////// BOARD MANIPULATION FUNCTIONS //////////
+
     public void getzrange(int x, int y, int z, int sectnum, // jfBuild
                           int walldist, int cliptype) {
 
@@ -746,8 +710,6 @@ public abstract class Engine {
         zr_florz = info.getFlorz();
         zr_florhit = info.getFlorhit();
     }
-
-    ////////// BOARD MANIPULATION FUNCTIONS //////////
 
     public Board loadboard(Entry fil) {
         Board board;
@@ -804,8 +766,6 @@ public abstract class Engine {
         return boardService.inside(x, y, boardService.getSector(sectnum)) ? 1 : 0;
     }
 
-    protected static int SETSPRITEZ = 0;
-
     public boolean setsprite(int spritenum, int newx, int newy, int newz) { // jfBuild
         return boardService.setSprite(spritenum, newx, newy, newz, SETSPRITEZ != 0);
     }
@@ -830,7 +790,7 @@ public abstract class Engine {
     }
 
     public void alignceilslope(int dasect, int x, int y, int z) { // jfBuild
-        boardService.alignSlope(dasect, x, y, z,true);
+        boardService.alignSlope(dasect, x, y, z, true);
     }
 
     public void alignflorslope(int dasect, int x, int y, int z) { // jfBuild
@@ -965,45 +925,5 @@ public abstract class Engine {
 
     public void setgotpic(int tilenume) { // jfBuild
         renderService.setgotpic(tilenume);
-    }
-
-    public static class Point {
-        private int x, y, z;
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        public int getZ() {
-            return z;
-        }
-
-        public Point set(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-
-            return this;
-        }
-
-        public Point set(int x, int y) {
-            this.x = x;
-            this.y = y;
-            this.z = 0;
-
-            return this;
-        }
-
-        public boolean equals(int x, int y) {
-            return this.x == x && this.y == y;
-        }
-
-        public boolean equals(int x, int y, int z) {
-            return this.x == x && this.y == y && this.z == z;
-        }
     }
 }

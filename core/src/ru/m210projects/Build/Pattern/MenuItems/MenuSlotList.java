@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
 import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
 import static ru.m210projects.Build.RenderService.xdim;
@@ -135,8 +135,8 @@ public abstract class MenuSlotList extends MenuList {
                     if (m_pMenu.mGetFocusedItem(this)) {
                         if (typing) {
                             Arrays.fill(typingBuf, (char) 0);
-                            char[] buf = getInput().getMessageBuffer();
-                            int messlen = getInput().getMessageLength();
+                            char[] buf = getInputController().getMessageBuffer();
+                            int messlen = getInputController().getMessageLength();
                             if (!owncursor) {
                                 messlen += 1;
                             }
@@ -161,8 +161,8 @@ public abstract class MenuSlotList extends MenuList {
                 rtext = toCharArray("New saved game");
                 if (typing) {
                     Arrays.fill(typingBuf, (char) 0);
-                    char[] buf = getInput().getMessageBuffer();
-                    int messlen = getInput().getMessageLength();
+                    char[] buf = getInputController().getMessageBuffer();
+                    int messlen = getInputController().getMessageLength();
                     if (!owncursor) {
                         messlen += 1;
                     }
@@ -215,10 +215,10 @@ public abstract class MenuSlotList extends MenuList {
     @Override
     public boolean callback(MenuHandler handler, MenuOpt opt) {
         if (deleteQuestion) {
-            if (getInput().getKey(Keys.Y) != 0 || opt == MenuOpt.ENTER) {
+            if (getInputController().getKey(Keys.Y) != 0 || opt == MenuOpt.ENTER) {
                 saveManager.delete(getFileEntry());
                 updateList();
-                getInput().setKey(Keys.Y, 0);
+                getInputController().setKey(Keys.Y, 0);
                 if (l_nFocus >= displayed.size()) {
                     int len = displayed.size();
                     if (saveList) {
@@ -235,9 +235,9 @@ public abstract class MenuSlotList extends MenuList {
                 }
                 deleteQuestion = false;
             }
-            if (getInput().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
+            if (getInputController().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
 
-                getInput().setKey(Keys.N, 0);
+                getInputController().setKey(Keys.N, 0);
                 deleteQuestion = false;
             }
 
@@ -252,8 +252,8 @@ public abstract class MenuSlotList extends MenuList {
         }
         if (typing) {
             if (opt != MenuOpt.ESC) {
-                if (getInput().putMessage(typingBuf.length, !owncursor, false, false) == 1 || opt == MenuOpt.ENTER) {
-                    typed = new String(getInput().getMessageBuffer(), 0, getInput().getMessageLength());
+                if (getInputController().putMessage(typingBuf.length, !owncursor, false, false) == 1 || opt == MenuOpt.ENTER) {
+                    typed = new String(getInputController().getMessageBuffer(), 0, getInputController().getMessageLength());
                     typing = false;
                     if (confirmCallback != null) {
                         confirmCallback.run(handler, this);
@@ -306,9 +306,9 @@ public abstract class MenuSlotList extends MenuList {
                     if (l_nFocus != -1 && len > 0) {
                         if (saveList) {
                             if (l_nFocus == 0) {
-                                getInput().initMessageInput(null);
+                                getInputController().initMessageInput(null);
                             } else {
-                                getInput().initMessageInput(displayed.get(focus).name);
+                                getInputController().initMessageInput(displayed.get(focus).name);
                             }
                             typing = true;
 
@@ -317,7 +317,7 @@ public abstract class MenuSlotList extends MenuList {
                         if (confirmCallback != null) {
                             confirmCallback.run(handler, this);
                         }
-                        getInput().resetKeyStatus();
+                        getInputController().resetKeyStatus();
                     }
 
                     return false;

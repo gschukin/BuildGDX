@@ -68,7 +68,7 @@ public class WorldShader {
 			+ "    \n" //
 			+ "    vec4 worldCoords = u_invProjectionView * ndc;\n" //
 			+ "    worldCoords.xyz /= worldCoords.w;\n" //
-			+ "    worldCoords.xyz *= vec3(512.0, 512.0, 8192.0); // BuildEngine coords scale\n" //
+			+ "    worldCoords.xyz *= vec3(512.0, 512.0, 8192.0); // Engine coords scale\n" //
 			+ "    worldCoords.w = 1.0;\n" //
 			+ "    return worldCoords;\n" //
 			+ "}\n" //
@@ -132,7 +132,7 @@ public class WorldShader {
 			+ "    \n" //
 			+ "    vec4 worldCoords = u_invProjectionView * ndc;\n" //
 			+ "    worldCoords.xyz /= worldCoords.w;\n" //
-			+ "    worldCoords.xyz *= vec3(512.0, 512.0, 8192.0); // BuildEngine coords scale\n" //
+			+ "    worldCoords.xyz *= vec3(512.0, 512.0, 8192.0); // Engine coords scale\n" //
 			+ "    worldCoords.w = 1.0;\n" //
 			+ "    return worldCoords;\n" //
 			+ "}\n" //

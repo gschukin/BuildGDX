@@ -20,7 +20,7 @@ public class OsdCommandPrompt {
     private OsdColor osdEditPal = OsdColor.DEFAULT;
     private int osdEditShade;
     private final ConsoleHistory inputHistory;
-    private final CommandFinder finder;
+    private CommandFinder finder;
     private static final int OSD_EDIT_LENGTH = 511;
     private final StringBuilder osdEditBuf = new StringBuilder(OSD_EDIT_LENGTH);
     private int osdEditCursor = 0; // position of cursor in edit buffer
@@ -32,9 +32,14 @@ public class OsdCommandPrompt {
 
     public OsdCommandPrompt(Console parent) {
         this.parent = parent;
-        this.finder = new CommandFinder(parent.osdVars);
         this.inputHistory = new ConsoleHistory(32);
+    }
 
+    protected void setCommandFinder(Console parent) {
+        this.finder = new CommandFinder(parent.osdVars);
+    }
+
+    protected void registerDefaultCommands(Console parent) {
         parent.registerCommand(new OsdValueRange("osdpromptshade", "osdpromptshade: sets the shade of the OSD prompt", 0, 7) {
             @Override
             public float getValue() {
@@ -83,7 +88,6 @@ public class OsdCommandPrompt {
 
     public void captureInput(boolean capture) {
         this.osdCaptureInput = capture;
-        parent.func.showOsd(capture);
     }
 
     public void onFirstPosition() {
@@ -200,29 +204,7 @@ public class OsdCommandPrompt {
     }
 
     public void onTab() {
-        handleTab(osdEditBuf.toString());
-    }
-
-    public void append(char ch) {
-        finder.reset();
-        if (osdEditBuf.length() < OSD_EDIT_LENGTH) {
-            if (osdEditCursor < osdEditBuf.length()) {
-                if(osdOverType) {
-                    osdEditBuf.deleteCharAt(osdEditCursor);
-                    osdEditBuf.insert(osdEditCursor, ch);
-                    osdEditCursor++;
-                } else {
-                    osdEditBuf.insert(osdEditCursor, ch);
-                    osdEditCursor++;
-                }
-            } else {
-                osdEditBuf.append(ch);
-                osdEditCursor++;
-            }
-        }
-    }
-
-    private void handleTab(String input) {
+        String input = osdEditBuf.toString();
         if (!finder.isListPresent()) {
             List<String> commands = finder.getCommands(input);
             if (commands.size() > 1) {
@@ -232,6 +214,21 @@ public class OsdCommandPrompt {
             }
         } else {
             fillEditBuf(finder.getNextTabCommand());
+        }
+    }
+
+    public void append(char ch) {
+        finder.reset();
+        if (osdEditBuf.length() < OSD_EDIT_LENGTH) {
+            if (osdEditCursor < osdEditBuf.length()) {
+                if (osdOverType) {
+                    osdEditBuf.deleteCharAt(osdEditCursor);
+                }
+                osdEditBuf.insert(osdEditCursor, ch);
+            } else {
+                osdEditBuf.append(ch);
+            }
+            osdEditCursor++;
         }
     }
 

@@ -27,8 +27,9 @@ import com.badlogic.gdx.ScreenAdapter;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.filehandle.Entry;
-import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildEngine;
+import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
 import ru.m210projects.Build.Pattern.BuildGame.NetMode;
@@ -40,7 +41,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 	protected BuildGame game;
 	protected BuildNet pNet;
 	protected MenuHandler pMenu;
-	protected BuildEngine pEngine;
+	protected Engine pEngine;
 	protected BuildConfig pCfg;
 	protected Runnable gScreenCapture;
 	protected LoadingAdapter load;
@@ -193,7 +194,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 
 		float smoothratio = 65536;
 		if (!game.gPaused && (game.nNetMode != NetMode.Single || !pMenu.gShowMenu && !Console.out.isShowing())) {
-			smoothratio = pEngine.getsmoothratio();
+			smoothratio = pEngine.getTimer().getsmoothratio(delta);
 			if (smoothratio < 0 || smoothratio > 0x10000) {
 //				System.err.println("Interpolation error " + smoothratio);
 				smoothratio = BClipRange(smoothratio, 0, 0x10000);
@@ -221,7 +222,7 @@ public abstract class GameAdapter extends ScreenAdapter {
 			pEngine.printfps(pCfg.gFpsScale);
 		}
 
-		pEngine.sampletimer();
+		pEngine.getTimer().update();
 		pEngine.nextpage();
 		game.pInt.clearinterpolations();
 	}

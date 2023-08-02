@@ -44,13 +44,13 @@ public abstract class MenuVariants extends MenuTitle
 	
 	@Override
 	public boolean callback(MenuHandler handler, MenuOpt opt) {
-		if(getInput().getKey(Keys.Y) != 0 || opt == MenuOpt.ENTER || opt == MenuOpt.LMB) {
+		if(getInputController().getKey(Keys.Y) != 0 || opt == MenuOpt.ENTER || opt == MenuOpt.LMB) {
 			positive(handler);
-		    getInput().setKey(Keys.Y, 0);
+		    getInputController().setKey(Keys.Y, 0);
 		}
-		if(getInput().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
+		if(getInputController().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
 			negative(handler);
-			getInput().setKey(Keys.N, 0);
+			getInputController().setKey(Keys.N, 0);
 		}
 		return false;
 	}

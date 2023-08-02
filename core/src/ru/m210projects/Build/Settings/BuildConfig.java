@@ -23,8 +23,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.*;
 
+import com.badlogic.gdx.utils.Array;
 import ru.m210projects.Build.Input.ButtonMap;
 import ru.m210projects.Build.Input.Keymap;
 import ru.m210projects.Build.filehandle.StreamUtils;
@@ -146,6 +147,7 @@ public abstract class BuildConfig extends IniFile {
 	public int[] secondkeys;
 	public int[] mousekeys;
 	public int[] gpadkeys;
+	public KeyType[] arrayPressedKey = new KeyType[256];
 
 	public int gJoyMoveAxis = 0; // Stick1Y
 	public int gJoyStrafeAxis = 1; // Stick1X
@@ -457,9 +459,14 @@ public abstract class BuildConfig extends IniFile {
 
 				if (primary != null) {
 					primarykeys[i] = Keymap.valueOf(primary);
+					if (primarykeys[i] == -1 || primarykeys[i] == 255) {
+						System.out.println();
+					}
+					arrayPressedKey[primarykeys[i]] = keymap[i];
 				}
 				if (secondary != null) {
 					secondkeys[i] = Keymap.valueOf(secondary);
+					arrayPressedKey[secondkeys[i]] = keymap[i];
 				}
 				if (mouse != null) {
 					mousekeys[i] = Keymap.valueOf(mouse);

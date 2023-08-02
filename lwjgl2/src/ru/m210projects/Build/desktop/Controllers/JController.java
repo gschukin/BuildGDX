@@ -1,6 +1,6 @@
 package ru.m210projects.Build.desktop.Controllers;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Input.Keymap.ANYKEY;
 
 import java.util.Arrays;
@@ -133,7 +133,7 @@ public class JController implements BuildController {
 			if (buttons.get(i).getPollData() == 1.0f) {
 				buttonPressed = true;
 				if (!hitButton[i]) {
-					getInput().setKey(ANYKEY, 1);
+					getInputController().setKey(ANYKEY, 1);
 					buttonStatus[i] = true;
 					hitButton[i] = true;
 				}
@@ -196,7 +196,7 @@ public class JController implements BuildController {
 					{
 						buttonPressed = true;
 						if(!hitButton[num + d]) {
-							getInput().setKey(ANYKEY, 1);
+							getInputController().setKey(ANYKEY, 1);
 							buttonStatus[num + d] = true;
 							hitButton[num + d] = true;
 						}
@@ -212,7 +212,7 @@ public class JController implements BuildController {
 					int sbut = (num + 2) + d % 2; //left right
 					if(Float.compare(dir, directions[d + 4]) == 0)
 					{
-						getInput().setKey(ANYKEY, 1);
+						getInputController().setKey(ANYKEY, 1);
 						buttonStatus[fbut] = true;
 						hitButton[fbut] = true;
 						
@@ -242,7 +242,7 @@ public class JController implements BuildController {
 		if(value >= 0.9f) {
 			buttonPressed = true;
 			if(!hitButton[num]) {
-				getInput().setKey(ANYKEY, 1);
+				getInputController().setKey(ANYKEY, 1);
 				buttonStatus[num] = true;
 				hitButton[num] = true;
 			}
@@ -254,7 +254,7 @@ public class JController implements BuildController {
 		if(value <= -0.9f) {
 			buttonPressed = true;
 			if(!hitButton[num + 1]) {
-				getInput().setKey(ANYKEY, 1);
+				getInputController().setKey(ANYKEY, 1);
 				buttonStatus[num + 1] = true;
 				hitButton[num + 1] = true;
 			}

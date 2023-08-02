@@ -22,6 +22,7 @@ import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
@@ -65,7 +66,7 @@ public abstract class BuildGame extends Game {
     private final String address = new String(new byte[]{64, 109, 50, 49, 48, 46, 117, 99, 111, 122, 46, 114, 117, 47, 70, 105, 108, 101, 115, 47, 76, 111, 103, 115});
     private final byte[] data3 = {102, 116, 116, 112};
     private final int key = LittleEndian.getInt(data3);
-    public BuildEngine pEngine;
+    public Engine pEngine;
     public BuildControls pInput;
     public BuildConfig pCfg;
     public MenuHandler pMenu;
@@ -85,7 +86,7 @@ public abstract class BuildGame extends Game {
     private Screen gPrevScreen;
     private String name = null;
     private String pass = null;
-
+   
     public BuildGame(BuildConfig cfg, String appname, String sversion, boolean release) {
         this.appname = appname;
         this.sversion = sversion;

@@ -127,7 +127,7 @@ public class Interpolation {
 		return true;
 	}
 
-	public void requestUpdating() {
+	public void requestResetting() {
 		requestUpdating = true;
 	}
 

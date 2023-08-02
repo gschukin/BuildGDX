@@ -56,7 +56,7 @@ public abstract class MenuAdapter extends ScreenAdapter {
 		}
 
 		engine.clearview(0);
-		engine.sampletimer();
+		engine.getTimer().update();
 
 		draw(delta);
 

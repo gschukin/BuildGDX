@@ -16,6 +16,7 @@
 
 package ru.m210projects.Build.Pattern;
 
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Input.BuildControllers;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
@@ -44,9 +45,9 @@ public abstract class BuildFactory {
 
     public abstract void drawInitScreen();
 
-    public abstract DefScript getBaseDef(BuildEngine engine);
+    public abstract DefScript getBaseDef(Engine engine);
 
-    public abstract BuildEngine engine() throws Exception;
+    public abstract Engine engine() throws Exception;
 
     public abstract Renderer renderer(RenderType type);
 

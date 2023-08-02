@@ -3828,7 +3828,7 @@ public class Polymost implements GLRenderer {
 	@Override
 	public void nextpage() {
 		omdtims = mdtims;
-		mdtims = engine.getticks();
+		mdtims = engine.getCurrentTimeMillis();
 
 		for (int i = 0; i < MAXSPRITES; i++) {
 			if (mdpause != 0) {

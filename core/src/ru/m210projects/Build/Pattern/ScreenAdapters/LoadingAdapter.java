@@ -82,8 +82,8 @@ public abstract class LoadingAdapter extends ScreenAdapter {
 			BuildGdx.app.postRunnable(toLoad);
 			toLoad = null;
 		}
-		
-		engine.sampletimer();
+
+		engine.getTimer().update();
 		engine.nextpage();
 		frames++;
 	}	

@@ -4,7 +4,6 @@ import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Input.Keymap.ANYKEY;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
@@ -80,8 +79,8 @@ public abstract class MovieScreen extends SkippableAdapter {
 		}
 
 		StopAllSounds();
-		engine.sampletimer();
-		LastMS = engine.getticks();
+		engine.getTimer().update();
+		LastMS = engine.getCurrentTimeMillis();
 		engine.getTimer().reset();
 		gCutsClock = 0;
 
@@ -215,11 +214,11 @@ public abstract class MovieScreen extends SkippableAdapter {
 	protected boolean play() {
 		if (mvfil != null) {
 			if (LastMS == -1) {
-				LastMS = engine.getticks();
+				LastMS = engine.getCurrentTimeMillis();
 			}
 			CachedArtEntry pic = (CachedArtEntry) engine.getTile(TILE_MOVIE);
 
-			long ms = engine.getticks();
+			long ms = engine.getCurrentTimeMillis();
 			long dt = ms - LastMS;
 			mvtime += dt;
 			float tick = mvfil.getRate();

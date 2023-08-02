@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Input;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Input.Keymap.ANYKEY;
 
 import java.util.Arrays;
@@ -83,7 +83,7 @@ public class TestController implements BuildController {
 			if (getTestButton(i)) {
 				buttonPressed = true;
 				if (!hitButton[i]) {
-					getInput().setKey(ANYKEY, 1);
+					getInputController().setKey(ANYKEY, 1);
 					buttonStatus[i] = true;
 					hitButton[i] = true;
 				}

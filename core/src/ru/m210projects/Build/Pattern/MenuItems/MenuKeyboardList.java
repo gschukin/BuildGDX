@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.BClipLow;
 import static ru.m210projects.Build.Gameutils.BClipRange;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
@@ -163,7 +163,7 @@ public abstract class MenuKeyboardList extends MenuList
 					callback.run(handler, this);
 				}
 				
-				getInput().resetKeyStatus();
+				getInputController().resetKeyStatus();
 				return false;
 			case DELETE:
 				if(l_nFocus == -1) {
@@ -204,7 +204,7 @@ public abstract class MenuKeyboardList extends MenuList
 			}
 			
 			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) {
-				getInput().resetKeyStatus();
+				getInputController().resetKeyStatus();
 			}
 
 			return false;

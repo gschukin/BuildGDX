@@ -46,7 +46,6 @@ import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
 import ru.m210projects.Build.osd.Console;
-import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Render.ModelHandle.MDInfo;
 import ru.m210projects.Build.Render.ModelHandle.VoxelInfo;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo;
@@ -155,7 +154,7 @@ public class DefScript {
 		this.currentAddon = entry;
 	}
 
-	public DefScript(BuildEngine engine) {
+	public DefScript(Engine engine) {
 		this.disposable = false;
 		texInfo = new TextureHDInfo();
 		mdInfo = new ModelsInfo();

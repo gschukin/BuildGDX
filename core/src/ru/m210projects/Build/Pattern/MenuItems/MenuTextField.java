@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Input.KeyInput.*;
 import static ru.m210projects.Build.Input.Keymap.*;
 import static ru.m210projects.Build.Strhandler.isalpha;
@@ -161,7 +161,7 @@ public class MenuTextField extends MenuItem {
 		if(typing) 
 		{
 			if(opt != MenuOpt.ESC) {
-				if(getInput().putMessage(inputCallback, true) == 1)
+				if(getInputController().putMessage(inputCallback, true) == 1)
 				{
 					typed = new String(typingBuf, 0, inputlen);
 					typing = false;
@@ -192,7 +192,7 @@ public class MenuTextField extends MenuItem {
 					return false;
 				}
 				
-				getInput().initMessageInput(null);		
+				getInputController().initMessageInput(null);
 				System.arraycopy(typingBuf, 0, otypingBuf, 0, 16);
 				oinputlen = inputlen;
 				typing = true;

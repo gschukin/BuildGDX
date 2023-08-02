@@ -64,7 +64,7 @@ public abstract class SkippableAdapter extends ScreenAdapter {
 	@Override
 	public final void render(float delta) {
 		engine.clearview(0);
-		engine.sampletimer();
+		engine.getTimer().update();
 
 		skippingHandler();
 		draw(delta);

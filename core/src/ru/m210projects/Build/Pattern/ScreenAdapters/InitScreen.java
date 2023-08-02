@@ -32,7 +32,6 @@ import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.Audio.BuildAudio.Driver;
-import ru.m210projects.Build.Pattern.BuildEngine;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.Tools.Interpolation;
 import ru.m210projects.Build.Pattern.Tools.SaveManager;
@@ -40,6 +39,7 @@ import ru.m210projects.Build.Render.Renderer.RenderType;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
+import ru.m210projects.Build.Types.BuildInputController;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Pattern.BuildFactory;
 import ru.m210projects.Build.filehandle.CacheResourceMap;
@@ -56,7 +56,7 @@ import ru.m210projects.Build.osd.commands.OsdCommand;
 public class InitScreen extends ScreenAdapter {
 
 	private int frames;
-	private BuildEngine engine;
+	private Engine engine;
 	private final BuildFactory factory;
 	private Thread thread;
 	private final BuildGame game;
@@ -132,8 +132,10 @@ public class InitScreen extends ScreenAdapter {
 			gameDirectory = new Directory(cfg.gamePath);
 			userDirectory = new Directory(cfg.cfgPath);
 		} catch (IOException e) {
-			BuildGdx.message.show("Build Engine Initialization Error!",
-					"There was a problem initialising the Build engine: \r\n" + e.getMessage(), MessageType.Info);
+			BuildGdx.message.show("Game Resources initialization failed!",
+					String.format("%s at\r\n %s", e, e.getStackTrace()[0]),
+					MessageType.Info);
+			e.printStackTrace();
 			System.exit(1);
 			return;
 		}
@@ -175,14 +177,16 @@ public class InitScreen extends ScreenAdapter {
 			this.engine = game.pEngine = factory.engine();
 		} catch (Exception e) {
 			BuildGdx.message.show("Build Engine Initialization Error!",
-					"There was a problem initialising the Build engine: \r\n" + e.getMessage(), MessageType.Info);
+					String.format("There was a problem initialising the Build engine: \r\n %s at\r\n %s", e, e.getStackTrace()[0]),
+					MessageType.Info);
+			e.printStackTrace();
 			System.exit(1);
 			return;
 		}
 
 		if (engine.loadpics() == 0) {
 			BuildGdx.message.show("Build Engine Initialization Error!",
-					"ART files not found " + gameDirectory.getPath().resolve(engine.tilesPath).toString(),
+					"ART files not found " + gameDirectory.getPath().resolve(engine.getTileManager().getTilesPath()),
 					MessageType.Info);
 			System.exit(1);
 			return;
@@ -217,18 +221,7 @@ public class InitScreen extends ScreenAdapter {
 			}
 		}
 
-//		Gdx.input.setInputProcessor(new InputAdapter() {
-//			@Override
-//			public boolean keyDown(int keycode) {
-//				return true;
-//			}
-//
-//			@Override
-//			public boolean keyTyped(char character) {
-//				System.out.println(character);
-//				return super.keyTyped(character);
-//			}
-//		});
+		Gdx.input.setInputProcessor(new BuildInputController(cfg));
 
 		thread = new Thread(new Runnable() {
 			@Override
@@ -297,10 +290,6 @@ public class InitScreen extends ScreenAdapter {
 		});
 		thread.setName("InitEngine thread");
 		thread.setDaemon(true); // to make the thread as background process and kill it if the app was closed
-	}
-
-	public void handleScanCode(KeyEvent e) {
-
 	}
 
 	public void start() {

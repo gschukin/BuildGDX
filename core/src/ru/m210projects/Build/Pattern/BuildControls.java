@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Pattern;
 
-import static ru.m210projects.Build.Engine.getInput;
+import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Settings.BuildConfig.*;
 
@@ -54,6 +54,10 @@ public abstract class BuildControls {
 		this.mouseMove = new Vector2();
 		this.stick1 = new Vector2();
 		this.stick2 = new Vector2();
+	}
+
+	public BuildControllers getGPManager() {
+		return gpmanager;
 	}
 
 	public float getScaleX()
@@ -197,21 +201,21 @@ public abstract class BuildControls {
 
 	public boolean ctrlKeyStatusOnce(int keyId)
 	{
-		return getInput().keyStatusOnce(keyId);
+		return getInputController().keyStatusOnce(keyId);
 	}
 
 	public boolean ctrlKeyStatus(int keyId)
 	{
-		return getInput().keyStatus(keyId);
+		return getInputController().keyStatus(keyId);
 	}
 
 	public boolean ctrlKeyPressed(int keyId)
 	{
-		return getInput().keyPressed(keyId);
+		return getInputController().keyPressed(keyId);
 	}
 
 	public boolean ctrlGetInputKey(KeyType keyName, boolean once) {
-		final KeyInput input = getInput();
+		final KeyInput input = getInputController();
 		if (!pCfg.isInited) {
 			return false;
 		}
@@ -236,13 +240,13 @@ public abstract class BuildControls {
 	}
 
 	public void ctrlResetKeyStatus() {
-		getInput().resetKeyStatus();
+		getInputController().resetKeyStatus();
 		gpmanager.resetButtonStatus();
 	}
 
 	public void ctrlResetInput() {
 		ctrlResetKeyStatus();
-		Arrays.fill(getInput().hitkey, false);
+		Arrays.fill(getInputController().hitkey, false);
 	}
 
 	public boolean ctrlMenuMouse()

@@ -140,7 +140,7 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 			currentIndex++;
 		}
 
-		engine.sampletimer();
+		engine.getTimer().update();
 		engine.nextpage();
 	}
 
