@@ -8,6 +8,7 @@ import static ru.m210projects.Build.Pragmas.ksgn;
 
 import java.util.Arrays;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.BuildGame.NetMode;
 import ru.m210projects.Build.Timer;
@@ -23,7 +24,7 @@ public abstract class BuildNet {
 		
 		int PutInput(byte[] p, int offset, NetInput oldInput);
 		
-		void Reset();
+		void reset();
 		
 		NetInput Copy(NetInput src);
 		
@@ -157,7 +158,7 @@ public abstract class BuildNet {
 		{
 			if ( i != myconnectindex )
 			{
-				gFifoInput[gNetFifoHead[i] & kFifoMask][i].Reset();
+				gFifoInput[gNetFifoHead[i] & kFifoMask][i].reset();
 				ptr = gFifoInput[gNetFifoHead[i] & kFifoMask][i].GetInput(p, ptr, gFifoInput[(gNetFifoHead[i] - 1) & kFifoMask][i]);
 				gNetFifoHead[i]++;
 			}
@@ -201,7 +202,7 @@ public abstract class BuildNet {
 	
  	protected int GetSlavePacket(byte[] p, int ptr, int len, int nPlayer)
 	{
-		gFifoInput[gNetFifoHead[nPlayer] & kFifoMask][nPlayer].Reset();
+		gFifoInput[gNetFifoHead[nPlayer] & kFifoMask][nPlayer].reset();
 		ptr = gFifoInput[gNetFifoHead[nPlayer] & kFifoMask][nPlayer].GetInput(p, ptr, gFifoInput[(gNetFifoHead[nPlayer] - 1) & kFifoMask][nPlayer]);
 		gNetFifoHead[nPlayer]++;
 
@@ -231,7 +232,7 @@ public abstract class BuildNet {
 		
 		if ( nPlayer == connecthead ) {
 			connecthead = connectpoint2[connecthead];
-			BuildGdx.app.postRunnable(new Runnable() {
+			Gdx.app.postRunnable(new Runnable() {
 				@Override
 				public void run() {
 					NetDisconnect(myconnectindex);
@@ -491,12 +492,12 @@ public abstract class BuildNet {
 		gNetFifoMasterTail = 0;
 		gPredictTail = 0;
 		gNetFifoTail = 0;
-		gInput.Reset();
+		gInput.reset();
 		Arrays.fill(gNetFifoHead, 0);
 		for(int i = 0; i < MAXPLAYERS; i++) {
 			Arrays.fill(gCheckFifo[i], (byte)0);
 			for(int j = 0; j < kNetFifoSize; j++) {
-				gFifoInput[j][i].Reset();
+				gFifoInput[j][i].reset();
 			}
 		}
 		Arrays.fill(gCheckHead, 0);
@@ -533,7 +534,7 @@ public abstract class BuildNet {
 		long starttime = System.currentTimeMillis();
 		while (true)
 		{
-			game.pEngine.handleevents();
+//			game.pEngine.handleevents();
 			long time = System.currentTimeMillis() - starttime;
 			
 			if (/*ctrlKeyStatusOnce(Keys.ESCAPE) || */(timeout != 0 && time > timeout)) 

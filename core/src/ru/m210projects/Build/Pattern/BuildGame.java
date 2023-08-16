@@ -16,13 +16,13 @@
 
 package ru.m210projects.Build.Pattern;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
 import ru.m210projects.Build.Engine;
+import ru.m210projects.Build.input.GameProcessor;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.SliderDrawable;
 import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
@@ -40,19 +40,18 @@ import ru.m210projects.Build.filehandle.fs.Directory;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
-import static ru.m210projects.Build.Net.Mmulti.myconnectindex;
-import static ru.m210projects.Build.Net.Mmulti.numplayers;
+import static ru.m210projects.Build.Net.Mmulti.*;
+import static ru.m210projects.Build.Net.Mmulti.connectpoint2;
 import static ru.m210projects.Build.RenderService.xdim;
 import static ru.m210projects.Build.RenderService.ydim;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 
-public abstract class BuildGame extends Game {
+public abstract class BuildGame extends Game implements Thread.UncaughtExceptionHandler {
 
     public final String appname;
     public final String sversion;
@@ -67,7 +66,7 @@ public abstract class BuildGame extends Game {
     private final byte[] data3 = {102, 116, 116, 112};
     private final int key = LittleEndian.getInt(data3);
     public Engine pEngine;
-    public BuildControls pInput;
+//    public BuildControls pInput;
     public BuildConfig pCfg;
     public MenuHandler pMenu;
     public FontHandler pFonts;
@@ -86,6 +85,7 @@ public abstract class BuildGame extends Game {
     private Screen gPrevScreen;
     private String name = null;
     private String pass = null;
+    protected GameProcessor controller;
    
     public BuildGame(BuildConfig cfg, String appname, String sversion, boolean release) {
         this.appname = appname;
@@ -94,6 +94,7 @@ public abstract class BuildGame extends Game {
         this.version = sversion.toCharArray();
         this.pCfg = cfg;
         this.date = new Date("MMM dd, yyyy HH:mm:ss");
+        this.controller = createGameProcessor();
     }
 
     @Override
@@ -102,6 +103,12 @@ public abstract class BuildGame extends Game {
         setScreen(scr);
         scr.start();
     }
+
+    public GameProcessor getProcessor() {
+        return controller;
+    }
+
+    public abstract GameProcessor createGameProcessor();
 
     public Cache createFileCache(Directory gameDirectory) {
         return new Cache(gameDirectory);
@@ -148,13 +155,50 @@ public abstract class BuildGame extends Game {
         return pFonts.getFont(i);
     }
 
+
+    // called by faketimehandler (30 times per sec)
+    public void syncInput(BuildNet net) {
+        if (numplayers > 1) {
+            net.GetPackets();
+        }
+
+        for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
+            if (i != myconnectindex && net.gNetFifoHead[myconnectindex] - 200 > net.gNetFifoHead[i]) {
+                return;
+            }
+        }
+
+        controller.processInput(pNet.gInput);
+        if ((net.gNetFifoHead[myconnectindex] & (net.MovesPerPacket - 1)) != 0) {
+            net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex]
+                    .Copy(net.gFifoInput[(net.gNetFifoHead[myconnectindex] - 1) & 0xFF][myconnectindex]);
+            net.gNetFifoHead[myconnectindex]++;
+            return;
+        }
+
+        net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex].Copy(net.gInput);
+        net.gNetFifoHead[myconnectindex]++;
+
+        if (nNetMode == BuildGame.NetMode.Multiplayer && numplayers < 2) {
+            for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
+                if (i != myconnectindex) {
+                    net.ComputerInput(i);
+                    net.gNetFifoHead[i]++;
+                }
+            }
+            return;
+        }
+
+        net.GetNetworkInput();
+    }
+
     @Override
     public void render() {
         try {
             if (!gExit) {
                 super.render();
             } else {
-                BuildGdx.app.exit();
+                Gdx.app.exit();
             }
         } catch (OutOfMemoryError me) {
             System.gc();
@@ -177,10 +221,10 @@ public abstract class BuildGame extends Game {
     }
 
     public void updateColorCorrection() {
-        if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-//			BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), GLSettings.brightness.get() / 4096.0f, GLSettings.contrast.get() / 4096.0f);
-            BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), 0.0f, 1.0f);
-        }
+//        if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//// FIXME			BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), GLSettings.brightness.get() / 4096.0f, GLSettings.contrast.get() / 4096.0f);
+//            BuildGdx.graphics.extra(Option.GLSetConfiguration, 1 - (GLSettings.gamma.get() / 4096.0f), 0.0f, 1.0f);
+//        }
     }
 
     private String exceptionHandler(Throwable e) {
@@ -244,7 +288,7 @@ public abstract class BuildGame extends Game {
             return gCurrScreen.getClass().getSimpleName();
         }
 
-        if (BuildGdx.app != null) {
+        if (Gdx.app != null) {
             return "Create frame";
         }
 
@@ -411,4 +455,8 @@ public abstract class BuildGame extends Game {
 
     public enum NetMode {Single, Multiplayer}
 
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        System.out.println(e.toString());
+    }
 }

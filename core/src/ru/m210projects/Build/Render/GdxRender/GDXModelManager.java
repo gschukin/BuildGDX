@@ -189,18 +189,18 @@ public class GDXModelManager extends ModelManager {
 //				if ((texid = m.getSkin(DETAILPAL, skinnum, surfnum)) != null) {
 //					if (!texid.isDetailTexture())
 //						System.err.println("Wtf detail!");
-//					BuildGdx.gl.glActiveTexture(++texunits);
-//					BuildGdx.gl.glEnable(GL_TEXTURE_2D);
+//					Gdx.gl.glActiveTexture(++texunits);
+//					Gdx.gl.glEnable(GL_TEXTURE_2D);
 //					parent.bind(texid);
 //					parent.setupTextureDetail(texid);
 //
 //					for (MDSkinmap sk = m.skinmap; sk != null; sk = sk.next)
 //						if (sk.palette == DETAILPAL && skinnum == sk.skinnum && surfnum == sk.surfnum) {
 //							float f = sk.param;
-//							BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-//							BuildGdx.gl.glLoadIdentity();
-//							BuildGdx.gl.glScalef(f, f, 1.0f);
-//							BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
+//							Gdx.gl.glMatrixMode(GL_TEXTURE);
+//							Gdx.gl.glLoadIdentity();
+//							Gdx.gl.glScalef(f, f, 1.0f);
+//							Gdx.gl.glMatrixMode(GL_MODELVIEW);
 //						}
 //				}
 //			}
@@ -210,8 +210,8 @@ public class GDXModelManager extends ModelManager {
 //					if (!texid.isGlowTexture())
 //						System.err.println("Wtf glow! " + surfnum);
 //
-//					BuildGdx.gl.glActiveTexture(++texunits);
-//					BuildGdx.gl.glEnable(GL_TEXTURE_2D);
+//					Gdx.gl.glActiveTexture(++texunits);
+//					Gdx.gl.glEnable(GL_TEXTURE_2D);
 //					parent.bind(texid);
 //					parent.setupTextureGlow(texid);
 //				}

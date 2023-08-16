@@ -42,20 +42,21 @@ public abstract class MenuJoin extends BuildMenu {
 	
 	public MenuJoin(final BuildGame app, int posx, int posy, int menuHeight, int width, Font style)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Join a game"), false);
 
 		mPortnum = new MenuTextField("Network socket number", "" + app.pCfg.mPort, style, posx, posy += menuHeight, width,
 				NUMBERS, new MenuProc() {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {
-						MenuTextField item = (MenuTextField) pItem;
-						if(item.typed.length() < 8) {
-							app.pCfg.mPort = Integer.parseInt(item.typed);
-						}
-						else {
-							System.arraycopy(item.otypingBuf, 0, item.typingBuf, 0, 16);
-							item.inputlen = item.oinputlen;
-						}
+//						MenuTextField item = (MenuTextField) pItem;
+//						if(item.typed.length() < 8) {
+//							app.pCfg.mPort = Integer.parseInt(item.typed);
+//						}
+//						else {
+//							System.arraycopy(item.otypingBuf, 0, item.typingBuf, 0, 16);
+//							item.inputlen = item.oinputlen;
+//						}
 					}
 				});
 
@@ -64,14 +65,14 @@ public abstract class MenuJoin extends BuildMenu {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {
 						MenuTextField item = (MenuTextField) pItem;
-						app.pCfg.pName = item.typed;
+//						app.pCfg.pName = item.typed;
 					}
 				}) {
 			@Override
 			public void open() {
-				Arrays.fill(typingBuf, (char) 0);
-				inputlen = app.pCfg.pName.length();
-				System.arraycopy(app.pCfg.pName.toCharArray(), 0, typingBuf, 0, inputlen);
+//				Arrays.fill(typingBuf, (char) 0);
+//				inputlen = app.pCfg.pName.length();
+//				System.arraycopy(app.pCfg.pName.toCharArray(), 0, typingBuf, 0, inputlen);
 			}
 		};
 
@@ -80,14 +81,14 @@ public abstract class MenuJoin extends BuildMenu {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {
 						MenuTextField item = (MenuTextField) pItem;
-						app.pCfg.mAddress = item.typed;
+//						app.pCfg.mAddress = item.typed;
 					}
 				}) {
 			@Override
 			public void open() {
-				Arrays.fill(typingBuf, (char) 0);
-				inputlen = app.pCfg.mAddress.length();
-				System.arraycopy(app.pCfg.mAddress.toCharArray(), 0, typingBuf, 0, inputlen);
+//				Arrays.fill(typingBuf, (char) 0);
+//				inputlen = app.pCfg.mAddress.length();
+//				System.arraycopy(app.pCfg.mAddress.toCharArray(), 0, typingBuf, 0, inputlen);
 			}
 		};
 

@@ -1,12 +1,12 @@
 package ru.m210projects.Build;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import ru.m210projects.Build.Architecture.BuildFrame;
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.art.CachedArtEntry;
@@ -215,9 +215,9 @@ public class RenderService {
     // JBF: davidoption now functions as a windowed-mode flag (0 == windowed, 1 ==
     // fullscreen)
     public boolean setgamemode(int davidoption, int daxdim, int daydim) { // jfBuild + gdxBuild
-        if (BuildGdx.app.getType() == Application.ApplicationType.Android) {
-            daxdim = BuildGdx.graphics.getWidth();
-            daydim = BuildGdx.graphics.getHeight();
+        if (Gdx.app.getType() == Application.ApplicationType.Android) {
+            daxdim = Gdx.graphics.getWidth();
+            daydim = Gdx.graphics.getHeight();
             davidoption = 0;
         }
 
@@ -225,8 +225,8 @@ public class RenderService {
         daydim = max(200, daydim);
 
         if (render.isInited()
-                && ((davidoption == (BuildGdx.graphics.isFullscreen() ? 1 : 0))
-                && (BuildGdx.graphics.getWidth() == daxdim) && (BuildGdx.graphics.getHeight() == daydim))
+                && ((davidoption == (Gdx.graphics.isFullscreen() ? 1 : 0))
+                && (Gdx.graphics.getWidth() == daxdim) && (Gdx.graphics.getHeight() == daydim))
                 && xdim == daxdim && ydim == daydim) {
             return true;
         }
@@ -249,7 +249,7 @@ public class RenderService {
 
         if (davidoption == 1) {
             Graphics.DisplayMode m = null;
-            for (Graphics.DisplayMode mode : BuildGdx.graphics.getDisplayModes()) {
+            for (Graphics.DisplayMode mode : Gdx.graphics.getDisplayModes()) {
                 if (mode.width == daxdim && mode.height == daydim) {
                     if (m == null || m.refreshRate < mode.refreshRate) {
                         m = mode;
@@ -259,13 +259,13 @@ public class RenderService {
 
             if (m == null) {
                 Console.out.println("Warning: " + daxdim + "x" + daydim + " fullscreen not supported", OsdColor.YELLOW);
-                BuildGdx.graphics.setWindowedMode(daxdim, daydim);
+                Gdx.graphics.setWindowedMode(daxdim, daydim);
                 return false;
             } else {
-                BuildGdx.graphics.setFullscreenMode(m);
+                Gdx.graphics.setFullscreenMode(m);
             }
         } else {
-            BuildGdx.graphics.setWindowedMode(daxdim, daydim);
+            Gdx.graphics.setWindowedMode(daxdim, daydim);
         }
 
         return true;
@@ -592,8 +592,8 @@ public class RenderService {
 
     public void printfps(float scale) {
         if (System.currentTimeMillis() - fpstime >= 1000) {
-            int fps = BuildGdx.graphics.getFramesPerSecond();
-            float rate = BuildGdx.graphics.getDeltaTime() * 1000;
+            int fps = Gdx.graphics.getFramesPerSecond();
+            float rate = Gdx.graphics.getDeltaTime() * 1000;
             if (fps <= 9999 && rate <= 9999) {
                 buildString(fpsbuffer, 0, String.format(Locale.US, "%.2fms %dfps", Math.round(rate * 100) / 100.0, fps));
             }

@@ -14,13 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with BuildGDX.  If not, see <http://www.gnu.org/licenses/>.
 
-package ru.m210projects.Build.Input;
-
-import com.badlogic.gdx.utils.ObjectIntMap;
+package ru.m210projects.Build.input.keymap;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static com.badlogic.gdx.Input.Keys.*;
 

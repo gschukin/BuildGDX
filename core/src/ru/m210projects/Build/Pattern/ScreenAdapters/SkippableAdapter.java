@@ -16,83 +16,91 @@
 
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
-import static ru.m210projects.Build.Input.Keymap.*;
-
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-
-import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
+import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
+import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.BuildGame;
+import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildConfig.GameKeys;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.GameKeyListener;
 
-public abstract class SkippableAdapter extends ScreenAdapter {
-	
-	protected BuildGame game;
-	protected Engine engine;
-	protected boolean escSkip;
-	protected Runnable skipCallback;
-	
-	public SkippableAdapter(BuildGame game)
-	{
-		this.game = game;
-		this.engine = game.pEngine;
-	}
+public abstract class SkippableAdapter extends ScreenAdapter implements GameKeyListener {
 
-	public SkippableAdapter setSkipping(Runnable skipCallback) {
-		game.pInput.ctrlResetKeyStatus();
-		this.skipCallback = skipCallback;
-		return this;
-	}
-	
-	public SkippableAdapter escSkipping(boolean escSkip) {
-		this.escSkip = escSkip;
-		return this;
-	}
-	
-	public abstract void draw(float delta);
+    protected BuildGame game;
+    protected Engine engine;
+    protected boolean escSkip;
+    protected Runnable skipCallback;
 
-	public void skip() {
-		if(skipCallback != null) {
-			BuildGdx.app.postRunnable(skipCallback);
-			skipCallback = null;
-		}
-		game.pInput.ctrlResetKeyStatus();
-	}
-	
-	@Override
-	public final void render(float delta) {
-		engine.clearview(0);
-		engine.getTimer().update();
+    public SkippableAdapter(BuildGame game) {
+        this.game = game;
+        this.engine = game.pEngine;
+    }
 
-		skippingHandler();
-		draw(delta);
+    public SkippableAdapter setSkipping(Runnable skipCallback) {
+        this.skipCallback = skipCallback;
+        return this;
+    }
 
-		engine.nextpage();
-	}
-	
-	private boolean skippingHandler() {
-		if((escSkip && (game.pInput.ctrlGetInputKey(GameKeys.Menu_Toggle, true) 
-				|| game.pInput.ctrlPadStatusOnce(GameKeys.Menu_Toggle))) 
-				|| (!escSkip && game.pInput.ctrlKeyStatusOnce(ANYKEY))) {
-			
-			skip();
-			return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
-		}
-	}
+    public SkippableAdapter escSkipping(boolean escSkip) {
+        this.escSkip = escSkip;
+        return this;
+    }
 
-	@Override
-	public void resume () {
-		game.updateColorCorrection();
-	}
+    public abstract void draw(float delta);
+
+    public void skip() {
+        if (skipCallback != null) {
+            Gdx.app.postRunnable(skipCallback);
+            skipCallback = null;
+        }
+    }
+
+    @Override
+    public final void render(float delta) {
+        engine.clearview(0);
+        engine.getTimer().update();
+
+        draw(delta);
+
+        engine.nextpage();
+    }
+
+    private boolean onSkipPressed(GameKey gameKey) {
+        if (!escSkip || GameKeys.Menu_Toggle.equals(gameKey)) {
+            skip();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void pause() {
+//        if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//            BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//        }
+    }
+
+    @Override
+    public void resume() {
+        game.updateColorCorrection();
+    }
+
+    @Override
+    public boolean onGameKeyPressed(GameKey gameKey) {
+        return onSkipPressed(gameKey);
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return onSkipPressed(BuildConfig.MenuKeys.Menu_Cancel);
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return onSkipPressed(BuildConfig.MenuKeys.Menu_Cancel);
+    }
 }

@@ -16,10 +16,10 @@
 
 package ru.m210projects.Build.desktop.Lwjgl;
 
-import static ru.m210projects.Build.Input.Keymap.KEY_CAPSLOCK;
-import static ru.m210projects.Build.Input.Keymap.KEY_PAUSE;
-import static ru.m210projects.Build.Input.Keymap.KEY_SCROLLOCK;
-import static ru.m210projects.Build.Input.Keymap.KEY_NUMDECIMAL;
+import static ru.m210projects.Build.input.keymap.Keymap.KEY_CAPSLOCK;
+import static ru.m210projects.Build.input.keymap.Keymap.KEY_PAUSE;
+import static ru.m210projects.Build.input.keymap.Keymap.KEY_SCROLLOCK;
+import static ru.m210projects.Build.input.keymap.Keymap.KEY_NUMDECIMAL;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -41,6 +41,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.IntSet;
 
 import org.lwjgl.BufferUtils;
@@ -54,7 +55,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.m210projects.Build.Architecture.BuildFrame;
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildInput;
 
 /** An implementation of the {@link Input} interface hooking a LWJGL panel for input.
@@ -236,7 +236,7 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public int getY () {
-		return BuildGdx.graphics.getHeight() - 1 - (int)(Mouse.getY() * Display.getPixelScaleFactor());
+		return Gdx.graphics.getHeight() - 1 - (int)(Mouse.getY() * Display.getPixelScaleFactor());
 	}
 
 	public boolean isAccelerometerAvailable () {
@@ -486,7 +486,7 @@ public class LwjglInput implements BuildInput {
 			while (Mouse.next()) {
 				events++;
 				int x = (int)(Mouse.getEventX() * Display.getPixelScaleFactor());
-				int y = BuildGdx.graphics.getHeight() - (int)(Mouse.getEventY() * Display.getPixelScaleFactor()) - 1;
+				int y = Gdx.graphics.getHeight() - (int)(Mouse.getEventY() * Display.getPixelScaleFactor()) - 1;
 				int button = Mouse.getEventButton();
 				int gdxButton = toGdxButton(button);
 				if (button != -1 && gdxButton == -1) {
@@ -535,7 +535,7 @@ public class LwjglInput implements BuildInput {
 //				deltaX = 0;
 //				deltaY = 0;
 			} else {
-				BuildGdx.graphics.requestRendering();
+				Gdx.graphics.requestRendering();
 			}
 		}
 	}
@@ -557,7 +557,7 @@ public class LwjglInput implements BuildInput {
 				event.type = KeyEvent.KEY_TYPED;
 				event.timeStamp = System.nanoTime();
 				keyEvents.add(event);
-				BuildGdx.graphics.requestRendering();
+				Gdx.graphics.requestRendering();
 			}
 		}
 
@@ -612,7 +612,7 @@ public class LwjglInput implements BuildInput {
 					}
 					lastKeyCharPressed = 0;
 				}
-				BuildGdx.graphics.requestRendering();
+				Gdx.graphics.requestRendering();
 			}
 		}
 	}
@@ -735,7 +735,7 @@ public class LwjglInput implements BuildInput {
 
 	@Override
 	public void setCursorPosition (int x, int y) {
-		Mouse.setCursorPosition(x, BuildGdx.graphics.getHeight() - 1 - y);
+		Mouse.setCursorPosition(x, Gdx.graphics.getHeight() - 1 - y);
 	}
 
 	@Override

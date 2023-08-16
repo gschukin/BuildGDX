@@ -1,9 +1,13 @@
 package ru.m210projects.Build.osd;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.StringUtils;
 import ru.m210projects.Build.Types.collections.MapList;
 import ru.m210projects.Build.Types.collections.MapNode;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.GameKeyListener;
 import ru.m210projects.Build.osd.commands.*;
 
 import java.util.Arrays;
@@ -13,12 +17,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
-import static ru.m210projects.Build.Engine.getInputController;
-import static ru.m210projects.Build.Input.KeyInput.gdxscantoasc;
-import static ru.m210projects.Build.Input.KeyInput.gdxscantoascwithshift;
-import static ru.m210projects.Build.Input.Keymap.KEY_CAPSLOCK;
 
-public class Console {
+public class Console extends InputAdapter implements GameKeyListener {
 
     private static final int MAX_LINES = 512;
     private static final OsdCommand UNKNOWN_COMMAND = new UnknownCommand();
@@ -65,7 +65,7 @@ public class Console {
 
     public Console() {
         this.osdVars = new HashMap<>();
-        this.prompt = new OsdCommandPrompt(new OsdConsolePromptUI(this));
+        this.prompt = new OsdCommandPrompt(512, 32);
         prompt.registerDefaultCommands(this);
         registerDefaultCommands();
         finder = new CommandFinder(osdVars);
@@ -75,7 +75,6 @@ public class Console {
                 dispatch(input);
             }
             setFirstLine();
-            finder.reset();
         });
     }
 
@@ -153,27 +152,6 @@ public class Console {
 
     public void setFunc(OsdFunc func) {
         this.func = func;
-    }
-
-    // FIXME get rid of...parameter keycode. make it as listener?
-    public void handleevents() {
-        for (int i = 0; i < 4; i++) {
-//                      Console.out.setCaptureKey(cfg.primarykeys[consolekey], 0);
-//						Console.out.setCaptureKey(cfg.secondkeys[consolekey], 1);
-//						Console.out.setCaptureKey(cfg.mousekeys[consolekey], 2);
-//						Console.out.setCaptureKey(cfg.gpadkeys[consolekey], 3);
-            if (getInputController().keyStatusOnce(Input.Keys.GRAVE)) {
-                onToggle();
-                return;
-            }
-        }
-
-        prompt.setShiftPressed(getInputController().keyStatus(Input.Keys.SHIFT_LEFT) || getInputController().keyStatus(Input.Keys.SHIFT_RIGHT));
-        prompt.setCtrlPressed(getInputController().keyStatus(Input.Keys.CONTROL_LEFT) || getInputController().keyStatus(Input.Keys.CONTROL_RIGHT));
-        getInputController().putMessage(ch -> {
-            onKeyPressed(ch);
-            return 0;
-        }, false);
     }
 
     public void registerCommand(OsdCommand cmd) {
@@ -330,7 +308,69 @@ public class Console {
         for (; node != null && row > 0; node = node.getNext()) {
             row -= func.drawosdstr(0, row, node.get(), osdCols, osdTextShade, osdTextPal, osdTextScale);
         }
-        prompt.draw();
+
+        drawPrompt();
+    }
+
+    private void drawPrompt() {
+        int osdEditShade = prompt.osdEditShade;
+        int osdPromptShade = prompt.osdPromptShade;
+        OsdColor osdPromptPal = prompt.osdPromptPal;
+        OsdColor osdEditPal = prompt.osdEditPal;
+        OsdColor osdVersionPal = prompt.osdVersionPal;
+
+        int ypos = osdRowsCur;
+        int textScale = osdTextScale;
+
+        int shade = osdPromptShade;
+        if (shade == 0) {
+            shade = func.getPulseShade(4);
+        }
+
+        if (isOnLastLine()) {
+            func.drawchar(0, ypos, '~', shade, osdPromptPal, textScale);
+        } else if (!isOnFirstLine()) {
+            func.drawchar(0, ypos, '^', shade, osdPromptPal, textScale);
+        }
+
+        int offset = 0;
+        if (prompt.isCapsLockPressed()) {
+            if (isOnFirstLine()) {
+                offset = 1;
+            }
+            func.drawchar(offset, ypos, 'C', shade, osdPromptPal, textScale);
+        }
+
+        if (prompt.isShiftPressed()) {
+            offset = 1;
+            if ((prompt.isCapsLockPressed() && isOnFirstLine())) {
+                offset = 2;
+            }
+            func.drawchar(offset, ypos, 'H', shade, osdPromptPal, textScale);
+        }
+
+        offset = 0;
+        if (prompt.isCapsLockPressed() && prompt.isShiftPressed() && isOnFirstLine()) {
+            offset = 1;
+        }
+        func.drawchar(2 + offset, ypos, '>', shade, osdPromptPal, textScale);
+
+        String inputText = prompt.getTextInput();
+        int len = Math.min(osdCols - 1 - 3 - offset, inputText.length());
+        for (int x = len - 1; x >= 0; x--) {
+            func.drawchar(3 + x + offset, ypos, inputText.charAt(x), osdEditShade << 1, osdEditPal, textScale);
+        }
+
+        offset += 3 + prompt.getCursorPosition();
+
+        func.drawcursor(offset, ypos, prompt.isOsdOverType(), textScale);
+
+        String osdVersionText = prompt.osdVersionText;
+        if (osdVersionText != null) {
+            int xpos = osdCols - osdVersionText.length() + 2;
+            func.drawstr(osdCols - osdVersionText.length() + 2, ypos - ((offset >= xpos) ? 1 : 0),
+                    osdVersionText, func.getPulseShade(4), osdVersionPal, textScale);
+        }
     }
 
     public boolean isCaptured() {
@@ -430,7 +470,7 @@ public class Console {
     private MapNode<OsdString> newLine() {
         MapNode<OsdString> last;
         if (osdTextList.getSize() < MAX_LINES) {
-            last = new MapNode<>(osdTextList.getSize()) {
+            last = new MapNode<OsdString>(osdTextList.getSize()) {
                 final OsdString value = new OsdString();
                 @Override
                 public OsdString get() {
@@ -536,16 +576,15 @@ public class Console {
             osdScroll = -1;
         }
         osdRowsCur += osdScroll;
-        prompt.captureInput(osdScroll == 1);
+        prompt.setCaptureInput(osdScroll == 1);
         func.showOsd(osdScroll == 1);
-        getInputController().initMessageInput(null);
         osdScrTime = getTicks();
     }
 
     void onClose() {
         osdScroll = -1;
         osdRowsCur--;
-        prompt.captureInput(false);
+        prompt.setCaptureInput(false);
         osdScrTime = getTicks();
     }
 
@@ -587,119 +626,93 @@ public class Console {
         }
     }
 
-    void onKeyPressed(int keyId) {
+    public void onKeyReleased(int keyId) {
+        prompt.keyUp(keyId);
+    }
+
+    public boolean onKeyPressed(int keyId) {
         if (!isCaptured()) {
-            return;
+            return false;
+        }
+
+        if (prompt.keyDown(keyId)) {
+            finder.reset();
+            return true;
         }
 
         switch (keyId) {
-            case Input.Keys.GRAVE: // FIXME: from config
-                onToggle();
-                return;
             case Input.Keys.ESCAPE:
                 onClose();
-                return;
+                return true;
             case Input.Keys.TAB:
                 onTabPressed();
-                return;
-            case Input.Keys.ENTER:
-                onEnterPressed();
-                return;
-            case Input.Keys.DEL: //backspace
-                onDeletePressed();
-                return;
-            case KEY_CAPSLOCK:
-                onCapsLockPressed();
-                return;
-            case Input.Keys.DOWN:
-                onNextHistory();
-                return;
-            case Input.Keys.UP:
-                onPrevHistory();
-                return;
-            case Input.Keys.RIGHT:
-                onRightPressed();
-                return;
-            case Input.Keys.LEFT:
-                onLeftPressed();
-                return;
-            case Input.Keys.INSERT:
-                onToggleOverType();
-                return;
+                return true;
             case Input.Keys.END:
                 if (prompt.isCtrlPressed()) {
                     onLastPage();
-                } else {
-                    onLastPosition();
+                    return true;
                 }
-                return;
+                break;
             case Input.Keys.HOME:
                 if (prompt.isCtrlPressed()) {
                     onFirstPage();
-                } else {
-                    onFirstPosition();
-                }
-                return;
-            case Input.Keys.PAGE_UP:
-                onPageUp();
-                return;
-            case Input.Keys.PAGE_DOWN:
-                onPageDown();
-                return;
-            default:
-                if (keyId < 128) {
-                    if (prompt.isShiftPressed()) {
-                        keyId = gdxscantoascwithshift[keyId];
-                    } else {
-                        keyId = gdxscantoasc[keyId];
-                    }
-
-                    if (keyId != 0) {
-                        prompt.append((char) keyId);
-                        finder.reset();
-                    }
+                    return true;
                 }
                 break;
+            case Input.Keys.PAGE_UP:
+                onPageUp();
+                return true;
+            case Input.Keys.PAGE_DOWN:
+                onPageDown();
+                return true;
         }
+
+        return false;
     }
 
-    void onFirstPosition() {
-        prompt.onFirstPosition();
+    @Override
+    public boolean keyTyped(char character) {
+        if(!isMoving() && prompt.keyTyped(character)) {
+            finder.reset();
+            return true;
+        }
+        return false;
     }
 
-    void onLastPosition() {
-        prompt.onLastPosition();
+    @Override
+    public boolean keyRepeat(int i) {
+        return keyDown(i);
     }
 
-    void onToggleOverType() {
-        prompt.toggleOverType();
+    @Override
+    public boolean keyDown(int keycode) {
+        return Console.out.onKeyPressed(keycode);
     }
 
-    void onLeftPressed() {
-        prompt.onLeft();
+    @Override
+    public boolean keyUp(int keycode) {
+        Console.out.onKeyReleased(keycode);
+        return true;
     }
 
-    void onRightPressed() {
-        prompt.onRight();
+    @Override
+    public boolean onGameKeyPressed(GameKey gameKey) {
+        if (BuildConfig.GameKeys.Show_Console.equals(gameKey)) {
+            onToggle();
+            return true;
+        }
+        return false;
     }
 
-    void onPrevHistory() {
-        prompt.historyPrev();
-    }
-
-    void onNextHistory() {
-        prompt.historyNext();
-    }
-
-    void onCapsLockPressed() {
-        prompt.setCapsLockPressed(!prompt.isCapsLockPressed());
-    }
-
-    void onDeletePressed() {
-        prompt.onDelete();
-    }
-
-    void onEnterPressed() {
-        prompt.onEnter();
+    @Override
+    public boolean scrolled(int amount) {
+        if (amount < 0) {
+            onPageUp();
+            return true;
+        } else if (amount > 0) {
+            onPageDown();
+            return true;
+        }
+        return false;
     }
 }

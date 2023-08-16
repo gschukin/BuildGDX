@@ -17,7 +17,7 @@ import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildMessage;
 import ru.m210projects.Build.Audio.BuildAudio;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildControllers;
 
 public class AndroidFactory implements ApplicationFactory {
 

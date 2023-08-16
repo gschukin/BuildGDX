@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.SharedLibraryLoader;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import ru.m210projects.Build.Architecture.BuildController;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildControllers;
 import ru.m210projects.Build.osd.Console;
 
 public class JControllers extends BuildControllers {

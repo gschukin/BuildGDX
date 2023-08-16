@@ -86,6 +86,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Application.ApplicationType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.Vector2;
@@ -96,7 +97,6 @@ import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
@@ -300,10 +300,10 @@ public class Polymost implements GLRenderer {
 	@Override
 	public void init() {
 		try {
-			if (BuildGdx.graphics.getFrameType() != FrameType.GL) {
-                BuildGdx.app.setFrame(FrameType.GL);
-            }
-			this.gl = BuildGdx.graphics.getGL10();
+//			if (Gdx.graphics.getFrameType() != FrameType.GL) {
+//                Gdx.app.setFrame(FrameType.GL);
+//            }
+			this.gl = (GL10) Gdx.gl; // Gdx.graphics.getGL10();
 
 			GLInfo.init();
 			gl.glShadeModel(GL_SMOOTH); // GL_FLAT
@@ -345,10 +345,11 @@ public class Polymost implements GLRenderer {
 			}
 
 			Console.out.println("Polymost renderer is initialized", OsdColor.GREEN);
-			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION), OsdColor.YELLOW);
+			Console.out.println(Gdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION), OsdColor.YELLOW);
 
 			isInited = true;
 		} catch (Throwable t) {
+			t.printStackTrace();
 			isInited = false;
 			Console.out.println("Polymost renderer initialization error!", OsdColor.RED);
 		}
@@ -361,7 +362,7 @@ public class Polymost implements GLRenderer {
 	public void setTextureParameters(GLTile tile, int tilenum, int pal, int shade, int skybox, int method) {
 		if (tile.getPixelFormat() == PixelFormat.Pal8) {
 			if (!texshader.isBinded()) {
-				BuildGdx.gl.glActiveTexture(GL_TEXTURE0);
+				Gdx.gl.glActiveTexture(GL_TEXTURE0);
 				texshader.begin();
 			}
 			texshader.setTextureParams(pal, shade);
@@ -386,10 +387,10 @@ public class Polymost implements GLRenderer {
 			// texture scale by parkar request
 			if (tile.isHighTile() && ((tile.getHiresXScale() != 1.0f) || (tile.getHiresYScale() != 1.0f))
 					&& Rendering.Skybox.getIndex() == 0) {
-				BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-				BuildGdx.gl.glLoadIdentity();
-				BuildGdx.gl.glScalef(tile.getHiresXScale(), tile.getHiresYScale(), 1.0f);
-				BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
+				gl.glMatrixMode(GL_TEXTURE);
+				gl.glLoadIdentity();
+				gl.glScalef(tile.getHiresXScale(), tile.getHiresYScale(), 1.0f);
+				gl.glMatrixMode(GL_MODELVIEW);
 			}
 
 			if (GLInfo.multisample != 0 && GLSettings.useHighTile.get() && Rendering.Skybox.getIndex() == 0) {
@@ -399,13 +400,13 @@ public class Polymost implements GLRenderer {
 						textureCache.bind(detail);
 						setupTextureDetail(detail);
 
-						BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-						BuildGdx.gl.glLoadIdentity();
+						gl.glMatrixMode(GL_TEXTURE);
+						gl.glLoadIdentity();
 						if (detail.isHighTile() && (detail.getHiresXScale() != 1.0f)
 								|| (detail.getHiresYScale() != 1.0f)) {
-                            BuildGdx.gl.glScalef(detail.getHiresXScale(), detail.getHiresYScale(), 1.0f);
+                            gl.glScalef(detail.getHiresXScale(), detail.getHiresYScale(), 1.0f);
                         }
-						BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
+						gl.glMatrixMode(GL_MODELVIEW);
 					}
 				}
 
@@ -440,7 +441,7 @@ public class Polymost implements GLRenderer {
 			if (!engine.getTile(tilenum).exists()) {
                 c.a = 0.01f; // Hack to update Z-buffer for invalid mirror textures
             }
-			BuildGdx.gl.glColor4f(c.r, c.g, c.b, c.a); // GL30 exception
+			gl.glColor4f(c.r, c.g, c.b, c.a); // GL30 exception
 		}
 	}
 
@@ -626,21 +627,21 @@ public class Polymost implements GLRenderer {
             return;
         }
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_ONE_MINUS_SRC_ALPHA);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_TEXTURE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_ONE_MINUS_SRC_ALPHA);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
 
 		tex.setupTextureWrap(TextureWrap.Repeat);
 	}
@@ -650,20 +651,20 @@ public class Polymost implements GLRenderer {
             return;
         }
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
 
-		BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 2.0f);
+		gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 2.0f);
 
 		tex.setupTextureWrap(TextureWrap.Repeat);
 	}
@@ -3708,7 +3709,7 @@ public class Polymost implements GLRenderer {
 		gl.glPolygonOffset(0, 0);
 
 		if (drunk) {
-			BuildGdx.gl.glActiveTexture(GL_TEXTURE0);
+			Gdx.gl.glActiveTexture(GL_TEXTURE0);
 			boolean hasShader = texshader != null && texshader.isBinded();
 			if (hasShader) {
                 texshader.end();
@@ -3870,10 +3871,10 @@ public class Polymost implements GLRenderer {
 
 		int byteperpixel = 3;
 		int fmt = GL10.GL_RGB;
-		if (BuildGdx.app.getPlatform() == Platform.Android) {
-			byteperpixel = 4;
-			fmt = GL10.GL_RGBA;
-		}
+//		if (Gdx.app.getPlatform() == Platform.Android) {
+//			byteperpixel = 4;
+//			fmt = GL10.GL_RGBA;
+//		}
 
 		if (rgbbuffer == null || rgbbuffer.capacity() < xsiz * ysiz * byteperpixel) {
             rgbbuffer = BufferUtils.newByteBuffer(xsiz * ysiz * byteperpixel);
@@ -3950,7 +3951,7 @@ public class Polymost implements GLRenderer {
 		ByteBuffer frame = getFrame(PixelFormat.Rgb, xdim, -ydim);
 
 		int byteperpixel = 3;
-		if (BuildGdx.app.getType() == ApplicationType.Android) {
+		if (Gdx.app.getType() == ApplicationType.Android) {
             byteperpixel = 4;
         }
 
@@ -4264,13 +4265,13 @@ public class Polymost implements GLRenderer {
 			return new IndexedShader(engine.getPaletteManager().getShadeCount()) {
 				@Override
 				public void bindPalette(int unit) {
-					BuildGdx.gl.glActiveTexture(unit);
+					Gdx.gl.glActiveTexture(unit);
 					textureCache.getPalette().bind(0);
 				}
 
 				@Override
 				public void bindPalookup(int unit, int pal) {
-					BuildGdx.gl.glActiveTexture(unit);
+					Gdx.gl.glActiveTexture(unit);
 					// FIXME getPalookup == null at initscreen
 					textureCache.getPalookup(pal).bind(0);
 				}

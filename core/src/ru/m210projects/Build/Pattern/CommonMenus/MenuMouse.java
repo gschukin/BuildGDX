@@ -56,6 +56,7 @@ public abstract class MenuMouse extends BuildMenu {
 
 	public MenuMouse(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, Font style, int buttonPal)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Mouse setup"), false);
 		
 		final BuildConfig cfg = app.pCfg;
@@ -177,7 +178,7 @@ public abstract class MenuMouse extends BuildMenu {
 	}
 	
 	protected BuildMenu buildAdvancedAxisMenu(BuildGame app, int posx, int posy, int width, int menuHeight, Font style) {
-		BuildMenu advancedMenu = new BuildMenu();
+		BuildMenu advancedMenu = new BuildMenu(app.pMenu);
 		
 		advancedMenu.addItem(getTitle(app, "Digital axis"), false);
 		final BuildConfig cfg = app.pCfg;

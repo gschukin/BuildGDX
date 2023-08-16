@@ -36,11 +36,12 @@ public abstract class MenuLoadSave extends BuildMenu {
 
 	public MenuPicnum picnum;
 	public MenuSlotList list;
-	public MenuScroller slider;
+	private MenuScroller slider;
 	public MenuText mInfo;
 	
 	public MenuLoadSave(BuildGame app, Font style, int posx, int posy, int posyHelp, int width, int nItems, int listPal, int specPal, int nBackground, MenuProc confirm, boolean saveMenu)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, saveMenu ? "Save game" : "Load game"), false);
 
 		picnum = getPicnum(app.pEngine, posx, posy);
@@ -63,6 +64,8 @@ public abstract class MenuLoadSave extends BuildMenu {
 				return MenuLoadSave.this.checkFile(entry);
 			}
 		};
+
+		// doenst work
 		slider = new MenuScroller(app.pSlider, list, width + posx - app.pSlider.getScrollerWidth());
 		mInfo = getInfo(app, posx, posy);
 		
@@ -83,5 +86,5 @@ public abstract class MenuLoadSave extends BuildMenu {
 	public abstract MenuPicnum getPicnum(Engine draw, int x, int y);
 	
 	public abstract MenuText getInfo(BuildGame app, int x, int y);
-	
+
 }

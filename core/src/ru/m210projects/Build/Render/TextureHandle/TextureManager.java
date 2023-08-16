@@ -1,18 +1,18 @@
-// This file is part of BuildGDX.
+// This file is part of Gdx.
 // Copyright (C) 2017-2021  Alexander Makarov-[M210] (m210-2007@mail.ru)
 //
-// BuildGDX is free software: you can redistribute it and/or modify
+// Gdx is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// BuildGDX is distributed in the hope that it will be useful,
+// Gdx is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with BuildGDX.  If not, see <http://www.gnu.org/licenses/>.
+// along with Gdx.  If not, see <http://www.gnu.org/licenses/>.
 
 package ru.m210projects.Build.Render.TextureHandle;
 
@@ -25,13 +25,13 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_ENV;
 import static ru.m210projects.Build.Settings.GLSettings.glfiltermodes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 
 import org.jetbrains.annotations.Nullable;
 import ru.m210projects.Build.Engine;
-import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.Types.PaletteManager;
 import ru.m210projects.Build.Types.font.BitmapFont;
@@ -297,8 +297,8 @@ public class TextureManager {
 
 			@Override
 			public void bind(int unit) {
-				// BuildGdx.gl.glActiveTexture(unit);
-				BuildGdx.gl.glBindTexture(glTarget, glHandle);
+				// Gdx.gl.glActiveTexture(unit);
+				Gdx.gl.glBindTexture(glTarget, glHandle);
 			}
 		};
 	}
@@ -313,8 +313,8 @@ public class TextureManager {
 
 			@Override
 			public void bind(int unit) {
-				// BuildGdx.gl.glActiveTexture(unit);
-				BuildGdx.gl.glBindTexture(glTarget, glHandle);
+				// Gdx.gl.glActiveTexture(unit);
+				Gdx.gl.glBindTexture(glTarget, glHandle);
 			}
 
 			@Override
@@ -411,8 +411,8 @@ public class TextureManager {
 			return;
 		}
 
-		BuildGdx.gl.glActiveTexture(GL_TEXTURE0 + ++texunits);
-		BuildGdx.gl.glEnable(GL_TEXTURE_2D);
+		Gdx.gl.glActiveTexture(GL_TEXTURE0 + ++texunits);
+		Gdx.gl.glEnable(GL_TEXTURE_2D);
 	}
 
 	public void deactivateEffects() {
@@ -421,13 +421,13 @@ public class TextureManager {
 		}
 
 		while (texunits >= 0) {
-			BuildGdx.gl.glActiveTexture(GL_TEXTURE0 + texunits);
-			BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-			BuildGdx.gl.glLoadIdentity();
-			BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
+			Gdx.gl.glActiveTexture(GL_TEXTURE0 + texunits);
+			((GL10) Gdx.gl).glMatrixMode(GL_TEXTURE);
+			((GL10) Gdx.gl).glLoadIdentity();
+			((GL10) Gdx.gl).glMatrixMode(GL_MODELVIEW);
 			if (texunits > 0) {
-				BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0f);
-				BuildGdx.gl.glDisable(GL_TEXTURE_2D);
+				((GL10) Gdx.gl).glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0f);
+				Gdx.gl.glDisable(GL_TEXTURE_2D);
 			}
 			texunits--;
 		}

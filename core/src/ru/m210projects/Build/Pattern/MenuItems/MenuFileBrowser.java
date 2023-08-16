@@ -16,6 +16,7 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.BuildGame;
@@ -33,10 +34,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
-import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.*;
 
-public abstract class MenuFileBrowser extends MenuItem {
+public abstract class MenuFileBrowser extends MenuItem implements ScrollableMenuItem {
 
     protected final int nListItems;
     protected final int nItemHeight;
@@ -73,7 +73,6 @@ public abstract class MenuFileBrowser extends MenuItem {
     protected Directory currDir;
     protected Font topFont, pathFont;
     protected char[] buffer = new char[40];
-    private int touchY;
     private int nBackground;
     private int scrollerHeight;
     private long checkDirectory; // checking for new files
@@ -361,47 +360,30 @@ public abstract class MenuFileBrowser extends MenuItem {
                 }
                 return false;
             case LEFT:
-                if (dirList.size() > 0) {
+                if (!dirList.isEmpty()) {
                     currColumn = DIRECTORY;
                 }
                 return false;
             case RIGHT:
-                if (fileList.size() > 0) {
+                if (!fileList.isEmpty()) {
                     currColumn = FILE;
                 }
                 return false;
             case ENTER:
             case LMB:
-                if (opt == MenuOpt.LMB && scrollTouch[FILE] || scrollTouch[DIRECTORY]) {
-                    if (getListSize(currColumn) <= nListItems) {
-                        return false;
-                    }
-
-                    int nList = BClipLow(getListSize(currColumn) - nListItems, 1);
-                    int nRange = scrollerHeight;
-
-                    int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
-
-                    l_nFocus[currColumn] = -1;
-                    l_nMin[currColumn] = BClipRange(((touchY - py) * nList) / nRange, 0, nList);
-
-                    return false;
-                }
-                if (dirList.size() > 0 && currColumn == DIRECTORY) {
+                if (!dirList.isEmpty() && currColumn == DIRECTORY) {
                     if (l_nFocus[DIRECTORY] == -1) {
                         return false;
                     }
 
                     changeDir(dirList.get(l_nFocus[DIRECTORY]));
-                } else if (fileList.size() > 0 && currColumn == FILE) {
-
+                } else if (!fileList.isEmpty() && currColumn == FILE) {
                     if (l_nFocus[FILE] == -1) {
                         return false;
                     }
 
                     invoke(fileList.get(l_nFocus[FILE]));
                 }
-                getInputController().resetKeyStatus();
                 return false;
             case ESC:
             case RMB:
@@ -462,17 +444,6 @@ public abstract class MenuFileBrowser extends MenuItem {
             currColumn = 0;
         }
 
-        if (!BuildGdx.input.isTouched()) {
-            scrollTouch[DIRECTORY] = false;
-            scrollTouch[FILE] = false;
-        }
-
-        touchY = my;
-        if (mx > scrollX[currColumn] && mx < scrollX[currColumn] + slider.getScrollerWidth()) {
-            scrollTouch[currColumn] = BuildGdx.input.isTouched();
-            return true;
-        }
-
         if ((!scrollTouch[DIRECTORY] && !scrollTouch[FILE]) && getListSize(currColumn) > 0) {
             int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
 
@@ -519,6 +490,44 @@ public abstract class MenuFileBrowser extends MenuItem {
         for (int i = 0; i < 2; i++) {
             l_nFocus[i] = l_nMin[i] = 0;
         }
+    }
+
+    @Override
+    public boolean onMoveSlider(MenuHandler handler, int mx, int my) {
+        if (getListSize(currColumn) <= nListItems) {
+            return false;
+        }
+
+        int nList = BClipLow(getListSize(currColumn) - nListItems, 1);
+        int nRange = scrollerHeight;
+
+        int py = y + 3 + pathFont.getSize() + 2 + topFont.getSize() + 2;
+
+        l_nFocus[currColumn] = -1;
+        l_nMin[currColumn] = BClipRange(((my - py) * nList) / nRange, 0, nList);
+        return true;
+    }
+
+    @Override
+    public boolean onLockSlider(MenuHandler handler, int mx, int my) {
+        if (mx >= x + width / 2) {
+            currColumn = 1;
+        } else {
+            currColumn = 0;
+        }
+
+        if (mx > scrollX[currColumn] && mx < scrollX[currColumn] + slider.getScrollerWidth()) {
+            scrollTouch[currColumn] = true;
+            onMoveSlider(handler, mx, my);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onUnlockSlider() {
+        scrollTouch[DIRECTORY] = false;
+        scrollTouch[FILE] = false;
     }
 
     private static class ExtProp {

@@ -16,6 +16,7 @@
 
 package ru.m210projects.Build.Render.Types;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -85,9 +86,9 @@ public abstract class FadeEffect {
     public abstract void update(int intensive);
 
     public static void setParams(FadeShader shader, int r, int g, int b, int a, int sfactor, int dfactor) {
-        BuildGdx.gl.glBlendFunc(sfactor, dfactor);
+        Gdx.gl.glBlendFunc(sfactor, dfactor);
         if (shader == null) {
-            BuildGdx.gl.glColor4ub(r, g, b, a);
+            ((GL10) Gdx.gl).glColor4ub(r, g, b, a);
         } else {
             shader.setColor(r, g, b, a);
         }
@@ -111,10 +112,10 @@ public abstract class FadeEffect {
     }
 
     protected static void gl10draw() {
-        BuildGdx.gl.glBegin(GL_TRIANGLES);
+        ((GL10) Gdx.gl).glBegin(GL_TRIANGLES);
         for (int i = 0; i < 6; i += 2) {
-            BuildGdx.gl.glVertex2f(vertices[i], vertices[i + 1]);
+            ((GL10) Gdx.gl).glVertex2f(vertices[i], vertices[i + 1]);
         }
-        BuildGdx.gl.glEnd();
+        ((GL10) Gdx.gl).glEnd();
     }
 }

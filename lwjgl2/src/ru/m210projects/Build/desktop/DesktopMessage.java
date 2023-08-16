@@ -21,6 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildFrame;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage;
@@ -46,7 +47,7 @@ public class DesktopMessage implements BuildMessage {
 			return false;
 		}
 
-		BuildGdx.input.setCursorCatched(false);
+		Gdx.input.setCursorCatched(false);
 		if(message != null && message.length() >= 384)
 		{
 			message = message.substring(0, 384);
@@ -105,8 +106,8 @@ public class DesktopMessage implements BuildMessage {
 			dialog.setIconImage(Toolkit.getDefaultToolkit().getImage(frame.icon));
 		}
 		panel.setBackground(dialog.getBackground());
-		dialog.setLocation(frame.getX() + (BuildGdx.graphics.getWidth() - dialog.getWidth()) / 2,
-				frame.getY() + (BuildGdx.graphics.getHeight() - dialog.getHeight()) / 2);
+		dialog.setLocation(frame.getX() + (Gdx.graphics.getWidth() - dialog.getWidth()) / 2,
+				frame.getY() + (Gdx.graphics.getHeight() - dialog.getHeight()) / 2);
 		dialog.setAlwaysOnTop(true);
 		dialog.setVisible(true);
 		dialog.dispose();

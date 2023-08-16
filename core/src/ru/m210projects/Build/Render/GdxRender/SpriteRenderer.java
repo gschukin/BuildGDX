@@ -406,9 +406,9 @@ public class SpriteRenderer {
 //			return false;
 //
 //		if ((method & 3) == 0) {
-//			BuildGdx.gl.glDisable(GL_BLEND);
+//			Gdx.gl.glDisable(GL_BLEND);
 //		} else {
-//			BuildGdx.gl.glEnable(GL_BLEND);
+//			Gdx.gl.glEnable(GL_BLEND);
 //		}
 //
 //		int vis = globalvisibility;
@@ -534,9 +534,9 @@ public class SpriteRenderer {
 //
 //		if (xflip ^ yflip) {
 //			xoff = -xoff;
-//			BuildGdx.gl.glFrontFace(GL_CCW);
+//			Gdx.gl.glFrontFace(GL_CCW);
 //		} else
-//			BuildGdx.gl.glFrontFace(GL_CW);
+//			Gdx.gl.glFrontFace(GL_CW);
 //
 //		Gdx.gl.glDepthFunc(GL20.GL_LESS);
 //		Gdx.gl.glDepthRangef(0.0f, 0.99999f);
@@ -564,7 +564,7 @@ public class SpriteRenderer {
 //		manager.frustum(null);
 //		parent.world.getQuad().render(manager.getProgram());
 //
-//		BuildGdx.gl.glFrontFace(GL_CW);
+//		Gdx.gl.glFrontFace(GL_CW);
 //		return true;
 
 		ShaderManager manager = parent.manager;
@@ -648,15 +648,15 @@ public class SpriteRenderer {
 		}
 
 		if ((method & 3) == 0) {
-			BuildGdx.gl.glDisable(GL_BLEND);
+			Gdx.gl.glDisable(GL_BLEND);
 		} else {
-			BuildGdx.gl.glEnable(GL_BLEND);
+			Gdx.gl.glEnable(GL_BLEND);
 		}
 
 		if (xflip ^ yflip) {
-			BuildGdx.gl.glFrontFace(GL_CCW);
+			Gdx.gl.glFrontFace(GL_CCW);
 		} else {
-			BuildGdx.gl.glFrontFace(GL_CW);
+			Gdx.gl.glFrontFace(GL_CW);
 		}
 
 		Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
@@ -685,7 +685,7 @@ public class SpriteRenderer {
 		manager.frustum(null);
 		parent.world.getQuad().render(manager.getProgram());
 
-		BuildGdx.gl.glFrontFace(GL_CW);
+		Gdx.gl.glFrontFace(GL_CW);
 		return true;
 	}
 

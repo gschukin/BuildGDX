@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Pattern.MenuItems;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
@@ -7,16 +8,17 @@ import ru.m210projects.Build.Pattern.Tools.SaveManager;
 import ru.m210projects.Build.Pattern.Tools.SaveManager.SaveInfo;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
+import ru.m210projects.Build.Types.font.CharInfo;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.filehandle.art.ArtEntry;
 import ru.m210projects.Build.filehandle.fs.FileEntry;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.GameKeyListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.coordsConvertXScaled;
 import static ru.m210projects.Build.Gameutils.coordsConvertYScaled;
 import static ru.m210projects.Build.RenderService.xdim;
@@ -24,7 +26,7 @@ import static ru.m210projects.Build.RenderService.ydim;
 import static ru.m210projects.Build.Strhandler.toCharArray;
 import static ru.m210projects.Build.filehandle.fs.Directory.DUMMY_ENTRY;
 
-public abstract class MenuSlotList extends MenuList {
+public abstract class MenuSlotList extends MenuList implements GameKeyListener {
     protected final boolean saveList;
     public boolean deleteQuestion;
     public List<SaveInfo> text;
@@ -32,9 +34,10 @@ public abstract class MenuSlotList extends MenuList {
     public MenuProc confirmCallback;
     public List<SaveInfo> displayed;
     public int nListOffset;
-    public boolean typing;
-    public char[] typingBuf = new char[16];
+
     public String typed;
+    private final MenuPrompt prompt;
+
     public int yHelpText;
     public int helpPal;
     public Font questionFont;
@@ -55,10 +58,10 @@ public abstract class MenuSlotList extends MenuList {
 
         super(null, font, x, y, width, 0, null, null, nListItems);
         this.draw = draw;
+        this.prompt = new MenuPrompt(16, 1);
         this.saveManager = saveManager;
         this.nBackground = nBackground;
 
-        this.typing = false;
         this.text = saveManager.getList();
         this.nListItems = nListItems;
         this.nListOffset = 0;
@@ -81,7 +84,7 @@ public abstract class MenuSlotList extends MenuList {
         if (saveList) {
             ptr--;
         }
-        if (ptr == -1 || displayed.size() == 0) {
+        if (ptr == -1 || displayed.isEmpty()) {
             return DUMMY_ENTRY;
         }
         return displayed.get(ptr).entry;
@@ -92,7 +95,7 @@ public abstract class MenuSlotList extends MenuList {
         if (saveList) {
             ptr--;
         }
-        if (ptr == -1 || displayed.size() == 0) {
+        if (ptr == -1 || displayed.isEmpty()) {
             return "Empty slot";
         }
         return displayed.get(ptr).name;
@@ -100,15 +103,12 @@ public abstract class MenuSlotList extends MenuList {
 
     @Override
     public void draw(MenuHandler handler) {
-        this.len = displayed.size();
+        len = getListSize();
 
         draw.rotatesprite((x + width / 2 - 5) << 16, (y - 3) << 16, 65536, 0, nBackground, 128, backgroundPal, 10 | 16 | transparent, 0, 0, coordsConvertXScaled(x + width, ConvertType.Normal), coordsConvertYScaled(y + nListItems * mFontOffset() + 3));
 
-        if (displayed.size() > 0) {
+        if (!displayed.isEmpty()) {
             int py = y, pal;
-            if (saveList) {
-                len += 1;
-            }
 
             for (int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
                 int ptr = i;
@@ -131,57 +131,31 @@ public abstract class MenuSlotList extends MenuList {
                     pal = listPal;
                 }
 
-                if (i == l_nFocus) {
-                    if (m_pMenu.mGetFocusedItem(this)) {
-                        if (typing) {
-                            Arrays.fill(typingBuf, (char) 0);
-                            char[] buf = getInputController().getMessageBuffer();
-                            int messlen = getInputController().getMessageLength();
-                            if (!owncursor) {
-                                messlen += 1;
-                            }
-                            System.arraycopy(buf, 0, typingBuf, 0, Math.min(messlen, typingBuf.length));
-                            rtext = typingBuf;
-                            shade = -128;
-                        }
-                    }
+                if (prompt.isCaptured() && i == l_nFocus && m_pMenu.mGetFocusedItem(this)) {
+                    drawPrompt(x + width / 2 + nListOffset, py, pal);
+                } else {
+                    font.drawTextScaled(x + width / 2 + nListOffset, py, rtext, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
                 }
-
-                font.drawTextScaled(x + width / 2 + nListOffset, py, rtext, 1.0f, shade, pal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
 
                 py += mFontOffset();
             }
         } else {
             int py = y;
             int shade = handler.getShade(l_nFocus != -1 ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null);
-            char[] rtext;
-
 
             if (saveList) {
-                rtext = toCharArray("New saved game");
-                if (typing) {
-                    Arrays.fill(typingBuf, (char) 0);
-                    char[] buf = getInputController().getMessageBuffer();
-                    int messlen = getInputController().getMessageLength();
-                    if (!owncursor) {
-                        messlen += 1;
-                    }
-                    System.arraycopy(buf, 0, typingBuf, 0, Math.min(messlen, typingBuf.length));
-                    rtext = typingBuf;
-                    shade = -128;
+                if (prompt.isCaptured()) {
+                    drawPrompt(x + width / 2 + nListOffset, py, listPal);
+                } else {
+                    font.drawTextScaled(x + width / 2 + nListOffset, py, "New saved game", 1.0f, shade, listPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
                 }
             } else {
-                rtext = toCharArray("List is empty");
+                font.drawTextScaled(x + width / 2 + nListOffset, py, "List is empty", 1.0f, shade, listPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
             }
-
-            font.drawTextScaled(x + width / 2 + nListOffset, py, rtext, 1.0f, shade, listPal, TextAlign.Left, Transparent.None, ConvertType.Normal, fontShadow);
         }
 
         pal = helpPal;
         if (deleteQuestion) {
-//			draw.setpalettefade(0, 0, 0, 48);
-//			draw.showfade();
-
             int tile = nBackground;
             ArtEntry pic = draw.getTile(tile);
 
@@ -211,147 +185,36 @@ public abstract class MenuSlotList extends MenuList {
         handler.mPostDraw(this);
     }
 
+    protected void drawPrompt(int x, int y, int pal) {
+        final String input = prompt.getTextInput();
+        final int cursorPos = prompt.getCursorPosition();
+        int curX = x;
+
+        for (int i = 0; i < input.length(); i++) {
+            CharInfo charInfo = font.getCharInfo(input.charAt(i));
+            font.drawCharScaled(x, y, input.charAt(i), 1.0f, -128, pal, Transparent.None, ConvertType.Normal, false);
+            x += charInfo.getCellSize();
+            if (i == cursorPos - 1) {
+                curX = x;
+            }
+        }
+
+        if (prompt.isCaptured() && (System.currentTimeMillis() & 0x100) == 0) {
+            char ch = '_';
+            if (prompt.isOsdOverType()) {
+                ch = '#';
+            }
+            font.drawCharScaled(curX, y + 1, ch, 1.0f, -128, pal, Transparent.None, ConvertType.Normal, false);
+        }
+    }
+
 
     @Override
     public boolean callback(MenuHandler handler, MenuOpt opt) {
-        if (deleteQuestion) {
-            if (getInputController().getKey(Keys.Y) != 0 || opt == MenuOpt.ENTER) {
-                saveManager.delete(getFileEntry());
-                updateList();
-                getInputController().setKey(Keys.Y, 0);
-                if (l_nFocus >= displayed.size()) {
-                    int len = displayed.size();
-                    if (saveList) {
-                        len += 1;
-                    }
-                    l_nFocus = len - 1;
-                    l_nMin = len - nListItems;
-                    if (l_nMin < 0) {
-                        l_nMin = 0;
-                    }
-                }
-                if (updateCallback != null) {
-                    updateCallback.run(handler, this);
-                }
-                deleteQuestion = false;
-            }
-            if (getInputController().getKey(Keys.N) != 0 || opt == MenuOpt.ESC || opt == MenuOpt.RMB) {
-
-                getInputController().setKey(Keys.N, 0);
-                deleteQuestion = false;
-            }
-
-            return false;
-        }
-
-        int focus = l_nFocus;
-        int len = displayed.size();
-        if (saveList) {
-            len += 1;
-            focus -= 1;
-        }
-        if (typing) {
-            if (opt != MenuOpt.ESC) {
-                if (getInputController().putMessage(typingBuf.length, !owncursor, false, false) == 1 || opt == MenuOpt.ENTER) {
-                    typed = new String(getInputController().getMessageBuffer(), 0, getInputController().getMessageLength());
-                    typing = false;
-                    if (confirmCallback != null) {
-                        confirmCallback.run(handler, this);
-                    }
-                }
-            } else {
-                typing = false;
-            }
-        } else {
-            switch (opt) {
-                case DELETE:
-                    if ((!saveList && (displayed.size() > 0 && l_nFocus != -1)) || saveList && l_nFocus != 0) {
-                        deleteQuestion = true;
-                    }
-                    return false;
-                case MWUP:
-                    ListMouseWheelUp(handler);
-                    return false;
-                case MWDW:
-                    if (text != null) {
-                        ListMouseWheelDown(handler, len);
-                    }
-                    return false;
-                case UP:
-                    ListUp(handler, len);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case DW:
-                    ListDown(handler, len);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case LEFT:
-                    ListLeft(handler);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case RIGHT:
-                    ListRight(handler);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case ENTER:
-                case LMB:
-                    if (l_nFocus != -1 && len > 0) {
-                        if (saveList) {
-                            if (l_nFocus == 0) {
-                                getInputController().initMessageInput(null);
-                            } else {
-                                getInputController().initMessageInput(displayed.get(focus).name);
-                            }
-                            typing = true;
-
-                            return false;
-                        }
-                        if (confirmCallback != null) {
-                            confirmCallback.run(handler, this);
-                        }
-                        getInputController().resetKeyStatus();
-                    }
-
-                    return false;
-                case ESC:
-                case RMB:
-                    ListEscape(handler, opt);
-                    return true;
-                case PGUP:
-                    ListPGUp(handler);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case PGDW:
-                    ListPGDown(handler, len);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case HOME:
-                    ListHome(handler);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                case END:
-                    ListEnd(handler, len);
-                    if (updateCallback != null) {
-                        updateCallback.run(handler, this);
-                    }
-                    return false;
-                default:
-                    return false;
-            }
+        switch (opt) {
+            case ESC:
+            case RMB:
+                return !prompt.isCaptured() && !deleteQuestion;
         }
         return false;
     }
@@ -365,8 +228,16 @@ public abstract class MenuSlotList extends MenuList {
         updateList();
 
         if (updateCallback != null) {
-            updateCallback.run(null, this);
+            updateCallback.run(menuHandler, this);
         }
+    }
+
+    protected int getListSize() {
+        int len = displayed.size();
+        if (saveList && !displayed.isEmpty()) {
+            len += 1;
+        }
+        return len;
     }
 
     public abstract boolean checkFile(FileEntry entry);
@@ -383,21 +254,23 @@ public abstract class MenuSlotList extends MenuList {
     @Override
     public void close() {
         deleteQuestion = false;
-        typing = false;
+        onCancel();
+    }
+
+    @Override
+    public boolean mouseMoved(int mx, int my) {
+        return prompt.isCaptured() || deleteQuestion;
     }
 
     @Override
     public boolean mouseAction(int mx, int my) {
-        if (deleteQuestion || typing) {
+        if (deleteQuestion || prompt.isCaptured()) {
             return false;
         }
 
-        if (displayed.size() > 0) {
+        if (!displayed.isEmpty()) {
             int px = x, py = y;
-            int len = displayed.size();
-            if (saveList) {
-                len += 1;
-            }
+            int len = getListSize();
 
             int ol_nFocus = l_nFocus;
             for (int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
@@ -406,7 +279,7 @@ public abstract class MenuSlotList extends MenuList {
                     if (my > py && my < py + font.getSize()) {
                         l_nFocus = i;
                         if (ol_nFocus != i && updateCallback != null) {
-                            updateCallback.run(null, this);
+                            updateCallback.run(menuHandler, this);
                         }
                         return true;
                     }
@@ -418,4 +291,198 @@ public abstract class MenuSlotList extends MenuList {
         return false;
     }
 
+    @Override
+    public boolean onGameKeyPressed(GameKey gameKey) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        if (prompt.isCaptured() || deleteQuestion) {
+            return true;
+        }
+
+        if (amount < 0) {
+            ListMouseWheelUp(menuHandler);
+            return true;
+        } else if (amount > 0) {
+            ListMouseWheelDown(menuHandler, getListSize());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyDown(int i) {
+        if (prompt.isCaptured()) {
+            switch (i) {
+                case Keys.ENTER:
+                    onConfirm();
+                    return true;
+                case Keys.ESCAPE:
+                    onCancel();
+                    return true;
+            }
+            return prompt.keyDown(i);
+        }
+
+        switch (i) {
+            case Keys.Y:
+                if (deleteQuestion) {
+                    onEnter();
+                    return true;
+                }
+                break;
+            case Keys.N:
+                if (deleteQuestion) {
+                    onCancel();
+                    return true;
+                }
+                break;
+            case Keys.FORWARD_DEL:
+                if ((!saveList && (!displayed.isEmpty() && l_nFocus != -1)) || saveList && l_nFocus != 0) {
+                    deleteQuestion = true;
+                }
+                return true;
+            case Keys.UP:
+                ListUp(menuHandler, getListSize());
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.DOWN:
+                ListDown(menuHandler, getListSize());
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.LEFT:
+                ListLeft(menuHandler);
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.RIGHT:
+                ListRight(menuHandler);
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.ENTER:
+                onEnter();
+                return true;
+            case Keys.ESCAPE:
+                onCancel();
+                return true;
+            case Keys.PAGE_UP:
+                ListPGUp(menuHandler);
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.PAGE_DOWN:
+                ListPGDown(menuHandler, getListSize());
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.HOME:
+                ListHome(menuHandler);
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+            case Keys.END:
+                ListEnd(menuHandler, getListSize());
+                if (updateCallback != null) {
+                    updateCallback.run(menuHandler, this);
+                }
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int i) {
+        prompt.keyUp(i);
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char c) {
+        if (prompt.isCaptured()) {
+            prompt.keyTyped(c);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (button == Input.Buttons.LEFT) {
+            onEnter();
+            return true;
+        } else if (button == Input.Buttons.RIGHT) {
+            return onCancel();
+        }
+        return false;
+    }
+
+    protected void onEnter() {
+        if (deleteQuestion) {
+            saveManager.delete(getFileEntry());
+            updateList();
+            if (l_nFocus >= displayed.size()) {
+                int len = getListSize();
+                l_nFocus = len - 1;
+                l_nMin = len - nListItems;
+                if (l_nMin < 0) {
+                    l_nMin = 0;
+                }
+            }
+            if (updateCallback != null) {
+                updateCallback.run(menuHandler, this);
+            }
+            deleteQuestion = false;
+            return;
+        }
+
+        if (saveList) {
+            if (!prompt.isCaptured()) {
+                if (l_nFocus != 0) {
+                    prompt.setTextInput(displayed.get(l_nFocus - 1).name);
+                }
+                prompt.setCaptureInput(true);
+            }
+        } else {
+            onConfirm();
+        }
+    }
+
+    protected void onConfirm() {
+        this.typed = prompt.getTextInput();
+        prompt.clear();
+        prompt.setCaptureInput(false);
+        if (l_nFocus != -1 && getListSize() > 0) {
+            if (confirmCallback != null) {
+                confirmCallback.run(menuHandler, this);
+                updateList();
+            }
+        }
+    }
+
+    protected boolean onCancel() {
+        if (prompt.isCaptured()) {
+            prompt.clear();
+            prompt.setCaptureInput(false);
+            return true;
+        } else if (deleteQuestion) {
+            deleteQuestion = false;
+            return true;
+        } else {
+            ListEscape(menuHandler, MenuOpt.ESC); // FIXME MenuOpt.ESC
+        }
+        return false;
+    }
 }

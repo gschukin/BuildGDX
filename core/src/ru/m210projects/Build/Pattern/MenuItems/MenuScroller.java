@@ -21,13 +21,10 @@ import static ru.m210projects.Build.Gameutils.*;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 
-public class MenuScroller extends MenuItem {
+public class MenuScroller extends MenuItem implements ScrollableMenuItem {
 
 	protected MenuList parent;
-	protected int touchY;
-	protected boolean isTouched;
-	protected static MenuScroller touchedObj;
-	
+	private boolean isLocked;
 	protected SliderDrawable slider;
 	protected int height;
 	
@@ -52,11 +49,6 @@ public class MenuScroller extends MenuItem {
 		
 		slider.drawScrollerBackground(x, y, height, 0, pal);
 		slider.drawScroller(x, posy, 0, pal);
-
-		if(touchedObj == this) {
-			parent.l_nFocus = -1;
-			parent.l_nMin = BClipRange(((touchY - y) * nList) / nRange, 0, nList);
-		}
 	}
 
 	@Override
@@ -66,30 +58,51 @@ public class MenuScroller extends MenuItem {
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		touchY = my;
-		if(!BuildGdx.input.isTouched()) {
-			touchedObj = null;
-		}
-
-		if(mx >= x && mx < x + width)
-		{
+		if(mx >= x && mx < x + width) {
 			if(my >= y && my < y + height) {
-				if(m_pMenu.m_pItems[m_pMenu.m_nFocus] != this)
-				{
+				if(m_pMenu.m_pItems[m_pMenu.m_nFocus] != this) {
 					for ( short i = 0; i < m_pMenu.m_nItems; ++i ) {
 						if(m_pMenu.m_pItems[i] == this) {
-							m_pMenu.m_nFocus = i; //autofocus to scroller
+							m_pMenu.m_nFocus = i; // autofocus to scroller
+							return true;
 						}
 					}
-				}
-				
-				if(BuildGdx.input.isTouched()) {
-					touchedObj = this;
 				}
 			}
 		}
 
-		return touchedObj != null;
+		return false;
+	}
+
+	@Override
+	public boolean onMoveSlider(MenuHandler handler, int scaledX, int scaledY) {
+		if (isLocked) {
+			int nList = BClipLow(parent.len - parent.nListItems, 1);
+			int nRange = height - slider.getScrollerHeight();
+
+			parent.l_nFocus = -1;
+			parent.l_nMin = BClipRange(((scaledY - y) * nList) / nRange, 0, nList);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onLockSlider(MenuHandler handler, int mx, int my) {
+		int cx = x + width - slider.getSliderRange();
+		if(mx > cx && mx < cx + slider.getSliderRange()) {
+			if(my >= y && my < y + height) {
+				isLocked = true;
+				onMoveSlider(handler, mx, my);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void onUnlockSlider() {
+		isLocked = false;
 	}
 
 	@Override

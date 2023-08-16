@@ -18,6 +18,7 @@ package ru.m210projects.Build.Pattern.ScreenAdapters;
 
 import static ru.m210projects.Build.RenderService.*;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
@@ -48,10 +49,8 @@ public class LogoScreen extends SkippableAdapter {
 	}
 
 	@Override
-	public void show()
-	{
+	public void show() {
 		this.gTicks = 0;
-		game.pInput.ctrlResetKeyStatus();
 	}
 
 	@Override
@@ -59,7 +58,7 @@ public class LogoScreen extends SkippableAdapter {
 		
 		if( (gTicks += delta) >= gShowTime && callback != null)
 		{
-			BuildGdx.app.postRunnable(callback);
+			Gdx.app.postRunnable(callback);
 			callback = null;
 		}
 
@@ -69,9 +68,9 @@ public class LogoScreen extends SkippableAdapter {
 	
 	@Override
 	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
-		}
+//		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//		}
 	}
 
 	@Override

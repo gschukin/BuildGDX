@@ -1,8 +1,9 @@
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
 import static ru.m210projects.Build.Engine.*;
-import static ru.m210projects.Build.Input.Keymap.ANYKEY;
+import static ru.m210projects.Build.input.keymap.Keymap.ANYKEY;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Render.GLRenderer;
@@ -255,7 +256,7 @@ public abstract class MovieScreen extends SkippableAdapter {
 	protected void callback() {
 		close();
 		if (callback != null) {
-			BuildGdx.app.postRunnable(callback);
+			Gdx.app.postRunnable(callback);
 			callback = null;
 		}
 	}
@@ -266,14 +267,15 @@ public abstract class MovieScreen extends SkippableAdapter {
 			callback();
 		}
 
-		if (game.pInput.ctrlKeyStatus(ANYKEY)) {
-			gCutsClock = engine.getTotalClock();
-		}
-
 		if (engine.getTotalClock() - gCutsClock < 200 && escSkip) // 2 sec
 		{
 			DrawEscText(GetFont(), MAXPALOOKUPS - RESERVEDPALS - 1);
 		}
+	}
+
+	@Override
+	public void anyKeyPressed() {
+		gCutsClock = engine.getTotalClock();
 	}
 
 	protected void close() {

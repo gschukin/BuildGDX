@@ -11,12 +11,12 @@ import static ru.m210projects.Build.Render.GLInfo.supportsGenerateMipmaps;
 
 import java.nio.ByteBuffer;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GLTexture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.math.MathUtils;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.TextureHandle.TileData.PixelFormat;
 import ru.m210projects.Build.Render.Types.GLFilter;
@@ -97,11 +97,11 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	protected void alloc(TileData pic) {
-		BuildGdx.gl.glBindTexture(glTarget, glHandle);
+		Gdx.gl.glBindTexture(glTarget, glHandle);
 
-		BuildGdx.gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		Gdx.gl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		BuildGdx.gl.glTexImage2D(glTarget, 0, pic.getGLInternalFormat(), pic.getWidth(), pic.getHeight(), 0,
+		Gdx.gl.glTexImage2D(glTarget, 0, pic.getGLInternalFormat(), pic.getWidth(), pic.getHeight(), 0,
 				pic.getGLFormat(), pic.getGLType(), pic.getPixels());
 
 		setupTextureFilter(GLSettings.textureFilter.get(), GLSettings.textureAnisotropy.get());
@@ -129,7 +129,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 			if ((getWidth() != width || getHeight() != height)) {
 				delete();
 
-				this.glHandle = BuildGdx.gl.glGenTexture();
+				this.glHandle = Gdx.gl.glGenTexture();
 				this.width = pic.getWidth();
 				this.height = pic.getHeight();
 
@@ -138,7 +138,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 				if (!isAllocated) {
 					alloc(pic);
 				} else {
-					BuildGdx.gl.glTexSubImage2D(glTarget, 0, 0, 0, pic.getWidth(), pic.getHeight(), pic.getGLFormat(),
+					Gdx.gl.glTexSubImage2D(glTarget, 0, 0, 0, pic.getWidth(), pic.getHeight(), pic.getGLFormat(),
 							GL_UNSIGNED_BYTE, pic.getPixels());
 				}
 			}
@@ -166,7 +166,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 	protected void generateMipmap(TileData data, boolean doalloc) {
 		if (supportsGenerateMipmaps) {
-			BuildGdx.gl.glGenerateMipmap(glTarget);
+			Gdx.gl.glGenerateMipmap(glTarget);
 			return;
 		}
 
@@ -250,10 +250,10 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 
 			if (j >= mipLevel) {
 				if (doalloc) {
-					BuildGdx.gl.glTexImage2D(GL_TEXTURE_2D, j - mipLevel, data.getGLInternalFormat(), x3, y3, 0,
+					Gdx.gl.glTexImage2D(GL_TEXTURE_2D, j - mipLevel, data.getGLInternalFormat(), x3, y3, 0,
 							data.getGLFormat(), GL_UNSIGNED_BYTE, pic); // loading 1st time
 				} else {
-					BuildGdx.gl.glTexSubImage2D(GL_TEXTURE_2D, j - mipLevel, 0, 0, x3, y3, data.getGLFormat(),
+					Gdx.gl.glTexSubImage2D(GL_TEXTURE_2D, j - mipLevel, 0, 0, x3, y3, data.getGLFormat(),
 							GL_UNSIGNED_BYTE, pic); // overwrite old texture
 				}
 			}
@@ -301,7 +301,7 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 		if (!force && MathUtils.isEqual(level, anisotropicFilterLevel, 0.1f)) {
 			return anisotropicFilterLevel;
 		}
-		BuildGdx.gl.glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
+		Gdx.gl.glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, level);
 		return anisotropicFilterLevel = level;
 	}
 
@@ -316,19 +316,19 @@ public class GLTile extends GLTexture implements Comparable<GLTile> {
 	}
 
 	public void unbind() {
-		BuildGdx.gl.glBindTexture(glTarget, 0);
+		Gdx.gl.glBindTexture(glTarget, 0);
 	}
 
 	@Override
 	public void bind() {
-		BuildGdx.gl.glBindTexture(glTarget, glHandle);
+		Gdx.gl.glBindTexture(glTarget, glHandle);
 	}
 
 	@Override
 	public void delete() {
 		if (glHandle != 0) {
-			if (BuildGdx.gl != null) {
-				BuildGdx.gl.glDeleteTexture(glHandle);
+			if (Gdx.gl != null) {
+				Gdx.gl.glDeleteTexture(glHandle);
 			}
 			glHandle = 0;
 		}

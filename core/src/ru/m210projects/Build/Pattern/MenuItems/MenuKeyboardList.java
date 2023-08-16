@@ -16,12 +16,9 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.Gameutils.BClipLow;
 import static ru.m210projects.Build.Gameutils.BClipRange;
-import static ru.m210projects.Build.Settings.BuildConfig.*;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
@@ -29,19 +26,20 @@ import ru.m210projects.Build.Types.font.TextAlign;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildConfig.GameKeys;
+import ru.m210projects.Build.input.GameKey;
 
-public abstract class MenuKeyboardList extends MenuList
+public abstract class MenuKeyboardList extends MenuList implements ScrollableMenuItem
 {
 	public int l_set = 0; 
 	public MenuOpt l_pressedId;
-	protected KeyType[] keynames;
+	protected GameKey[] keynames;
 	protected BuildConfig cfg;
 	
 	protected SliderDrawable slider;
 	protected int scrollerX, scrollerHeight;
-	protected int touchY;
-	protected boolean isTouched;
-	
+//	protected int touchY;
+	protected boolean isLocked;
+//
 	public int pal_left;
 	public int pal_right;
 
@@ -55,11 +53,7 @@ public abstract class MenuKeyboardList extends MenuList
 	}
 	
 	public abstract String getKeyName(int keycode);
-	
-	public int mFontOffset() {
-		return font.getSize() + 2;
-	}
-	
+
 	@Override
 	public void draw(MenuHandler handler) {
 		int px = x, py = y;
@@ -115,7 +109,7 @@ public abstract class MenuKeyboardList extends MenuList
 		
 		scrollerX = x + width - slider.getScrollerWidth() + 5;
 		slider.drawScrollerBackground(scrollerX, y, scrollerHeight, 0, 0);
-		slider.drawScroller(scrollerX, posy, handler.getShade(isTouched ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
+		slider.drawScroller(scrollerX, posy, handler.getShade(isLocked ? m_pMenu.m_pItems[m_pMenu.m_nFocus] : null), 0);
 		
 		handler.mPostDraw(this);
 	}
@@ -142,28 +136,11 @@ public abstract class MenuKeyboardList extends MenuList
 				if ( (flags & 4) == 0 ) {
 					return false;
 				}
-				
-				if(opt == MenuOpt.LMB && isTouched)
-				{
-					if(len <= nListItems) {
-						return false;
-					}
 
-					int nList = BClipLow(len - nListItems, 1);
-					int nRange = scrollerHeight;
-					int py = y;
-
-					l_nFocus = -1;
-					l_nMin = BClipRange(((touchY - py) * nList) / nRange, 0, nList);
-					
-					return false;
-				}
-				
 				if(l_nFocus != -1 && callback != null) {
 					callback.run(handler, this);
 				}
-				
-				getInputController().resetKeyStatus();
+
 				return false;
 			case DELETE:
 				if(l_nFocus == -1) {
@@ -203,20 +180,12 @@ public abstract class MenuKeyboardList extends MenuList
 				callback.run(handler, this);
 			}
 			
-			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) {
-				getInputController().resetKeyStatus();
-			}
+//			if(l_nFocus == GameKeys.Menu_Toggle.getNum()) {
+//				getInputController().resetKeyStatus();
+//			}
 
 			return false;
 		}
-	}
-	
-	@Override
-	public void open() {
-	}
-
-	@Override
-	public void close() {
 	}
 	
 	@Override
@@ -224,32 +193,59 @@ public abstract class MenuKeyboardList extends MenuList
 		if(l_set != 0) {
 			return false;
 		}
-		
-		if(!BuildGdx.input.isTouched()) {
-			isTouched = false;
-		}
-				
-		touchY = my;
-		if(mx > scrollerX && mx < scrollerX + slider.getScrollerWidth()) 
-		{
-			isTouched = BuildGdx.input.isTouched();
-			return true;
-		}
 
-		if(!isTouched)
-		{
-			int py = y;
-			for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {	
-				if(my >= py && my < py + font.getSize())
-				{
-					l_nFocus = i;
-					return true;
-				}
-			    
-				py += mFontOffset();
+		int py = y;
+		for(int i = l_nMin; i >= 0 && i < l_nMin + nListItems && i < len; i++) {
+			if(my >= py && my < py + font.getSize())
+			{
+				l_nFocus = i;
+				return true;
 			}
+
+			py += mFontOffset();
 		}
 
 		return false;
 	}
+
+	@Override
+	public boolean onMoveSlider(MenuHandler handler, int scaledX, int scaledY) {
+		if (isLocked) {
+
+			if(len <= nListItems) {
+				return false;
+			}
+
+			int nList = BClipLow(len - nListItems, 1);
+			int nRange = scrollerHeight;
+			int py = y;
+
+			l_nFocus = -1;
+			l_nMin = BClipRange(((scaledY - py) * nList) / nRange, 0, nList);
+
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onLockSlider(MenuHandler handler, int mx, int my) {
+		if(l_set != 0) {
+			return false;
+		}
+
+		if(mx > scrollerX && mx < scrollerX + slider.getScrollerWidth())
+		{
+			isLocked = true;
+			onMoveSlider(handler, mx, my);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onUnlockSlider() {
+		isLocked = false;
+	}
+
 }

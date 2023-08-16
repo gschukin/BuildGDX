@@ -16,11 +16,11 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import static ru.m210projects.Build.Input.Keymap.MOUSE_BUTTON11;
-import static ru.m210projects.Build.Input.Keymap.MOUSE_LBUTTON;
-import static ru.m210projects.Build.Input.Keymap.MOUSE_RBUTTON;
-import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLDN;
-import static ru.m210projects.Build.Input.Keymap.MOUSE_WHELLUP;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_BUTTON11;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_LBUTTON;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_RBUTTON;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_WHELLDN;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_WHELLUP;
 
 import com.badlogic.gdx.Input.Keys;
 
@@ -47,6 +47,7 @@ public abstract class MenuKeyboard extends BuildMenu {
 	public abstract String keyNames(int keycode);
 	
 	public MenuKeyboard(final BuildGame app, int posx, int posy, int width, int list_len, Font style) {
+		super(app.pMenu);
 		addItem(getTitle(app, "Configure keys"), false);
 		final BuildConfig cfg = app.pCfg;
 		
@@ -86,7 +87,6 @@ public abstract class MenuKeyboard extends BuildMenu {
 						if (item.l_nFocus == GameKeys.Menu_Toggle.getNum()) {
 							cfg.setKey(item.l_nFocus, Keys.ESCAPE);
 						}
-						app.pInput.ctrlResetKeyStatus();
 						item.l_set = 0;
 						break;
 					case SPACE:
@@ -156,30 +156,30 @@ public abstract class MenuKeyboard extends BuildMenu {
 						item.l_set = 0;
 						break;
 					default:
-						for (int kb = 0; kb < 256; kb++) {
-							if (kb >= MOUSE_WHELLUP && kb <= MOUSE_BUTTON11) {
-								if (app.pInput.ctrlKeyStatus(kb)) {
-									mousekeys[item.l_nFocus] = kb;
-
-									for (int i = 0; i < mousekeys.length; i++) {
-										if (i != item.l_nFocus && kb == mousekeys[i]) {
-											mousekeys[i] = 0;
-										}
-									}
-
-									item.l_set = 0;
-								}
-							} else if (app.pInput.ctrlKeyStatus(kb)) {
-								cfg.setKey(item.l_nFocus, kb);
-								item.l_set = 0;
-							}
-						}
+//		FIXME				for (int kb = 0; kb < 256; kb++) {
+//							if (kb >= MOUSE_WHELLUP && kb <= MOUSE_BUTTON11) {
+//								if (app.pInput.ctrlKeyStatus(kb)) {
+//									mousekeys[item.l_nFocus] = kb;
+//
+//									for (int i = 0; i < mousekeys.length; i++) {
+//										if (i != item.l_nFocus && kb == mousekeys[i]) {
+//											mousekeys[i] = 0;
+//										}
+//									}
+//
+//									item.l_set = 0;
+//								}
+//							} else if (app.pInput.ctrlKeyStatus(kb)) {
+//								cfg.setKey(item.l_nFocus, kb);
+//								item.l_set = 0;
+//							}
+//						}
 						break;
 					}
 				}
 
 				if (item.l_nFocus == GameKeys.Show_Console.getNum()) {
-					app.pInput.ctrlResetKeyStatus();
+//					app.pInput.ctrlResetKeyStatus();
 //	FIXME				Console.setCaptureKey(cfg.primarykeys[item.l_nFocus], 0);
 //					Console.setCaptureKey(cfg.secondkeys[item.l_nFocus], 1);
 //					Console.setCaptureKey(cfg.mousekeys[item.l_nFocus], 2);

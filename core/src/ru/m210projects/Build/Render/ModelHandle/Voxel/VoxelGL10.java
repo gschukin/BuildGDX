@@ -11,12 +11,14 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_VERTEX_ARRAY;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.BufferUtils;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.ModelHandle.Voxel.VoxelBuilder.Rectangle;
 import ru.m210projects.Build.Render.TextureHandle.GLTile;
+import ru.m210projects.Build.Render.Types.GL10;
 
 public abstract class VoxelGL10 extends GLVoxel {
 
@@ -82,36 +84,36 @@ public abstract class VoxelGL10 extends GLVoxel {
 		}
 
 		if (alpha != 1.0f) {
-			BuildGdx.gl.glEnable(GL_BLEND);
+			Gdx.gl.glEnable(GL_BLEND);
 		} else {
-			BuildGdx.gl.glDisable(GL_BLEND);
+			Gdx.gl.glDisable(GL_BLEND);
 		}
 
 		skin.bind(); // TODO skinBind instead of setTextureParams
 		setTextureParameters(skin, pal, shade, visibility, alpha);
 
 		if (isVertexArray) {
-			BuildGdx.gl.glColor4f(color.r, color.g, color.b, color.a);
-			BuildGdx.gl.glEnableClientState(GL_VERTEX_ARRAY);
-			BuildGdx.gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			((GL10) Gdx.gl).glColor4f(color.r, color.g, color.b, color.a);
+			((GL10) Gdx.gl).glEnableClientState(GL_VERTEX_ARRAY);
+			((GL10) Gdx.gl).glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-			BuildGdx.gl.glVertexPointer(3, GL_FLOAT, 0, vertices);
-			BuildGdx.gl.glTexCoordPointer(2, GL_FLOAT, 0, uv);
-			BuildGdx.gl.glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_SHORT, indices);
+			((GL10) Gdx.gl).glVertexPointer(3, GL_FLOAT, 0, vertices);
+			((GL10) Gdx.gl).glTexCoordPointer(2, GL_FLOAT, 0, uv);
+			((GL10) Gdx.gl).glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_SHORT, indices);
 
-			BuildGdx.gl.glDisableClientState(GL_VERTEX_ARRAY);
-			BuildGdx.gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			((GL10) Gdx.gl).glDisableClientState(GL_VERTEX_ARRAY);
+			((GL10) Gdx.gl).glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			return true;
 		}
 
 		float ru = 1.0f / skinData.getWidth();
 		float rv = 1.0f / skinData.getHeight();
 
-		BuildGdx.gl.glBegin(GL_QUADS);
+		((GL10) Gdx.gl).glBegin(GL_QUADS);
 		for (int i = 0, fi = 0; i < qcnt; i++) {
 			if (i == qfacind[fi]) {
 				float f = dvoxclut[fi++];
-				BuildGdx.gl.glColor4f(color.r * f, color.g * f, color.b * f, color.a * f);
+				((GL10) Gdx.gl).glColor4f(color.r * f, color.g * f, color.b * f, color.a * f);
 			}
 
 			Rectangle rec = quad[i];
@@ -121,7 +123,7 @@ public abstract class VoxelGL10 extends GLVoxel {
 			float zz = rec.getZ(0) + rec.getZ(2);
 
 			for (int j = 0; j < 4; j++) {
-				BuildGdx.gl.glTexCoord2d((rec.getU(j)) * ru, (rec.getV(j)) * rv);
+				((GL10) Gdx.gl).glTexCoord2d((rec.getU(j)) * ru, (rec.getV(j)) * rv);
 				float vertx = (rec.getX(j)) - dvoxphack[(xx > (rec.getX(j) * 2)) ? 1 : 0]
 						+ dvoxphack[(xx < (rec.getX(j) * 2)) ? 1 : 0];
 				float verty = (rec.getY(j)) - dvoxphack[(yy > (rec.getY(j) * 2)) ? 1 : 0]
@@ -129,10 +131,10 @@ public abstract class VoxelGL10 extends GLVoxel {
 				float vertz = (rec.getZ(j)) - dvoxphack[(zz > (rec.getZ(j) * 2)) ? 1 : 0]
 						+ dvoxphack[(zz < (rec.getZ(j) * 2)) ? 1 : 0];
 
-				BuildGdx.gl.glVertex3d(vertx, verty, vertz);
+				((GL10) Gdx.gl).glVertex3d(vertx, verty, vertz);
 			}
 		}
-		BuildGdx.gl.glEnd();
+		((GL10) Gdx.gl).glEnd();
 
 		return true;
 	}

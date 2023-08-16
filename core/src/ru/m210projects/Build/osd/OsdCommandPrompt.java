@@ -1,5 +1,8 @@
 package ru.m210projects.Build.osd;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import ru.m210projects.Build.osd.commands.OsdValueRange;
 
 import java.io.BufferedReader;
@@ -7,14 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static ru.m210projects.Build.Engine.MAXPALOOKUPS;
+import static ru.m210projects.Build.input.keymap.Keymap.KEY_CAPSLOCK;
 
-public class OsdCommandPrompt {
+public class OsdCommandPrompt extends InputAdapter {
 
-    private static final int OSD_EDIT_LENGTH = 511;
-    private final ConsoleHistory inputHistory;
-    private final StringBuilder osdEditBuf = new StringBuilder(OSD_EDIT_LENGTH);
-    private final OsdCommandPromptUI ui;
-    //    private final Console parent;
+    protected final ConsoleHistory inputHistory;
+    private final StringBuilder osdEditBuf;
     protected String osdVersionText;
     protected int osdVersionShade;
     protected OsdColor osdVersionPal = OsdColor.DEFAULT;
@@ -28,11 +29,11 @@ public class OsdCommandPrompt {
     private boolean osdCtrl = false;
     private boolean osdCapsLock = false;
     private boolean osdOverType = false;
-    private ActionListener actionListener;
+    protected ActionListener actionListener;
 
-    public OsdCommandPrompt(OsdCommandPromptUI ui) {
-        this.inputHistory = new ConsoleHistory(32);
-        this.ui = ui;
+    public OsdCommandPrompt(int editLength, int historyDepth) {
+        this.inputHistory = new ConsoleHistory(historyDepth);
+        this.osdEditBuf = new StringBuilder(editLength);
     }
 
     public void setActionListener(ActionListener actionListener) {
@@ -86,7 +87,7 @@ public class OsdCommandPrompt {
         });
     }
 
-    public void captureInput(boolean capture) {
+    public void setCaptureInput(boolean capture) {
         this.osdCaptureInput = capture;
     }
 
@@ -171,10 +172,10 @@ public class OsdCommandPrompt {
 
     public void onEnter() {
         if (!isEmpty()) {
-            String input = osdEditBuf.toString();
+            String input = getTextInput();
             inputHistory.add(input);
+            actionListener.onEnter(input);
         }
-        actionListener.onEnter(getTextInput());
         clear();
     }
 
@@ -202,7 +203,7 @@ public class OsdCommandPrompt {
     }
 
     public void append(char ch) {
-        if (osdEditBuf.length() < OSD_EDIT_LENGTH) {
+        if (osdEditBuf.length() < osdEditBuf.capacity()) {
             if (osdEditCursor < osdEditBuf.length()) {
                 if (osdOverType) {
                     osdEditBuf.deleteCharAt(osdEditCursor);
@@ -223,6 +224,10 @@ public class OsdCommandPrompt {
         clear();
         osdEditBuf.append(text);
         onLastPosition();
+    }
+
+    public int getCursorPosition() {
+        return osdEditCursor;
     }
 
     public boolean isEmpty() {
@@ -246,10 +251,6 @@ public class OsdCommandPrompt {
     }
 
     public void onResize() {
-    }
-
-    public void draw() {
-        ui.draw();
     }
 
     public boolean isCaptured() {
@@ -278,6 +279,112 @@ public class OsdCommandPrompt {
 
     public void setCtrlPressed(boolean osdCtrl) {
         this.osdCtrl = osdCtrl;
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if (!isCaptured()) {
+            return false;
+        }
+
+        switch (keycode) {
+            case Input.Keys.V:
+                if (isCtrlPressed()) {
+					if(Gdx.app.getClipboard() != null) {
+						String content = Gdx.app.getClipboard().getContents();
+						for(int i = 0; i < content.length(); i++) {
+							keyTyped(content.charAt(i));
+						}
+					}
+                    return true;
+                }
+                break;
+            case Input.Keys.ENTER:
+                onEnter();
+                return true;
+            case Input.Keys.DEL: //backspace
+                if (isCtrlPressed()) {
+                    clear();
+                } else {
+                    onDelete();
+                }
+                return true;
+            case KEY_CAPSLOCK:
+                setCapsLockPressed(!isCapsLockPressed());
+                return true;
+            case Input.Keys.DOWN:
+                historyNext();
+                return true;
+            case Input.Keys.UP:
+                historyPrev();
+                return true;
+            case Input.Keys.RIGHT:
+                onRight();
+                return true;
+            case Input.Keys.LEFT:
+                onLeft();
+                return true;
+            case Input.Keys.INSERT:
+                toggleOverType();
+                return true;
+            case Input.Keys.END:
+                if (!isCtrlPressed()) {
+                    onLastPosition();
+                    return true;
+                }
+                break;
+            case Input.Keys.HOME:
+                if (!isCtrlPressed()) {
+                    onFirstPosition();
+                    return true;
+                }
+                break;
+            case Input.Keys.SHIFT_LEFT:
+            case Input.Keys.SHIFT_RIGHT:
+                setShiftPressed(true);
+                return true;
+            case Input.Keys.CONTROL_LEFT:
+            case Input.Keys.CONTROL_RIGHT:
+                setCtrlPressed(true);
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        switch (keycode) {
+            case Input.Keys.SHIFT_LEFT:
+            case Input.Keys.SHIFT_RIGHT:
+                setShiftPressed(false);
+                break;
+            case Input.Keys.CONTROL_LEFT:
+            case Input.Keys.CONTROL_RIGHT:
+                setCtrlPressed(false);
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        if (!isCaptured()) {
+            return false;
+        }
+
+        if (isCharacterAllowed(character)) {
+            append(character);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isCharacterAllowed(char character) {
+//        if (Character.isLetterOrDigit(character)) {
+//            return true;
+//        }
+        return character >= 32 && character < 127;
     }
 
     public interface ActionListener {

@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Clipboard;
 
 import ru.m210projects.Build.Architecture.BuildApplication.Platform;
 import ru.m210projects.Build.Audio.BuildAudio;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildGamepadManager;
 
 public interface ApplicationFactory {
 
@@ -36,7 +36,7 @@ public interface ApplicationFactory {
 
 	Files getFiles();
 
-	BuildControllers getControllers();
+	BuildGamepadManager getControllers();
 
 	Platform getPlatform();
 

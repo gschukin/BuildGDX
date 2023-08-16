@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with BuildGDX.  If not, see <http://www.gnu.org/licenses/>.
 
-package ru.m210projects.Build.Input;
+package ru.m210projects.Build.input;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import ru.m210projects.Build.Architecture.BuildController;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.OsdColor;
 
-public abstract class BuildControllers {
+public abstract class BuildGamepadManager {
 	
 	public final static int MAXBUTTONS = 64;
 	public final static int MAXPOV = 4;
@@ -36,7 +36,7 @@ public abstract class BuildControllers {
 	
 	private final boolean TestGamepad = false;
 
-	public BuildControllers init() {
+	public BuildGamepadManager init() {
 		gamepads = new ArrayList<BuildController>();
 		getControllers(gamepads);
 		if(TestGamepad) {

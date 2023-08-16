@@ -1,8 +1,7 @@
 package ru.m210projects.Build.Settings;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Architecture.BuildGraphics;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GLInfo;
 import ru.m210projects.Build.Render.GLRenderer;
@@ -39,7 +38,7 @@ public class GLSettings extends BuildSettings {
                 "Changes the texture filtering settings") {
             @Override
             public void execute(GLFilter value) {
-                BuildGdx.app.postRunnable(new Runnable() { // it must be started at GLthread
+                Gdx.app.postRunnable(new Runnable() { // it must be started at GLthread
                     @Override
                     public void run() {
                         GLRenderer gl = engine.glrender();
@@ -69,7 +68,7 @@ public class GLSettings extends BuildSettings {
         textureAnisotropy = new BuildVariable<Integer>(1, "Changes the texture anisotropy settings") {
             @Override
             public void execute(final Integer value) {
-                BuildGdx.app.postRunnable(new Runnable() { // it must be started at GLthread
+                Gdx.app.postRunnable(new Runnable() { // it must be started at GLthread
                     @Override
                     public void run() {
                         GLRenderer gl = engine.glrender();
@@ -148,7 +147,7 @@ public class GLSettings extends BuildSettings {
 		useHighTile = new BooleanVar(true, "Use true color textures from high resolution pack") {
 			@Override
 			public void execute(Boolean value) {
-				BuildGdx.app.postRunnable(new Runnable() { // it must be started at GLthread
+				Gdx.app.postRunnable(new Runnable() { // it must be started at GLthread
 					@Override
 					public void run() {
 						GLRenderer gl = engine.glrender();
@@ -183,7 +182,7 @@ public class GLSettings extends BuildSettings {
 //						}
 //						try {
 //							final int value = Integer.parseInt(osd_argv[1]);
-//							BuildGdx.app.postRunnable(new Runnable() { // it must be started at GLthread
+//							Gdx.app.postRunnable(new Runnable() { // it must be started at GLthread
 //								@Override
 //								public void run() {
 //									usePaletteShader.set(value == 1);
@@ -210,12 +209,12 @@ public class GLSettings extends BuildSettings {
 			protected Integer check(Object value) {
 				if (value instanceof Integer) {
 					try {
-						float gamma = (Integer) value / 4096.0f;
-						if (engine.glrender() == null || (Boolean) BuildGdx.graphics.extra(BuildGraphics.Option.GLSetConfiguration,
-								//1 - gamma, cfg.fbrightness, cfg.fcontrast))
-								1 - gamma, 0.0f, 1.0f)) {
-							return (Integer) value;
-						}
+//						float gamma = (Integer) value / 4096.0f;
+//						if (engine.glrender() == null || (Boolean) Gdx.graphics.extra(BuildGraphics.Option.GLSetConfiguration,
+//								//1 - gamma, cfg.fbrightness, cfg.fcontrast))
+//								1 - gamma, 0.0f, 1.0f)) {
+//							return (Integer) value;
+//						}
 					} catch(Throwable ignored) {
 					}
 				}

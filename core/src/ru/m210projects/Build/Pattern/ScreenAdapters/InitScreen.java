@@ -20,14 +20,13 @@ import static ru.m210projects.Build.Net.Mmulti.uninitmultiplayer;
 import static ru.m210projects.Build.Strhandler.toLowerCase;
 import static ru.m210projects.Build.filehandle.CacheResourceMap.CachePriority.NORMAL;
 
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.nio.file.Path;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
 
+import ru.m210projects.Build.Audio.BuildAudio;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildMessage.MessageType;
@@ -39,14 +38,12 @@ import ru.m210projects.Build.Render.Renderer.RenderType;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
-import ru.m210projects.Build.Types.BuildInputController;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Pattern.BuildFactory;
-import ru.m210projects.Build.filehandle.CacheResourceMap;
+import ru.m210projects.Build.desktop.Lwjgl.LwjglGL10;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.fs.Directory;
-import ru.m210projects.Build.filehandle.fs.FileEntry;
 import ru.m210projects.Build.osd.CommandResponse;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.osd.ConsoleLogger;
@@ -123,6 +120,9 @@ public class InitScreen extends ScreenAdapter {
 
 	public InitScreen(final BuildGame game) {
 		this.game = game;
+		Gdx.gl = new LwjglGL10(); // FIXME:
+		BuildGdx.audio = new BuildAudio();
+
 		BuildConfig cfg = game.pCfg;
 		factory = game.getFactory();
 
@@ -198,7 +198,6 @@ public class InitScreen extends ScreenAdapter {
 		BuildSettings.init(engine, cfg);
 		GLSettings.init(engine, cfg);
 
-
 		if(!engine.setrendermode(factory.renderer(cfg.renderType))) {
 			engine.setrendermode(factory.renderer(RenderType.Software));
 			cfg.renderType = RenderType.Software;
@@ -210,7 +209,6 @@ public class InitScreen extends ScreenAdapter {
 
 		Console.out.revalidate();
 
-
 		if(cfg.autoloadFolder) {
 			Entry entry = gameDirectory.getEntry("autoload");
 			if (!entry.exists()) {
@@ -221,7 +219,9 @@ public class InitScreen extends ScreenAdapter {
 			}
 		}
 
-		Gdx.input.setInputProcessor(new BuildInputController(cfg));
+		Gdx.input.setInputProcessor(game.getProcessor());
+
+//		Gdx.input.setInputProcessor(new InputMultiplexer(game.getController(), Console.out));
 
 		thread = new Thread(new Runnable() {
 			@Override
@@ -234,26 +234,18 @@ public class InitScreen extends ScreenAdapter {
 					}
 
 					game.pNet = factory.net();
-					game.pInput = factory.input(BuildGdx.controllers.init());
+//					game.pInput = factory.input(BuildGdx.controllers.init());
 					game.pSlider = factory.slider();
 					game.pMenu = factory.menus();
 					game.baseDef = factory.getBaseDef(engine);
 
 					uninitmultiplayer();
 
-					cfg.snddrv = BuildGdx.audio.checkNum(Driver.Sound, cfg.snddrv);
-					cfg.middrv = BuildGdx.audio.checkNum(Driver.Music, cfg.middrv);
-
-					BuildGdx.audio.setDriver(Driver.Sound, cfg.snddrv);
-					BuildGdx.audio.setDriver(Driver.Music, cfg.middrv);
-
-//					int consolekey = GameKeys.Show_Console.getNum();
-//					if (consolekey != -1) {
-//						Console.out.setCaptureKey(cfg.primarykeys[consolekey], 0);
-//						Console.out.setCaptureKey(cfg.secondkeys[consolekey], 1);
-//						Console.out.setCaptureKey(cfg.mousekeys[consolekey], 2);
-//						Console.out.setCaptureKey(cfg.gpadkeys[consolekey], 3);
-//					}
+//					cfg.snddrv = BuildGdx.audio.checkNum(Driver.Sound, cfg.snddrv);
+//					cfg.middrv = BuildGdx.audio.checkNum(Driver.Music, cfg.middrv);
+//
+//					BuildGdx.audio.setDriver(Driver.Sound, cfg.snddrv);
+//					BuildGdx.audio.setDriver(Driver.Music, cfg.middrv);
 
 					BuildSettings.usenewaspect.set(cfg.widescreen == 1);
 					BuildSettings.fov.set(cfg.gFov);
@@ -321,7 +313,7 @@ public class InitScreen extends ScreenAdapter {
 							game.show();
 						} else {
 							game.GameMessage("InitScreen unknown error!");
-							BuildGdx.app.exit();
+							Gdx.app.exit();
 						}
 					}
 				}

@@ -218,7 +218,7 @@ public class AndroidGraphics extends BuildGraphics implements Renderer {
 	@Override
 	protected void updateSize(int width, int height) {
 		if (BuildGdx.gl != null)
-			BuildGdx.gl.glViewport(0, 0, width, height);
+			Gdx.gl.glViewport(0, 0, width, height);
 	}
 
 	@Override
@@ -373,7 +373,7 @@ public class AndroidGraphics extends BuildGraphics implements Renderer {
 	@Override
 	public boolean supportsExtension(String extension) {
 		if (extensions == null)
-			extensions = BuildGdx.gl.glGetString(GLES11.GL_EXTENSIONS);
+			extensions = Gdx.gl.glGetString(GLES11.GL_EXTENSIONS);
 		return extensions.contains(extension);
 	}
 

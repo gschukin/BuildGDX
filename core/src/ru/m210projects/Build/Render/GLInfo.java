@@ -8,20 +8,13 @@
 package ru.m210projects.Build.Render;
 
 import static com.badlogic.gdx.graphics.GL20.*;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_DITHER;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_LINE_SMOOTH_HINT;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_NICEST;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_PERSPECTIVE_CORRECTION_HINT;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE_2D;
-//import static ru.m210projects.Build.Render.Types.GL10.GL_VERSION;
-
 import java.nio.FloatBuffer;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
+import com.badlogic.gdx.Gdx;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.utils.BufferUtils;
+import ru.m210projects.Build.Render.Types.GL10;
 
 public class GLInfo {
 	public static String version;
@@ -41,61 +34,61 @@ public class GLInfo {
 	public static int gltexmaxsize;
 
 	public static void init() {
-		BuildGdx.gl.glEnable(GL_TEXTURE_2D);
-		BuildGdx.gl.glClearColor(0, 0, 0, 0.5f); // Black Background
-		BuildGdx.gl.glDisable(GL_DITHER);
+		Gdx.gl.glEnable(GL_TEXTURE_2D);
+		Gdx.gl.glClearColor(0, 0, 0, 0.5f); // Black Background
+		Gdx.gl.glDisable(GL_DITHER);
 
-		version = BuildGdx.gl.glGetString(GL_VERSION);
+		version = Gdx.gl.glGetString(GL_VERSION);
 
 		maxanisotropy = 1.0f;
 		bgra = false;
 		texcompr = 0;
 		gltexmaxsize = 0;
 
-		if (BuildGdx.graphics.supportsExtension("GL_EXT_texture_filter_anisotropic")) {
+		if (Gdx.graphics.supportsExtension("GL_EXT_texture_filter_anisotropic")) {
 			FloatBuffer buf = BufferUtils.newFloatBuffer(16);
-			BuildGdx.gl.glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, buf);
+			Gdx.gl.glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, buf);
 			maxanisotropy = buf.get(); // supports anisotropy. get the maximum anisotropy level
 		}
-//		if (BuildGdx.graphics.supportsExtension("GL_EXT_texture_edge_clamp") ||
-//				BuildGdx.graphics.supportsExtension("GL_SGIS_texture_edge_clamp")) {
+//		if (Gdx.graphics.supportsExtension("GL_EXT_texture_edge_clamp") ||
+//				Gdx.graphics.supportsExtension("GL_SGIS_texture_edge_clamp")) {
 //			clamptoedge = true; // supports GL_CLAMP_TO_EDGE or GL_CLAMP_TO_EDGE_SGIS
 //		}
-		if (BuildGdx.graphics.supportsExtension("GL_EXT_bgra")) {
+		if (Gdx.graphics.supportsExtension("GL_EXT_bgra")) {
 			bgra = true; // support bgra textures
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_texture_compression")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_texture_compression")) {
 			texcompr = 1; // support texture compression
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_texture_non_power_of_two")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_texture_non_power_of_two")) {
 //			texnpot = 1; // support non-power-of-two texture sizes
 		}
-		if (BuildGdx.graphics.supportsExtension("WGL_3DFX_gamma_control")) {
+		if (Gdx.graphics.supportsExtension("WGL_3DFX_gamma_control")) {
 			hack_nofog = true; // 3dfx cards have issues with fog
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_multisample")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_multisample")) {
 			multisample = 1; // supports multisampling
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_NV_multisample_filter_hint")) {
+		if (Gdx.graphics.supportsExtension("GL_NV_multisample_filter_hint")) {
 			nvmultisamplehint = 1; // supports nvidia's multisample hint extension
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_multitexture")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_multitexture")) {
 			multitex = 1;
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_texture_env_combine")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_texture_env_combine")) {
 			envcombine = 1;
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_vertex_buffer_object")) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_vertex_buffer_object")) {
 			vbos = 1;
 		}
-		if (BuildGdx.graphics.supportsExtension("GL_ARB_framebuffer_object")
-				|| BuildGdx.graphics.supportsExtension("GL_EXT_framebuffer_object") || BuildGdx.gl30 != null
-				|| BuildGdx.app.getType() == ApplicationType.Android || BuildGdx.app.getType() == ApplicationType.WebGL
-				|| BuildGdx.app.getType() == ApplicationType.iOS) {
+		if (Gdx.graphics.supportsExtension("GL_ARB_framebuffer_object")
+				|| Gdx.graphics.supportsExtension("GL_EXT_framebuffer_object") || Gdx.gl30 != null
+				|| Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.WebGL
+				|| Gdx.app.getType() == ApplicationType.iOS) {
 			supportsGenerateMipmaps = true;
 		}
 
-		int i = BuildGdx.gl.glGetInteger(GL_MAX_TEXTURE_SIZE);
+		int i = ((GL10) Gdx.gl).glGetInteger(GL_MAX_TEXTURE_SIZE);
 		if (i == 0) {
 			gltexmaxsize = 6; // 2^6 = 64 == default GL max texture size
 		} else {

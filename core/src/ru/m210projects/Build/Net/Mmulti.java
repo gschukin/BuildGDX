@@ -354,9 +354,9 @@ public class Mmulti {
 							if (timeout != 0 && time > timeout) {
 								throw new Exception("Connection timed out!");
 							}
-							if(BuildGdx.input != null && BuildGdx.input.isKeyPressed(Keys.ESCAPE)) {
-								throw new Exception("Connection cancelled");
-							}
+//	FIXME						if(BuildGdx.input != null && BuildGdx.input.isKeyPressed(Keys.ESCAPE)) {
+//								throw new Exception("Connection cancelled");
+//							}
 						}
 						inet.netready = 1;
 					}

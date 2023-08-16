@@ -25,21 +25,21 @@ import com.badlogic.gdx.utils.Array;
 import ru.m210projects.Build.Architecture.BuildController;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildGamepadManager;
 
-public class GdxControllers extends BuildControllers {
+public class GdxControllers extends BuildGamepadManager {
 
 	@Override
 	protected void getControllers(List<BuildController> gamepads) {
 		Array<Controller> controllers = null;
 
-		if(BuildGdx.graphics.getFrameType() != FrameType.Canvas) {
-			try {
-				controllers = Controllers.getControllers();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+//		if(BuildGdx.graphics.getFrameType() != FrameType.Canvas) {
+//			try {
+//				controllers = Controllers.getControllers();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		} FIXME
 
 		if (controllers != null && controllers.size > 0) {
 			for (int i = 0; i < controllers.size; i++) {

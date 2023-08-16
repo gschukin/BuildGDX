@@ -10,10 +10,10 @@ import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_HINT;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_MODE;
 import static ru.m210projects.Build.Render.Types.GL10.GL_FOG_START;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.EngineUtils;
-import ru.m210projects.Build.Render.TextureHandle.TextureManager;
+
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Render.Types.Color;
+import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Types.PaletteManager;
 
 public class GLFog {
@@ -36,12 +36,12 @@ public class GLFog {
 	protected float[] curcolor = new float[4];
 
 	public void init(PaletteManager paletteManager) {
-		if (BuildGdx.graphics.getGLVersion().getVendorString().compareTo("NVIDIA Corporation") == 0) {
-			BuildGdx.gl.glHint(GL_FOG_HINT, GL_NICEST);
+		if (Gdx.graphics.getGLVersion().getVendorString().compareTo("NVIDIA Corporation") == 0) {
+			Gdx.gl.glHint(GL_FOG_HINT, GL_NICEST);
 		} else {
-			BuildGdx.gl.glHint(GL_FOG_HINT, GL_DONT_CARE);
+			Gdx.gl.glHint(GL_FOG_HINT, GL_DONT_CARE);
 		}
-		BuildGdx.gl.glFogi(GL_FOG_MODE, GL_LINEAR); // GL_EXP
+		((GL10) Gdx.gl).glFogi(GL_FOG_MODE, GL_LINEAR); // GL_EXP
 		this.paletteManager = paletteManager;
 	}
 
@@ -78,9 +78,9 @@ public class GLFog {
 
 //		if (manager.getShader() != null)
 //			manager.getShader().setFogParams(true, start, end, color);
-		BuildGdx.gl.glFogfv(GL_FOG_COLOR, color, 0);
-		BuildGdx.gl.glFogf(GL_FOG_START, start);
-		BuildGdx.gl.glFogf(GL_FOG_END, end);
+		((GL10) Gdx.gl).glFogfv(GL_FOG_COLOR, color, 0);
+		((GL10) Gdx.gl).glFogf(GL_FOG_START, start);
+		((GL10) Gdx.gl).glFogf(GL_FOG_END, end);
 	}
 
 	public void setFogScale(int var) {
@@ -94,13 +94,13 @@ public class GLFog {
 	public void enable() {
 		if (!nofog) {
 			isEnabled = true;
-			BuildGdx.gl.glEnable(GL_FOG);
+			Gdx.gl.glEnable(GL_FOG);
 		}
 	}
 
 	public void disable() {
 		isEnabled = false;
-		BuildGdx.gl.glDisable(GL_FOG);
+		Gdx.gl.glDisable(GL_FOG);
 //		if (manager.getShader() != null)
 //			manager.getShader().setFogParams(false, 0.0f, 0.0f, null);
 	}

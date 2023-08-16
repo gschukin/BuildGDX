@@ -29,6 +29,7 @@ public abstract class MenuMultiplayer extends BuildMenu {
 
 	public MenuMultiplayer(BuildGame app, int posx, int posy, int menuHeight, Font style)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Multiplayer"), false);
 
 		int pos = posy;

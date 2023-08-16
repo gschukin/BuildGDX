@@ -54,7 +54,7 @@ public class BuildApplication implements Application {
 	protected final Array<Runnable> runnables = new Array<Runnable>();
 	protected final Array<Runnable> executedRunnables = new Array<Runnable>();
 
-	public BuildApplication (BuildGame listener, final ApplicationFactory factory, RenderType type) {
+	public BuildApplication (ApplicationListener listener, final ApplicationFactory factory, RenderType type) {
 		this.listener = listener;
 		this.config = factory.getConfiguration();
 
@@ -72,7 +72,7 @@ public class BuildApplication implements Application {
 		BuildGdx.audio = factory.getAudio();
 		BuildGdx.message = factory.getMessage();
 		BuildGdx.message.setFrame(frame);
-		BuildGdx.controllers = factory.getControllers();
+//		BuildGdx.controllers = factory.getControllers();
 		this.platform = factory.getPlatform();
 		this.type = factory.getApplicationType();
 		this.clipboard = factory.getClipboard();

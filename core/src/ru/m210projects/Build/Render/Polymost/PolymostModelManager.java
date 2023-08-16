@@ -10,12 +10,14 @@ import static ru.m210projects.Build.Engine.RESERVEDPALS;
 import static ru.m210projects.Build.Render.Types.GL10.GL_MODELVIEW;
 import static ru.m210projects.Build.Render.Types.GL10.GL_TEXTURE0;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
+import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Render.ModelHandle.GLModel;
@@ -174,18 +176,18 @@ public class PolymostModelManager extends ModelManager {
 					if (!texid.isDetailTexture()) {
 						System.err.println("Wtf detail!");
 					}
-					BuildGdx.gl.glActiveTexture(++texunits);
-					BuildGdx.gl.glEnable(GL_TEXTURE_2D);
+					Gdx.gl.glActiveTexture(++texunits);
+					Gdx.gl.glEnable(GL_TEXTURE_2D);
 					parent.bind(texid);
 					parent.setupTextureDetail(texid);
 
 					for (MDSkinmap sk = m.skinmap; sk != null; sk = sk.next) {
 						if (sk.palette == DETAILPAL && skinnum == sk.skinnum && surfnum == sk.surfnum) {
 							float f = sk.param;
-							BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-							BuildGdx.gl.glLoadIdentity();
-							BuildGdx.gl.glScalef(f, f, 1.0f);
-							BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
+							((GL10) Gdx.gl).glMatrixMode(GL_TEXTURE);
+							((GL10) Gdx.gl).glLoadIdentity();
+							((GL10) Gdx.gl).glScalef(f, f, 1.0f);
+							((GL10) Gdx.gl).glMatrixMode(GL_MODELVIEW);
 						}
 					}
 				}
@@ -197,8 +199,8 @@ public class PolymostModelManager extends ModelManager {
 						System.err.println("Wtf glow! " + surfnum);
 					}
 
-					BuildGdx.gl.glActiveTexture(++texunits);
-					BuildGdx.gl.glEnable(GL_TEXTURE_2D);
+					Gdx.gl.glActiveTexture(++texunits);
+					Gdx.gl.glEnable(GL_TEXTURE_2D);
 					parent.bind(texid);
 					parent.setupTextureGlow(texid);
 				}

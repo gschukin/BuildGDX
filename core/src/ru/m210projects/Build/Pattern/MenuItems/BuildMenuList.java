@@ -16,20 +16,13 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Input.Keymap.MOUSE_LBUTTON;
+import static ru.m210projects.Build.input.keymap.Keymap.MOUSE_LBUTTON;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.m210projects.Build.Pattern.BuildGame;
-import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
-import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler.MenuOpt;
-import ru.m210projects.Build.Pattern.MenuItems.MenuItem;
-import ru.m210projects.Build.Pattern.MenuItems.MenuList;
-import ru.m210projects.Build.Pattern.MenuItems.MenuScroller;
-import ru.m210projects.Build.Pattern.MenuItems.MenuSlider;
-import ru.m210projects.Build.Pattern.MenuItems.MenuTitle;
 
 public abstract class BuildMenuList extends BuildMenu {
 
@@ -227,7 +220,9 @@ public abstract class BuildMenuList extends BuildMenu {
 	private final BuildGame app;
 
 	public BuildMenuList(BuildGame app, String title, int x, int y, int width, int step, int nShowElements) {
+		super(app.pMenu);
 		this.app = app;
+
 
 		super.addItem(getTitle(app, title), false);
 		super.addItem(list = new MenuItemList(x, y, width, step, nShowElements), true);
@@ -267,11 +262,11 @@ public abstract class BuildMenuList extends BuildMenu {
 		MenuItem pItem;
 		if (list.l_nFocus >= 0 && list.m_pItems.size() > 0
 				&& ((pItem = list.m_pItems.get(list.l_nFocus)).flags & 2) != 0) {
-			if (pItem instanceof MenuSlider || pItem instanceof MenuScroller) {
-				if (app.pInput.ctrlKeyPressed(MOUSE_LBUTTON)) {
-					opt = MenuOpt.LMB;
-				}
-			}
+//			if (pItem instanceof MenuSlider || pItem instanceof MenuScroller) {
+//				if (app.pInput.ctrlKeyPressed(MOUSE_LBUTTON)) {
+//					opt = MenuOpt.LMB;
+//				}
+//			}
 		}
 
 		if (list.l_OldMouseFocus != list.l_nFocus) {

@@ -46,6 +46,7 @@ public abstract class MenuControls extends BuildMenu {
 	
 	public MenuControls(BuildGame app, int posy, int questionPos, int menuHeight, int separatorHeight, Font style, int pal, int questionPal)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Controls setup"), false);
 
 		MenuButton mMouse = new MenuButton("Mouse setup", style, 0, posy += menuHeight, 320, 1, pal, getMouseMenu(app), -1, null, 0);
@@ -69,7 +70,7 @@ public abstract class MenuControls extends BuildMenu {
 	
 	protected BuildMenu getResetDefaultMenu(final BuildGame app, Font style, int posy, int pal)
 	{
-		BuildMenu menu = new BuildMenu();
+		BuildMenu menu = new BuildMenu(app.pMenu);
 		
 		MenuText QuitQuestion = new MenuText("Do you really want to reset keys?", style, 160, posy, 1);
 		QuitQuestion.pal = pal;
@@ -89,7 +90,7 @@ public abstract class MenuControls extends BuildMenu {
 	
 	protected BuildMenu getResetClassicMenu(final BuildGame app, Font style, int posy, int pal)
 	{
-		BuildMenu menu = new BuildMenu();
+		BuildMenu menu = new BuildMenu(app.pMenu);
 		
 		MenuText QuitQuestion = new MenuText("Do you really want reset to classic keys?", style, 160, posy, 1);
 		QuitQuestion.pal = pal;

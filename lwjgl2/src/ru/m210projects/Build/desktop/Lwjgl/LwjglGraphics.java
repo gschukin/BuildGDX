@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
+import com.badlogic.gdx.Gdx;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -243,8 +244,8 @@ public class LwjglGraphics extends BuildGraphics {
 
 	@Override
 	protected void updateSize(int width, int height) {
-		if (BuildGdx.gl != null) {
-			BuildGdx.gl.glViewport(0, 0, width, height);
+		if (Gdx.gl != null) {
+			Gdx.gl.glViewport(0, 0, width, height);
 		}
 	}
 
@@ -398,7 +399,7 @@ public class LwjglGraphics extends BuildGraphics {
 			config.width = (int)(mode.getWidth() * scaleFactor);
 			config.height = (int)(mode.getHeight() * scaleFactor);
 			if (BuildGdx.gl != null) {
-				BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+				Gdx.gl.glViewport(0, 0, config.width, config.height);
 			}
 			resize = true;
 
@@ -432,7 +433,7 @@ public class LwjglGraphics extends BuildGraphics {
 			config.width = (int)(targetDisplayMode.getWidth() * scaleFactor);
 			config.height = (int)(targetDisplayMode.getHeight() * scaleFactor);
 			if (BuildGdx.gl != null) {
-				BuildGdx.gl.glViewport(0, 0, config.width, config.height);
+				Gdx.gl.glViewport(0, 0, config.width, config.height);
 			}
 			resize = true;
 

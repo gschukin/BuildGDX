@@ -21,18 +21,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 
 import ru.m210projects.Build.Audio.BuildAudio;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildGamepadManager;
 import ru.m210projects.Build.Render.Types.GL10;
 import ru.m210projects.Build.filehandle.Cache;
 
 public class BuildGdx {
 
 	public static BuildApplication app;
-	public static BuildGraphics graphics;
+//	public static BuildGraphics graphics;
 	public static BuildAudio audio;
 	public static BuildInput input;
 	public static BuildMessage message;
-	public static BuildControllers controllers;
 	public static Files files;
 
 	public static GL10 gl;

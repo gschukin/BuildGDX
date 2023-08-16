@@ -144,8 +144,8 @@ public class GDXOrtho extends OrphoRenderer {
 //		xpos <<= 16;
 //		ypos <<= 16;
 //
-//		BuildGdx.gl.glDisable(GL_CULL_FACE);
-//		BuildGdx.gl.glDisable(GL_DEPTH_TEST);
+//		Gdx.gl.glDisable(GL_CULL_FACE);
+//		Gdx.gl.glDisable(GL_DEPTH_TEST);
 //		Shader shader = ((font.type == FontType.Tilemap)
 //				? (atlas.getPixelFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader)
 //				: Shader.BitmapShader);
@@ -200,7 +200,7 @@ public class GDXOrtho extends OrphoRenderer {
 //			xpos += scale * (font.charsizx << 16);
 //			c++;
 //		}
-//		BuildGdx.gl.glDepthMask(true); // re-enable writing to the z-buffer
+//		Gdx.gl.glDepthMask(true); // re-enable writing to the z-buffer
 //	}
 
 	@Override
@@ -477,10 +477,10 @@ public class GDXOrtho extends OrphoRenderer {
 
 		if ((hudInfo.flags & 8) != 0) // NODEPTH flag
         {
-            BuildGdx.gl.glDisable(GL_DEPTH_TEST);
+            Gdx.gl.glDisable(GL_DEPTH_TEST);
         } else {
-			BuildGdx.gl.glEnable(GL_DEPTH_TEST);
-			BuildGdx.gl.glClear(GL_DEPTH_BUFFER_BIT);
+			Gdx.gl.glEnable(GL_DEPTH_TEST);
+			Gdx.gl.glClear(GL_DEPTH_BUFFER_BIT);
 		}
 
 		BuildCamera cam = parent.cam;

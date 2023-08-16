@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with BuildGDX.  If not, see <http://www.gnu.org/licenses/>.
 
-package ru.m210projects.Build.Input;
+package ru.m210projects.Build.input.keymap;
 
-import static ru.m210projects.Build.Input.BuildControllers.MAXBUTTONS;
+import static ru.m210projects.Build.input.BuildGamepadManager.MAXBUTTONS;
 import com.badlogic.gdx.utils.ObjectIntMap;
 
 public class ButtonMap {

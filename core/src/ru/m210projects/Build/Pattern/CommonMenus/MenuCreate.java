@@ -47,6 +47,7 @@ public abstract class MenuCreate extends BuildMenu {
 	
 	public MenuCreate(final BuildGame app, int posx, int posy, int menuHeight, int width, Font style, int kMaxPlayers)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Multiplayer"), false);
 		
 		mPlayerNum = new MenuSlider(app.pSlider, "Number of players", style, posx, posy += menuHeight, width, mPlayers, 1,
@@ -62,14 +63,14 @@ public abstract class MenuCreate extends BuildMenu {
 				NUMBERS, new MenuProc() {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {
-						MenuTextField item = (MenuTextField) pItem;
-						if(item.typed.length() < 8) {
-							app.pCfg.mPort = Integer.parseInt(item.typed);
-						}
-						else {
-							System.arraycopy(item.otypingBuf, 0, item.typingBuf, 0, 16);
-							item.inputlen = item.oinputlen;
-						}
+//						MenuTextField item = (MenuTextField) pItem;
+//						if(item.typed.length() < 8) {
+//							app.pCfg.mPort = Integer.parseInt(item.typed);
+//						}
+//						else {
+//							System.arraycopy(item.otypingBuf, 0, item.typingBuf, 0, 16);
+//							item.inputlen = item.oinputlen;
+//						} FIXME
 					}
 				});
 
@@ -77,16 +78,16 @@ public abstract class MenuCreate extends BuildMenu {
 				new MenuProc() {
 					@Override
 					public void run(MenuHandler handler, MenuItem pItem) {
-						MenuTextField item = (MenuTextField) pItem;
-						app.pCfg.pName = item.typed;
+//						MenuTextField item = (MenuTextField) pItem;
+//						app.pCfg.pName = item.typed;
 					}
 				}) {
 			
 			@Override
 			public void open() {
-				Arrays.fill(typingBuf, (char) 0);
-				inputlen = app.pCfg.pName.length();
-				System.arraycopy(app.pCfg.pName.toCharArray(), 0, typingBuf, 0, inputlen);
+//				Arrays.fill(typingBuf, (char) 0);
+//				inputlen = app.pCfg.pName.length();
+//				System.arraycopy(app.pCfg.pName.toCharArray(), 0, typingBuf, 0, inputlen);
 			}
 		};
 		

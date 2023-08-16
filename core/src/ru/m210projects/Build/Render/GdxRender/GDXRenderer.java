@@ -201,12 +201,12 @@ public class GDXRenderer implements GLRenderer {
 	@Override
 	public void init() {
 		try {
-			if (BuildGdx.graphics.getFrameType() != FrameType.GL) {
-				BuildGdx.app.setFrame(FrameType.GL);
-			}
+//			if (BuildGdx.graphics.getFrameType() != FrameType.GL) {
+//				BuildGdx.app.setFrame(FrameType.GL);
+//			}
 
 			GLInfo.init();
-			this.gl = BuildGdx.graphics.getGL20();
+			this.gl = Gdx.graphics.getGL20();
 
 			enableIndexedShader(GLSettings.usePaletteShader.get());
 
@@ -223,7 +223,7 @@ public class GDXRenderer implements GLRenderer {
 			this.textureCache.changePalette(paletteManager.getCurrentPalette().getBytes());
 
 			Console.out.println("Polygdx renderer is initialized", OsdColor.GREEN);
-			Console.out.println(BuildGdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
+			Console.out.println(Gdx.graphics.getGLVersion().getRendererString() + " " + gl.glGetString(GL_VERSION),
 					OsdColor.YELLOW);
 
 			orphoRen.init();
@@ -901,10 +901,10 @@ public class GDXRenderer implements GLRenderer {
 
 		int byteperpixel = 3;
 		int fmt = GL_RGB;
-		if (BuildGdx.app.getPlatform() == Platform.Android) {
-			byteperpixel = 4;
-			fmt = GL_RGBA;
-		}
+//		if (BuildGdx.app.getPlatform() == Platform.Android) {
+//			byteperpixel = 4;
+//			fmt = GL_RGBA;
+//		}
 
 		if (pix32buffer == null || pix32buffer.capacity() < xsiz * ysiz * byteperpixel) {
 			pix32buffer = BufferUtils.newByteBuffer(xsiz * ysiz * byteperpixel);
@@ -1360,7 +1360,7 @@ public class GDXRenderer implements GLRenderer {
 		if (cam != null) {
 			cam.setFieldOfView(fov);
 		} else {
-			BuildGdx.app.postRunnable(new Runnable() {
+			Gdx.app.postRunnable(new Runnable() {
 				@Override
 				public void run() {
 					cam.setFieldOfView(fov);

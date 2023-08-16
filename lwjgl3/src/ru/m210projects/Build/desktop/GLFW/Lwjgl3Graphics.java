@@ -74,7 +74,7 @@ public class Lwjgl3Graphics extends BuildGraphics {
 	private final GLFWWindowFocusCallback focusCallback = new GLFWWindowFocusCallback() {
 		@Override
 		public void invoke(long windowHandle, final boolean focused) {
-			BuildGdx.app.postRunnable(new Runnable() {
+			Gdx.app.postRunnable(new Runnable() {
 				@Override
 				public void run() {
 					isActive = focused;
@@ -301,7 +301,7 @@ public class Lwjgl3Graphics extends BuildGraphics {
 	@Override
 	protected void updateSize(int width, int height) {
 		if (BuildGdx.gl != null)
-			BuildGdx.gl.glViewport(0, 0, width, height);
+			Gdx.gl.glViewport(0, 0, width, height);
 	}
 
 	@Override

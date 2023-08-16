@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Shaders;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -555,13 +556,13 @@ public class ShaderManager {
 
                 @Override
                 public void bindPalette(int unit) {
-                    BuildGdx.gl.glActiveTexture(unit);
+                    Gdx.gl.glActiveTexture(unit);
                     textureCache.getPalette().bind(0);
                 }
 
                 @Override
                 public void bindPalookup(int unit, int pal) {
-                    BuildGdx.gl.glActiveTexture(unit);
+                    Gdx.gl.glActiveTexture(unit);
                     textureCache.getPalookup(pal).bind(0);
                 }
             };
@@ -603,13 +604,13 @@ public class ShaderManager {
             IndexedShader shader = new IndexedShader(WorldShader.vertex, WorldShader.fragment, palette_numshades) {
                 @Override
                 public void bindPalette(int unit) {
-                    BuildGdx.gl.glActiveTexture(unit);
+                    Gdx.gl.glActiveTexture(unit);
                     textureCache.getPalette().bind(0);
                 }
 
                 @Override
                 public void bindPalookup(int unit, int pal) {
-                    BuildGdx.gl.glActiveTexture(unit);
+                    Gdx.gl.glActiveTexture(unit);
                     textureCache.getPalookup(pal).bind(0);
                 }
 

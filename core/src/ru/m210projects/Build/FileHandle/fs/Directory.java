@@ -186,12 +186,13 @@ public class Directory implements Group {
         });
     }
 
-    public void addEntry(Path path) {
+    public FileEntry addEntry(Path path) {
         FileEntry entry = newEntry(path);
         if (entry.exists()) {
             entries.put(entry.getName().toUpperCase(), entry);
             entry.setParent(this);
         }
+        return entry;
     }
 
     public boolean revalidate() {

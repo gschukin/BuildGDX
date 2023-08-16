@@ -24,6 +24,7 @@ import static ru.m210projects.Build.Render.VideoMode.validmodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Types.ConvertType;
 import ru.m210projects.Build.Types.Transparent;
@@ -73,7 +74,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 	public abstract void setMode(BuildConfig cfg);
 
 	public BuildMenu getResolutionListMenu(final MenuVideoMode parent, final BuildGame app, int posx, int posy, int width, int nListItems, Font style, int nListBackground) {
-		BuildMenu menu = new BuildMenu();
+		BuildMenu menu = new BuildMenu(app.pMenu);
 
 		menu.addItem(parent.getTitle(app, "Resolution"), false);
 
@@ -92,7 +93,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 					return;
 				}
 
-				BuildGdx.app.postRunnable(new Runnable() {
+				Gdx.app.postRunnable(new Runnable() {
 					@Override
 					public void run() {
 						currentMode = choosedMode = validmodes.get(item.l_nFocus);
@@ -117,14 +118,14 @@ public abstract class MenuVideoMode extends BuildMenu {
 	public abstract MenuRendererSettings getRenSettingsMenu(final BuildGame app, int posx, int posy, int width, int nHeight, Font style);
 
 	public MenuVideoMode(final BuildGame app, int posx, int posy, int width, int itemHeight, Font style, int nListItems, int nListWidth, int nBackground) {
-
+		super(app.pMenu);
 		addItem(getTitle(app, "Video mode"), false);
 
 		final BuildConfig cfg = app.pCfg;
 		MenuProc callback = new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, MenuItem pItem) {
-				BuildGdx.app.postRunnable(new Runnable() {
+				Gdx.app.postRunnable(new Runnable() {
 					@Override
 					public void run() {
 						cfg.fullscreen = isFullscreen ? 1 : 0;
@@ -146,7 +147,6 @@ public abstract class MenuVideoMode extends BuildMenu {
 						setMode(cfg);  //init new renderer is doing here
 					}
 				});
-				app.pInput.ctrlResetInput();
 			}
 		};
 
@@ -219,7 +219,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 					currentMode = validmodes.get(num);
 					choosedMode = currentMode;
 				} else {
-					currentMode = new VideoMode(BuildGdx.graphics.getDisplayMode());
+					currentMode = new VideoMode(Gdx.graphics.getDisplayMode());
 				}
 			}
 
@@ -251,7 +251,7 @@ public abstract class MenuVideoMode extends BuildMenu {
 		MenuProc renderCallback = new MenuProc() {
 			@Override
 			public void run(MenuHandler handler, final MenuItem pItem) {
-				BuildGdx.app.postRunnable(new Runnable() {
+				Gdx.app.postRunnable(new Runnable() {
 					@Override
 					public void run() {
 						MenuConteiner item = (MenuConteiner) pItem;

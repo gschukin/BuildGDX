@@ -9,14 +9,9 @@
 
 package ru.m210projects.Build;
 
-import com.badlogic.gdx.Screen;
 import ru.m210projects.Build.Architecture.BuildGdx;
-import ru.m210projects.Build.Input.KeyInput;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
-import ru.m210projects.Build.Pattern.ScreenAdapters.GameAdapter;
-import ru.m210projects.Build.Pattern.ScreenAdapters.InitScreen;
-import ru.m210projects.Build.Pattern.ScreenAdapters.LoadingAdapter;
 import ru.m210projects.Build.Render.GLRenderer;
 import ru.m210projects.Build.Render.GLRenderer.GLInvalidateFlag;
 import ru.m210projects.Build.Render.Renderer;
@@ -146,7 +141,6 @@ public class Engine {
     public static byte[] show2dwall;
     public static byte[] show2dsprite;
     protected static int SETSPRITEZ = 0;
-    private static KeyInput input; // FIXME static
     protected final GetZRange getZRange = new GetZRange(this);
     protected final EngineService engineService = new EngineService(this);
     protected final PushMover pushMover = new PushMover(this);
@@ -181,8 +175,6 @@ public class Engine {
         visibility = 512;
         parallaxvisibility = 512;
 
-        initkeys();
-
         randomseed = 1; // random for voxels
     }
 
@@ -216,12 +208,6 @@ public class Engine {
             return; // not initialized yet
         }
 
-        Screen current = game.getScreen();
-        if (!(current instanceof GameAdapter) && !(current instanceof LoadingAdapter)
-                && !(current instanceof InitScreen)) {
-            handleevents();
-        }
-
         if (timer.getTotalClock() < net.ototalclock || !net.ready2send) {
             return;
         }
@@ -229,8 +215,7 @@ public class Engine {
         net.ototalclock += timer.getFrameTicks();
         timer.resetsmoothticks();
         game.pInt.requestResetting();
-        handleevents();
-        GetInput(net);
+        game.syncInput(net);
     }
 
     protected RenderService createRenderService() {
@@ -254,7 +239,7 @@ public class Engine {
         renderService.uninit();
         uninitmultiplayer();
 
-        BuildGdx.audio.dispose();
+//        BuildGdx.audio.dispose();
         BuildGdx.message.dispose();
     }
 
@@ -302,54 +287,8 @@ public class Engine {
     public void nextpage() { // gdxBuild
         faketimerhandler();
         Console.out.draw();
-        BuildGdx.audio.update();
+//        BuildGdx.audio.update();
         renderService.nextpage();
-    }
-
-    public static KeyInput getInputController() // gdxBuild
-    {
-        return input;
-    }
-
-    // called by faketimehandler (30 times per sec)
-    protected void GetInput(BuildNet net) {
-        if (numplayers > 1) {
-            net.GetPackets();
-        }
-
-        for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
-            if (i != myconnectindex && net.gNetFifoHead[myconnectindex] - 200 > net.gNetFifoHead[i]) {
-                return;
-            }
-        }
-
-        if (!game.pMenu.gShowMenu && !Console.out.isShowing()) {
-            game.pInput.ctrlMouseHandler();
-            game.pInput.ctrlJoyHandler();
-        }
-        game.pInput.ctrlGetInput(game.pNet.gInput);
-
-        if ((net.gNetFifoHead[myconnectindex] & (net.MovesPerPacket - 1)) != 0) {
-            net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex]
-                    .Copy(net.gFifoInput[(net.gNetFifoHead[myconnectindex] - 1) & 0xFF][myconnectindex]);
-            net.gNetFifoHead[myconnectindex]++;
-            return;
-        }
-
-        net.gFifoInput[net.gNetFifoHead[myconnectindex] & 0xFF][myconnectindex].Copy(net.gInput);
-        net.gNetFifoHead[myconnectindex]++;
-
-        if (game.nNetMode == BuildGame.NetMode.Multiplayer && numplayers < 2) {
-            for (int i = connecthead; i >= 0; i = connectpoint2[i]) {
-                if (i != myconnectindex) {
-                    net.ComputerInput(i);
-                    net.gNetFifoHead[i]++;
-                }
-            }
-            return;
-        }
-
-        net.GetNetworkInput();
     }
 
     public int neartag(int xs, int ys, int zs, int sectnum, int ange, Neartag near, int neartagrange, int tagsearch) { // jfBuild
@@ -532,17 +471,6 @@ public class Engine {
     public int rand() // gdxBuild
     {
         return (int) (Math.random() * 32767);
-    }
-
-    public void handleevents() { // gdxBuild
-        input.handleevents();
-        Console.out.handleevents();
-        timer.update();
-        game.pInput.getGPManager().handler();
-    }
-
-    public void initkeys() { // gdxBuild
-        input = new KeyInput();
     }
 
     public DefScript getDefs() {

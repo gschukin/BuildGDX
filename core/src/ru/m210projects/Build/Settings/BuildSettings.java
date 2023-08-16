@@ -1,5 +1,7 @@
 package ru.m210projects.Build.Settings;
 
+import com.badlogic.gdx.Gdx;
+import ru.m210projects.Build.Architecture.common.BuildApplication;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.EngineUtils;
@@ -41,7 +43,7 @@ public class BuildSettings {
 			@Override
 			public void execute(Integer value) { 
 				cfg.fpslimit = value;
-				BuildGdx.graphics.setFramesPerSecond(cfg.fpslimit);
+				((BuildApplication) Gdx.app).setFramesPerSecond(cfg.fpslimit);
 			}
 			
 			@Override
@@ -77,7 +79,7 @@ public class BuildSettings {
 				if(value instanceof Boolean) {
 					boolean vs = (Boolean) value;
 					try { // crash if hires textures loaded
-						BuildGdx.graphics.setVSync(vs);
+						Gdx.graphics.setVSync(vs);
 						return vs;
 					} catch (Exception e) { e.printStackTrace(); }
 				}

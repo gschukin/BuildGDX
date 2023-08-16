@@ -11,6 +11,7 @@ import static ru.m210projects.Build.Pragmas.mulscale;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT1;
 import static ru.m210projects.Build.RenderService.TRANSLUSCENT2;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 
 import ru.m210projects.Build.BoardService;
@@ -112,11 +113,11 @@ public class GDXModelRenderer {
             parent.calcFog(pal, shade, vis);
         }
 
-		BuildGdx.gl.glEnable(GL_BLEND);
+		Gdx.gl.glEnable(GL_BLEND);
 		Tile2model t2m = defs.mdInfo.getParams(tspr.getPicnum());
 		m.render(pal, shade, t2m != null ? t2m.skinnum : 0, vis, alpha);
 
-		BuildGdx.gl.glFrontFace(GL_CW);
+		Gdx.gl.glFrontFace(GL_CW);
 
 		return true;
 	}
@@ -194,11 +195,11 @@ public class GDXModelRenderer {
 			transform.rotate(1, 0, 0, -90.0f);
 		}
 
-		BuildGdx.gl.glEnable(GL_CULL_FACE);
+		Gdx.gl.glEnable(GL_CULL_FACE);
 		if (yflip ^ xflip) {
-            BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CCW : GL_CW);
+            Gdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CCW : GL_CW);
         } else {
-            BuildGdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CW : GL_CCW);
+            Gdx.gl.glFrontFace(m.getType() != Type.Md2 ? GL_CW : GL_CCW);
         }
 		return transform;
 	}
@@ -234,7 +235,7 @@ public class GDXModelRenderer {
 //		int vis = getVisibility(tspr);
 //		m.render(tspr.pal & 0xFF, tspr.shade, 0, vis, alpha);
 //
-//		BuildGdx.gl.glFrontFace(GL_CW);
+//		Gdx.gl.glFrontFace(GL_CW);
 //		return true;
 //	}
 //
@@ -260,7 +261,7 @@ public class GDXModelRenderer {
 //		int vis = getVisibility(tspr);
 //		m.render(tspr.pal & 0xFF, tspr.shade, defs.mdInfo.getParams(tspr.picnum).skinnum, vis, alpha);
 //
-//		BuildGdx.gl.glFrontFace(GL_CW);
+//		Gdx.gl.glFrontFace(GL_CW);
 //		return true;
 //	}
 //
@@ -303,11 +304,11 @@ public class GDXModelRenderer {
 //		transform.scale(0.01f, 0.01f, 0.01f);
 //		transform.rotate(1, 0, 0, -90.0f);
 //
-//		BuildGdx.gl.glEnable(GL_CULL_FACE);
+//		Gdx.gl.glEnable(GL_CULL_FACE);
 //		if (yflip ^ xflip)
-//			BuildGdx.gl.glFrontFace(GL_CW);
+//			Gdx.gl.glFrontFace(GL_CW);
 //		else
-//			BuildGdx.gl.glFrontFace(GL_CCW);
+//			Gdx.gl.glFrontFace(GL_CCW);
 //
 //		parent.switchShader(
 //				parent.getTexFormat() != PixelFormat.Pal8 ? Shader.RGBWorldShader : Shader.IndexedWorldShader);
@@ -374,11 +375,11 @@ public class GDXModelRenderer {
 //			transform.translate(0, -m.ypiv / 64.0f, -m.zpiv / 64.0f);
 //		}
 //
-//		BuildGdx.gl.glEnable(GL_CULL_FACE);
+//		Gdx.gl.glEnable(GL_CULL_FACE);
 //		if (yflip ^ xflip)
-//			BuildGdx.gl.glFrontFace(GL_CCW);
+//			Gdx.gl.glFrontFace(GL_CCW);
 //		else
-//			BuildGdx.gl.glFrontFace(GL_CW);
+//			Gdx.gl.glFrontFace(GL_CW);
 //
 //		int vis = globalvisibility;
 //		if (boardService.getSector()[tspr.sectnum].visibility != 0)
@@ -399,7 +400,7 @@ public class GDXModelRenderer {
 //
 //		m.render(tspr.pal & 0xFF, tspr.shade, 0, vis, alpha);
 //
-//		BuildGdx.gl.glFrontFace(GL_CW);
+//		Gdx.gl.glFrontFace(GL_CW);
 //		return 1;
 //	}
 }

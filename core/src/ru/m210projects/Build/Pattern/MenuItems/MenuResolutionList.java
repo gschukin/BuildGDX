@@ -16,7 +16,6 @@
 
 package ru.m210projects.Build.Pattern.MenuItems;
 
-import static ru.m210projects.Build.Engine.getInputController;
 import static ru.m210projects.Build.RenderService.*;
 import static ru.m210projects.Build.Render.VideoMode.validmodes;
 import static ru.m210projects.Build.Gameutils.*;
@@ -144,7 +143,7 @@ public class MenuResolutionList extends MenuList {
 						handler.mOpen(nextMenu, -1);
 					}
 				}
-				getInputController().resetKeyStatus();
+//				getInputController().resetKeyStatus();
 				return false;
 			case ESC:
 			case RMB:

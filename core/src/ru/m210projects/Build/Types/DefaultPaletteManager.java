@@ -1,6 +1,6 @@
 package ru.m210projects.Build.Types;
 
-import ru.m210projects.Build.Architecture.BuildGdx;
+import com.badlogic.gdx.Gdx;
 import ru.m210projects.Build.CRC32;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Render.GLRenderer;
@@ -93,7 +93,7 @@ public class DefaultPaletteManager implements PaletteManager {
 
         currentPalette.update(palette);
         fastColorLookup.invalidate();
-        BuildGdx.app.postRunnable(() -> renderer.changepalette(palette));
+        Gdx.app.postRunnable(() -> renderer.changepalette(palette));
         return true;
     }
 
@@ -129,7 +129,7 @@ public class DefaultPaletteManager implements PaletteManager {
 
         Renderer renderer = engine.getrender();
         if (renderer instanceof GLRenderer) {
-            BuildGdx.app.postRunnable(() -> ((GLRenderer) renderer).getTextureManager().invalidatepalookup(palnum));
+            Gdx.app.postRunnable(() -> ((GLRenderer) renderer).getTextureManager().invalidatepalookup(palnum));
         }
 
         return palookup[palnum];

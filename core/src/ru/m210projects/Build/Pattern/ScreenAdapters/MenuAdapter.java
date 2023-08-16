@@ -27,8 +27,11 @@ import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Settings.BuildConfig;
 import ru.m210projects.Build.Settings.BuildConfig.GameKeys;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.GameKeyListener;
+import ru.m210projects.Build.osd.Console;
 
-public abstract class MenuAdapter extends ScreenAdapter {
+public abstract class MenuAdapter extends ScreenAdapter implements GameKeyListener {
 
 	protected BuildGame game;
 	protected MenuHandler menu;
@@ -60,15 +63,10 @@ public abstract class MenuAdapter extends ScreenAdapter {
 
 		draw(delta);
 
-		engine.handleevents();
+		// engine.handleevents();
 
 		if (menu.gShowMenu) {
-			menu.mKeyHandler(game.pInput, delta);
 			menu.mDrawMenu();
-		} else {
-			if (game.pInput.ctrlGetInputKey(GameKeys.Menu_Toggle, true)) {
-				menu.mOpen(mainMenu, -1);
-			}
 		}
 
 		process(delta);
@@ -82,13 +80,27 @@ public abstract class MenuAdapter extends ScreenAdapter {
 
 	@Override
 	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
-		}
+//		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//		}
 	}
 
 	@Override
 	public void resume () {
 		game.updateColorCorrection();
+	}
+
+	@Override
+	public boolean onGameKeyPressed(GameKey gameKey) {
+		if (BuildConfig.GameKeys.Show_Console.equals(gameKey)) {
+			Console.out.onToggle();
+			return true;
+		}
+
+		if (GameKeys.Menu_Toggle.equals(gameKey) && !menu.isShowing()) {
+			game.pMenu.mOpen(mainMenu, -1);
+			return true;
+		}
+		return false;
 	}
 }

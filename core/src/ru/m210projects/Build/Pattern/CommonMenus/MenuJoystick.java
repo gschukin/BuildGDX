@@ -16,7 +16,7 @@
 
 package ru.m210projects.Build.Pattern.CommonMenus;
 
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildGamepadManager;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.MenuItems.BuildMenu;
@@ -58,6 +58,7 @@ public abstract class MenuJoystick extends BuildMenu {
 	
 	public MenuJoystick(final BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight, Font style, int list_len)
 	{
+		super(app.pMenu);
 		addItem(getTitle(app, "Joystick setup"), false);
 		
 		final BuildConfig cfg = app.pCfg;
@@ -74,24 +75,24 @@ public abstract class MenuJoystick extends BuildMenu {
 				}) {
 			@Override
 			public void open() {
-				int controllers = app.pInput.ctrlGetControllers();
-				if (this.list == null) {
-					if (controllers > 0) {
-						this.list = new char[controllers + 1][];
-						this.list[0] = "Disabled".toCharArray();
-						for (int i = 0; i < controllers; i++) {
-							this.list[i + 1] = app.pInput.ctrlGetControllerName(i).toCharArray();
-						}
-					} else {
-						this.list = new char[][]{"No joystick devices found".toCharArray()};
-					}
-				}
-
-				// handles unplugged device(s) between runs
-				int min = 0;
-				int max = Math.max(0, controllers);
-				int val = cfg.gJoyDevice + 1;
-				this.num = val < min ? min : (Math.min(val, max));
+//				int controllers = app.pInput.ctrlGetControllers();
+//				if (this.list == null) {
+//					if (controllers > 0) {
+//						this.list = new char[controllers + 1][];
+//						this.list[0] = "Disabled".toCharArray();
+//						for (int i = 0; i < controllers; i++) {
+//							this.list[i + 1] = app.pInput.ctrlGetControllerName(i).toCharArray();
+//						}
+//					} else {
+//						this.list = new char[][]{"No joystick devices found".toCharArray()};
+//					}
+//				}
+//
+//				// handles unplugged device(s) between runs
+//				int min = 0;
+//				int max = Math.max(0, controllers);
+//				int val = cfg.gJoyDevice + 1;
+//				this.num = val < min ? min : (Math.min(val, max));
 			}
 		};
 
@@ -99,7 +100,7 @@ public abstract class MenuJoystick extends BuildMenu {
 				null, 0) {
 			@Override
 			public void draw(MenuHandler handler) {
-				mCheckEnableItem(app.pInput.ctrlGetControllers() > 0 && app.pInput.ctrlIsValidDevice(mJoyDevices.num - 1));
+				// mCheckEnableItem(app.pInput.ctrlGetControllers() > 0 && app.pInput.ctrlIsValidDevice(mJoyDevices.num - 1));
 				super.draw(handler);
 			}
 		};
@@ -170,7 +171,7 @@ public abstract class MenuJoystick extends BuildMenu {
 					public void run(MenuHandler handler, MenuItem pItem) {
 						MenuSlider slider = (MenuSlider) pItem;
 						cfg.gJoyDeadZone = slider.value;
-						app.pInput.ctrlSetDeadZone(cfg.gJoyDeadZone / 65536f);
+						// app.pInput.ctrlSetDeadZone(cfg.gJoyDeadZone / 65536f);
 					}
 				}, true);
 		mDeadZone.digitalMax = 65536.0f;
@@ -217,12 +218,12 @@ public abstract class MenuJoystick extends BuildMenu {
 
 	public BuildMenu getJoyButtonsMenu(MenuJoystick parent, final BuildGame app, int width, Font style, int posx, int posy, int list_len)
 	{
-		BuildMenu menu = new BuildMenu();
+		BuildMenu menu = new BuildMenu(app.pMenu);
 		
 		menu.addItem(parent.getTitle(app, "Config. buttons"), false);
 		
 		final BuildConfig cfg = app.pCfg;
-		final BuildControllers gpmanager = app.pInput.ctrlGetGamepadManager();
+		final BuildGamepadManager gpmanager = null; //app.pInput.ctrlGetGamepadManager();
 
 		MenuProc callback = new MenuProc() {
 			@Override
@@ -267,7 +268,6 @@ public abstract class MenuJoystick extends BuildMenu {
 						break;
 					}
 				}
-				app.pInput.ctrlResetKeyStatus();
 				if (item.l_nFocus == GameKeys.Show_Console.getNum()) {
 //FIXME					Console.setCaptureKey(cfg.gpadkeys[item.l_nFocus], 3);
 				}

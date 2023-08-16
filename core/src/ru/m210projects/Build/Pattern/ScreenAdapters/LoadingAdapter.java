@@ -16,6 +16,7 @@
 
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 
 import ru.m210projects.Build.Engine;
@@ -79,7 +80,7 @@ public abstract class LoadingAdapter extends ScreenAdapter {
 
 		if(toLoad != null && frames > 10)
 		{
-			BuildGdx.app.postRunnable(toLoad);
+			Gdx.app.postRunnable(toLoad);
 			toLoad = null;
 		}
 
@@ -90,9 +91,9 @@ public abstract class LoadingAdapter extends ScreenAdapter {
 	
 	@Override
 	public void pause () {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
-		}
+//		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//		}
 	}
 
 	@Override

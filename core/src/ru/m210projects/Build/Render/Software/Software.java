@@ -183,9 +183,9 @@ public class Software implements Renderer {
 		}
 
 		try {
-			if (BuildGdx.graphics.getFrameType() != FrameType.Canvas) {
-				BuildGdx.app.setFrame(FrameType.Canvas);
-			}
+//			if (BuildGdx.graphics.getFrameType() != FrameType.Canvas) {
+//				BuildGdx.app.setFrame(FrameType.Canvas);
+//			}
 
 			bytesperline = xdim;
 
@@ -3899,14 +3899,14 @@ public class Software implements Renderer {
 
 	@Override
 	public void nextpage() {
-		byte[] src = a.getframeplace();
-		byte[] dst = (byte[]) BuildGdx.graphics.extra(Option.SWGetFrame);
-		int len = src.length;
-		if(dst.length < src.length) {
-			len = dst.length;
-		}
+//		byte[] src = a.getframeplace();
+//		byte[] dst = (byte[]) BuildGdx.graphics.extra(Option.SWGetFrame);
+//		int len = src.length;
+//		if(dst.length < src.length) {
+//			len = dst.length;
+//		}
 
-		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
+//		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
 	}
 
 	@Override
@@ -4074,7 +4074,7 @@ public class Software implements Renderer {
 
 	@Override
 	public void changepalette(byte[] palette) {
-		BuildGdx.graphics.extra(Option.SWChangePalette, palette);
+//		BuildGdx.graphics.extra(Option.SWChangePalette, palette);
 	}
 
 	private void scansector(short sectnum) {

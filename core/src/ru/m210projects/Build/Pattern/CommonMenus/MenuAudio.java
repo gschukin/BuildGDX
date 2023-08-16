@@ -123,6 +123,7 @@ public abstract class MenuAudio extends BuildMenu {
 
 	public MenuAudio(BuildGame app, int posx, int posy, int width, int menuHeight, int separatorHeight,
 			Font menuItems) {
+		super(app.pMenu);
 		final BuildConfig cfg = app.pCfg;
 		
 		addItem(getTitle(app, "Audio setup"), false);

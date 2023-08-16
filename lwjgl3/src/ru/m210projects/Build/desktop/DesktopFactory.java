@@ -33,7 +33,7 @@ import ru.m210projects.Build.Architecture.BuildInput;
 import ru.m210projects.Build.Architecture.BuildMessage;
 import ru.m210projects.Build.Audio.BuildAudio;
 import ru.m210projects.Build.Audio.BuildAudio.Driver;
-import ru.m210projects.Build.Input.BuildControllers;
+import ru.m210projects.Build.input.BuildControllers;
 import ru.m210projects.Build.Render.VideoMode;
 import ru.m210projects.Build.desktop.AWT.AWTGraphics;
 import ru.m210projects.Build.desktop.AWT.AWTInput;

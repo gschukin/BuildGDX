@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 
 import ru.m210projects.Build.Engine;
@@ -110,7 +111,7 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
                 gl.preload(GLPreloadFlag.Other);
             }
 
-			BuildGdx.app.postRunnable(toLoad);
+			Gdx.app.postRunnable(toLoad);
 			toLoad = null;
 		}
 	};
@@ -131,12 +132,12 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 		if (currentIndex >= queues.size()) {
 			draw("Getting ready...", -1);
 			if (toLoad != null) {
-				BuildGdx.app.postRunnable(glpreload);
+				Gdx.app.postRunnable(glpreload);
 			}
 		} else {
 			PrecacheQueue current = queues.get(currentIndex);
 			draw(current.name, currentIndex);
-			BuildGdx.app.postRunnable(current.runnable);
+			Gdx.app.postRunnable(current.runnable);
 			currentIndex++;
 		}
 
@@ -163,9 +164,9 @@ public abstract class PrecacheAdapter extends ScreenAdapter {
 
 	@Override
 	public void pause() {
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-            BuildGdx.graphics.extra(Option.GLDefConfiguration);
-        }
+//		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//            BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//        }
 	}
 
 	@Override

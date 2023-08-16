@@ -16,10 +16,10 @@
 
 package ru.m210projects.Build.desktop.GLFW;
 
-import static ru.m210projects.Build.Input.Keymap.KEY_CAPSLOCK;
-import static ru.m210projects.Build.Input.Keymap.KEY_PAUSE;
-import static ru.m210projects.Build.Input.Keymap.KEY_SCROLLOCK;
-import static ru.m210projects.Build.Input.Keymap.KEY_NUMDECIMAL;
+import static ru.m210projects.Build.input.Keymap.KEY_CAPSLOCK;
+import static ru.m210projects.Build.input.Keymap.KEY_PAUSE;
+import static ru.m210projects.Build.input.Keymap.KEY_SCROLLOCK;
+import static ru.m210projects.Build.input.Keymap.KEY_NUMDECIMAL;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -263,7 +263,7 @@ public class Lwjgl3Input implements BuildInput {
 	{
 		if(postRunnable) return;
 		
-		BuildGdx.app.postRunnable(prepareNext);
+		Gdx.app.postRunnable(prepareNext);
 		postRunnable = true;
 	}
 

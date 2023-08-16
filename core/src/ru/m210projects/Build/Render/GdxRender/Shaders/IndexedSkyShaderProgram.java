@@ -1,5 +1,6 @@
 package ru.m210projects.Build.Render.GdxRender.Shaders;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 
@@ -64,7 +65,7 @@ public abstract class IndexedSkyShaderProgram extends IndexedShader {
 		setUniformi(shadeloc, shade);
 		this.lastShade = shade;
 
-		BuildGdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 	}
 
 }

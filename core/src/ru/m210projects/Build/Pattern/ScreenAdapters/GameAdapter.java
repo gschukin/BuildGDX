@@ -17,10 +17,8 @@
 package ru.m210projects.Build.Pattern.ScreenAdapters;
 
 import static ru.m210projects.Build.Gameutils.*;
-import static ru.m210projects.Build.Engine.*;
 import static ru.m210projects.Build.Net.Mmulti.*;
 import static ru.m210projects.Build.Pattern.BuildNet.*;
-import static ru.m210projects.Build.Strhandler.toLowerCase;
 
 import com.badlogic.gdx.ScreenAdapter;
 
@@ -29,6 +27,8 @@ import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGraphics.Option;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.filehandle.Entry;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.GameKeyListener;
 import ru.m210projects.Build.osd.Console;
 import ru.m210projects.Build.Pattern.BuildGame;
 import ru.m210projects.Build.Pattern.BuildNet;
@@ -36,7 +36,7 @@ import ru.m210projects.Build.Pattern.BuildGame.NetMode;
 import ru.m210projects.Build.Pattern.MenuItems.MenuHandler;
 import ru.m210projects.Build.Settings.BuildConfig;
 
-public abstract class GameAdapter extends ScreenAdapter {
+public abstract class GameAdapter extends ScreenAdapter implements GameKeyListener {
 
 	protected BuildGame game;
 	protected BuildNet pNet;
@@ -98,8 +98,6 @@ public abstract class GameAdapter extends ScreenAdapter {
 
 	public abstract void DrawHud(float smooth);
 
-	public abstract void KeyHandler();
-
 	public abstract void sndHandlePause(boolean pause);
 
 	protected abstract boolean prepareboard(Entry entry);
@@ -139,11 +137,11 @@ public abstract class GameAdapter extends ScreenAdapter {
 			System.gc();
 
 			pNet.ResetTimers();
-			game.pInput.resetMousePos();
+			game.getProcessor().resetMousePos();
 			pNet.ready2send = true;
 			game.changeScreen(GameAdapter.this);
 
-			pEngine.faketimerhandler();
+//			pEngine.faketimerhandler();
 		}
 	};
 
@@ -158,10 +156,8 @@ public abstract class GameAdapter extends ScreenAdapter {
 
 	@Override
 	public synchronized void render(float delta) {
-		KeyHandler();
-
 		if (numplayers > 1) {
-			pEngine.faketimerhandler();
+//			pEngine.faketimerhandler();
 
 			pNet.GetPackets();
 			while (pNet.gPredictTail < pNet.gNetFifoHead[myconnectindex] && !game.gPaused) {
@@ -184,10 +180,8 @@ public abstract class GameAdapter extends ScreenAdapter {
 				break;
 			}
 
-			synchronized (GameAdapter.this) {
-				pEngine.faketimerhandler(); // game timer sync
-				ProcessFrame(pNet);
-			}
+			pEngine.faketimerhandler(); // game timer sync
+			ProcessFrame(pNet);
 		}
 
 		pNet.CheckSync();
@@ -247,9 +241,9 @@ public abstract class GameAdapter extends ScreenAdapter {
 			sndHandlePause(game.gPaused);
 		}
 
-		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
-			BuildGdx.graphics.extra(Option.GLDefConfiguration);
-		}
+//		if (BuildGdx.graphics.getFrameType() == FrameType.GL) {
+//			BuildGdx.graphics.extra(Option.GLDefConfiguration);
+//		}
 	}
 
 	@Override
@@ -264,4 +258,12 @@ public abstract class GameAdapter extends ScreenAdapter {
 		game.updateColorCorrection();
 	}
 
+	@Override
+	public boolean onGameKeyPressed(GameKey gameKey) {
+		if (BuildConfig.GameKeys.Show_Console.equals(gameKey)) {
+			Console.out.onToggle();
+			return true;
+		}
+		return false;
+	}
 }

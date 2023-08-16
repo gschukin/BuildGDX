@@ -25,9 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import com.badlogic.gdx.utils.Array;
-import ru.m210projects.Build.Input.ButtonMap;
-import ru.m210projects.Build.Input.Keymap;
+import ru.m210projects.Build.input.GameKey;
+import ru.m210projects.Build.input.keymap.ButtonMap;
+import ru.m210projects.Build.input.keymap.Keymap;
 import ru.m210projects.Build.filehandle.StreamUtils;
 import ru.m210projects.Build.osd.Console;import ru.m210projects.Build.Pattern.Tools.IniFile;
 import ru.m210projects.Build.Render.Renderer.RenderType;
@@ -40,21 +40,33 @@ public abstract class BuildConfig extends IniFile {
 	public final int cfgVersion = 1901; // year XX, num XX
 	public boolean isInited;
 
-	public interface KeyType {
+	public static GameKey UNKNOWN_KEY = new GameKey() {
+		@Override
+		public int getNum() {
+			return 0;
+		}
 
-		int getNum();
+		@Override
+		public GameKey setNum(int num) {
+			return null;
+		}
 
-		KeyType setNum(int num);
+		@Override
+		public String getName() {
+			return "N/A";
+		}
 
-		String getName();
+		@Override
+		public String toString() {
+			return "Unknown_key";
+		}
+	};
 
-	}
-
-	public KeyType[] joymap = { MenuKeys.Menu_Enter.setJoyNum(0), MenuKeys.Menu_Cancel.setJoyNum(1),
+	public GameKey[] joymap = { MenuKeys.Menu_Enter.setJoyNum(0), MenuKeys.Menu_Cancel.setJoyNum(1),
 			MenuKeys.Menu_Up.setJoyNum(2), MenuKeys.Menu_Down.setJoyNum(3), MenuKeys.Menu_Left.setJoyNum(4),
 			MenuKeys.Menu_Right.setJoyNum(5), };
 
-	public enum MenuKeys implements KeyType {
+	public enum MenuKeys implements GameKey {
 		Menu_Enter, Menu_Cancel, Menu_Up, Menu_Down, Menu_Left, Menu_Right;
 
 		private int num = -1;
@@ -71,7 +83,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 
 		@Override
-		public KeyType setNum(int num) {
+		public GameKey setNum(int num) {
 			this.num = num;
 			return this;
 		}
@@ -80,13 +92,13 @@ public abstract class BuildConfig extends IniFile {
 			return joynum;
 		}
 
-		public KeyType setJoyNum(int num) {
+		public GameKey setJoyNum(int num) {
 			this.joynum = num;
 			return this;
 		}
 	}
 
-	public enum GameKeys implements KeyType {
+	public enum GameKeys implements GameKey {
 
 		Move_Forward, Move_Backward, Turn_Left, Turn_Right, Turn_Around, Strafe, Strafe_Left, Strafe_Right, Jump,
 		Crouch, Run, Open, Weapon_Fire, Next_Weapon, Previous_Weapon, Look_Up, Look_Down, Map_Toggle, Enlarge_Screen,
@@ -110,7 +122,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 
 		@Override
-		public KeyType setNum(int num) {
+		public GameKey setNum(int num) {
 			this.num = num;
 			return this;
 		}
@@ -142,12 +154,12 @@ public abstract class BuildConfig extends IniFile {
 //	protected float fcontrast = 1;
 	public float gFpsScale = 1.0f;
 
-	public KeyType[] keymap;
+	public GameKey[] keymap;
 	public int[] primarykeys;
 	public int[] secondkeys;
 	public int[] mousekeys;
 	public int[] gpadkeys;
-	public KeyType[] arrayPressedKey = new KeyType[256];
+	protected GameKey[] arrayPressedKey = new GameKey[256];
 
 	public int gJoyMoveAxis = 0; // Stick1Y
 	public int gJoyStrafeAxis = 1; // Stick1X
@@ -239,7 +251,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	public abstract KeyType[] getKeyMap();
+	public abstract GameKey[] getKeyMap();
 
 	public boolean isExist() {
 		return data != null && version == cfgVersion;
@@ -446,6 +458,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 
 		if (set("KeyDefinitions")) {
+			Arrays.fill(arrayPressedKey, UNKNOWN_KEY);
 			for (int i = 0; i < keymap.length; i++) {
 				primarykeys[i] = defkeys[i];
 				secondkeys[i] = 0;
@@ -459,9 +472,6 @@ public abstract class BuildConfig extends IniFile {
 
 				if (primary != null) {
 					primarykeys[i] = Keymap.valueOf(primary);
-					if (primarykeys[i] == -1 || primarykeys[i] == 255) {
-						System.out.println();
-					}
 					arrayPressedKey[primarykeys[i]] = keymap[i];
 				}
 				if (secondary != null) {
@@ -470,9 +480,13 @@ public abstract class BuildConfig extends IniFile {
 				}
 				if (mouse != null) {
 					mousekeys[i] = Keymap.valueOf(mouse);
+					arrayPressedKey[mousekeys[i]] = keymap[i];
 				}
 				if (joystick != null) {
 					gpadkeys[i] = ButtonMap.valueOf(joystick);
+					if (gpadkeys[i] != -1) {
+						arrayPressedKey[gpadkeys[i]] = keymap[i];
+					}
 				}
 			}
 			if (primarykeys[GameKeys.Menu_Toggle.getNum()] == 0) {
@@ -788,7 +802,7 @@ public abstract class BuildConfig extends IniFile {
 		}
 	}
 
-	public void setButton(KeyType key, int button) {
+	public void setButton(GameKey key, int button) {
 		if (key instanceof MenuKeys) {
 			MenuKeys mk = (MenuKeys) key;
 			gJoyMenukeys[mk.getJoyNum()] = button;
@@ -877,5 +891,25 @@ public abstract class BuildConfig extends IniFile {
 			gamePart = gamePart.substring(index);
 			saveString(fil, gamePart);
 		}
+	}
+
+	public GameKey convertToGameKey(int keycode) {
+		return arrayPressedKey[keycode];
+	}
+
+	public GameKey convertToGameKey(int axis, int value) {
+		if (value != 0) {
+			int index;
+			if (value > 0) {
+				index = axis == 0 ? AXISRIGHT : AXISDOWN;
+			} else {
+				index = axis == 0 ? AXISLEFT : AXISUP;
+			}
+
+			if (mouseaxis[index] != -1) {
+				return keymap[mouseaxis[index]];
+			}
+		}
+		return UNKNOWN_KEY;
 	}
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Render.ModelHandle.ModelInfo.Type;
 import ru.m210projects.Build.Render.ModelHandle.MDModel.MDModel;
+import ru.m210projects.Build.Render.Types.GL10;
 
 public abstract class MD3ModelGL10 extends MDModel {
 
@@ -87,28 +89,28 @@ public abstract class MD3ModelGL10 extends MDModel {
 
 				int l = GL_TEXTURE0;
 				do {
-					BuildGdx.gl.glClientActiveTexture(l++);
-					BuildGdx.gl.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-					BuildGdx.gl.glTexCoordPointer(2, GL_FLOAT, 0, s.uv);
+					((GL10) Gdx.gl).glClientActiveTexture(l++);
+					((GL10) Gdx.gl).glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+					((GL10) Gdx.gl).glTexCoordPointer(2, GL_FLOAT, 0, s.uv);
 				} while (l <= texunits);
 
-				BuildGdx.gl.glEnableClientState(GL_VERTEX_ARRAY);
-				BuildGdx.gl.glVertexPointer(3, GL_FLOAT, 0, vertices);
-				BuildGdx.gl.glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_SHORT, indices);
+				((GL10) Gdx.gl).glEnableClientState(GL_VERTEX_ARRAY);
+				((GL10) Gdx.gl).glVertexPointer(3, GL_FLOAT, 0, vertices);
+				Gdx.gl.glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_SHORT, indices);
 
 				while (texunits > GL_TEXTURE0) {
-					BuildGdx.gl.glMatrixMode(GL_TEXTURE);
-					BuildGdx.gl.glLoadIdentity();
-					BuildGdx.gl.glMatrixMode(GL_MODELVIEW);
-					BuildGdx.gl.glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0f);
-					BuildGdx.gl.glDisable(GL_TEXTURE_2D);
+					((GL10) Gdx.gl).glMatrixMode(GL_TEXTURE);
+					((GL10) Gdx.gl).glLoadIdentity();
+					((GL10) Gdx.gl).glMatrixMode(GL_MODELVIEW);
+					((GL10) Gdx.gl).glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0f);
+					Gdx.gl.glDisable(GL_TEXTURE_2D);
 
-					BuildGdx.gl.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-					BuildGdx.gl.glClientActiveTexture(texunits - 1);
+					((GL10) Gdx.gl).glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+					((GL10) Gdx.gl).glClientActiveTexture(texunits - 1);
 
-					BuildGdx.gl.glActiveTexture(--texunits);
+					Gdx.gl.glActiveTexture(--texunits);
 				}
-				BuildGdx.gl.glDisableClientState(GL_VERTEX_ARRAY);
+				((GL10) Gdx.gl).glDisableClientState(GL_VERTEX_ARRAY);
 				isRendered = true;
 			} else {
 				break;
@@ -116,10 +118,10 @@ public abstract class MD3ModelGL10 extends MDModel {
 		}
 
 		if (usesalpha) {
-			BuildGdx.gl.glDisable(GL_ALPHA_TEST);
+			Gdx.gl.glDisable(GL_ALPHA_TEST);
 		}
-		BuildGdx.gl.glDisable(GL_CULL_FACE);
-		BuildGdx.gl.glLoadIdentity();
+		Gdx.gl.glDisable(GL_CULL_FACE);
+		((GL10) Gdx.gl).glLoadIdentity();
 
 		return isRendered;
 	}

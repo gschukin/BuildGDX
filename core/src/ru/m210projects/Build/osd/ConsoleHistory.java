@@ -15,7 +15,7 @@ public class ConsoleHistory {
 
     public boolean add(String text) {
         pos = -1;
-        if (history.size() != 0 && text.equals(history.get(0))) {
+        if (!history.isEmpty() && text.equals(history.get(0))) {
             return false;
         }
 
@@ -32,6 +32,9 @@ public class ConsoleHistory {
 
     public String prev() {
         if (!hasPrev()) {
+            if (history.isEmpty()) {
+                return "";
+            }
             return history.get(pos);
         }
 

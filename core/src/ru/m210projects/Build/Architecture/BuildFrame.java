@@ -63,8 +63,8 @@ public abstract class BuildFrame {
 			Gdx.gl20 = BuildGdx.gl20 = graphics.getGL20();
 			Gdx.gl30 = BuildGdx.gl30 = graphics.getGL30();
 
-			Gdx.graphics = BuildGdx.graphics = graphics;
-			Gdx.input = BuildGdx.input = input;
+			Gdx.graphics = graphics;
+			Gdx.input = input;
 		}
 	}
 

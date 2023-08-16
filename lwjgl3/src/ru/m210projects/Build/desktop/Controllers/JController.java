@@ -1,7 +1,7 @@
 package ru.m210projects.Build.desktop.Controllers;
 
 import static ru.m210projects.Build.Engine.getInput;
-import static ru.m210projects.Build.Input.Keymap.ANYKEY;
+import static ru.m210projects.Build.input.Keymap.ANYKEY;
 
 import java.util.Arrays;
 

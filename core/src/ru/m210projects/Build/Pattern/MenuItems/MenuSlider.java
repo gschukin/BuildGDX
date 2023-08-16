@@ -29,7 +29,7 @@ import ru.m210projects.Build.Types.Transparent;
 import ru.m210projects.Build.Types.font.Font;
 import ru.m210projects.Build.Types.font.TextAlign;
 
-public class MenuSlider extends MenuItem {
+public class MenuSlider extends MenuItem implements ScrollableMenuItem {
 
 	public int min;
 	public int max;
@@ -40,10 +40,7 @@ public class MenuSlider extends MenuItem {
 	public char[] dbuff; 
 	public MenuProc callback;
 	public Font sliderNumbers;
-
-	private int touchX;
-	private boolean isTouched;
-	private static MenuSlider touchedObj;
+	private boolean isLocked;
 	private final SliderDrawable slider;
 	
 	public MenuSlider(SliderDrawable slider, Object text, Font textStyle, int x, int y, int width, int value, int min, int max,
@@ -174,21 +171,6 @@ public class MenuSlider extends MenuItem {
 				callback.run(handler, this);
 			}
 			break;
-		case LMB:
-			if ( (flags & 4) == 0 ) {
-				return false;
-			}
-			
-			if(touchedObj == this)
-			{
-				int startx = x + width - slider.getSliderRange() + slider.getSliderWidth() / 2;
-				float dr = (float)(touchX - startx) / (slider.getSliderRange() - slider.getSliderWidth() - 1);
-				value = BClipRange((int) (dr * (max - min) + min), min, max);
-				if(callback != null) {
-					callback.run(handler, this);
-				}
-			} 
-			break;
 		default:
 			return m_pMenu.mNavigation(opt);
 		}
@@ -198,12 +180,6 @@ public class MenuSlider extends MenuItem {
 
 	@Override
 	public boolean mouseAction(int mx, int my) {
-		touchX = mx;
-		isTouched = false;
-		if(!BuildGdx.input.isTouched() /*&& touchedObj != this*/) {
-			touchedObj = null;
-		}
-		
 		if(text != null) {
 			if(mx > x && mx < x + font.getWidth(text, 1.0f)) {
 				if(my > y && my < y + font.getSize()) {
@@ -212,19 +188,14 @@ public class MenuSlider extends MenuItem {
 			}
 		}
 
-		if(touchedObj == null) {
-			int cx = x + width - slider.getSliderRange();
-			if(mx > cx && mx < cx + slider.getSliderRange()) {
-				if(my > y && my < y + font.getSize()) {
-					isTouched = true;
-					if(BuildGdx.input.isTouched()) {
-						touchedObj = this;
-					}
-				}
+		int cx = x + width - slider.getSliderRange();
+		if(mx > cx && mx < cx + slider.getSliderRange()) {
+			if(my > y && my < y + font.getSize()) {
+				return true;
 			}
 		}
 		
-		return isTouched;
+		return false;
 	}
 
 	@Override
@@ -235,4 +206,39 @@ public class MenuSlider extends MenuItem {
 	public void close() {
 	}
 
+	@Override
+	public boolean onMoveSlider(MenuHandler handler, int scaledX, int scaledY) {
+		if (isLocked) {
+			int startx = x + width - slider.getSliderRange() + slider.getSliderWidth() / 2;
+			float dr = (float) (scaledX - startx) / (slider.getSliderRange() - slider.getSliderWidth() - 1);
+			value = BClipRange((int) (dr * (max - min) + min), min, max);
+			if (callback != null) {
+				callback.run(handler, this);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onLockSlider(MenuHandler handler, int mx, int my) {
+		if ( (flags & 4) == 0 ) {
+			return false;
+		}
+
+		int cx = x + width - slider.getSliderRange();
+		if(mx > cx && mx < cx + slider.getSliderRange()) {
+			if(my > y && my < y + font.getSize()) {
+				isLocked = true;
+				onMoveSlider(handler, mx, my);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void onUnlockSlider() {
+		isLocked = false;
+	}
 }

@@ -32,6 +32,7 @@ public abstract class MenuItem {
 	}
 
 	public BuildMenu m_pMenu;
+	MenuHandler menuHandler; // controller
 	public char[] text;          
 	public Font font;
 	public boolean fontShadow;
@@ -91,7 +92,10 @@ public abstract class MenuItem {
 	}
 
 	public abstract void draw(MenuHandler handler);
+
+	@Deprecated
 	public abstract boolean callback(MenuHandler handler, MenuOpt opt);
+	@Deprecated
 	public abstract boolean mouseAction(int mx, int my);
 	public abstract void open();
 	public abstract void close();
