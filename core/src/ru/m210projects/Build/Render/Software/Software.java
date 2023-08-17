@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.badlogic.gdx.Gdx;
+import ru.m210projects.Build.Architecture.common.SoftwareGraphics;
 import ru.m210projects.Build.BoardService;
 import ru.m210projects.Build.Engine;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
@@ -161,12 +163,14 @@ public class Software implements Renderer {
 
 	protected SoftwareOrpho ortho;
 	protected PaletteManager paletteManager;
+	protected SoftwareGraphics graphics;
 
 	public Software(Engine engine, IOverheadMapSettings settings) {
 
 		this.engine = engine;
 		this.boardService = engine.getBoardService();
 		this.paletteManager = engine.getPaletteManager();
+		this.graphics = (SoftwareGraphics) Gdx.graphics;
 
 		ortho = allocOrphoRenderer(settings);
 
@@ -3899,14 +3903,14 @@ public class Software implements Renderer {
 
 	@Override
 	public void nextpage() {
-//		byte[] src = a.getframeplace();
-//		byte[] dst = (byte[]) BuildGdx.graphics.extra(Option.SWGetFrame);
-//		int len = src.length;
-//		if(dst.length < src.length) {
-//			len = dst.length;
-//		}
+		byte[] src = a.getframeplace();
+		byte[] dst = graphics.getRasterBuffer();
+		int len = src.length;
+		if(dst.length < src.length) {
+			len = dst.length;
+		}
 
-//		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
+		System.arraycopy(src, 0, dst, 0, len); // Math.min(frameplace.length,
 	}
 
 	@Override
@@ -4074,7 +4078,7 @@ public class Software implements Renderer {
 
 	@Override
 	public void changepalette(byte[] palette) {
-//		BuildGdx.graphics.extra(Option.SWChangePalette, palette);
+		graphics.changePalette(palette);
 	}
 
 	private void scansector(short sectnum) {

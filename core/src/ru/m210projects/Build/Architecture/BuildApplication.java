@@ -114,7 +114,7 @@ public class BuildApplication implements Application {
 		listener.create();
 
 		while (running) {
-			BuildGdx.input.processMessages();
+//			Gdx.input.processMessages();
 
 			switch(frame.getStatus()) {
 			case Closed:

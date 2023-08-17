@@ -40,7 +40,7 @@ import ru.m210projects.Build.Settings.BuildSettings;
 import ru.m210projects.Build.Settings.GLSettings;
 import ru.m210projects.Build.Types.MemLog;
 import ru.m210projects.Build.Pattern.BuildFactory;
-import ru.m210projects.Build.desktop.Lwjgl.LwjglGL10;
+import ru.m210projects.Build.desktop.backend.lwjgl.LwjglGL10;
 import ru.m210projects.Build.filehandle.Entry;
 import ru.m210projects.Build.filehandle.Group;
 import ru.m210projects.Build.filehandle.fs.Directory;
@@ -221,8 +221,6 @@ public class InitScreen extends ScreenAdapter {
 
 		Gdx.input.setInputProcessor(game.getProcessor());
 
-//		Gdx.input.setInputProcessor(new InputMultiplexer(game.getController(), Console.out));
-
 		thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -241,11 +239,11 @@ public class InitScreen extends ScreenAdapter {
 
 					uninitmultiplayer();
 
-//					cfg.snddrv = BuildGdx.audio.checkNum(Driver.Sound, cfg.snddrv);
-//					cfg.middrv = BuildGdx.audio.checkNum(Driver.Music, cfg.middrv);
-//
-//					BuildGdx.audio.setDriver(Driver.Sound, cfg.snddrv);
-//					BuildGdx.audio.setDriver(Driver.Music, cfg.middrv);
+					cfg.snddrv = BuildGdx.audio.checkNum(Driver.Sound, cfg.snddrv);
+					cfg.middrv = BuildGdx.audio.checkNum(Driver.Music, cfg.middrv);
+
+					BuildGdx.audio.setDriver(Driver.Sound, cfg.snddrv);
+					BuildGdx.audio.setDriver(Driver.Music, cfg.middrv);
 
 					BuildSettings.usenewaspect.set(cfg.widescreen == 1);
 					BuildSettings.fov.set(cfg.gFov);

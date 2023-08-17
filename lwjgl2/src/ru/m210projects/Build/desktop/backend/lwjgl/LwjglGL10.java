@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Gdx.  If not, see <http://www.gnu.org/licenses/>.
 
-package ru.m210projects.Build.desktop.Lwjgl;
+package ru.m210projects.Build.desktop.backend.lwjgl;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;

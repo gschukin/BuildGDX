@@ -47,6 +47,7 @@ import ru.m210projects.Build.Architecture.BuildConfiguration;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics;
+import ru.m210projects.Build.desktop.backend.lwjgl.LwjglGL10;
 
 public class LwjglGraphics extends BuildGraphics {
 

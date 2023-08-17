@@ -114,9 +114,9 @@ public abstract class MenuHandler implements GameKeyListener {
 
         gShowMenu = false;
 
-        if (!((BuildApplication) Gdx.app).isActive()) {
-            return;
-        }
+//        if (!((BuildApplication) Gdx.app).isActive()) {
+//            return;
+//        }
 
         Gdx.input.setCursorCatched(true);
         Gdx.input.setCursorPosition(xdim / 2, ydim / 2);

@@ -16,6 +16,7 @@
 
 package ru.m210projects.Build;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import ru.m210projects.Build.Architecture.BuildGdx;
@@ -257,7 +258,7 @@ public class Gameutils {
         byte[] data = null;
         String filename = resname;
         try { // try to avoid GDX's bug that can't read the file
-            FileHandle fil = BuildGdx.files.internal(resname);
+            FileHandle fil = Gdx.files.internal(resname);
             if (fil != null && fil.exists()) {
                 filename = fil.name();
                 data = fil.readBytes();

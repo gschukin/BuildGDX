@@ -43,7 +43,7 @@ public class BuildSettings {
 			@Override
 			public void execute(Integer value) { 
 				cfg.fpslimit = value;
-				((BuildApplication) Gdx.app).setFramesPerSecond(cfg.fpslimit);
+				// ((BuildApplication) Gdx.app).setFramesPerSecond(cfg.fpslimit);
 			}
 			
 			@Override

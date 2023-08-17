@@ -82,12 +82,12 @@ public abstract class GameProcessor implements GameKeyListener {
     }
 
     public void resetMousePos() {
-        if (((BuildApplication) Gdx.app).isActive()) {
-            mouseDelta.set(0, 0);
-            Gdx.input.setCursorPosition(xdim / 2, ydim / 2);
-
-            // reset axis input
-        }
+//        if (((BuildApplication) Gdx.app).isActive()) {
+//            mouseDelta.set(0, 0);
+//            Gdx.input.setCursorPosition(xdim / 2, ydim / 2);
+//
+//            // reset axis input
+//        }
     }
 
     @Override

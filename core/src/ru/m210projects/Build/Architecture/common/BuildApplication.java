@@ -5,6 +5,14 @@ import com.badlogic.gdx.Gdx;
 
 public interface BuildApplication extends Application {
 
+
+    // cursor handler
+    // check active windows
+    // gamma correction
+    // change openal sources
+    // change midi driver
+    //
+
     RenderType getRenderType();
 
     default boolean changeApplication(RenderType type) {

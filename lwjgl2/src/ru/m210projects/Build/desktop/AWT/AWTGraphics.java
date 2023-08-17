@@ -36,9 +36,10 @@ import ru.m210projects.Build.Architecture.BuildConfiguration;
 import ru.m210projects.Build.Architecture.BuildFrame.FrameType;
 import ru.m210projects.Build.Architecture.BuildGdx;
 import ru.m210projects.Build.Architecture.BuildGraphics;
+import ru.m210projects.Build.Architecture.common.SoftwareGraphics;
 import ru.m210projects.Build.Render.Types.GL10;
 
-public class AWTGraphics extends BuildGraphics {
+public class AWTGraphics extends BuildGraphics implements SoftwareGraphics {
 
 	protected JDisplay display;
 	private final BuildConfiguration config;
@@ -214,6 +215,20 @@ public class AWTGraphics extends BuildGraphics {
 	public DisplayMode getDesktopDisplayMode() {
 		java.awt.DisplayMode mode = display.getDesktopDisplayMode();
 		return new SoftDisplayMode(mode.getWidth(), mode.getHeight(), mode.getRefreshRate(), mode.getBitDepth(), mode);
+	}
+
+	@Override
+	public byte[] getRasterBuffer() {
+		return display.getCanvas().getFrame();
+	}
+
+	@Override
+	public void changePalette(byte[] palette) {
+		if(palette.length != 768) {
+			throw new UnsupportedOperationException("The array should be 256 bytes!");
+		}
+
+		display.getCanvas().changepalette(palette);
 	}
 
 	private class SoftDisplayMode extends DisplayMode {
